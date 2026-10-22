@@ -197,6 +197,25 @@
     max-width: 380px;
   }
 
+  .ai-header .ai-actions {
+    grid-template-columns: repeat(2, minmax(0, 160.28125px));
+    justify-content: center;
+    align-items: center;
+  }
+
+  .ai-header .ai-button[data-ai-action="chat"],
+  .ai-header .ai-button[data-ai-action="voice"] {
+    width: 100%;
+  }
+
+  .ai-header .ai-button[data-ai-action="chat"] {
+    gap: 6px;
+  }
+
+  .ai-header [data-ai-action="voice"] .ai-button__description {
+    font-size: min(12px, calc(4vw - 2.4px));
+  }
+
   .ai-header h2 {
     font-size: min(22px, calc(5.7vw - 1.71px));
     line-height: 1.25;
