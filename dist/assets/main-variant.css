@@ -75,7 +75,7 @@
   .page-header__inner {
     display: grid;
     grid-template-columns: 243px minmax(0, 1fr) max-content;
-    gap: 24px;
+    gap: 48px;
     padding-top: 20px;
     padding-bottom: 20px;
   }
