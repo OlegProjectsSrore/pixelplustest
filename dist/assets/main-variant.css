@@ -14,18 +14,18 @@
 
 .ai-header .ai-inner {
   display: grid;
-  grid-template-columns: minmax(0, 380px) 220px;
+  grid-template-columns: minmax(0, 384px) 220px;
   align-items: start;
   gap: 24px;
-  max-width: 624px;
+  max-width: 628px;
   margin-inline: auto;
 }
 
 .ai-header__text {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  align-self: stretch;
+  justify-content: center;
+  align-self: center;
   min-width: 0;
 }
 
@@ -35,15 +35,17 @@
   line-height: 1.25;
   letter-spacing: -.02em;
   text-wrap: pretty;
+  text-align-last: justify;
 }
 
 .ai-header .ai-result {
   width: 100%;
-  margin-top: 8px;
+  margin-top: 12px;
   font-size: 15px;
   line-height: 1.45;
   color: #555;
-  text-wrap: balance;
+  text-wrap: wrap;
+  text-align-last: justify;
 }
 
 .ai-header .ai-result strong {
@@ -136,12 +138,15 @@
   .ai-header h2 {
     font-size: 24px;
     line-height: 1.2;
+    text-align-last: auto;
   }
 
   .ai-header .ai-result {
     margin-top: 8px;
     font-size: 15px;
     line-height: 1.5;
+    text-wrap: balance;
+    text-align-last: auto;
   }
 
   .ai-header .ai-button {
