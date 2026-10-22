@@ -22,6 +22,10 @@
 }
 
 .ai-header__text {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-self: stretch;
   min-width: 0;
 }
 
