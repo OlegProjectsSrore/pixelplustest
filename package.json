@@ -1,0 +1,10 @@
+{
+  "name": "pixelplustest",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Single-page responsive test copy of pixelplus.ru",
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "build": "python -X utf8 scripts/build_snapshot.py"
+  }
+}

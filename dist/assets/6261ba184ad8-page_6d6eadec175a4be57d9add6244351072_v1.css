@@ -1,0 +1,178 @@
+
+
+/* Start:/local/templates/pixelplus.ru_2021/components/pixelplus/feedback/form-short/style.css?16437063753704*/
+.form--short-feedback {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    padding: 20px 0 0 0;
+    background: #fff;
+    margin: 30px auto;
+    font-size: 13px;
+}
+
+    .fancybox-opened .form--short-feedback {
+        margin: 0;
+        max-width: 250px;
+        box-shadow: none;
+    }
+
+.form--short-feedback .form__title {
+    font-family: Ubuntu, sans-serif;
+    font-size: 21px;
+    margin-bottom: 21px;
+}
+
+.form--short-feedback .form__intro {
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 21px;
+}
+
+.form--short-feedback .moving-placeholder {
+    position: relative;
+}
+
+.form--short-feedback .moving-placeholder__field {
+}
+
+.form--short-feedback .moving-placeholder__label {
+    color: inherit;
+    font-size: inherit;
+    line-height: 1;
+    opacity: .8;
+    pointer-events: none;
+    position: absolute;
+    top: .85em;
+    left: .85em;
+    transition: .3s;
+}
+
+.form--short-feedback .moving-placeholder__field:focus + .moving-placeholder__label,
+.form--short-feedback .moving-placeholder__field.--focus + .moving-placeholder__label {
+    font-size: 11px;
+    top: -.5em;
+    left: .6em;
+    background: #fff;
+    opacity: 1;
+    padding: 0 .5em;
+}
+
+.form--short-feedback .form__field-input--required:after {
+    content: '*';
+    color: red;
+    position: absolute;
+    right: .85em;
+    top: .85em;
+}
+
+.form--short-feedback .form__fields {
+    margin-bottom: 20px;
+}
+
+.form__field-name {
+    font-style: normal;
+    font-weight: 300;
+    font-size: 13px;
+    text-align: center;
+}
+
+.form--short-feedback .form__field {
+    margin: 0;
+}
+
+.form--short-feedback .form__field + .form__field {
+    margin-top: 15px;
+}
+
+.form--short-feedback .form__required-message {
+    font-family: Ubuntu, sans-serif;
+    font-weight: 300;
+    font-size: 10px;
+    text-align: center;
+    color: #555;
+    margin-bottom: 26px;
+}
+
+.form--short-feedback .form__button {
+    background: linear-gradient(to bottom, #c61526 0%, #b30a1a 100%);
+    border: none;
+    border-bottom: 2px solid #750712;
+    border-radius: 2em;
+    box-shadow: none;
+    box-sizing: content-box;
+    color: #fff;
+    cursor: pointer;
+    display: block;
+    font-family: inherit;
+    font-size: 16px;
+    margin: 0 auto;
+    padding: 0.95em 2.5em;
+    text-align: center;
+    text-align-last: center;
+    text-decoration: none;
+    transition: all 0.2s;
+    user-select: none;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.form--short-feedback .form__field--privacy-policy {
+    text-align: center;
+    color: #8d8d8d;
+    font-style: italic;
+    font-size: 13px;
+    margin-top: 20px;
+}
+
+.form--short-feedback .form__field--privacy-policy .form__label {
+    padding: 0;
+}
+
+.form--short-feedback .form__field--privacy-policy .fake-checkbox {
+    display: none;
+}
+
+.form--short-feedback .field.field-theme {
+    display: none;
+}
+
+.form--short-feedback .jq-selectbox__select,
+/*.form--short-feedback .jq-selectbox.opened .jq-selectbox__select,*/
+.form--short-feedback .jq-selectbox.focused .jq-selectbox__select {
+    background: #fff;
+    border: 1px solid #c7cfd6;
+    border-radius: 3px;
+    box-shadow: none;
+    padding: 0.85em;
+    transition: all 0.2s;
+    width: 100%;
+}
+
+.form--short-feedback .jq-selectbox__dropdown {
+    width: 100% !important;
+}
+
+.form--short-feedback .jq-selectbox__dropdown ul {
+    max-height: 150px;
+}
+
+@media screen and (min-width: 1024px) {
+    .form--short-feedback {
+        padding: 40px 70px;
+        font-size: 14px;
+        max-width: 474px;
+    }
+
+    .fancybox-opened .form--short-feedback {
+        max-width: 474px;
+    }
+
+    .form--short-feedback .form__fields {
+        padding: 0 20px;
+    }
+
+    .form--short-feedback .form__button {
+        padding: 0.95em 3.5em;
+    }
+}
+/* End */
+/* /local/templates/pixelplus.ru_2021/components/pixelplus/feedback/form-short/style.css?16437063753704 */

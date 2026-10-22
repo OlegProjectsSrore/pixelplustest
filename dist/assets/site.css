@@ -1,0 +1,7 @@
+/* The original Other services dropdown overflows at 360 px. */
+@media (max-width: 575px) {
+  .fake-select__dropdown .form__column {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+}
