@@ -198,17 +198,18 @@
   }
 
   .ai-header h2 {
-    font-size: 24px;
-    line-height: 1.2;
-    text-align-last: auto;
+    font-size: min(22px, calc(5.7vw - 1.71px));
+    line-height: 1.25;
+    white-space: nowrap;
+    text-wrap: nowrap;
   }
 
   .ai-header .ai-result {
     margin-top: 8px;
-    font-size: 15px;
+    font-size: min(14.8px, calc(3.9vw - 1.17px));
     line-height: 1.5;
-    text-wrap: balance;
-    text-align-last: auto;
+    white-space: nowrap;
+    text-wrap: nowrap;
   }
 
   .ai-header .ai-button {
