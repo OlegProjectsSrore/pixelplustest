@@ -15,7 +15,7 @@
 .ai-header .ai-inner {
   display: grid;
   grid-template-columns: minmax(0, 384px) 220px;
-  align-items: start;
+  align-items: center;
   gap: 24px;
   max-width: 628px;
   margin-inline: auto;
@@ -198,7 +198,7 @@
   }
 
   .ai-header .ai-actions {
-    grid-template-columns: repeat(2, minmax(0, 160.28125px));
+    grid-template-columns: minmax(0, 160.28125px);
     justify-content: center;
     align-items: center;
   }
