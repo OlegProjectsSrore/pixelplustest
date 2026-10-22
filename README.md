@@ -2,6 +2,12 @@
 
 Одна адаптивная копия главной страницы https://pixelplus.ru/ для тестового задания.
 
+## Сайт
+
+Адрес GitHub Pages: https://olegprojectssrore.github.io/pixelplustest/.
+
+Публикация выполняется из ветки `main` через `.github/workflows/pages.yml` при изменении страницы или настроек публикации. Скрипт `scripts/prepare_pages.py` готовит копию `dist/` в `outputs/github-pages/`, добавляя префикс `/pixelplustest` к адресам локальных ресурсов. Исходный `dist/` остаётся пригодным для локального запуска и размещения в корне домена.
+
 ## Запуск
 
 Готовая страница находится в `dist/index.html`. Установка npm-зависимостей не требуется.
