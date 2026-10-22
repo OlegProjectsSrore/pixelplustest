@@ -95,6 +95,7 @@
 }
 
 /* Match the rendered hero's Online application button, including its border. */
+.ai-header .ai-button[data-ai-action="chat"],
 .ai-header .ai-button[data-ai-action="voice"] {
   display: inline-flex;
   justify-self: center;
@@ -128,6 +129,7 @@
 }
 
 @media (max-width: 767px) {
+  .ai-header .ai-button[data-ai-action="chat"],
   .ai-header .ai-button[data-ai-action="voice"] {
     width: 160.28125px;
     height: 42.9375px;
