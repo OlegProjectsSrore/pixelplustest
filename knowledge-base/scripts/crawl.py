@@ -12,6 +12,7 @@ import sys
 import time
 from collections import Counter, deque
 from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 from urllib.parse import quote, unquote, urljoin, urlsplit
 
@@ -42,9 +43,14 @@ CASE_LISTING = re.compile(r"^/portfolio/(?:[^/]+/(?:page-\d+/)?)?$")
 # Адреса той же формы в других разделах — списки с двумя фильтрами (/portfolio/prodvizhenie-saytov/mebel/internet-magazin/).
 CASE_PAGE = re.compile(r"^/portfolio/(?:[^/]+/[^/]+\.html|sozdanie-saytov/[^/]+/(?!page-\d+/)[^/]+/)$")
 
+# Презентации в PDF. /doc/ закрыт в robots.txt; эти четыре файла владелец базы решил взять явно (2026-10-22).
+DOCUMENTS = ("/doc/pixelplus.ru.pdf", "/doc/dev-pixelplus.ru.pdf", "/doc/support-pixelplus.ru.pdf", "/doc/seo-pixelplus.ru.pdf")
+
 
 def kind_of(path):
     """Тип страницы или None, если она вне базы."""
+    if path in DOCUMENTS:
+        return "document"
     first = path.strip("/").split("/")[0]
     if first in SERVICES:
         return "service"
@@ -114,9 +120,30 @@ def save(state):
     tmp.replace(URLS)
 
 
+def fetch_documents(session, pages):
+    """Скачивает PDF из DOCUMENTS в raw/doc/ (уже скачанные не трогает) и записывает дату изменения с сервера."""
+    for path in DOCUMENTS:
+        target = RAW / path.strip("/")
+        record = pages.setdefault(path, {"path": path, "kind": "document", "found_on": "список DOCUMENTS"})
+        response = session.head("https://" + HOST + path, timeout=60)
+        if response.headers.get("Last-Modified"):
+            record["last_modified"] = parsedate_to_datetime(response.headers["Last-Modified"]).date().isoformat()
+        if not target.exists():
+            time.sleep(DELAY)
+            response = session.get("https://" + HOST + path, timeout=120)
+            response.raise_for_status()
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(response.content)
+            record["fetched_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        record.setdefault("fetched_at", datetime.fromtimestamp(target.stat().st_mtime, timezone.utc).isoformat(timespec="seconds"))
+        record.update(status=200, file=target.relative_to(ROOT).as_posix())
+        print(f"document {path} ({target.stat().st_size:,} байт)")
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--limit", type=int, default=0, help="остановиться после N скачиваний (для пробы)")
+    parser.add_argument("--documents-only", action="store_true", help="только скачать PDF из DOCUMENTS, без обхода сайта")
     args = parser.parse_args()
     sys.stdout.reconfigure(encoding="utf-8")
 
@@ -128,6 +155,11 @@ def main():
     if URLS.exists():
         # Страницы, которые после изменения правил больше не входят в базу, отбрасываются.
         pages = {p["path"]: p for p in json.loads(URLS.read_text(encoding="utf-8"))["pages"] if kind_of(p["path"])}
+    if args.documents_only:
+        state = json.loads(URLS.read_text(encoding="utf-8"))
+        fetch_documents(session, pages)
+        save({"pages": sorted(pages.values(), key=lambda p: p["path"]), "skipped": state["skipped"]})
+        return
     skipped = Counter()  # путь вне базы -> сколько раз встречен
     reasons = {}
     queue = deque(["/"])
@@ -199,6 +231,7 @@ def main():
             print("Достигнут --limit, остановка.")
             break
 
+    fetch_documents(session, pages)
     state = {
         "pages": sorted(pages.values(), key=lambda p: p["path"]),
         "skipped": [{"path": p, "reason": reasons[p], "seen": n} for p, n in sorted(skipped.items())],

@@ -8632,6 +8632,46 @@
   "chars": 4971
  },
  {
+  "url": "https://pixelplus.ru/doc/dev-pixelplus.ru.pdf",
+  "title": "Презентация услуг по разработке сайтов",
+  "kind": "document",
+  "section": "razrabotka-sajtov",
+  "document_date": "2018-08-03",
+  "crawled_at": "2026-10-22T14:23:31+00:00",
+  "file": "kb/documents/dev-pixelplus.ru.md",
+  "chars": 20481
+ },
+ {
+  "url": "https://pixelplus.ru/doc/pixelplus.ru.pdf",
+  "title": "Презентация основных услуг агентства «Пиксель Плюс»",
+  "kind": "document",
+  "section": "studio",
+  "document_date": "2024-02-27",
+  "crawled_at": "2026-10-22T14:23:29+00:00",
+  "file": "kb/documents/pixelplus.ru.md",
+  "chars": 18094
+ },
+ {
+  "url": "https://pixelplus.ru/doc/seo-pixelplus.ru.pdf",
+  "title": "Презентация услуг по поисковому продвижению сайтов",
+  "kind": "document",
+  "section": "prodvizhenie-sajtov",
+  "document_date": "2023-12-13",
+  "crawled_at": "2026-10-22T14:23:33+00:00",
+  "file": "kb/documents/seo-pixelplus.ru.md",
+  "chars": 13247
+ },
+ {
+  "url": "https://pixelplus.ru/doc/support-pixelplus.ru.pdf",
+  "title": "Презентация услуг по поддержке и доработке сайта",
+  "kind": "document",
+  "section": "podderzhka-sajtov",
+  "document_date": "2023-12-13",
+  "crawled_at": "2026-10-22T14:23:32+00:00",
+  "file": "kb/documents/support-pixelplus.ru.md",
+  "chars": 2892
+ },
+ {
   "title": "Общие блоки раздела 1c",
   "kind": "shared",
   "section": "1c",

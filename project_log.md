@@ -2,6 +2,21 @@
 
 ---
 
+- Date/time: 2026-10-22 15:55
+- Scope: S:\PROJECTS\pixelplustest
+- Summary: в базу знаний добавлены четыре презентации PDF из /doc/ (общая, разработка, поддержка, SEO). /doc/ закрыт в robots.txt, файлы взяты явно по указанию пользователя. Новый модуль pdf_markdown.py переводит слайды в Markdown (раздел на слайд, карточки по порядку чтения, склейка переносов); в начале каждого документа указана дата файла на сервере (разработка — 2018-08-03, поддержка и SEO — 2023-12-13, общая — 2024-02-27). База пересобрана (1 705 документов), индекс перестроен (2 954 куска), векторы перезагружены в Vectorize pixelplus-services и проверены. Изменения отправлены на GitHub.
+- Files changed:
+  - knowledge-base/scripts/pdf_markdown.py (новый)
+  - knowledge-base/scripts/crawl.py (DOCUMENTS, --documents-only)
+  - knowledge-base/scripts/extract.py (документы PDF)
+  - knowledge-base/kb/documents/*.md (новые)
+  - knowledge-base/README.md, urls.json, index.json, search-index.json
+  - knowledge-base/raw/doc/*.pdf (в Git не входит)
+  - Cloudflare Vectorize: pixelplus-services (2 954 вектора)
+- Reference: «Добавь все четыре PDF из /doc/ в базу знаний, переиндексируй и синхронизируй с GitHub.»
+
+---
+
 - Date/time: 2026-10-22 15:20
 - Scope: S:\PROJECTS\pixelplustest
 - Summary: база знаний и индекс поиска закоммичены в main двумя коммитами и отправлены в https://github.com/OlegProjectsSrore/pixelplustest. Перед отправкой GitHub проверен: новых коммитов там не было. Git запускался с `-c safe.directory=*` на время команды (глобальные настройки не менялись) и с той же идентичностью автора, что и прежние коммиты.

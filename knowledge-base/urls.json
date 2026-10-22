@@ -2119,6 +2119,42 @@
    "file": "raw/crm/sistemy/sap/index.html.gz"
   },
   {
+   "path": "/doc/dev-pixelplus.ru.pdf",
+   "kind": "document",
+   "found_on": "список DOCUMENTS",
+   "last_modified": "2018-08-03",
+   "fetched_at": "2026-10-22T14:23:31+00:00",
+   "status": 200,
+   "file": "raw/doc/dev-pixelplus.ru.pdf"
+  },
+  {
+   "path": "/doc/pixelplus.ru.pdf",
+   "kind": "document",
+   "found_on": "список DOCUMENTS",
+   "last_modified": "2024-02-27",
+   "fetched_at": "2026-10-22T14:23:29+00:00",
+   "status": 200,
+   "file": "raw/doc/pixelplus.ru.pdf"
+  },
+  {
+   "path": "/doc/seo-pixelplus.ru.pdf",
+   "kind": "document",
+   "found_on": "список DOCUMENTS",
+   "last_modified": "2023-12-13",
+   "fetched_at": "2026-10-22T14:23:33+00:00",
+   "status": 200,
+   "file": "raw/doc/seo-pixelplus.ru.pdf"
+  },
+  {
+   "path": "/doc/support-pixelplus.ru.pdf",
+   "kind": "document",
+   "found_on": "список DOCUMENTS",
+   "last_modified": "2023-12-13",
+   "fetched_at": "2026-10-22T14:23:32+00:00",
+   "status": 200,
+   "file": "raw/doc/support-pixelplus.ru.pdf"
+  },
+  {
    "path": "/express/",
    "kind": "service",
    "found_on": "/studio/",
@@ -18085,5 +18121,5 @@
    "seen": 1
   }
  ],
- "updated_at": "2026-10-22T13:50:53+00:00"
+ "updated_at": "2026-10-22T15:26:32+00:00"
 }

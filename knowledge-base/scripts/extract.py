@@ -16,12 +16,22 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 from markdownify import markdownify
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))  # скрипты запускаются с -I, соседний модуль добавляем явно
+from pdf_markdown import pdf_markdown  # noqa: E402
+
 ROOT = Path(__file__).resolve().parent.parent
 KB = ROOT / "kb"
 SITE = "https://pixelplus.ru"
 REPEATS = 3  # блок, встреченный на стольких страницах и более, считается общим
 SIMILAR = 0.75  # доля общих четвёрок слов, начиная с которой страницы считаются вариантами одной
 MIN_TEXT = 200  # страница с меньшим текстом (только картинки и кнопка заказа) в базу не берётся
+# Презентации из /doc/: имя файла -> заголовок в базе и раздел услуг.
+DOCUMENTS = {
+    "pixelplus.ru": ("Презентация основных услуг агентства «Пиксель Плюс»", "studio"),
+    "dev-pixelplus.ru": ("Презентация услуг по разработке сайтов", "razrabotka-sajtov"),
+    "support-pixelplus.ru": ("Презентация услуг по поддержке и доработке сайта", "podderzhka-sajtov"),
+    "seo-pixelplus.ru": ("Презентация услуг по поисковому продвижению сайтов", "prodvizhenie-sajtov"),
+}
 
 CHROME = [
     "script", "style", "noscript", "svg", "img", "picture", "video", "iframe", "button", "input", "select",
@@ -172,6 +182,18 @@ def location(page):
     return KB / "company" / ("/".join(rest) + ".md"), "studio"
 
 
+def document_doc(page):
+    """Презентация в PDF как документ базы: kb/documents/<имя>.md, по разделу на слайд."""
+    name = Path(page["path"]).stem
+    title, section = DOCUMENTS[name]
+    slides, pdf_date = pdf_markdown(ROOT / page["file"])
+    date = page.get("last_modified") or pdf_date
+    lead = f"Презентация в PDF на сайте «Пиксель Плюс». Файл изменён {date}; цифры, цены и рейтинги в ней — на эту дату."
+    fields = {"url": SITE + page["path"], "title": title, "kind": "document", "section": section,
+              "document_date": date, "crawled_at": page.get("fetched_at")}
+    return {"page": page, "target": KB / "documents" / f"{name}.md", "fields": fields, "body": f"# {title}\n\n{lead}\n\n{slides}"}
+
+
 def front_matter(fields):
     return "---\n" + "".join(f"{k}: {json.dumps(v, ensure_ascii=False)}\n" for k, v in fields.items() if v not in (None, "")) + "---\n\n"
 
@@ -180,6 +202,7 @@ def main():
     sys.stdout.reconfigure(encoding="utf-8")
     state = json.loads((ROOT / "urls.json").read_text(encoding="utf-8"))
     pages = [p for p in state["pages"] if p.get("status") == 200 and p.get("file") and p["kind"] in ("service", "case", "company")]
+    documents = [p for p in state["pages"] if p.get("status") == 200 and p.get("file") and p["kind"] == "document"]
     for page in pages:
         if page["kind"] == "service" and re.search(r"/cases/.+", page["path"]):
             page["kind"] = "case"
@@ -228,6 +251,8 @@ def main():
         docs.append({"page": page, "target": target, "fields": fields, "body": single_h1(body, title, h1)})
 
     variants = group_variants(docs)
+    for page in documents:
+        docs.append(document_doc(page))
     for doc in docs:
         if doc["page"]["path"] in variants["of"]:
             continue
