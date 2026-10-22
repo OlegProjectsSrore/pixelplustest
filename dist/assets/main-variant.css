@@ -15,6 +15,12 @@
 }
 
 @media (min-width: 992px) {
+  .page-header__phones {
+    flex-shrink: 0;
+    margin-left: auto;
+    padding-right: 0;
+  }
+
   .page-header__phones .phones__number {
     font-size: 20px;
     line-height: 28px;
