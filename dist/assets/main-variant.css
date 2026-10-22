@@ -1,0 +1,23 @@
+/* Typography for the /main/ variant; QR tooltip markup and handlers stay intact. */
+@font-face {
+  font-family: "Open Sans";
+  src: url("/assets/OpenSans-SemiBold.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+.page-header__phones .phones__number > a,
+.page-nav__contacts .phones__number > a {
+  font-family: "Open Sans", sans-serif;
+  font-weight: 600;
+  letter-spacing: normal;
+}
+
+@media (min-width: 992px) {
+  .page-header__phones .phones__number {
+    font-size: 20px;
+    line-height: 28px;
+    text-align: right;
+  }
+}

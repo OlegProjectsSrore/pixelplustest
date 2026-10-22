@@ -6,7 +6,7 @@
 
 Адрес GitHub Pages: https://olegprojectssrore.github.io/pixelplustest/.
 
-Второй вариант: https://olegprojectssrore.github.io/pixelplustest/main/. Его отдельная разметка находится в `dist/main/index.html`; пока это точная копия основной страницы с общими ресурсами из `dist/assets/`.
+Второй вариант: https://olegprojectssrore.github.io/pixelplustest/main/. Его отдельная разметка находится в `dist/main/index.html`, стили варианта — в `dist/assets/main-variant.css`. Номера телефонов в шапке и мобильном меню используют Open Sans SemiBold из UI Kit; всплывающие QR-коды сохранены. Остальные ресурсы общие с основной страницей.
 
 Публикация выполняется из ветки `main` через `.github/workflows/pages.yml` при изменении страницы или настроек публикации. Скрипт `scripts/prepare_pages.py` готовит копию `dist/` в `outputs/github-pages/`, добавляя префикс `/pixelplustest` к адресам локальных ресурсов. Исходный `dist/` остаётся пригодным для локального запуска и размещения в корне домена.
 
