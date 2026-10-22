@@ -154,6 +154,9 @@ for src in (jquery_path, vendor_path, *form_scripts, '/assets/original-feedback.
     tag = soup.new_tag('script', src=src, defer=True)
     soup.body.append(tag)
 soup.head.append(soup.new_tag('link', rel='stylesheet', href='/assets/site.css'))
+soup.head.append(soup.new_tag('link', rel='stylesheet', href='/assets/ai-lead.css'))
+lead = BeautifulSoup((ASSETS / 'ai-lead.html').read_text(encoding='utf-8'), 'html.parser')
+soup.select_one('.page__heading').insert_after(lead)
 
 done = set()
 while pending := [(url, path) for url, path in asset_map.items() if url not in done]:
