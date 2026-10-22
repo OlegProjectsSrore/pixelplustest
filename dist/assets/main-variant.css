@@ -58,6 +58,19 @@
   gap: 8px;
 }
 
+/* Reduce the visible text-to-button gap, including the centred button inset, by 20%. */
+@media (min-width: 680px) {
+  .ai-header .ai-actions {
+    transform: translateX(calc(-0.2 * (24px + (220px - 182.890625px) / 2)));
+  }
+}
+
+@media (min-width: 680px) and (max-width: 767px) {
+  .ai-header .ai-actions {
+    transform: translateX(calc(-0.2 * (24px + (220px - 160.28125px) / 2)));
+  }
+}
+
 .ai-header .ai-button {
   width: 100%;
   min-height: 56px;
