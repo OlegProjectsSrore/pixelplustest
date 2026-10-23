@@ -10,10 +10,16 @@ args = parser.parse_args()
 base_path = '/' + args.base_path.strip('/')
 destination = ROOT / 'outputs' / 'github-pages'
 
+(destination / 'index.html').unlink(missing_ok=True)
+
 for source in (ROOT / 'dist').rglob('*'):
     if not source.is_file():
         continue
-    target = destination / source.relative_to(ROOT / 'dist')
+    relative = source.relative_to(ROOT / 'dist')
+    # Publish /main/ only; keep the root snapshot out of GitHub Pages.
+    if relative == Path('index.html'):
+        continue
+    target = destination / relative
     target.parent.mkdir(parents=True, exist_ok=True)
     if source.suffix.lower() in {'.html', '.css', '.js', '.json', '.svg', '.txt'}:
         content = source.read_text(encoding='utf-8')
