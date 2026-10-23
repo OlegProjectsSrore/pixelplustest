@@ -104,6 +104,7 @@ try {
         messages: [{ id: 'u', role: 'user', text: '<img src=x onerror=alert(1)>' }], remaining_seconds: 500, busy: false,
         capabilities: { chat: true, voice: true, pause: true, resume: true, finish: true, email: true } }), phase);
       assert.equal(await page.locator('dialog').evaluate(node => node.scrollWidth > node.clientWidth || node.querySelector('.audit-body').scrollWidth > node.querySelector('.audit-body').clientWidth), false, `${width}px ${phase}`);
+      assert.equal(await page.locator('.audit-header > .audit-time').count(), 1, 'Timer stays in the header');
     }
   }
   await page.evaluate(() => auditView.render({ phase: 'interview', mode: 'chat', launchPending: false, capabilities: { voice: true } }));

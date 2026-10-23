@@ -66,7 +66,9 @@ export function createAuditView(handlers = {}) {
   callButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7 12.8 12.8 0 0 0 .7 2.8 2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5 12.8 12.8 0 0 0 2.8.7 2 2 0 0 1 1.8 2.1Z"/></svg>';
   const closeButton = button('×', 'close');
   closeButton.setAttribute('aria-label', 'Закрыть окно опроса');
-  header.append(callButton, closeButton);
+  const time = element('p', 'audit-time');
+  time.setAttribute('aria-live', 'off');
+  header.append(callButton, time, closeButton);
 
   const body = element('div', 'audit-body');
   const toolbar = element('div', 'audit-toolbar');
@@ -76,9 +78,7 @@ export function createAuditView(handlers = {}) {
   const chatButton = button('Чат', 'channel');
   const voiceButton = button('Голос', 'channel');
   channels.append(chatButton, voiceButton);
-  const time = element('p', 'audit-time');
-  time.setAttribute('aria-live', 'off');
-  toolbar.append(channels, time);
+  toolbar.append(channels);
 
   const status = element('p', 'audit-status');
   status.setAttribute('role', 'status');
