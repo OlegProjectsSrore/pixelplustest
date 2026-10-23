@@ -1,11 +1,12 @@
-// Check a deployed Worker while public sessions remain closed for release validation.
+// Check deployed access controls without creating sessions or calling AI providers.
 // No credentials are accepted; requests only exercise CORS, D1 and access gates.
 import assert from 'node:assert/strict';
 import { randomBytes } from 'node:crypto';
 
-const [workerArgument, originArgument] = process.argv.slice(2);
+const [workerArgument, originArgument, mode] = process.argv.slice(2);
+assert.ok(mode === undefined || mode === '--open', 'Only --open is supported as the third argument');
 if (!workerArgument || !originArgument) {
-  throw new Error('Usage: npm run smoke:deployed -- <Worker HTTPS origin> <allowed frontend HTTPS origin>');
+  throw new Error('Usage: npm run smoke:deployed -- <Worker HTTPS origin> <allowed frontend HTTPS origin> [--open]');
 }
 const base = new URL(workerArgument);
 const frontend = new URL(originArgument);
@@ -55,6 +56,11 @@ const closed = await request('/api/session', {
   method: 'POST', headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({ operation_id: randomBytes(32).toString('base64url'), channel: 'chat' }),
 });
-await errorResponse(closed, 503, 'sessions_not_released');
-assert.ok(Number(closed.headers.get('retry-after')) > 0);
-console.log('PASS deployed Worker: CORS, authorization, D1 lookup, missing report, public session release gate. No audit session or provider request created.');
+if (mode === '--open') {
+  await errorResponse(closed, 400, 'invalid_request');
+  console.log('PASS open Worker: CORS, authorization, D1 lookup, missing report, creation requires Turnstile. No audit session or provider request created.');
+} else {
+  await errorResponse(closed, 503, 'sessions_not_released');
+  assert.ok(Number(closed.headers.get('retry-after')) > 0);
+  console.log('PASS closed Worker: CORS, authorization, D1 lookup, missing report, release gate. No audit session or provider request created.');
+}
