@@ -177,6 +177,20 @@
     margin-bottom: 0;
   }
 
+  /* Align visible Ubuntu text and button edges with the Open Sans phone digits. */
+  .ai-header h2 {
+    transform: translateY(3px);
+  }
+
+  .ai-header .ai-result {
+    transform: translateY(-4px);
+  }
+
+  .ai-header .ai-button[data-ai-action="voice"] {
+    height: 42px;
+    padding: 1px 8px;
+  }
+
   .page-header__logo,
   .page-header__phones {
     padding: 0;
