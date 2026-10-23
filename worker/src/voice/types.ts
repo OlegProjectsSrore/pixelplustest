@@ -13,6 +13,7 @@ export interface UltravoxClientTool {
 export type UltravoxSelectedTool = UltravoxClientTool | { toolName: 'hangUp'; parameterOverrides: { strict: true } };
 export interface UltravoxCallRequest {
   systemPrompt: string; model: string; voice: string; languageHint: 'ru'; temperature: 0;
+  voiceOverrides?: { inworld: { speakingRate: number } };
   maxDuration: string; joinTimeout: string; recordingEnabled: false; transcriptOptional: false;
   medium: { webRtc: { dataMessages: { transcript: true; clientToolInvocation: true } } };
   initialOutputMedium: 'MESSAGE_MEDIUM_VOICE'; timeExceededMessage: string;
