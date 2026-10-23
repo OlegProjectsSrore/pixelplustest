@@ -1,6 +1,6 @@
 /* Navigation behavior for the single-page exercise. */
 // Both static pages share the audit client; providers are loaded only on request.
-void import('./audit-config.js?v=4a892187f0').then(() => import('./audit-client.js?v=f5d9125c5d'));
+void import('./audit-config.js?v=4a892187f0').then(() => import('./audit-client.js?v=3348454b46'));
 document.addEventListener('DOMContentLoaded', () => {
   window.pixelplusTest = {
     numberFormat(number) { return new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 }).format(number).replace(/\u00a0/g, ' '); }

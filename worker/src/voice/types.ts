@@ -17,7 +17,7 @@ export interface UltravoxCallRequest {
   maxDuration: string; joinTimeout: string; recordingEnabled: false; transcriptOptional: false;
   medium: { webRtc: { dataMessages: { transcript: true; clientToolInvocation: true } } };
   initialOutputMedium: 'MESSAGE_MEDIUM_VOICE'; timeExceededMessage: string;
-  selectedTools: UltravoxSelectedTool[]; firstSpeakerSettings: { agent: { text: string; uninterruptible: false } };
+  selectedTools: UltravoxSelectedTool[]; firstSpeakerSettings: { agent: { text: string; uninterruptible: false } } | { user: Record<string, never> };
   callbacks: Record<'joined' | 'ended' | 'billed', { url: string; secrets: string[] }>;
   metadata: Record<string, string>; initialMessages?: UltravoxInitialMessage[];
 }
@@ -38,7 +38,7 @@ export interface VoiceDependencies {
 export interface VoiceCallConfig {
   system_prompt: string; model: string; voice: string; remaining_seconds: number; first_message: string;
   callback_url: string; webhook_secrets: string[]; metadata?: Record<string, string>;
-  prior_call_id?: string; initial_messages?: { role: 'user' | 'assistant'; text: string }[];
+  prior_call_id?: string; initial_messages?: { role: 'user' | 'assistant'; text: string }[]; user_first?: boolean;
 }
 export interface VoicePromptInput {
   library_version: string; questions: QuestionView[]; current_question_id: string | null;

@@ -26,7 +26,7 @@ export function buildCallConfig(input: VoiceCallConfig): { body: UltravoxCallReq
     transcriptOptional: false, initialOutputMedium: 'MESSAGE_MEDIUM_VOICE',
     medium: { webRtc: { dataMessages: { transcript: true, clientToolInvocation: true } } },
     timeExceededMessage: CLOSING_MESSAGE, selectedTools: createInterviewTools(),
-    firstSpeakerSettings: { agent: { text: nonempty(input.first_message, 'first message', 4000), uninterruptible: false } },
+    firstSpeakerSettings: input.user_first ? { user: {} } : { agent: { text: nonempty(input.first_message, 'first message', 4000), uninterruptible: false } },
     callbacks: { joined: { url: callback.href, secrets: [...secrets] }, ended: { url: callback.href, secrets: [...secrets] }, billed: { url: callback.href, secrets: [...secrets] } },
     metadata,
   };

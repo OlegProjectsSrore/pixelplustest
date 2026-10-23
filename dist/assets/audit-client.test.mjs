@@ -26,6 +26,7 @@ function fixture(t, { initial = record(state()), request, challenge, microphone,
   let voiceCallbacks;
   let voiceActive = false;
   let stopFailure = false;
+  let startFailure = false;
   let voiceStarts = 0;
   const persistence = storage || { load: () => structuredClone(stored), save: value => { stored = structuredClone(value); } };
   const client = createAuditClient({ config: { publicSessionsEnabled, apiBaseUrl: 'https://audit.example', turnstileSiteKey: 'test', ultravoxSdkUrl: '/sdk.js' },
@@ -37,8 +38,8 @@ function fixture(t, { initial = record(state()), request, challenge, microphone,
     },
     voiceFactory(callbacks) {
       voiceCallbacks = callbacks;
-      return { get active() { return voiceActive; }, async start() { voiceStarts++; voiceActive = true; },
-        async stop() { if (stopFailure) throw new Error('leave unknown'); voiceActive = false; } };
+      return { get active() { return voiceActive; }, async start() { voiceStarts++; if (startFailure) throw new Error('join failed'); voiceActive = true; callbacks.onState('listening'); },
+        async stop() { if (stopFailure) throw new Error('leave unknown'); if (voiceActive) callbacks.onState('disconnected'); voiceActive = false; } };
     },
     transport: { async request(path, options = {}) {
       calls.push({ path, ...structuredClone(options) });
@@ -55,9 +56,10 @@ function fixture(t, { initial = record(state()), request, challenge, microphone,
       server.revision++;
       if (path === '/api/session/channel') {
         server.channel_revision++;
-        server.paused = options.body.action === 'pause';
+        server.paused = options.body.action === 'pause' || (options.body.channel || server.active_channel) === 'voice';
         if (options.body.channel) server.active_channel = options.body.channel;
       }
+      if (path === '/api/voice/start') server.paused = false;
       if (path === '/api/audit/finish') server.status = 'closing';
       return { session: structuredClone(server), ...(path === '/api/voice/start' ? { call_id: `call${server.revision}`, join_url: 'wss://voice.example/join' } : {}),
         ...(path === '/api/voice/transcript' ? { through_event_id: 'voice:call1:0:1', accepted_events: options.body.events.map(event => ({ event_id: `server:${event.source_key}:${event.source_revision}`, source_key: event.source_key, source_revision: event.source_revision })) } : {}) };
@@ -66,7 +68,7 @@ function fixture(t, { initial = record(state()), request, challenge, microphone,
   t.after(async () => { stopFailure = false; await client.destroy(); });
   return { client, calls, get handlers() { return handlers; }, get model() { return model; }, get stored() { return stored; },
     set draft(value) { draft = value; }, get draft() { return draft; }, get voice() { return voiceCallbacks; },
-    set stopFailure(value) { stopFailure = value; }, get voiceStarts() { return voiceStarts; } };
+    set stopFailure(value) { stopFailure = value; }, set startFailure(value) { startFailure = value; }, get voiceStarts() { return voiceStarts; } };
 }
 
 test('Retry creates a session after a challenge failure without nesting a busy action', async t => {
@@ -210,6 +212,60 @@ test('pause waits for local stop and server ACK; resume creates voice only after
   assert.equal(f.client.session.paused, true);
   await f.handlers.onResume();
   assert.equal(f.client.session.paused, false); assert.equal(f.voiceStarts, 2);
+});
+
+test('voice and chat can be switched repeatedly without a false disconnect error', async t => {
+  const f = fixture(t, { initial: null });
+  await f.client.open('voice');
+  for (let index = 0; index < 3; index++) {
+    await f.handlers.onChannel('chat');
+    assert.equal(f.client.session.active_channel, 'chat');
+    assert.equal(f.model.mode, 'chat');
+    assert.equal(f.model.error, '');
+    await f.handlers.onChannel('voice');
+    assert.equal(f.client.session.active_channel, 'voice');
+    assert.equal(f.client.session.paused, false);
+    assert.equal(f.model.mode, 'voice');
+    assert.equal(f.model.error, '');
+  }
+  assert.equal(f.voiceStarts, 4);
+});
+
+test('a late server revision during call stop is refreshed and the switch completes', async t => {
+  let conflicts = 0;
+  const f = fixture(t, { initial: null, request(path, options, context) {
+    if (path === '/api/session/channel' && options.body.channel === 'chat' && conflicts++ === 0) {
+      context.server.revision += 2;
+      context.server.paused = true;
+      throw new AuditRequestError('Состояние изменилось. Получите актуальную ревизию.', { status: 409, code: 'revision_conflict' });
+    }
+  } });
+  await f.client.open('voice');
+  await f.handlers.onChannel('chat');
+  assert.equal(f.client.session.active_channel, 'chat');
+  assert.equal(f.stored.control_intent, null);
+  assert.equal(f.model.error, '');
+  const switches = f.calls.filter(call => call.path === '/api/session/channel');
+  assert.equal(switches.length, 2);
+  assert.equal(switches[1].body.expected_revision, switches[0].body.expected_revision + 2);
+});
+
+test('retry reconnects after voice join fails on a paused voice channel', async t => {
+  const f = fixture(t, { initial: record(state()) });
+  await f.client.open('chat');
+  f.startFailure = true;
+  await f.handlers.onChannel('voice');
+  assert.equal(f.client.session.active_channel, 'voice');
+  assert.equal(f.client.session.paused, false);
+  assert.ok(f.model.error);
+  assert.ok(f.stored.voice_call);
+  f.startFailure = false;
+  await f.handlers.onRetry();
+  assert.equal(f.client.session.active_channel, 'voice');
+  assert.equal(f.client.session.paused, false);
+  assert.equal(f.model.error, '');
+  assert.equal(f.stored.voice_call.call_id, 'call4');
+  assert.equal(f.voiceStarts, 2);
 });
 
 test('ready PDF downloads using report token after management expiry', async t => {

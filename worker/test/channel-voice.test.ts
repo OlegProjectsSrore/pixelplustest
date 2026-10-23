@@ -98,6 +98,24 @@ test('start reserves before provider, attaches before join URL, and encrypted re
   assert.equal(f.requests.length, 1);
 });
 
+test('returning to an already spoken voice question waits for the visitor instead of repeating it', async t => {
+  const f = await fixture(); t.after(() => f.db.close());
+  const first = await f.start();
+  const firstRequest = JSON.parse(String(f.requests[0].init?.body));
+  const question = firstRequest.firstSpeakerSettings.agent.text;
+  await f.transcript(first.call_id, 'spoken-question', [{ text: question, role: 'assistant', order: 0 }]);
+  f.tick(5000);
+  await f.core.store.confirmCallStopped(first.call_id, f.core.now());
+  await f.core.channel(f.request(), await f.body('to-chat', { action: 'switch', channel: 'chat' }), f.adapters.pollVoice);
+  await f.core.channel(f.request(), await f.body('to-voice', { action: 'switch', channel: 'voice' }), f.adapters.pollVoice);
+  const secondProviderId = '22222222-2222-4222-8222-222222222222';
+  f.respond(() => Response.json({ ...rawCall(), callId: secondProviderId }, { status: 201 }));
+  await f.start('start-2');
+  const second = f.requests.at(-1)!;
+  assert.equal(new URL(second.url).searchParams.get('priorCallId'), PROVIDER_ID);
+  assert.deepEqual(JSON.parse(String(second.init?.body)).firstSpeakerSettings, { user: {} });
+});
+
 test('concurrent start authorizes one external create and retains unknown outcome without retry', async t => {
   const f = await fixture(); t.after(() => f.db.close());
   f.respond(() => { throw new Error('network unavailable'); });

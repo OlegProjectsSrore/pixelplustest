@@ -91,6 +91,50 @@ try {
   assert.equal(requests.filter(request => request.path === '/api/audit/finish').length, beforeEscape);
   await page.evaluate(() => auditClient.destroy());
 
+  // Exercise the real channel buttons against a local voice/server stub, including a late revision.
+  await page.evaluate(async origin => {
+    const { createAuditClient } = await import(`${origin}/assets/audit-client.js`);
+    const { AuditRequestError } = await import(`${origin}/assets/audit-http.js`);
+    const current = { session_id: 'switch-test', library_version: 'test', revision: 0, channel_revision: 0,
+      active_channel: 'chat', paused: false, status: 'in_progress', remaining_ms: 900000,
+      access_expires_at: Date.now() + 86400000, question: { id: 'q1', text: 'Вопрос', options: [] } };
+    let failedOnce = false;
+    let callbacks;
+    let active = false;
+    let saved = { version: 1, session: structuredClone(current), management_token: 'management', report_token: 'report', messages: [], transcript_outbox: [] };
+    window.switchClient = createAuditClient({ config: { apiBaseUrl: origin, turnstileSiteKey: 'stub', ultravoxSdkUrl: '/sdk.js' },
+      persistence: { load: () => structuredClone(saved), save: value => { saved = structuredClone(value); } },
+      microphone: async () => {}, challenge: async () => 'stub', sdkLoader: async () => ({}),
+      voiceFactory: hooks => { callbacks = hooks; return { get active() { return active; },
+        async start() { active = true; callbacks.onState('listening'); },
+        async stop() { if (active) callbacks.onState('disconnected'); active = false; } }; },
+      transport: { async request(path, options = {}) {
+        if (options.method !== 'POST') return structuredClone(current);
+        if (path === '/api/session/channel' && options.body.channel === 'chat' && !failedOnce) {
+          failedOnce = true; current.revision += 2;
+          throw new AuditRequestError('Состояние изменилось. Получите актуальную ревизию.', { status: 409, code: 'revision_conflict' });
+        }
+        current.revision++;
+        if (path === '/api/session/channel') {
+          current.channel_revision++;
+          current.active_channel = options.body.channel || current.active_channel;
+          current.paused = current.active_channel === 'voice';
+        }
+        if (path === '/api/voice/start') current.paused = false;
+        return { session: structuredClone(current), ...(path === '/api/voice/start' ? { call_id: `call${current.revision}`, join_url: 'wss://voice.example/join' } : {}) };
+      } },
+    });
+    await window.switchClient.open('chat');
+  }, origin);
+  for (let index = 0; index < 3; index++) {
+    await page.getByRole('button', { name: 'Голос' }).click();
+    await page.waitForFunction(() => document.querySelector('.audit-button--voice')?.getAttribute('aria-pressed') === 'true' && document.querySelector('.audit-body')?.getAttribute('aria-busy') === 'false');
+    await page.getByRole('button', { name: 'Чат' }).click();
+    await page.waitForFunction(() => document.querySelector('.audit-channels button:first-child')?.getAttribute('aria-pressed') === 'true' && document.querySelector('.audit-body')?.getAttribute('aria-busy') === 'false');
+    assert.equal(await page.locator('.audit-error').isVisible(), false);
+  }
+  await page.evaluate(() => switchClient.destroy());
+
   // Pure view rendering checks keep all nine states and user-supplied text in scope.
   await page.evaluate(async origin => {
     const { createAuditView } = await import(`${origin}/assets/audit-ui.js`);
@@ -125,5 +169,5 @@ try {
   await page.locator('.audit-button--close').focus(); await page.keyboard.press('Shift+Tab');
   assert.equal(await page.evaluate(() => document.querySelector('dialog').contains(document.activeElement)), true);
   assert.deepEqual(errors, []);
-  console.log('Passed: actual controller+transport+view, challenge retry, lost ACK/reload, PDF/email consent, Escape/focus, nine phases at 320/390/768/1440px, safe text. No provider requests.');
+  console.log('Passed: actual controller+transport+view, challenge retry, lost ACK/reload, repeated voice/chat switching with a revision conflict, PDF/email consent, Escape/focus, nine phases at 320/390/768/1440px, safe text. No provider requests.');
 } finally { await browser.close(); }

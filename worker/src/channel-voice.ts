@@ -465,11 +465,15 @@ export function createVoiceAdapters(options: VoiceBridgeOptions = {}): Partial<C
       const question = nextQuestion(planned, core.now(), lib, core.engineOptions);
       const blocks = compileVoiceBlocks(lib, core.engineOptions), block = question ? Object.values(blocks).find(item => item.questions.some(item => item.id === question.id)) : undefined;
       const history = await core.store.listCalls(session.id), prior = history.findLast(call => call.status === 'stopped' && call.providerCallId !== null);
+      const priorOnSameSlot = prior?.slotId === slot!.id;
+      const alreadyAsked = priorOnSameSlot && question && latestEvents(await readEvents(core, session.id)).some(event =>
+        event.call_id === prior?.id && event.role === 'assistant' && event.kind === 'utterance' &&
+        record(event.data).is_final === true && event.text?.trim() === question.text.trim());
       const config: VoiceCallConfig = {
         system_prompt: buildInterviewPrompt({ library_version: lib.version, questions: block?.questions ?? (question ? [question] : []), current_question_id: question?.id ?? null, accepted_facts: Object.values(session.state.facts), remaining_seconds: remainingSeconds, humor_enabled: session.state.humor.enabled, off_topic_categories: lib.jokes.categories }),
         model, voice, remaining_seconds: remainingSeconds, first_message: question?.text ?? 'Сведения сохранены. Можно завершить опрос и подготовить предварительный аудит.',
         callback_url: new URL('/api/webhooks/ultravox', publicUrl).href, webhook_secrets: [webhookSecret], metadata: { audit_session_id: session.id },
-        ...(prior?.slotId === slot!.id ? { prior_call_id: prior.providerCallId! } : {}),
+        ...(priorOnSameSlot ? { prior_call_id: prior!.providerCallId!, user_first: Boolean(alreadyAsked) } : {}),
       };
       buildCallConfig(config);
       let starts: UsageReservation | null = null, seconds: UsageReservation | null = null, call: VoiceCall | null = null;

@@ -261,7 +261,7 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
     const sdk = await sdkLoader(config?.ultravoxSdkUrl);
     voice = voiceFactory({ sdk, onState(status) {
       voiceStatus = VOICE_STATUS[status] || 'Голосовой опрос';
-      if (status === 'disconnected' && saved.session?.status === 'in_progress') error = 'Голосовое соединение прервано. Для продолжения нажмите «Попробовать ещё раз».';
+      if (status === 'disconnected' && !saved.control_intent && saved.session?.status === 'in_progress' && mode === 'voice') error = 'Голосовое соединение прервано. Для продолжения нажмите «Попробовать ещё раз».';
       if (status === 'disconnected' && saved.control_intent?.action === 'pause') void action(performControlIntent);
       render();
     },
@@ -319,7 +319,24 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
     if (intent.action === 'finish') {
       await enqueue(() => mutate('/api/audit/finish', { reason: intent.reason }));
     } else {
-      await enqueue(() => mutate('/api/session/channel', intent));
+      for (let attempt = 0; ; attempt++) {
+        try {
+          await enqueue(() => mutate('/api/session/channel', intent));
+          break;
+        } catch (problem) {
+          if (!(problem instanceof AuditRequestError) || problem.status !== 409 ||
+              !['revision_conflict', 'voice_stop_pending', 'channel_stop_pending'].includes(problem.code) || saved.pending) throw problem;
+          await refresh();
+          const completed = intent.action === 'pause' ? saved.session?.paused
+            : intent.action === 'resume' ? false
+              : saved.session?.active_channel === intent.channel &&
+                saved.session?.paused === (intent.channel === 'voice') &&
+                (intent.channel !== 'voice' || !saved.voice_call);
+          if (completed) { saved.control_intent = null; saved.voice_call = null; persist(); break; }
+          if (attempt >= 5) throw problem;
+          if (problem.code !== 'revision_conflict') await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      }
       if (intent.action !== 'pause' && mode === 'voice') await startVoice();
     }
   }
@@ -363,10 +380,12 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
       await microphone();
       const adapter = await getVoice();
       await adapter.start({ call_id: result.call_id, join_url: result.join_url });
-    } else if (saved.session?.status === 'in_progress' && !saved.session.paused && mode === 'voice' && !voice?.active) {
+    } else if (saved.session?.status === 'in_progress' && mode === 'voice' && !voice?.active) {
       await stopVoice();
-      if (saved.voice_call) await enqueue(() => mutate('/api/session/channel', { action: 'resume' }));
-      await startVoice();
+      if (saved.voice_call) {
+        saved.control_intent = { action: 'resume' }; persist();
+        await performControlIntent();
+      } else await startVoice();
     }
   }
   function ensureView() {
