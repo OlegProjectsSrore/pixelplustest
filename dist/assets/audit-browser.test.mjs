@@ -146,11 +146,19 @@ try {
     for (const phase of ['idle', 'loading', 'interview', 'paused', 'closing', 'preparing', 'ready', 'failed', 'unavailable']) {
       await page.evaluate(phase => auditView.render({ mode: 'chat', phase, question: { id: 'unsafe', text: '<script>danger()</script>', options: [{ id: 'a', text: '<img src=x>' }] },
         messages: [{ id: 'u', role: 'user', text: '<img src=x onerror=alert(1)>' }], remaining_seconds: 500, busy: false,
-        capabilities: { chat: true, voice: true, pause: true, resume: true, finish: true, email: true } }), phase);
+        capabilities: phase === 'failed'
+          ? { chat: false, voice: false, pause: false, resume: false, finish: false, email: false }
+          : { chat: true, voice: true, pause: true, resume: true, finish: true, email: true } }), phase);
       assert.equal(await page.locator('dialog').evaluate(node => node.scrollWidth > node.clientWidth || node.querySelector('.audit-body').scrollWidth > node.querySelector('.audit-body').clientWidth), false, `${width}px ${phase}`);
       assert.equal(await page.locator('.audit-header > .audit-time').count(), 1, 'Timer stays in the header');
       assert.equal(await page.locator('.audit-header > .audit-channels').count(), 1, 'Chat and voice controls stay in the header');
       assert.equal(await page.locator('.audit-channels button:first-child svg').count(), 1, 'Chat button uses an icon');
+      if (phase === 'failed') {
+        assert.equal(await page.locator('.audit-channels').isVisible(), true, 'Channel icons stay visible after a failed session creation');
+        assert.equal(await page.getByRole('button', { name: 'Чат' }).isDisabled(), true);
+        assert.equal(await page.getByRole('button', { name: 'Голос' }).isDisabled(), true);
+        assert.equal(await page.locator('.audit-text-form').isVisible(), false, 'A blocked session has no misleading answer field');
+      }
     }
   }
   await page.evaluate(() => auditView.render({ phase: 'interview', mode: 'chat', launchPending: false, capabilities: { voice: true } }));

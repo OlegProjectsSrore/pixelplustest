@@ -421,3 +421,16 @@ test('published closed mode opens the panel without a pointless challenge or ses
   assert.equal(challenges, 0);
   assert.equal(f.calls.length, 0);
 });
+
+test('exhausted new-session budget explains the daily reset without enabling a blocked channel', async t => {
+  const f = fixture(t, { initial: null, request(path) {
+    if (path === '/api/session') throw new AuditRequestError('Лимит операции исчерпан. Повторите позже.', { status: 429, code: 'budget_exhausted' });
+  } });
+  await f.client.open('chat');
+  assert.equal(f.model.phase, 'failed');
+  assert.match(f.model.error, /Суточный лимит новых опросов/);
+  assert.match(f.model.error, /00:00 UTC/);
+  assert.equal(f.model.capabilities.chat, false);
+  assert.equal(f.model.capabilities.voice, false);
+  assert.equal(f.stored.pending.path, '/api/session', 'the original creation nonce remains available after the reset');
+});

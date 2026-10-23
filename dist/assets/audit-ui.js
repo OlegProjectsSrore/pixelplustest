@@ -322,8 +322,8 @@ export function createAuditView(handlers = {}) {
       ? 'Аудит готовится к запуску. Начать опрос пока нельзя. Пожалуйста, зайдите позже.'
       : PHASE_TEXT[phase] || PHASE_TEXT.unavailable;
     status.hidden = phase === 'interview' && !busy;
-    greeting.hidden = Boolean(model.messages?.length) || completed;
-    channels.hidden = completed || !['interview', 'paused'].includes(phase);
+    greeting.hidden = Boolean(model.messages?.length) || completed || phase === 'failed';
+    channels.hidden = completed || !['interview', 'paused', 'failed'].includes(phase);
     voiceStatus.textContent = safeText(model.voice_status);
     voiceStatus.hidden = model.mode !== 'voice' || !voiceStatus.textContent || completed;
     error.textContent = safeText(model.error);
@@ -392,7 +392,7 @@ export function createAuditView(handlers = {}) {
     selectionSubmit.hidden = !options.length;
     skipButton.hidden = question?.can_skip !== true;
     skipButton.disabled = !canAnswer();
-    textForm.hidden = model.mode !== 'chat' || completed || paused;
+    textForm.hidden = model.mode !== 'chat' || !interviewing;
     draft.disabled = !canAnswer();
     updateAnswerButtons();
 

@@ -1,4 +1,4 @@
-import { createAuditView } from './audit-ui.js?v=dad5eddb9c';
+import { createAuditView } from './audit-ui.js?v=8abb6cc982';
 import { createAuditTransport, createAuditStorage, AuditRequestError } from './audit-http.js';
 import { getTurnstileToken } from './audit-turnstile.js';
 import { checkMicrophone, createVoiceAdapter, loadVoiceSdk } from './audit-voice.js?v=7f69e524a9';
@@ -224,9 +224,11 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
     busy = true; error = ''; render();
     try { await task(); }
     catch (problem) {
-      error = ['sessions_not_released', 'library_not_approved'].includes(problem?.code)
-        ? 'Аудит готовится к запуску. Начать опрос пока нельзя. Пожалуйста, зайдите позже.'
-        : problem?.message || 'Операция временно недоступна.';
+      error = !saved.session && ['budget_exhausted', 'session_limit'].includes(problem?.code)
+        ? 'Суточный лимит новых опросов исчерпан. Доступ возобновится после 00:00 UTC.'
+        : ['sessions_not_released', 'library_not_approved'].includes(problem?.code)
+          ? 'Аудит готовится к запуску. Начать опрос пока нельзя. Пожалуйста, зайдите позже.'
+          : problem?.message || 'Операция временно недоступна.';
     }
     finally { busy = false; render(); schedulePoll(); }
   }
