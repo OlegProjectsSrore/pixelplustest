@@ -17,7 +17,7 @@
     "ULTRAVOX_MODEL": "ultravox-v0.7",
     "ULTRAVOX_VOICE": "83b2a94f-8078-4321-935c-a0798b2ac621",
     "ALLOW_DRAFT_LIBRARY": "false",
-    "PUBLIC_SESSIONS_ENABLED": "false",
+    "PUBLIC_SESSIONS_ENABLED": "true",
     "SMTP_HOST": "smtp.gmail.com",
     "SMTP_PORT": "587",
     "BUDGETS_JSON": "{\"new_sessions\":7,\"sessions_per_ip\":7,\"voice_starts\":14,\"voice_seconds\":7200,\"deepseek_usd_micros\":20000000,\"deepseek_calls\":20000000,\"deepseek_tokens\":3333333333,\"pdf_renders\":20,\"browser_seconds\":600,\"email_attempts\":14}"
