@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0.0",
+  "version": "0.1.0",
+  "status": "draft",
+  "items": [
+    {
+      "id": "case_roistat",
+      "source_id": "case_roistat",
+      "block_ids": [
+        "crm_capture",
+        "analytics_sales"
+      ],
+      "usage": "Пример передачи формы через систему аналитики в CRM с сохранением сведений об источнике. Не доказывает измерение оплат в другом проекте.",
+      "status": "draft",
+      "reviewer": null,
+      "version": "0.1.0",
+      "visitor_forecast": false
+    },
+    {
+      "id": "case_forms",
+      "source_id": "case_forms",
+      "block_ids": [
+        "dev_editor",
+        "ux_form"
+      ],
+      "usage": "Пример восстановления управляемости форм после отказа от прежней CRM. Не основание менять платформу каждого посетителя.",
+      "status": "draft",
+      "reviewer": null,
+      "version": "0.1.0",
+      "visitor_forecast": false
+    },
+    {
+      "id": "case_ozon_sync",
+      "source_id": "case_ozon_sync",
+      "block_ids": [
+        "market_sync",
+        "integration_orders"
+      ],
+      "usage": "Пример обмена каталогом, остатками и заказами с маркетплейсом. Сроки и ограничения описывают конкретный проект.",
+      "status": "draft",
+      "reviewer": null,
+      "version": "0.1.0",
+      "visitor_forecast": false
+    },
+    {
+      "id": "case_ozon_funnel",
+      "source_id": "case_ozon_funnel",
+      "block_ids": [
+        "market_entry",
+        "market_click",
+        "market_order",
+        "market_ads"
+      ],
+      "usage": "Пример совместной работы с экономикой, карточками и рекламой. Результаты клиента не являются прогнозом.",
+      "status": "draft",
+      "reviewer": null,
+      "version": "0.1.0",
+      "visitor_forecast": false
+    }
+  ]
+}

@@ -1,0 +1,248 @@
+{
+  "schema_version": "1.0.0",
+  "version": "0.1.1",
+  "status": "approved",
+  "author": "Codex — подготовка по методике и локальным источникам",
+  "reviewer": "project_owner_chat_approval",
+  "approved_at": "2026-10-23T06:01:25.796Z",
+  "items": [
+    {
+      "id": "strategy",
+      "title": "Стратегия и приоритеты",
+      "target_blocks": 8,
+      "scope": "маркетинговые цели, каналы и ресурсы"
+    },
+    {
+      "id": "analytics",
+      "title": "Измерение результатов",
+      "target_blocks": 12,
+      "scope": "учёт обращений, оплат и расходов"
+    },
+    {
+      "id": "seo",
+      "title": "Поисковое продвижение",
+      "target_blocks": 14,
+      "scope": "обычный поиск и видимость в ответах AI"
+    },
+    {
+      "id": "advertising",
+      "title": "Платная реклама",
+      "target_blocks": 12,
+      "scope": "рекламные кампании и качество обращений"
+    },
+    {
+      "id": "ux",
+      "title": "Удобство сайта",
+      "target_blocks": 10,
+      "scope": "путь от посещения до заявки или покупки"
+    },
+    {
+      "id": "development",
+      "title": "Разработка сайта",
+      "target_blocks": 10,
+      "scope": "новый сайт, функции и изменение платформы"
+    },
+    {
+      "id": "support",
+      "title": "Поддержка сайта",
+      "target_blocks": 8,
+      "scope": "работоспособность, обновления и регулярные задачи"
+    },
+    {
+      "id": "crm",
+      "title": "Обработка обращений",
+      "target_blocks": 10,
+      "scope": "учёт, распределение и сопровождение продаж"
+    },
+    {
+      "id": "retention",
+      "title": "Повторные продажи",
+      "target_blocks": 6,
+      "scope": "работа с уже покупавшими клиентами"
+    },
+    {
+      "id": "marketplace",
+      "title": "Маркетплейсы",
+      "target_blocks": 8,
+      "scope": "карточки, заказы и экономика площадок"
+    },
+    {
+      "id": "reputation",
+      "title": "Локальное присутствие и репутация",
+      "target_blocks": 8,
+      "scope": "карты, отзывы и информация о компании"
+    },
+    {
+      "id": "content",
+      "title": "Контент и социальные сети",
+      "target_blocks": 10,
+      "scope": "полезные материалы, сообщества и обращения"
+    },
+    {
+      "id": "brand",
+      "title": "Брендинг и материалы продаж",
+      "target_blocks": 5,
+      "scope": "идентичность бренда и презентация предложения"
+    },
+    {
+      "id": "ai",
+      "title": "AI и автоматизация",
+      "target_blocks": 8,
+      "scope": "повторяемые операции, знания и контроль AI"
+    },
+    {
+      "id": "mobile",
+      "title": "Мобильные приложения",
+      "target_blocks": 5,
+      "scope": "сценарии приложения, установки и удержание"
+    },
+    {
+      "id": "integration",
+      "title": "1С и обмен данными",
+      "target_blocks": 6,
+      "scope": "учётные системы и интеграции"
+    }
+  ],
+  "relationships": [
+    {
+      "a": "seo_mobile",
+      "b": "ux_mobile",
+      "relation": "related_but_distinct_work"
+    },
+    {
+      "a": "analytics_quality",
+      "b": "ads_quality",
+      "relation": "measurement_before_optimization"
+    },
+    {
+      "a": "analytics_margin",
+      "b": "market_ads",
+      "relation": "measurement_before_optimization"
+    },
+    {
+      "a": "analytics_disagreement",
+      "b": "integration_reports",
+      "relation": "related_but_distinct_work"
+    },
+    {
+      "a": "analytics_ecommerce",
+      "b": "integration_reports",
+      "relation": "related_but_distinct_work"
+    },
+    {
+      "a": "support_speed",
+      "b": "ux_mobile",
+      "relation": "possible_shared_cause"
+    },
+    {
+      "a": "crm_response",
+      "b": "ads_capacity",
+      "relation": "same_observation"
+    },
+    {
+      "a": "crm_capture",
+      "b": "ux_form",
+      "relation": "possible_shared_cause"
+    },
+    {
+      "a": "content_expertise",
+      "b": "seo_trust",
+      "relation": "same_work"
+    },
+    {
+      "a": "content_intent",
+      "b": "seo_intent",
+      "relation": "same_work"
+    },
+    {
+      "a": "market_sync",
+      "b": "integration_catalog",
+      "relation": "related_but_distinct_work"
+    },
+    {
+      "a": "crm_orders",
+      "b": "integration_orders",
+      "relation": "same_work"
+    },
+    {
+      "a": "strategy_dependency",
+      "b": "market_dependence",
+      "relation": "same_observation"
+    },
+    {
+      "a": "brand_consistency",
+      "b": "brand_templates",
+      "relation": "shared_deliverable"
+    },
+    {
+      "a": "ux_redesign",
+      "b": "dev_platform",
+      "relation": "alternatives_require_comparison"
+    },
+    {
+      "a": "support_backlog",
+      "b": "support_regular",
+      "relation": "compare_payment_formats"
+    },
+    {
+      "a": "analytics_absent",
+      "b": "analytics_goals",
+      "relation": "configure_then_validate"
+    },
+    {
+      "a": "analytics_sales",
+      "b": "ads_cost",
+      "relation": "measurement_before_optimization"
+    },
+    {
+      "a": "retention_permissions",
+      "b": "retention_triggers",
+      "relation": "permissions_before_contact"
+    },
+    {
+      "a": "ai_knowledge",
+      "b": "ai_handoff",
+      "relation": "knowledge_and_fallback"
+    },
+    {
+      "a": "ai_access",
+      "b": "ai_actions",
+      "relation": "access_before_actions"
+    },
+    {
+      "a": "ai_eval",
+      "b": "ai_speech",
+      "relation": "validation_before_rollout"
+    },
+    {
+      "a": "support_backup",
+      "b": "support_updates",
+      "relation": "restore_before_change"
+    },
+    {
+      "a": "integration_migration",
+      "b": "integration_update",
+      "relation": "different_work_no_automatic_merge"
+    },
+    {
+      "a": "dev_launch",
+      "b": "mobile_need",
+      "relation": "validate_task_before_build"
+    },
+    {
+      "a": "rep_root",
+      "b": "rep_response",
+      "relation": "response_and_root_cause"
+    },
+    {
+      "a": "crm_adoption",
+      "b": "crm_migration",
+      "relation": "alternatives_require_comparison"
+    },
+    {
+      "a": "content_goal",
+      "b": "content_process",
+      "relation": "goal_before_production"
+    }
+  ]
+}

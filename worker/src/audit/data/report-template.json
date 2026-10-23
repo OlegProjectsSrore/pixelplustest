@@ -1,0 +1,92 @@
+{
+  "schema_version": "1.0.0",
+  "version": "0.1.2",
+  "status": "approved",
+  "author": "Codex — подготовка библиотеки",
+  "reviewer": "project_owner_chat_approval",
+  "approved_at": "2026-10-23T06:01:25.796Z",
+  "title": "ПРЕДВАРИТЕЛЬНЫЙ АУДИТ",
+  "format": "content model for PDF renderer",
+  "sections": [
+    {
+      "id": "profile",
+      "title": "Контекст и цель",
+      "content": "Подтверждённые сведения о компании, задаче и ограничениях."
+    },
+    {
+      "id": "facts",
+      "title": "Что известно из ваших ответов",
+      "content": "Факты с периодом, параметрами и указанием источника со слов посетителя."
+    },
+    {
+      "id": "findings",
+      "title": "Ситуации, требующие внимания",
+      "content": "Обоснование, тип вывода, значимость и ограничения по каждому подходящему блоку."
+    },
+    {
+      "id": "history",
+      "title": "Что уже предпринимали",
+      "content": "Прошлые действия, результаты и способ оценки; неизвестность явно обозначена."
+    },
+    {
+      "id": "actions",
+      "title": "Порядок дальнейшей работы",
+      "content": "Проверки и действия с зависимостями, предпосылками, ролями и результатом."
+    },
+    {
+      "id": "services",
+      "title": "Подходящие направления работ",
+      "content": "Только обоснованные услуги; предварительные цены из утверждённого тарифа с единицами и условиями."
+    },
+    {
+      "id": "gaps",
+      "title": "Что ещё необходимо уточнить",
+      "content": "Неизвестные, спорные, не измеряемые и не рассмотренные сведения."
+    },
+    {
+      "id": "limitations",
+      "title": "Ограничения предварительного аудита",
+      "content": "Выводы основаны на ответах посетителя. Проверка сайта, рекламных кабинетов и систем отдельно не проводилась."
+    }
+  ],
+  "rules": {
+    "fixed_number_of_findings": null,
+    "fixed_number_of_steps": null,
+    "approved_blocks_only": true,
+    "unknown_is_not_zero": true,
+    "reported_is_not_verified": true,
+    "free_generation_of_recommendations": false,
+    "preserve_hypothesis_wording": true,
+    "escape_substitutions": true,
+    "allowed_substitutions": [
+      "evidence_summary",
+      "history_summary",
+      "impact_summary"
+    ],
+    "prices_in_block_prose": false,
+    "tariff_requires": [
+      "approved status",
+      "no unresolved conflicts",
+      "confirmed diagnostic context and related approved service",
+      "evidence rule matches; package scope is explicitly marked for confirmation",
+      "source unit and billing period shown without conversion",
+      "source date and conditions"
+    ]
+  },
+  "deduplication": "Объединять только подтверждённо одинаковую работу или наблюдение; сохранять основания всех объединённых блоков. Совпадение названия услуги не означает дубль.",
+  "dependencies": "Сначала доступ и пригодность данных, затем проверка причины, затем внедрение; связи domains.json требуют контекстной проверки.",
+  "reproducibility": {
+    "persist": [
+      "library_version",
+      "file_hashes",
+      "fact_snapshot",
+      "selected_block_ids",
+      "tariff_versions",
+      "source_refs",
+      "approved_rendered_content"
+    ],
+    "regeneration": "Повторно рендерить сохранённое содержание; не анализировать заново."
+  },
+  "empty_result": "По полученным сведениям главное ограничение пока не установлено. Для содержательного вывода нужны дополнительные сведения и проверки.",
+  "preview_label": "ПРИМЕР ДЛЯ ПРОВЕРКИ БИБЛИОТЕКИ. Не является аудитом реальной компании."
+}

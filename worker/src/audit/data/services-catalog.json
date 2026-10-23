@@ -1,0 +1,1425 @@
+{
+  "schema_version": "1.0.0",
+  "version": "0.1.4",
+  "status": "approved",
+  "author": "Codex — подготовка библиотеки",
+  "reviewer": "project_owner_chat_approval",
+  "approved_at": "2026-10-23T06:01:25.796Z",
+  "items": [
+    {
+      "id": "strategy",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Разработка digital-стратегии развития маркетинга и продаж",
+      "source_id": "strategy",
+      "scope": [
+        "Анализ целей, рынка и каналов",
+        "План развития маркетинга и показателей"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Ресурсы на системные изменения; проверить пригодность для масштаба каналов"
+      ],
+      "tariff_ids": [
+        "strategy_individual"
+      ],
+      "price_observation_source_ids": [
+        "strategy"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "strategy_channels",
+        "strategy_new_market",
+        "strategy_segments",
+        "dev_launch",
+        "market_dependence",
+        "content_goal",
+        "brand_position"
+      ]
+    },
+    {
+      "id": "marketing_audit",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Аудит интернет-маркетинга для бизнеса",
+      "source_id": "marketing_audit",
+      "scope": [
+        "Аудит интернет-маркетинга",
+        "Разбор продвижения и направлений улучшения"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "marketing_audit"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "strategy_goal",
+        "strategy_dependency",
+        "strategy_accountability",
+        "strategy_resources",
+        "strategy_previous"
+      ]
+    },
+    {
+      "id": "analytics",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Услуги веб-аналитики",
+      "source_id": "analytics",
+      "scope": [
+        "Настройка измерений",
+        "Анализ результата и отчётность"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [
+        "analytics_once",
+        "analytics_month",
+        "analytics_advanced"
+      ],
+      "price_observation_source_ids": [
+        "analytics"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "analytics_absent",
+        "analytics_goals",
+        "analytics_sales",
+        "analytics_domains",
+        "analytics_ecommerce",
+        "analytics_margin",
+        "analytics_costs",
+        "analytics_quality",
+        "analytics_disagreement",
+        "analytics_access",
+        "analytics_comparison",
+        "ads_cost",
+        "ads_optimization",
+        "retention_measure",
+        "retention_loyalty",
+        "market_entry",
+        "market_ads",
+        "ai_prediction",
+        "integration_reports"
+      ]
+    },
+    {
+      "id": "calltracking",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Коллтрекинг",
+      "source_id": "calltracking",
+      "scope": [
+        "Определение источников звонков",
+        "Связь звонков с каналами привлечения"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "calltracking"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "analytics_calls",
+        "crm_calls"
+      ]
+    },
+    {
+      "id": "seo",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Комплексный SEO-аудит сайта",
+      "source_id": "seo",
+      "scope": [
+        "Аудит поискового продвижения",
+        "Выявление направлений работ"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [
+        "seo_audit_standard"
+      ],
+      "price_observation_source_ids": [
+        "seo"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "seo_intent",
+        "seo_region",
+        "seo_assortment",
+        "seo_content",
+        "seo_links",
+        "seo_mobile",
+        "seo_trust",
+        "dev_languages"
+      ],
+      "tariff_review_ids": [
+        "seo_offer_scope"
+      ]
+    },
+    {
+      "id": "seo_technical",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Технический SEO-аудит сайта",
+      "source_id": "seo_technical",
+      "scope": [
+        "Проверка технических условий поискового продвижения"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "seo_technical"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "seo_index",
+        "seo_migration",
+        "seo_duplicates"
+      ]
+    },
+    {
+      "id": "semantics",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Сбор эффективного семантического ядра",
+      "source_id": "semantics",
+      "scope": [
+        "Сбор и группировка поисковых запросов"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [
+        "semantics_start"
+      ],
+      "price_observation_source_ids": [
+        "semantics"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "seo_demand",
+        "seo_before_build",
+        "content_intent"
+      ]
+    },
+    {
+      "id": "geo",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "GEO-аудит бренда",
+      "source_id": "geo",
+      "scope": [
+        "Проверка представления бренда в AI-ответах",
+        "Отчёт и план работ"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [
+        "geo_base",
+        "geo_extended"
+      ],
+      "price_observation_source_ids": [
+        "geo"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "seo_ai_visibility",
+        "seo_ai_accuracy"
+      ]
+    },
+    {
+      "id": "ads",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Аудит рекламной кампании в Яндекс Директ",
+      "source_id": "ads",
+      "scope": [
+        "Аудит кампаний Яндекс Директ"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "ads"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "ads_quality",
+        "ads_cost",
+        "ads_geo",
+        "ads_capacity",
+        "ads_landing",
+        "ads_optimization",
+        "ads_feed",
+        "ads_spread",
+        "ads_ownership",
+        "ads_creatives",
+        "ads_restart"
+      ]
+    },
+    {
+      "id": "retarget",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Настройка ретаргетинга и ремаркетинга",
+      "source_id": "retarget",
+      "scope": [
+        "Настройка повторных рекламных обращений к аудитории"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "retarget"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "ads_retarget"
+      ]
+    },
+    {
+      "id": "ux",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Юзабилити-аудит сайта",
+      "source_id": "ux",
+      "scope": [
+        "Проверка пользовательских сценариев и интерфейса"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "ux"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "seo_mobile",
+        "ads_landing",
+        "ux_checkout",
+        "ux_form",
+        "ux_mobile",
+        "ux_navigation",
+        "ux_cost",
+        "ux_service",
+        "ux_contact",
+        "ux_accessibility",
+        "ux_redesign"
+      ]
+    },
+    {
+      "id": "cjm",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Customer Journey Map, которая показывает, где бизнес теряет клиента и деньги",
+      "source_id": "cjm",
+      "scope": [
+        "Описание пути клиента и точек взаимодействия"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "cjm"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "ux_navigation",
+        "ux_contact",
+        "ux_redesign",
+        "retention_winback",
+        "rep_root",
+        "content_next"
+      ]
+    },
+    {
+      "id": "cro",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "CRO: повышение конверсии интернет-магазина",
+      "source_id": "cro",
+      "scope": [
+        "Проверка и улучшение конверсии действующего интернет-магазина"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Действующий магазин со стабильным потоком посетителей; применимость подтверждается отдельно"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "cro"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "ux_checkout",
+        "ux_cost",
+        "ux_product"
+      ],
+      "tariff_review_ids": [
+        "cro_cross_promotion"
+      ]
+    },
+    {
+      "id": "web",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Создание сайтов, которые работают",
+      "source_id": "web",
+      "scope": [
+        "Создание сайтов и веб-сервисов по согласованным требованиям"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "web"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "seo_before_build",
+        "dev_launch",
+        "dev_b2b",
+        "dev_cabinet",
+        "dev_platform",
+        "dev_editor",
+        "dev_languages",
+        "dev_booking",
+        "dev_mvp"
+      ]
+    },
+    {
+      "id": "shop",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Создаем интернет-магазины под ключ, которые продают 24/7",
+      "source_id": "shop",
+      "scope": [
+        "Создание интернет-магазина",
+        "Проектирование покупки и управления каталогом"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [
+        "shop_start"
+      ],
+      "price_observation_source_ids": [
+        "shop",
+        "t_web"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "seo_assortment",
+        "dev_shop",
+        "dev_b2b",
+        "market_dependence"
+      ],
+      "tariff_review_ids": [
+        "web_offer_scope"
+      ]
+    },
+    {
+      "id": "portal",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Разработка корпоративного портала под ключ",
+      "source_id": "portal",
+      "scope": [
+        "Разработка корпоративного портала и внутренних процессов"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "portal"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "dev_portal",
+        "dev_mvp"
+      ]
+    },
+    {
+      "id": "support",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Поддержка и развитие сайтов",
+      "source_id": "support",
+      "scope": [
+        "Сопровождение и доработка сайтов"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [
+        "support_subscription_10",
+        "support_subscription_30",
+        "support_subscription_100",
+        "support_deposit_30",
+        "support_deposit_100",
+        "support_deposit_300",
+        "support_postpaid"
+      ],
+      "price_observation_source_ids": [
+        "support",
+        "t_support_sub",
+        "t_support_deposit",
+        "t_support_post",
+        "t_support_overview"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "dev_editor",
+        "support_outages",
+        "support_updates",
+        "support_backup",
+        "support_regressions",
+        "support_access",
+        "support_backlog",
+        "support_regular"
+      ],
+      "tariff_review_ids": [
+        "support_deposit_period",
+        "support_postpaid_unit",
+        "support_overview"
+      ]
+    },
+    {
+      "id": "technical",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Технический аудит сайта",
+      "source_id": "technical",
+      "scope": [
+        "Технический аудит сайта",
+        "Отчёт и оценка согласованных доработок"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "technical"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "ux_form",
+        "ux_accessibility",
+        "dev_platform",
+        "support_outages",
+        "support_speed",
+        "support_backup",
+        "support_regressions"
+      ]
+    },
+    {
+      "id": "crm",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Подбор и внедрение CRM-систем",
+      "source_id": "crm",
+      "scope": [
+        "Настройка CRM, этапов, ролей и работы с обращениями"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "crm"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "analytics_quality",
+        "ads_capacity",
+        "crm_capture",
+        "crm_owner",
+        "crm_response",
+        "crm_stages",
+        "crm_duplicates",
+        "crm_handoff",
+        "crm_adoption",
+        "crm_migration",
+        "retention_segments",
+        "retention_permissions",
+        "retention_winback"
+      ]
+    },
+    {
+      "id": "crm_integration",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Интеграция CRM",
+      "source_id": "crm_integration",
+      "scope": [
+        "Связь CRM с другими рабочими системами"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "crm_integration"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "analytics_sales",
+        "dev_cabinet",
+        "dev_booking",
+        "crm_capture",
+        "crm_duplicates",
+        "crm_handoff",
+        "crm_migration",
+        "crm_orders",
+        "retention_triggers",
+        "ai_handoff",
+        "integration_manual"
+      ]
+    },
+    {
+      "id": "telephony",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Интеграция CRM и IP-телефонии",
+      "source_id": "telephony",
+      "scope": [
+        "Связь телефонии и CRM"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "telephony"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "crm_response",
+        "crm_calls"
+      ]
+    },
+    {
+      "id": "oms",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "OMS-система управления заказами в RetailCRM",
+      "source_id": "oms",
+      "scope": [
+        "Управление заказами разных каналов на базе retailCRM"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "oms"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "crm_orders",
+        "market_stock",
+        "integration_orders"
+      ]
+    },
+    {
+      "id": "loyalty",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Программы лояльности для магазина в RetailCRM",
+      "source_id": "loyalty",
+      "scope": [
+        "Настройка программы лояльности и коммуникаций на базе retailCRM"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "loyalty"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "retention_measure",
+        "retention_segments",
+        "retention_permissions",
+        "retention_triggers",
+        "retention_loyalty"
+      ]
+    },
+    {
+      "id": "marketplace",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Комплексное продвижение бизнеса на маркетплейсах",
+      "source_id": "marketplace",
+      "scope": [
+        "Продвижение и сопровождение продаж на маркетплейсах"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "marketplace"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "market_entry",
+        "market_order",
+        "market_ads",
+        "market_returns",
+        "market_stock",
+        "market_dependence"
+      ]
+    },
+    {
+      "id": "market_cards",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Аудит карточек товаров на маркетплейсах",
+      "source_id": "market_cards",
+      "scope": [
+        "Аудит карточек товаров маркетплейсов"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [
+        "market_cards_paid"
+      ],
+      "price_observation_source_ids": [
+        "market_cards",
+        "t_market"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "market_click",
+        "market_order",
+        "market_returns"
+      ],
+      "tariff_review_ids": [
+        "market_free_scope"
+      ]
+    },
+    {
+      "id": "market_integration",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Интеграция сайтов и интернет-магазинов с маркетплейсами",
+      "source_id": "market_integration",
+      "scope": [
+        "Обмен товарами, остатками и заказами с маркетплейсами"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "market_integration"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "ads_feed",
+        "market_sync"
+      ]
+    },
+    {
+      "id": "maps",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Оформление и оптимизация бизнеса в Яндекс Картах",
+      "source_id": "maps",
+      "scope": [
+        "Оформление и актуализация карточек на картах",
+        "Работа с локальным представлением компании"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "maps"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "rep_missing",
+        "rep_details",
+        "rep_branches"
+      ]
+    },
+    {
+      "id": "reputation",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "ORM: Управление репутацией в интернете",
+      "source_id": "reputation",
+      "scope": [
+        "Мониторинг и работа с репутационными материалами"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "reputation"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "rep_branches",
+        "rep_response",
+        "rep_root",
+        "rep_crisis",
+        "rep_false"
+      ]
+    },
+    {
+      "id": "serm",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "SERM-аудит компании",
+      "source_id": "serm",
+      "scope": [
+        "Аудит представления компании в поисковой выдаче"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "serm"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "rep_search",
+        "rep_false",
+        "brand_name"
+      ]
+    },
+    {
+      "id": "social",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "SMM-аудит групп/сообществ/страниц",
+      "source_id": "social",
+      "scope": [
+        "Аудит социальных сетей и их работы"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "social"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "social_quality",
+        "social_moderation",
+        "social_promotion",
+        "content_capacity"
+      ]
+    },
+    {
+      "id": "telegram",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Ведение Telegram-канала под ключ",
+      "source_id": "telegram",
+      "scope": [
+        "Ведение Telegram-канала",
+        "Подготовка контента и отчётность"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "telegram",
+        "t_telegram"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "social_moderation",
+        "social_promotion"
+      ],
+      "tariff_review_ids": [
+        "telegram_offer_scope"
+      ]
+    },
+    {
+      "id": "content",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Эффективный контент-маркетинг",
+      "source_id": "content",
+      "scope": [
+        "Контент-маркетинг",
+        "Материалы для задач аудитории и продвижения"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [
+        "content_start",
+        "content_advanced",
+        "content_business"
+      ],
+      "price_observation_source_ids": [
+        "content",
+        "t_content"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "seo_content",
+        "ux_product",
+        "ux_service",
+        "content_goal",
+        "content_process",
+        "content_expertise",
+        "content_intent",
+        "content_next",
+        "content_capacity",
+        "content_reuse"
+      ]
+    },
+    {
+      "id": "brand",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Фирменный стиль – ключевой инструмент маркетинга",
+      "source_id": "brand",
+      "scope": [
+        "Разработка фирменного стиля и правил использования"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "brand"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "brand_position",
+        "brand_consistency",
+        "brand_templates"
+      ]
+    },
+    {
+      "id": "presentation",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Презентации",
+      "source_id": "presentation",
+      "scope": [
+        "Дизайн и подготовка презентаций"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [
+        "presentation_template",
+        "presentation_filled",
+        "presentation_authored"
+      ],
+      "price_observation_source_ids": [
+        "presentation"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "content_reuse",
+        "brand_presentation",
+        "brand_templates"
+      ]
+    },
+    {
+      "id": "naming",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Нейминг, разработка названия и слогана",
+      "source_id": "naming",
+      "scope": [
+        "Разработка названия"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "naming"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "brand_name"
+      ]
+    },
+    {
+      "id": "ai",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "ИИ-консалтинг — решение для вашего бизнеса",
+      "source_id": "ai",
+      "scope": [
+        "Аудит процессов и данных для внедрения AI",
+        "Приоритеты и план внедрения"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [
+        "ai_minimum",
+        "ai_optimal",
+        "ai_enterprise"
+      ],
+      "price_observation_source_ids": [
+        "ai"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "ai_process",
+        "ai_knowledge",
+        "ai_eval",
+        "ai_prediction",
+        "ai_access"
+      ]
+    },
+    {
+      "id": "ai_agents",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "ИИ-агенты и ассистенты для бизнеса",
+      "source_id": "ai_agents",
+      "scope": [
+        "Помощники по знаниям",
+        "Агенты с согласованными действиями и контролем"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [
+        "ai_agents_minimum",
+        "ai_agents_optimal",
+        "ai_agents_enterprise"
+      ],
+      "price_observation_source_ids": [
+        "ai_agents"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "ai_knowledge",
+        "ai_handoff",
+        "ai_actions",
+        "ai_eval",
+        "ai_access"
+      ]
+    },
+    {
+      "id": "speech",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Анализ звонков с помощью ИИ для бизнеса",
+      "source_id": "speech",
+      "scope": [
+        "Анализ разговоров по согласованным критериям"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [
+        "speech_minimum",
+        "speech_optimal",
+        "speech_enterprise"
+      ],
+      "price_observation_source_ids": [
+        "speech"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "ai_speech"
+      ]
+    },
+    {
+      "id": "mobile",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Разработка мобильных приложений",
+      "source_id": "mobile",
+      "scope": [
+        "Разработка мобильных приложений"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "mobile"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "mobile_need",
+        "mobile_transaction",
+        "mobile_return"
+      ]
+    },
+    {
+      "id": "mobile_ux",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "UX-аудит мобильного приложения, который показывает, где теряется рост и деньги",
+      "source_id": "mobile_ux",
+      "scope": [
+        "Проверка пользовательских сценариев мобильного приложения"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "mobile_ux"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "mobile_need",
+        "mobile_onboarding",
+        "mobile_transaction",
+        "mobile_return"
+      ]
+    },
+    {
+      "id": "aso",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Продвижение мобильных приложений за 30 дней",
+      "source_id": "aso",
+      "scope": [
+        "Оптимизация представления приложения в магазинах"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "aso"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "mobile_store"
+      ]
+    },
+    {
+      "id": "one_c",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Внедрение продуктов 1С",
+      "source_id": "one_c",
+      "scope": [
+        "Внедрение и настройка 1С",
+        "Обновления и консультации"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [
+        "one_c_implementation",
+        "one_c_many_updates",
+        "one_c_single_update",
+        "one_c_once_update",
+        "one_c_custom_update",
+        "one_c_consultation",
+        "one_c_regular_consultation"
+      ],
+      "price_observation_source_ids": [
+        "one_c"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "integration_migration",
+        "integration_manual",
+        "integration_reports"
+      ]
+    },
+    {
+      "id": "one_c_support",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Техническое обслуживание и поддержка 1С",
+      "source_id": "one_c_support",
+      "scope": [
+        "Обслуживание и сопровождение 1С"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "one_c_support"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "integration_update"
+      ]
+    },
+    {
+      "id": "one_c_sync",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "name": "Интеграция 1С с сайтом на 1С-Битрикс",
+      "source_id": "one_c_sync",
+      "scope": [
+        "Обмен данными между сайтом и 1С"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованный объём и разрешённый доступ к необходимым данным"
+      ],
+      "tariff_ids": [],
+      "price_observation_source_ids": [
+        "one_c_sync"
+      ],
+      "pricing_resolution": "scope_and_quote_required",
+      "block_ids": [
+        "market_sync",
+        "integration_catalog",
+        "integration_orders"
+      ]
+    }
+  ],
+  "notes": [
+    "Отсутствие утверждённой цены не означает бесплатную услугу.",
+    "Наличие услуги в каталоге не доказывает её применимость конкретному посетителю."
+  ]
+}

@@ -1,0 +1,135 @@
+{
+  "schema_version": "1.0.0",
+  "version": "0.1.1",
+  "status": "approved",
+  "author": "Codex — подготовка библиотеки",
+  "reviewer": "project_owner_chat_approval",
+  "approved_at": "2026-10-23T06:01:25.796Z",
+  "channels": [
+    "chat",
+    "voice"
+  ],
+  "visitor_result": "PDF only",
+  "clock": {
+    "target_seconds": [
+      480,
+      600
+    ],
+    "max_seconds": 900,
+    "no_new_deep_branch_after": 720,
+    "closing_from": 840,
+    "scope": "Общий бюджет сессии, включая уточнения, юмор и смену канала; время PDF после интервью отдельно."
+  },
+  "entry_questions": [
+    "context_business",
+    "context_goal",
+    "context_assets",
+    "context_priority"
+  ],
+  "routing": {
+    "domain_activation": "Только явные факты о задачах, активах и процессах; неизвестную применимость уточнить одним scope-вопросом.",
+    "within_domain": "Сначала уже названные посетителем ситуации; затем вопрос, закрывающий существенный пробел выбранной ветки. Не обходить каталог подряд.",
+    "choice_order": [
+      "Уточнить существенное противоречие",
+      "Закрыть основания уже выбранной ситуации",
+      "Уточнить прошлые попытки выбранной ветки",
+      "Уточнить значимость и ресурсы",
+      "Выбрать следующую названную посетителем задачу при достаточном остатке времени"
+    ],
+    "tie_break": "Порядок названных посетителем приоритетов, затем устойчивый id; не изобретать вес из стоимости услуги.",
+    "stop_screening_if": "Содержательные ветки уже покрывают заявленные задачи либо остаток времени нужен для уточнений и завершения.",
+    "skip_known": true,
+    "allow_multiple_facts": true,
+    "max_clarifications_per_fact": 1,
+    "extra_clarification": "Только существенное противоречие и доступное время",
+    "after_unknown": "Зафиксировать состояние; пропустить необязательное углубление",
+    "after_declined": "Не возвращаться к отказу без инициативы посетителя",
+    "after_other": "Сохранить исходный смысл и передать на последующий разбор словаря"
+  },
+  "phases": [
+    {
+      "id": "orientation",
+      "next": "selected_branches"
+    },
+    {
+      "id": "selected_branches",
+      "next": "confirmation",
+      "may_continue_while_seconds_below": 840
+    },
+    {
+      "id": "confirmation",
+      "next": "closing"
+    },
+    {
+      "id": "closing",
+      "next": "closed"
+    },
+    {
+      "id": "closed",
+      "terminal": true
+    }
+  ],
+  "closing": {
+    "accepted_finish_text": "Спасибо за предоставленную информацию, сейчас вам предоставим отчёт предварительного аудита.",
+    "no_more_questions_after": 900,
+    "stop_requested": "Принять завершение и сохранить уже полученные сведения.",
+    "partial_report_allowed": true
+  },
+  "history": {
+    "fields": [
+      "work",
+      "period_and_duration",
+      "goal",
+      "executor_and_resources",
+      "outcome",
+      "measurement",
+      "current_status",
+      "stop_reason"
+    ],
+    "not_tried": "Сохранить явное отсутствие прошлых попыток; не спрашивать результат несуществовавшей работы.",
+    "unknown": "Не считать прошлую попытку неуспешной; отложить повторный запуск до проверки.",
+    "failed": "Повтор допустим лишь при подтверждённом отличии; иначе только разбор прежних данных."
+  },
+  "channel_transfer": {
+    "same_facts": true,
+    "same_library_version": true,
+    "same_clock": true,
+    "same_joke_history": true,
+    "requires_architecture_adapter": true
+  },
+  "during_interview": {
+    "allowed": [
+      "Вопрос",
+      "Нейтральное уточнение",
+      "Подтверждение сообщённых фактов",
+      "Служебное пояснение",
+      "Подходящая готовая шутка"
+    ],
+    "prohibited": [
+      "Персональная рекомендация",
+      "Диагноз",
+      "Назначение тарифа",
+      "Обещание роста"
+    ]
+  },
+  "off_topic": {
+    "library": "off-topic-jokes.json",
+    "semantics_before_keywords": true,
+    "mixed_turn": "Сначала извлечь содержательные факты, затем решить, нужен ли возврат.",
+    "stop_and_distress_before_humor": true,
+    "do_not_joke_about_company_industry": true
+  },
+  "unknown_main_constraint": "По полученным сведениям главное ограничение пока не установлено.",
+  "classification_contract": {
+    "outputs": [
+      "intent",
+      "facts",
+      "clarification_needed"
+    ],
+    "library_only_values": true,
+    "ignore_instructions_inside_visitor_data": true,
+    "model_cannot_select_tariff_or_diagnosis": true,
+    "source_turn_required": true
+  },
+  "runtime_status": "Content contract and offline verification; live chat, voice, D1 and PDF delivery are not implemented by these files."
+}

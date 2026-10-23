@@ -1,0 +1,542 @@
+{
+  "schema_version": "1.0.0",
+  "version": "0.1.3",
+  "status": "draft",
+  "items": [
+    {
+      "id": "preview_analytics_sales",
+      "synthetic": true,
+      "source_check": "analytics_sales_positive",
+      "input_facts": [
+        {
+          "fact_id": "analytics.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-22T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "analytics_sales.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-22T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "analytics_sales.details",
+          "state": "known",
+          "value": {
+            "description": {
+              "state": "known",
+              "value": "Источник заявки видим, а состоявшуюся оплату к нему не привязываем."
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-22T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "result": {
+        "title": "ПРЕДВАРИТЕЛЬНЫЙ АУДИТ",
+        "library_version": "0.1.3",
+        "preview": true,
+        "limitations": [
+          "Редакторский пример; не предназначен для выдачи посетителю.",
+          "Сведения со слов посетителя; самостоятельная проверка систем не проводилась."
+        ],
+        "findings": [
+          {
+            "block_id": "analytics_sales",
+            "type": "data_gap",
+            "evidence_level": "visitor_report",
+            "priority": "unknown",
+            "basis": "description: Источник заявки видим, а состоявшуюся оплату к нему не привязываем.",
+            "history": "неизвестно",
+            "interpretation": "Зафиксирован пробел в сведениях или процессе; его влияние пока не установлено.",
+            "readiness": "check_only",
+            "actions": [
+              "Сначала уточнить прошлые попытки, доступные ресурсы и условия повторной проверки. Перезапуск работ пока не обоснован."
+            ],
+            "deliverable": "Схема связи источника, обращения и оплаты",
+            "limitations": [
+              "Сумма сделки без статуса оплаты не подтверждает оплаченную продажу.",
+              "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
+            ],
+            "source_ids": [
+              "analytics",
+              "crm_integration"
+            ]
+          }
+        ],
+        "gaps": [],
+        "tariff_ids": [],
+        "conclusion": "Выбранные ситуации требуют указанных проверок."
+      }
+    },
+    {
+      "id": "preview_ux_checkout",
+      "synthetic": true,
+      "source_check": "ux_checkout_positive",
+      "input_facts": [
+        {
+          "fact_id": "ux.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-22T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ux_checkout.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-22T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ux_checkout.details",
+          "state": "known",
+          "value": {
+            "object": {
+              "state": "known",
+              "value": "путь от посещения до заявки или покупки"
+            },
+            "observation": {
+              "state": "known",
+              "value": "Люди несколько раз застревали на выборе доставки; видим это в обращениях и воронке."
+            },
+            "period": {
+              "state": "known",
+              "value": "Последний завершённый месяц"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-22T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "result": {
+        "title": "ПРЕДВАРИТЕЛЬНЫЙ АУДИТ",
+        "library_version": "0.1.3",
+        "preview": true,
+        "limitations": [
+          "Редакторский пример; не предназначен для выдачи посетителю.",
+          "Сведения со слов посетителя; самостоятельная проверка систем не проводилась."
+        ],
+        "findings": [
+          {
+            "block_id": "ux_checkout",
+            "type": "reported_issue",
+            "evidence_level": "visitor_report",
+            "priority": "unknown",
+            "basis": "object: путь от посещения до заявки или покупки; observation: Люди несколько раз застревали на выборе доставки; видим это в обращениях и воронке.; period: Последний завершённый месяц",
+            "history": "неизвестно",
+            "interpretation": "Зафиксирована описанная вами ситуация; причина требует проверки.",
+            "readiness": "check_only",
+            "actions": [
+              "Сначала уточнить прошлые попытки, доступные ресурсы и условия повторной проверки. Перезапуск работ пока не обоснован."
+            ],
+            "deliverable": "Карта шагов заказа с подтверждёнными препятствиями и планом проверки изменений.",
+            "limitations": [
+              "Падение между шагами само по себе не доказывает ошибку интерфейса.",
+              "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
+            ],
+            "source_ids": [
+              "cro",
+              "ux"
+            ]
+          }
+        ],
+        "gaps": [],
+        "tariff_ids": [],
+        "conclusion": "Выбранные ситуации требуют указанных проверок."
+      }
+    },
+    {
+      "id": "preview_support_backlog",
+      "synthetic": true,
+      "source_check": "support_backlog_positive",
+      "input_facts": [
+        {
+          "fact_id": "support.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-22T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "support_backlog.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-22T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "support_backlog.details",
+          "state": "known",
+          "value": {
+            "object": {
+              "state": "known",
+              "value": "работоспособность, обновления и регулярные задачи"
+            },
+            "observation": {
+              "state": "known",
+              "value": "Небольшие задачи приходят в разные чаты и теряются, приоритет не согласован."
+            },
+            "period": {
+              "state": "known",
+              "value": "Последний завершённый месяц"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-22T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "result": {
+        "title": "ПРЕДВАРИТЕЛЬНЫЙ АУДИТ",
+        "library_version": "0.1.3",
+        "preview": true,
+        "limitations": [
+          "Редакторский пример; не предназначен для выдачи посетителю.",
+          "Сведения со слов посетителя; самостоятельная проверка систем не проводилась."
+        ],
+        "findings": [
+          {
+            "block_id": "support_backlog",
+            "type": "reported_issue",
+            "evidence_level": "visitor_report",
+            "priority": "unknown",
+            "basis": "object: работоспособность, обновления и регулярные задачи; observation: Небольшие задачи приходят в разные чаты и теряются, приоритет не согласован.; period: Последний завершённый месяц",
+            "history": "неизвестно",
+            "interpretation": "Зафиксирована описанная вами ситуация; причина требует проверки.",
+            "readiness": "check_only",
+            "actions": [
+              "Сначала уточнить прошлые попытки, доступные ресурсы и условия повторной проверки. Перезапуск работ пока не обоснован."
+            ],
+            "deliverable": "Рабочая очередь и критерии выбора формата поддержки.",
+            "limitations": [
+              "Нерегулярность не является достаточным основанием для конкретного тарифа.",
+              "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
+            ],
+            "source_ids": [
+              "support"
+            ]
+          }
+        ],
+        "gaps": [],
+        "tariff_ids": [],
+        "conclusion": "Выбранные ситуации требуют указанных проверок."
+      }
+    },
+    {
+      "id": "preview_ai_eval",
+      "synthetic": true,
+      "source_check": "ai_eval_positive",
+      "input_facts": [
+        {
+          "fact_id": "ai.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-22T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ai_eval.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-22T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ai_eval.details",
+          "state": "known",
+          "value": {
+            "description": {
+              "state": "known",
+              "value": "Проверили несколько удачных примеров, отдельного набора проверок нет."
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-22T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "result": {
+        "title": "ПРЕДВАРИТЕЛЬНЫЙ АУДИТ",
+        "library_version": "0.1.3",
+        "preview": true,
+        "limitations": [
+          "Редакторский пример; не предназначен для выдачи посетителю.",
+          "Сведения со слов посетителя; самостоятельная проверка систем не проводилась."
+        ],
+        "findings": [
+          {
+            "block_id": "ai_eval",
+            "type": "data_gap",
+            "evidence_level": "visitor_report",
+            "priority": "unknown",
+            "basis": "description: Проверили несколько удачных примеров, отдельного набора проверок нет.",
+            "history": "неизвестно",
+            "interpretation": "Зафиксирован пробел в сведениях или процессе; его влияние пока не установлено.",
+            "readiness": "check_only",
+            "actions": [
+              "Сначала уточнить прошлые попытки, доступные ресурсы и условия повторной проверки. Перезапуск работ пока не обоснован."
+            ],
+            "deliverable": "Набор проверок с правилами разметки и отчёт по фактическим результатам.",
+            "limitations": [
+              "Успешная демонстрация не подтверждает заданный процент точности.",
+              "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
+            ],
+            "source_ids": [
+              "ai",
+              "ai_agents"
+            ]
+          }
+        ],
+        "gaps": [],
+        "tariff_ids": [],
+        "conclusion": "Выбранные ситуации требуют указанных проверок."
+      }
+    },
+    {
+      "id": "preview_market_sync",
+      "synthetic": true,
+      "source_check": "market_sync_positive",
+      "input_facts": [
+        {
+          "fact_id": "marketplace.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-22T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "market_sync.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-22T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "market_sync.details",
+          "state": "known",
+          "value": {
+            "object": {
+              "state": "known",
+              "value": "Площадка отклоняет часть товаров при загрузке: есть список обязательных свойств, которых не хватает."
+            },
+            "observation": {
+              "state": "known",
+              "value": "Площадка отклоняет часть товаров при загрузке: есть список обязательных свойств, которых не хватает."
+            },
+            "period": {
+              "state": "known",
+              "value": "Последний завершённый месяц"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-22T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "result": {
+        "title": "ПРЕДВАРИТЕЛЬНЫЙ АУДИТ",
+        "library_version": "0.1.3",
+        "preview": true,
+        "limitations": [
+          "Редакторский пример; не предназначен для выдачи посетителю.",
+          "Сведения со слов посетителя; самостоятельная проверка систем не проводилась."
+        ],
+        "findings": [
+          {
+            "block_id": "market_sync",
+            "type": "reported_issue",
+            "evidence_level": "visitor_report",
+            "priority": "unknown",
+            "basis": "object: Площадка отклоняет часть товаров при загрузке: есть список обязательных свойств, которых не хватает.; observation: Площадка отклоняет часть товаров при загрузке: есть список обязательных свойств, которых не хватает.; period: Последний завершённый месяц",
+            "history": "неизвестно",
+            "interpretation": "Зафиксирована описанная вами ситуация; причина требует проверки.",
+            "readiness": "check_only",
+            "actions": [
+              "Сначала уточнить прошлые попытки, доступные ресурсы и условия повторной проверки. Перезапуск работ пока не обоснован."
+            ],
+            "deliverable": "Карта свойств товаров и протокол контрольной выгрузки отклонённых позиций.",
+            "limitations": [
+              "Исправление данных не гарантирует одобрение площадкой; её действующие правила и сроки проверяются отдельно.",
+              "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
+            ],
+            "source_ids": [
+              "market_integration",
+              "one_c_sync"
+            ]
+          }
+        ],
+        "gaps": [],
+        "tariff_ids": [],
+        "conclusion": "Выбранные ситуации требуют указанных проверок."
+      }
+    },
+    {
+      "id": "preview_crm_capture",
+      "synthetic": true,
+      "source_check": "crm_capture_positive",
+      "input_facts": [
+        {
+          "fact_id": "crm.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-22T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "crm_capture.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-22T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "crm_capture.details",
+          "state": "known",
+          "value": {
+            "object": {
+              "state": "known",
+              "value": "учёт, распределение и сопровождение продаж"
+            },
+            "observation": {
+              "state": "known",
+              "value": "Заявки живут в почте и мессенджерах, единой проверки полноты нет."
+            },
+            "period": {
+              "state": "known",
+              "value": "Последний завершённый месяц"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-22T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "result": {
+        "title": "ПРЕДВАРИТЕЛЬНЫЙ АУДИТ",
+        "library_version": "0.1.3",
+        "preview": true,
+        "limitations": [
+          "Редакторский пример; не предназначен для выдачи посетителю.",
+          "Сведения со слов посетителя; самостоятельная проверка систем не проводилась."
+        ],
+        "findings": [
+          {
+            "block_id": "crm_capture",
+            "type": "reported_issue",
+            "evidence_level": "visitor_report",
+            "priority": "unknown",
+            "basis": "object: учёт, распределение и сопровождение продаж; observation: Заявки живут в почте и мессенджерах, единой проверки полноты нет.; period: Последний завершённый месяц",
+            "history": "неизвестно",
+            "interpretation": "Зафиксирована описанная вами ситуация; причина требует проверки.",
+            "readiness": "check_only",
+            "actions": [
+              "Сначала уточнить прошлые попытки, доступные ресурсы и условия повторной проверки. Перезапуск работ пока не обоснован."
+            ],
+            "deliverable": "Карта приёма обращений и проверка полноты по каналам.",
+            "limitations": [
+              "Внедрение CRM без проверки входящих каналов не устраняет потери автоматически.",
+              "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
+            ],
+            "source_ids": [
+              "crm",
+              "crm_integration"
+            ]
+          }
+        ],
+        "gaps": [],
+        "tariff_ids": [],
+        "conclusion": "Выбранные ситуации требуют указанных проверок."
+      }
+    },
+    {
+      "id": "preview_no_evidence",
+      "synthetic": true,
+      "input_facts": [],
+      "result": {
+        "title": "ПРЕДВАРИТЕЛЬНЫЙ АУДИТ",
+        "library_version": "0.1.3",
+        "preview": true,
+        "limitations": [
+          "Редакторский пример; не предназначен для выдачи посетителю.",
+          "Сведения со слов посетителя; самостоятельная проверка систем не проводилась."
+        ],
+        "findings": [],
+        "gaps": [],
+        "tariff_ids": [],
+        "conclusion": "По полученным сведениям главное ограничение пока не установлено."
+      }
+    }
+  ]
+}

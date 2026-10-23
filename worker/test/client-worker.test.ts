@@ -1,0 +1,77 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { SqliteD1 } from './helpers/d1.ts';
+import { createWorker } from '../src/index.ts';
+import { CoreServices } from '../src/core.ts';
+import type { Env } from '../src/env.ts';
+
+// Use the real client and transport; only DOM presentation and external providers are replaced.
+(globalThis as any).window = { addEventListener() {}, removeEventListener() {} };
+(globalThis as any).document = { addEventListener() {} };
+// @ts-expect-error The independently implemented static frontend intentionally uses JavaScript.
+const { createAuditClient } = await import('../../dist/assets/audit-client.js');
+// @ts-expect-error Static frontend transport has no TypeScript declaration file.
+const { createAuditTransport } = await import('../../dist/assets/audit-http.js');
+
+test('real client/transport/Worker: creation, text, multi-selection, lost ACK retry, pause and finish', async () => {
+  const db = new SqliteD1(), now = Date.parse('2026-10-22T20:00:00Z');
+  const jobs: Promise<unknown>[] = [];
+  let providerCalls = 0, stored: any = null, handlers: any, model: any, dropSelectionAck = true;
+  const selectionBodies: string[] = [];
+  const origin = 'https://olegprojectssrore.github.io';
+  const env: Env = { DB: db.binding(), REPORTS_KV: { get: async () => null, put: async () => undefined } as unknown as KVNamespace,
+    ALLOW_DRAFT_LIBRARY: 'true', ALLOWED_ORIGINS: origin, TURNSTILE_HOSTNAMES: 'olegprojectssrore.github.io',
+    TURNSTILE_SECRET: 'local-test', IP_HASH_SALT: 'local-test-only-'.repeat(4), DEEPSEEK_API_KEY: 'local-test',
+    BUDGETS_JSON: JSON.stringify({ new_sessions: 10, sessions_per_ip: 10, deepseek_usd_micros: 20_000_000, deepseek_calls: 10, deepseek_tokens: 1_000_000 }) };
+  const provider: typeof fetch = async (url, init) => {
+    if (String(url).includes('turnstile')) return Response.json({ success: true, hostname: 'olegprojectssrore.github.io', action: 'session' });
+    providerCalls++;
+    const context = JSON.parse(JSON.parse(String(init?.body)).messages[1].content), event = context.source_events[0];
+    const answers = [ ['context_business', 'context.business', 'Магазин'], ['context_goal', 'context.goal', 'Рост продаж'], ['context_assets', 'context.assets', ['Сайт']] ]
+      .map(([question_id, fact_id, value]) => ({ question_id, fact_id, value, state: 'known', event_ids: [event.id], evidence: [{ event_id: event.id, text: event.text }] }));
+    return Response.json({ usage: { prompt_tokens: 80, completion_tokens: 20, total_tokens: 100 }, choices: [{ finish_reason: 'stop', message: { content: JSON.stringify({
+      intent: 'answer', answers, clarification_question_id: null, faq_id: null, joke_category_id: null, humor_preference: null,
+    }) } }] });
+  };
+  const worker = createWorker(undefined, { now: () => now, fetcher: provider });
+  const transport = createAuditTransport('https://audit.example', { fetcher: async (url: string, init: RequestInit) => {
+    const headers = new Headers(init.headers); headers.set('Origin', origin); headers.set('CF-Connecting-IP', '192.0.2.1');
+    const response = await worker.fetch(new Request(url, { ...init, headers }), env, { waitUntil(promise: Promise<unknown>) { jobs.push(promise); } } as ExecutionContext);
+    const body = init.body ? JSON.parse(String(init.body)) : null;
+    if (url.endsWith('/api/chat') && body.input.kind === 'selection') {
+      selectionBodies.push(String(init.body));
+      if (dropSelectionAck && response.ok) { dropSelectionAck = false; throw new Error('lost ACK after durable commit'); }
+    }
+    return response;
+  } });
+  const client = createAuditClient({ config: { apiBaseUrl: 'https://audit.example', turnstileSiteKey: 'local-test' }, transport, now: () => now,
+    persistence: { load: () => structuredClone(stored), save: (value: unknown) => { stored = structuredClone(value); } }, challenge: async () => 'test-turnstile',
+    viewFactory(callbacks: any) { handlers = callbacks; return { open() {}, destroy() {}, render(value: unknown) { model = value; },
+      getDraft: () => '', setDraft() {}, clearDraft() {}, challengeElement: {} }; },
+  });
+  try {
+    await client.open('chat');
+    assert.equal(model.error, ''); assert.equal(client.session.question.id, 'context_business');
+    assert.equal(stored.management_token.length, 43); assert.notEqual(stored.management_token, stored.report_token);
+    await handlers.onText('Магазин. Рост продаж. Сайт.');
+    assert.equal(model.error, ''); assert.equal(client.session.question.id, 'context_priority');
+    assert.equal(model.question.answer_mode, 'multiple');
+    await handlers.onSelection(['strategy', 'analytics']);
+    assert.ok(stored.pending); assert.equal(providerCalls, 1);
+    const core = new CoreServices(env, () => now);
+    const revision = (await core.store.requireSession(client.session.session_id)).state.revision;
+    await handlers.onRetry();
+    assert.equal(model.error, ''); assert.equal(stored.pending, null);
+    assert.equal(selectionBodies.length, 2); assert.equal(selectionBodies[0], selectionBodies[1]);
+    assert.equal(client.session.revision, revision); assert.equal(providerCalls, 1);
+    const answers = await core.store.listAnswers(client.session.session_id);
+    assert.equal(answers.length, 4);
+    assert.deepEqual(answers.find(answer => answer.fact_id === 'context.priority')?.value, ['strategy', 'analytics']);
+    await handlers.onPause(); assert.equal(client.session.paused, true);
+    await handlers.onResume(); assert.equal(client.session.paused, false);
+    await handlers.onFinish();
+    assert.ok(['closing', 'preparing'].includes(client.session.status));
+    assert.equal(db.sqlite.prepare('SELECT count(*) AS n FROM audit_jobs').get()!.n, 1);
+    assert.ok(stored.messages.some((message: any) => message.id === 'closing-message'));
+  } finally { await client.destroy(); await Promise.allSettled(jobs); db.close(); }
+});

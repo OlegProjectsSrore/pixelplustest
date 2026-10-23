@@ -1,0 +1,25 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "pixelplus-ai",
+  "account_id": "6d05f3368fb4a17fd693106dc7cdac83",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-22",
+  "workers_dev": true,
+  "send_metrics": false,
+  "triggers": { "crons": ["* * * * *"] },
+  "d1_databases": [{ "binding": "DB", "database_name": "pixelplus-ai", "database_id": "9a74183c-b271-47df-8d22-1facab33e988", "migrations_dir": "migrations" }],
+  "kv_namespaces": [{ "binding": "REPORTS_KV", "id": "c607d12502534f1b9fbe754cc6f39be3" }],
+  "browser": { "binding": "BROWSER", "remote": true },
+  "vars": {
+    "PUBLIC_WORKER_URL": "https://pixelplus-ai.rudiskiyoleg.workers.dev",
+    "ALLOWED_ORIGINS": "https://olegprojectssrore.github.io",
+    "TURNSTILE_HOSTNAMES": "olegprojectssrore.github.io",
+    "ULTRAVOX_MODEL": "ultravox-v0.7",
+    "ULTRAVOX_VOICE": "83b2a94f-8078-4321-935c-a0798b2ac621",
+    "ALLOW_DRAFT_LIBRARY": "false",
+    "PUBLIC_SESSIONS_ENABLED": "false",
+    "SMTP_HOST": "smtp.gmail.com",
+    "SMTP_PORT": "587",
+    "BUDGETS_JSON": "{\"new_sessions\":7,\"sessions_per_ip\":7,\"voice_starts\":14,\"voice_seconds\":7200,\"deepseek_usd_micros\":20000000,\"deepseek_calls\":20000000,\"deepseek_tokens\":3333333333,\"pdf_renders\":20,\"browser_seconds\":600,\"email_attempts\":14}"
+  }
+}

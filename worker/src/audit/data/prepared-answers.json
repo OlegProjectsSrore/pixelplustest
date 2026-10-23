@@ -1,0 +1,178 @@
+{
+  "schema_version": "1.0.0",
+  "version": "0.1.1",
+  "status": "approved",
+  "author": "Codex — подготовка библиотеки",
+  "reviewer": "project_owner_chat_approval",
+  "approved_at": "2026-10-23T06:01:25.796Z",
+  "items": [
+    {
+      "id": "purpose",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "text": "Это короткий опрос о вашей задаче. По ответам будет подготовлен предварительный аудит в PDF.",
+      "channels": [
+        "chat",
+        "voice"
+      ],
+      "diagnostic": false
+    },
+    {
+      "id": "time",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "text": "Ориентир — 8–10 минут, максимум — 15 минут, включая уточнения.",
+      "channels": [
+        "chat",
+        "voice"
+      ],
+      "diagnostic": false
+    },
+    {
+      "id": "result",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "text": "Персональные выводы и дальнейшие действия будут в PDF после сбора сведений.",
+      "channels": [
+        "chat",
+        "voice"
+      ],
+      "diagnostic": false
+    },
+    {
+      "id": "not_technical_audit",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "text": "В этом опросе я фиксирую ваши ответы. Самостоятельная проверка сайта и рабочих систем не проводится.",
+      "channels": [
+        "chat",
+        "voice"
+      ],
+      "diagnostic": false
+    },
+    {
+      "id": "unknown",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "text": "Так и зафиксирую. Неизвестные сведения не буду заменять предположениями.",
+      "channels": [
+        "chat",
+        "voice"
+      ],
+      "diagnostic": false
+    },
+    {
+      "id": "refusal",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "text": "Хорошо, пропустим этот вопрос и отметим ограничение сведений.",
+      "channels": [
+        "chat",
+        "voice"
+      ],
+      "diagnostic": false
+    },
+    {
+      "id": "price",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "text": "Формат и условия работ можно будет оценить по собранным сведениям в итоговом PDF.",
+      "channels": [
+        "chat",
+        "voice"
+      ],
+      "diagnostic": false
+    },
+    {
+      "id": "correction",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "text": "Уточните правильное значение. Я сохраню исправление и учту его дальше.",
+      "channels": [
+        "chat",
+        "voice"
+      ],
+      "diagnostic": false
+    },
+    {
+      "id": "technical_terms",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "text": "Уточню вопрос простыми словами, сохранив его смысл.",
+      "channels": [
+        "chat",
+        "voice"
+      ],
+      "diagnostic": false
+    },
+    {
+      "id": "stop",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "text": "Завершим сбор сведений и используем уже полученные ответы.",
+      "channels": [
+        "chat",
+        "voice"
+      ],
+      "diagnostic": false
+    },
+    {
+      "id": "recommendation_now",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "text": "Дальнейшие действия будут в итоговом PDF. Сейчас уточню сведения, на которых они должны основываться.",
+      "channels": [
+        "chat",
+        "voice"
+      ],
+      "diagnostic": false
+    },
+    {
+      "id": "out_of_catalog",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка библиотеки",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "text": "Зафиксирую вашу задачу для отдельной оценки. Подменять её ближайшей по названию услугой не буду.",
+      "channels": [
+        "chat",
+        "voice"
+      ],
+      "diagnostic": false
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0.0",
+  "version": "0.1.1",
+  "algorithm": "sha256-utf8",
+  "items": [
+    {
+      "id": "purpose",
+      "sha256": "155ad9da80a65bfe0a1595b42ecb81a9fae4e7e4806276ce7cabf0e56cad53fb"
+    },
+    {
+      "id": "time",
+      "sha256": "0571c35db83c267b7e8da143b67363734c12a21d9c9887392a00ee84447ddd2d"
+    },
+    {
+      "id": "result",
+      "sha256": "9bd2e4eef2acf2170b13a0e2e18e12d90337d237d285bf9e1992313c54bbcd69"
+    },
+    {
+      "id": "not_technical_audit",
+      "sha256": "20eb252a331a04712f3f44a0351c7c713bded18f6d4e5a69c44a6b32da3654ad"
+    },
+    {
+      "id": "unknown",
+      "sha256": "274551229fca9b496c442b7ee756554447d5badfb8b0f4ea85de439223fd2ec6"
+    },
+    {
+      "id": "refusal",
+      "sha256": "7692b0f264bf7292ee5e05a6f5532ea67fd4552635f99ca153abfc3cd5513928"
+    },
+    {
+      "id": "price",
+      "sha256": "30e63af0f54b0145d63f34e751d00ae7e9801a97f8eafe9d5ab2de6986c87f90"
+    },
+    {
+      "id": "correction",
+      "sha256": "320a3dff4abfaf7262a2059d1cd1d832a96a1e83e546dca672874d95aa0dcda6"
+    },
+    {
+      "id": "technical_terms",
+      "sha256": "6306920de3b93c37bbb0f82a021374ee2e881723f1103262c7be1ca056a51a3e"
+    },
+    {
+      "id": "stop",
+      "sha256": "ea664795e8d879467fdfb48eade791f5a1202505d1a49d55fc0fd49bc63e731f"
+    },
+    {
+      "id": "recommendation_now",
+      "sha256": "f17d564f567de5f987b8e1304ddf50536a05224096656ce423a41a0b6002948c"
+    },
+    {
+      "id": "out_of_catalog",
+      "sha256": "666b4469e56694b9b963d3aae749cdbc17a2c537a2d8e52bcba9b8681ea1339c"
+    }
+  ]
+}

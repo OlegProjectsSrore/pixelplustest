@@ -1,0 +1,283 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Зафиксированное содержание предварительного аудита; внутренний результат",
+  "type": "object",
+  "required": [
+    "title",
+    "library_version",
+    "preview",
+    "limitations",
+    "findings",
+    "gaps",
+    "tariff_ids"
+  ],
+  "properties": {
+    "title": {
+      "const": "ПРЕДВАРИТЕЛЬНЫЙ АУДИТ"
+    },
+    "library_version": {
+      "const": "0.1.3"
+    },
+    "preview": {
+      "type": "boolean"
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "block_id",
+          "type",
+          "evidence_level",
+          "priority",
+          "basis",
+          "history",
+          "actions",
+          "limitations",
+          "source_ids"
+        ],
+        "properties": {
+          "block_id": {
+            "enum": [
+              "strategy_goal",
+              "strategy_channels",
+              "strategy_dependency",
+              "strategy_new_market",
+              "strategy_accountability",
+              "strategy_resources",
+              "strategy_segments",
+              "strategy_previous",
+              "analytics_absent",
+              "analytics_goals",
+              "analytics_sales",
+              "analytics_calls",
+              "analytics_domains",
+              "analytics_ecommerce",
+              "analytics_margin",
+              "analytics_costs",
+              "analytics_quality",
+              "analytics_disagreement",
+              "analytics_access",
+              "analytics_comparison",
+              "seo_index",
+              "seo_migration",
+              "seo_duplicates",
+              "seo_demand",
+              "seo_intent",
+              "seo_region",
+              "seo_assortment",
+              "seo_content",
+              "seo_links",
+              "seo_mobile",
+              "seo_trust",
+              "seo_before_build",
+              "seo_ai_visibility",
+              "seo_ai_accuracy",
+              "ads_quality",
+              "ads_cost",
+              "ads_geo",
+              "ads_capacity",
+              "ads_landing",
+              "ads_optimization",
+              "ads_retarget",
+              "ads_feed",
+              "ads_spread",
+              "ads_ownership",
+              "ads_creatives",
+              "ads_restart",
+              "ux_checkout",
+              "ux_form",
+              "ux_mobile",
+              "ux_navigation",
+              "ux_cost",
+              "ux_product",
+              "ux_service",
+              "ux_contact",
+              "ux_accessibility",
+              "ux_redesign",
+              "dev_launch",
+              "dev_shop",
+              "dev_b2b",
+              "dev_cabinet",
+              "dev_portal",
+              "dev_platform",
+              "dev_editor",
+              "dev_languages",
+              "dev_booking",
+              "dev_mvp",
+              "support_outages",
+              "support_speed",
+              "support_updates",
+              "support_backup",
+              "support_regressions",
+              "support_access",
+              "support_backlog",
+              "support_regular",
+              "crm_capture",
+              "crm_owner",
+              "crm_response",
+              "crm_stages",
+              "crm_duplicates",
+              "crm_calls",
+              "crm_handoff",
+              "crm_adoption",
+              "crm_migration",
+              "crm_orders",
+              "retention_measure",
+              "retention_segments",
+              "retention_permissions",
+              "retention_triggers",
+              "retention_loyalty",
+              "retention_winback",
+              "market_entry",
+              "market_click",
+              "market_order",
+              "market_ads",
+              "market_returns",
+              "market_sync",
+              "market_stock",
+              "market_dependence",
+              "rep_missing",
+              "rep_details",
+              "rep_branches",
+              "rep_response",
+              "rep_root",
+              "rep_search",
+              "rep_crisis",
+              "rep_false",
+              "content_goal",
+              "content_process",
+              "content_expertise",
+              "content_intent",
+              "content_next",
+              "social_quality",
+              "social_moderation",
+              "social_promotion",
+              "content_capacity",
+              "content_reuse",
+              "brand_position",
+              "brand_consistency",
+              "brand_name",
+              "brand_presentation",
+              "brand_templates",
+              "ai_process",
+              "ai_knowledge",
+              "ai_handoff",
+              "ai_actions",
+              "ai_eval",
+              "ai_speech",
+              "ai_prediction",
+              "ai_access",
+              "mobile_need",
+              "mobile_onboarding",
+              "mobile_transaction",
+              "mobile_store",
+              "mobile_return",
+              "integration_catalog",
+              "integration_orders",
+              "integration_update",
+              "integration_migration",
+              "integration_manual",
+              "integration_reports"
+            ]
+          },
+          "type": {
+            "enum": [
+              "reported_issue",
+              "hypothesis",
+              "data_gap",
+              "opportunity"
+            ]
+          },
+          "evidence_level": {
+            "const": "visitor_report"
+          },
+          "priority": {
+            "enum": [
+              "high",
+              "normal",
+              "low",
+              "unknown"
+            ]
+          },
+          "basis": {
+            "type": "string"
+          },
+          "history": {
+            "type": "string"
+          },
+          "actions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "limitations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "interpretation": {
+            "type": "string"
+          },
+          "deliverable": {
+            "type": "string"
+          },
+          "readiness": {
+            "enum": [
+              "check_only",
+              "ready_for_scoping"
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "gaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "block_id",
+          "reason"
+        ],
+        "properties": {
+          "block_id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "tariff_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "conclusion": {
+      "type": "string"
+    },
+    "version_snapshot": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": false
+}
+

@@ -1,0 +1,70 @@
+{
+  "schema_version": "1.0.0",
+  "version": "0.1.1",
+  "status": "approved",
+  "author": "Codex — подготовка библиотеки",
+  "reviewer": "project_owner_chat_approval",
+  "approved_at": "2026-10-23T06:01:25.796Z",
+  "items": [
+    {
+      "id": "purpose",
+      "question": "Что это за аудит?",
+      "prepared_answer_id": "purpose"
+    },
+    {
+      "id": "time",
+      "question": "Сколько займёт разговор?",
+      "prepared_answer_id": "time"
+    },
+    {
+      "id": "result",
+      "question": "Где будут рекомендации?",
+      "prepared_answer_id": "result"
+    },
+    {
+      "id": "not_technical_audit",
+      "question": "Вы уже проверили сайт?",
+      "prepared_answer_id": "not_technical_audit"
+    },
+    {
+      "id": "unknown",
+      "question": "Я не знаю ответ.",
+      "prepared_answer_id": "unknown"
+    },
+    {
+      "id": "refusal",
+      "question": "Не хочу это сообщать.",
+      "prepared_answer_id": "refusal"
+    },
+    {
+      "id": "price",
+      "question": "Какой тариф мне нужен?",
+      "prepared_answer_id": "price"
+    },
+    {
+      "id": "correction",
+      "question": "Я ошибся в предыдущем ответе.",
+      "prepared_answer_id": "correction"
+    },
+    {
+      "id": "technical_terms",
+      "question": "Не понимаю термин.",
+      "prepared_answer_id": "technical_terms"
+    },
+    {
+      "id": "stop",
+      "question": "Хочу закончить.",
+      "prepared_answer_id": "stop"
+    },
+    {
+      "id": "recommendation_now",
+      "question": "Что мне сейчас делать?",
+      "prepared_answer_id": "recommendation_now"
+    },
+    {
+      "id": "out_of_catalog",
+      "question": "Моя задача не покрывается вопросами.",
+      "prepared_answer_id": "out_of_catalog"
+    }
+  ]
+}

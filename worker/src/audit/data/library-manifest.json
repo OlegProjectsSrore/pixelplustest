@@ -1,0 +1,199 @@
+{
+  "schema_version": "1.0.0",
+  "library_version": "0.1.3",
+  "status": "approved",
+  "language": "ru",
+  "reviewer": "project_owner_chat_approval",
+  "approved_at": "2026-10-23T06:01:25.796Z",
+  "storage": {
+    "library": "Project JSON imported into the server bundle; not D1",
+    "visitor_data": "D1 per architecture; no database writes performed by these tools"
+  },
+  "content_entrypoints": {
+    "situations": "bottlenecks.json",
+    "questions": "question-bank.json",
+    "answers": "answer-options.json",
+    "facts": "facts.json",
+    "services": "services-catalog.json",
+    "tariffs": "tariffs.json",
+    "scenario": "scenario.json",
+    "report": "report-template.json",
+    "jokes": "off-topic-jokes.json"
+  },
+  "schemas": {
+    "state": "audit-state.schema.json",
+    "result": "audit-result.schema.json",
+    "conditions": "conditions.schema.json"
+  },
+  "files": [
+    {
+      "name": "answer-options.json",
+      "sha256": "db7fe63c889b245b7888b4f21f13382f4b802a68854d012c3dbb2714f5f9fb6e",
+      "bytes": 431206,
+      "role": "runtime_candidate"
+    },
+    {
+      "name": "audit-result.schema.json",
+      "sha256": "570d506bf82e525d253cc8addc3604672329006a6d7d063588ac671b92a582e6",
+      "bytes": 7379,
+      "role": "runtime_candidate"
+    },
+    {
+      "name": "audit-state.schema.json",
+      "sha256": "97370545fdc9b9ff28a24370c93b735958f2a74a3abdf97fff5dedbfd4d93095",
+      "bytes": 55510,
+      "role": "runtime_candidate"
+    },
+    {
+      "name": "bottlenecks.json",
+      "sha256": "ebc1358516a0d33dbd0392d69a02ec122795d5215c83468d61d9516b567a1ab9",
+      "bytes": 1286348,
+      "role": "runtime_candidate"
+    },
+    {
+      "name": "cases-map.json",
+      "sha256": "2a97f491e29547f5221aace4ee5cd005dd62abee75dc19dbeefd7bfed5660de0",
+      "bytes": 2126,
+      "role": "runtime_candidate"
+    },
+    {
+      "name": "conditions.schema.json",
+      "sha256": "cf30107ffaa8ca803736f9717075ddef3028118c4c2b5f52c2ae0a1b0761e975",
+      "bytes": 39882,
+      "role": "runtime_candidate"
+    },
+    {
+      "name": "domains.json",
+      "sha256": "61146667561d0efa5655601c0ed0a4fddff157bdd6218ed5103a63470758c9c5",
+      "bytes": 6862,
+      "role": "runtime_candidate"
+    },
+    {
+      "name": "evaluation-cases.json",
+      "sha256": "2a50d5e7882b73a72200adf3b740c588a9226684696b8ca5f23a058645c56884",
+      "bytes": 21787,
+      "role": "editorial"
+    },
+    {
+      "name": "facts.json",
+      "sha256": "4536a044b3726ed26fb2e3cfe14625134f91cf9f6d6478e774e16383a32a874a",
+      "bytes": 486126,
+      "role": "runtime_candidate"
+    },
+    {
+      "name": "faq.json",
+      "sha256": "21fe813d6e594482dd26fd4d47ee173591eaf07c51932d4195bf13d829d9cf79",
+      "bytes": 1953,
+      "role": "runtime_candidate"
+    },
+    {
+      "name": "off-topic-jokes.json",
+      "sha256": "12bf1ff78c976b720c6567aade66e17a7dc588fbffd123887de1c770eaa61282",
+      "bytes": 59420,
+      "role": "runtime_candidate"
+    },
+    {
+      "name": "prepared-answers-hash.json",
+      "sha256": "2a2ffcccd9a069cff201c3190c4d056022a6d50ef407be08239e46e6299233ed",
+      "bytes": 1561,
+      "role": "runtime_candidate"
+    },
+    {
+      "name": "prepared-answers.json",
+      "sha256": "661fcdeeaa3a5ce00c51a3ede0c0689c8590a4cc2b01ac6582255e657d6a86cf",
+      "bytes": 6332,
+      "role": "runtime_candidate"
+    },
+    {
+      "name": "question-bank.json",
+      "sha256": "8718d4afd43a89eee9d019c01cc0620caeae1b80e8a3b1684db42f6b4240cad7",
+      "bytes": 743059,
+      "role": "runtime_candidate"
+    },
+    {
+      "name": "report-examples.json",
+      "sha256": "6fd05ba37e8931f89259e260ca5779443575abcdcf1eae52b5b89951b1a0f9fb",
+      "bytes": 24105,
+      "role": "editorial"
+    },
+    {
+      "name": "report-template.json",
+      "sha256": "742b10ed6c024cef285927d6a6fdf89ff03a192655ad00243da1d8ab19a0aa28",
+      "bytes": 4685,
+      "role": "runtime_candidate"
+    },
+    {
+      "name": "rule-checks.json",
+      "sha256": "3404a5dd9987dc2f0bcb2fe54b9adce0a1f1f6a06e255261f62f2385ff7d703a",
+      "bytes": 778712,
+      "role": "editorial"
+    },
+    {
+      "name": "scenario.json",
+      "sha256": "4f11a34f56f1223d48a7575d23fd5b91833f2f533e13ed28152768f78044c8a4",
+      "bytes": 6008,
+      "role": "runtime_candidate"
+    },
+    {
+      "name": "services-catalog.json",
+      "sha256": "50a230b68b3d2db5de2d9a4625cd6f8bd9caf7a117f7b96f4f3e5a18f8d63875",
+      "bytes": 56974,
+      "role": "runtime_candidate"
+    },
+    {
+      "name": "source-inventory.json",
+      "sha256": "85f658d2fceda7b0f336b6f48d32e607daab626818489b52c8e58883e5fe611a",
+      "bytes": 739546,
+      "role": "editorial"
+    },
+    {
+      "name": "sources.json",
+      "sha256": "71dace593a7113c803f6515979d03ab1fe28a5523d3c9907179eb25bc686a850",
+      "bytes": 186288,
+      "role": "editorial"
+    },
+    {
+      "name": "tariffs.json",
+      "sha256": "84c7d57c71987d08f2c7b5605e0eb71f482231a43886322470a5dfaa9dcdfbe8",
+      "bytes": 237017,
+      "role": "runtime_candidate"
+    },
+    {
+      "name": "voice-question-blocks.json",
+      "sha256": "b0b6eed97afce54dd128a32383a9bc4c35933522f4c2ebac1cbf4e1a4c5d47ef",
+      "bytes": 124477,
+      "role": "runtime_candidate"
+    }
+  ],
+  "counts": {
+    "situations": 140,
+    "domains": 16,
+    "facts": 345,
+    "questions": 393,
+    "answer_sets": 140,
+    "services": 44,
+    "normalized_tariffs": 39,
+    "sources": 65,
+    "inventory": 1705,
+    "jokes": 150,
+    "authored_evaluation_cases": 30,
+    "report_examples": 7
+  },
+  "release_ready": false,
+  "release_blockers": [
+    "Точность сопоставления не измерена на независимых диалогах с человеческой разметкой.",
+    "Реальные аудиозаписи и длительность интервью ещё не проверены."
+  ],
+  "validation_commands": [
+    "node scripts/verify-audit-content.mjs",
+    "node --test scripts/audit-rules.test.mjs",
+    "node scripts/build-audit-assets.mjs --check"
+  ],
+  "rebuild_command": "node scripts/verify-audit-content.mjs --write",
+  "release_gate_command": "node scripts/verify-audit-content.mjs --release",
+  "notes": [
+    "Утверждение диагностического содержания не заменяет отдельное коммерческое утверждение тарифов и проверки на независимых диалогах и реальном аудио.",
+    "Изменения источников требуют предметной проверки перед обновлением хешей.",
+    "Проверка содержания не публикует сайт и не подтверждает работу внешних сервисов."
+  ]
+}

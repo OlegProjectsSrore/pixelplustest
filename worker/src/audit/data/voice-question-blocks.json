@@ -1,0 +1,3217 @@
+{
+  "schema_version": "1.0.0",
+  "version": "0.1.3",
+  "status": "approved",
+  "purpose": "Сервер выбирает один блок; не передавать весь каталог агенту или браузеру.",
+  "blocks": [
+    {
+      "id": "strategy",
+      "questions": [
+        {
+          "id": "strategy_scope",
+          "text": "Нужно ли обсудить маркетинговые цели, каналы и ресурсы?",
+          "fact_ids": [
+            "strategy.applicable"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "strategy_impact",
+          "text": "Что меняется для бизнеса из-за этой ситуации?",
+          "fact_ids": [
+            "strategy.impact"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "strategy_history_1",
+          "text": "Что уже делали по этой теме, когда и как долго?",
+          "fact_ids": [
+            "strategy.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "strategy_history_2",
+          "text": "Какого результата ждали и кто выполнял работу?",
+          "fact_ids": [
+            "strategy.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "strategy_history_3",
+          "text": "Что получилось и по каким данным оценивали результат?",
+          "fact_ids": [
+            "strategy.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "strategy_history_4",
+          "text": "Работа продолжается? Если остановили или изменили подход, почему?",
+          "fact_ids": [
+            "strategy.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "strategy_goal_screen",
+          "text": "По какому результату Вы поймёте, что работа над продвижением помогла?",
+          "fact_ids": [
+            "strategy_goal.signal"
+          ],
+          "answer_set": "strategy_goal"
+        },
+        {
+          "id": "strategy_goal_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "strategy_goal.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "strategy_channels_screen",
+          "text": "Как согласуются задачи сайта, рекламы и социальных сетей?",
+          "fact_ids": [
+            "strategy_channels.signal"
+          ],
+          "answer_set": "strategy_channels"
+        },
+        {
+          "id": "strategy_channels_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "strategy_channels.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "strategy_dependency_screen",
+          "text": "Какие источники дают клиентов и что происходит при остановке основного?",
+          "fact_ids": [
+            "strategy_dependency.signal"
+          ],
+          "answer_set": "strategy_dependency"
+        },
+        {
+          "id": "strategy_dependency_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "strategy_dependency.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "strategy_new_market_screen",
+          "text": "Что уже известно о спросе и покупателях на новом рынке?",
+          "fact_ids": [
+            "strategy_new_market.signal"
+          ],
+          "answer_set": "strategy_new_market"
+        },
+        {
+          "id": "strategy_new_market_detail",
+          "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
+          "fact_ids": [
+            "strategy_new_market.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "strategy_accountability_screen",
+          "text": "Как Вы оцениваете результат работы нынешних подрядчиков?",
+          "fact_ids": [
+            "strategy_accountability.signal"
+          ],
+          "answer_set": "strategy_accountability"
+        },
+        {
+          "id": "strategy_accountability_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "strategy_accountability.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "strategy_resources_screen",
+          "text": "Кто и в каком объёме сможет внедрять предлагаемые изменения?",
+          "fact_ids": [
+            "strategy_resources.signal"
+          ],
+          "answer_set": "strategy_resources"
+        },
+        {
+          "id": "strategy_resources_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "strategy_resources.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "strategy_segments_screen",
+          "text": "Чем отличаются причины покупки у Ваших основных групп клиентов?",
+          "fact_ids": [
+            "strategy_segments.signal"
+          ],
+          "answer_set": "strategy_segments"
+        },
+        {
+          "id": "strategy_segments_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "strategy_segments.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "strategy_previous_screen",
+          "text": "Как вы договариваетесь, что работа подрядчика выполнена, и по каким признакам принимаете результат?",
+          "fact_ids": [
+            "strategy_previous.signal"
+          ],
+          "answer_set": "strategy_previous"
+        },
+        {
+          "id": "strategy_previous_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "strategy_previous.details"
+          ],
+          "answer_set": null
+        }
+      ]
+    },
+    {
+      "id": "analytics",
+      "questions": [
+        {
+          "id": "analytics_scope",
+          "text": "Нужно ли обсудить учёт обращений, оплат и расходов?",
+          "fact_ids": [
+            "analytics.applicable"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "analytics_impact",
+          "text": "Что меняется для бизнеса из-за этой ситуации?",
+          "fact_ids": [
+            "analytics.impact"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "analytics_history_1",
+          "text": "Что уже делали по этой теме, когда и как долго?",
+          "fact_ids": [
+            "analytics.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "analytics_history_2",
+          "text": "Какого результата ждали и кто выполнял работу?",
+          "fact_ids": [
+            "analytics.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "analytics_history_3",
+          "text": "Что получилось и по каким данным оценивали результат?",
+          "fact_ids": [
+            "analytics.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "analytics_history_4",
+          "text": "Работа продолжается? Если остановили или изменили подход, почему?",
+          "fact_ids": [
+            "analytics.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "analytics_absent_screen",
+          "text": "Какие действия посетителей сайта сейчас попадают в отчёты?",
+          "fact_ids": [
+            "analytics_absent.signal"
+          ],
+          "answer_set": "analytics_absent"
+        },
+        {
+          "id": "analytics_absent_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "analytics_absent.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "analytics_goals_screen",
+          "text": "В какой момент система считает заявку или покупку состоявшейся?",
+          "fact_ids": [
+            "analytics_goals.signal"
+          ],
+          "answer_set": "analytics_goals"
+        },
+        {
+          "id": "analytics_goals_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "analytics_goals.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "analytics_sales_screen",
+          "text": "Как связываются источник обращения и оплаченная продажа?",
+          "fact_ids": [
+            "analytics_sales.signal"
+          ],
+          "answer_set": "analytics_sales"
+        },
+        {
+          "id": "analytics_sales_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "analytics_sales.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "analytics_calls_screen",
+          "text": "Как определяется, откуда пришёл человек, который позвонил?",
+          "fact_ids": [
+            "analytics_calls.signal"
+          ],
+          "answer_set": "analytics_calls"
+        },
+        {
+          "id": "analytics_calls_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "analytics_calls.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "analytics_domains_screen",
+          "text": "Как отслеживается покупка при переходе между Вашими сайтами или сервисами?",
+          "fact_ids": [
+            "analytics_domains.signal"
+          ],
+          "answer_set": "analytics_domains"
+        },
+        {
+          "id": "analytics_domains_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "analytics_domains.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "analytics_ecommerce_screen",
+          "text": "Как сверяете число заказов и их суммы в аналитике с учётной системой?",
+          "fact_ids": [
+            "analytics_ecommerce.signal"
+          ],
+          "answer_set": "analytics_ecommerce"
+        },
+        {
+          "id": "analytics_ecommerce_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "analytics_ecommerce.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "analytics_margin_screen",
+          "text": "Какие расходы и возвраты учитываются при оценке результата рекламы?",
+          "fact_ids": [
+            "analytics_margin.signal"
+          ],
+          "answer_set": "analytics_margin"
+        },
+        {
+          "id": "analytics_margin_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "analytics_margin.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "analytics_costs_screen",
+          "text": "Где Вы сравниваете затраты на каждый канал с полученными продажами?",
+          "fact_ids": [
+            "analytics_costs.signal"
+          ],
+          "answer_set": "analytics_costs"
+        },
+        {
+          "id": "analytics_costs_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "analytics_costs.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "analytics_quality_screen",
+          "text": "Как в отчётах отличаются подходящие обращения от спама и нецелевых?",
+          "fact_ids": [
+            "analytics_quality.signal"
+          ],
+          "answer_set": "analytics_quality"
+        },
+        {
+          "id": "analytics_quality_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "analytics_quality.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "analytics_disagreement_screen",
+          "text": "Как объясняются различия показателей в отчётах разных команд?",
+          "fact_ids": [
+            "analytics_disagreement.signal"
+          ],
+          "answer_set": "analytics_disagreement"
+        },
+        {
+          "id": "analytics_disagreement_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "analytics_disagreement.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "analytics_access_screen",
+          "text": "Кто имеет доступ к аналитике и может выгрузить исходные данные?",
+          "fact_ids": [
+            "analytics_access.signal"
+          ],
+          "answer_set": "analytics_access"
+        },
+        {
+          "id": "analytics_access_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "analytics_access.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "analytics_comparison_screen",
+          "text": "Какие периоды и условия Вы сравниваете, оценивая рост или падение?",
+          "fact_ids": [
+            "analytics_comparison.signal"
+          ],
+          "answer_set": "analytics_comparison"
+        },
+        {
+          "id": "analytics_comparison_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "analytics_comparison.details"
+          ],
+          "answer_set": null
+        }
+      ]
+    },
+    {
+      "id": "seo",
+      "questions": [
+        {
+          "id": "seo_scope",
+          "text": "Нужно ли обсудить обычный поиск и видимость в ответах AI?",
+          "fact_ids": [
+            "seo.applicable"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "seo_impact",
+          "text": "Что меняется для бизнеса из-за этой ситуации?",
+          "fact_ids": [
+            "seo.impact"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "seo_history_1",
+          "text": "Что уже делали по этой теме, когда и как долго?",
+          "fact_ids": [
+            "seo.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "seo_history_2",
+          "text": "Какого результата ждали и кто выполнял работу?",
+          "fact_ids": [
+            "seo.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "seo_history_3",
+          "text": "Что получилось и по каким данным оценивали результат?",
+          "fact_ids": [
+            "seo.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "seo_history_4",
+          "text": "Работа продолжается? Если остановили или изменили подход, почему?",
+          "fact_ids": [
+            "seo.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "seo_index_screen",
+          "text": "Как проверяете присутствие нужных страниц в поиске?",
+          "fact_ids": [
+            "seo_index.signal"
+          ],
+          "answer_set": "seo_index"
+        },
+        {
+          "id": "seo_index_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "seo_index.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "seo_migration_screen",
+          "text": "Что изменилось в поисковом трафике после смены адресов или платформы?",
+          "fact_ids": [
+            "seo_migration.signal"
+          ],
+          "answer_set": "seo_migration"
+        },
+        {
+          "id": "seo_migration_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "seo_migration.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "seo_duplicates_screen",
+          "text": "Какие варианты одной страницы доступны и учитываются поиском?",
+          "fact_ids": [
+            "seo_duplicates.signal"
+          ],
+          "answer_set": "seo_duplicates"
+        },
+        {
+          "id": "seo_duplicates_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "seo_duplicates.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "seo_demand_screen",
+          "text": "Как сопоставлены запросы покупателей и страницы Ваших товаров или услуг?",
+          "fact_ids": [
+            "seo_demand.signal"
+          ],
+          "answer_set": "seo_demand"
+        },
+        {
+          "id": "seo_demand_detail",
+          "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
+          "fact_ids": [
+            "seo_demand.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "seo_intent_screen",
+          "text": "Какие запросы приводят людей и что они находят на посадочной странице?",
+          "fact_ids": [
+            "seo_intent.signal"
+          ],
+          "answer_set": "seo_intent"
+        },
+        {
+          "id": "seo_intent_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "seo_intent.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "seo_region_screen",
+          "text": "Из каких регионов приходят поисковые обращения и где Вы реально работаете?",
+          "fact_ids": [
+            "seo_region.signal"
+          ],
+          "answer_set": "seo_region"
+        },
+        {
+          "id": "seo_region_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "seo_region.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "seo_assortment_screen",
+          "text": "Что видит посетитель, пришедший из поиска на недоступный товар?",
+          "fact_ids": [
+            "seo_assortment.signal"
+          ],
+          "answer_set": "seo_assortment"
+        },
+        {
+          "id": "seo_assortment_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "seo_assortment.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "seo_content_screen",
+          "text": "Как проверяется актуальность информации на страницах, привлекающих клиентов?",
+          "fact_ids": [
+            "seo_content.signal"
+          ],
+          "answer_set": "seo_content"
+        },
+        {
+          "id": "seo_content_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "seo_content.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "seo_links_screen",
+          "text": "Какие внешние размещения делали для сайта и что известно об их результатах?",
+          "fact_ids": [
+            "seo_links.signal"
+          ],
+          "answer_set": "seo_links"
+        },
+        {
+          "id": "seo_links_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "seo_links.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "seo_mobile_screen",
+          "text": "Есть ли различия между содержимым страницы для посетителя и тем, что показывает проверка страницы в панели поиска?",
+          "fact_ids": [
+            "seo_mobile.signal"
+          ],
+          "answer_set": "seo_mobile"
+        },
+        {
+          "id": "seo_mobile_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "seo_mobile.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "seo_trust_screen",
+          "text": "Как посетитель может проверить авторство и достоверность важных материалов?",
+          "fact_ids": [
+            "seo_trust.signal"
+          ],
+          "answer_set": "seo_trust"
+        },
+        {
+          "id": "seo_trust_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "seo_trust.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "seo_before_build_screen",
+          "text": "На чём основана структура сайта, который Вы собираетесь создавать?",
+          "fact_ids": [
+            "seo_before_build.signal"
+          ],
+          "answer_set": "seo_before_build"
+        },
+        {
+          "id": "seo_before_build_detail",
+          "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
+          "fact_ids": [
+            "seo_before_build.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "seo_ai_visibility_screen",
+          "text": "Как Вы проверяете, что AI-сервисы отвечают о Вашем бренде и категории?",
+          "fact_ids": [
+            "seo_ai_visibility.signal"
+          ],
+          "answer_set": "seo_ai_visibility"
+        },
+        {
+          "id": "seo_ai_visibility_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "seo_ai_visibility.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "seo_ai_accuracy_screen",
+          "text": "Какие конкретные неточности о компании Вы видели в AI-ответах?",
+          "fact_ids": [
+            "seo_ai_accuracy.signal"
+          ],
+          "answer_set": "seo_ai_accuracy"
+        },
+        {
+          "id": "seo_ai_accuracy_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "seo_ai_accuracy.details"
+          ],
+          "answer_set": null
+        }
+      ]
+    },
+    {
+      "id": "advertising",
+      "questions": [
+        {
+          "id": "advertising_scope",
+          "text": "Нужно ли обсудить рекламные кампании и качество обращений?",
+          "fact_ids": [
+            "advertising.applicable"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "advertising_impact",
+          "text": "Что меняется для бизнеса из-за этой ситуации?",
+          "fact_ids": [
+            "advertising.impact"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "advertising_history_1",
+          "text": "Что уже делали по этой теме, когда и как долго?",
+          "fact_ids": [
+            "advertising.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "advertising_history_2",
+          "text": "Какого результата ждали и кто выполнял работу?",
+          "fact_ids": [
+            "advertising.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "advertising_history_3",
+          "text": "Что получилось и по каким данным оценивали результат?",
+          "fact_ids": [
+            "advertising.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "advertising_history_4",
+          "text": "Работа продолжается? Если остановили или изменили подход, почему?",
+          "fact_ids": [
+            "advertising.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ads_quality_screen",
+          "text": "По каким признакам обращения из рекламы не подходят компании?",
+          "fact_ids": [
+            "ads_quality.signal"
+          ],
+          "answer_set": "ads_quality"
+        },
+        {
+          "id": "ads_quality_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "ads_quality.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ads_cost_screen",
+          "text": "Как рассчитана стоимость подходящего обращения и с чем её сравнивают?",
+          "fact_ids": [
+            "ads_cost.signal"
+          ],
+          "answer_set": "ads_cost"
+        },
+        {
+          "id": "ads_cost_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "ads_cost.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ads_geo_screen",
+          "text": "Как фактическая география рекламных обращений соотносится с территорией работы?",
+          "fact_ids": [
+            "ads_geo.signal"
+          ],
+          "answer_set": "ads_geo"
+        },
+        {
+          "id": "ads_geo_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "ads_geo.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ads_capacity_screen",
+          "text": "Что происходит с рекламными обращениями вне времени работы команды?",
+          "fact_ids": [
+            "ads_capacity.signal"
+          ],
+          "answer_set": "ads_capacity"
+        },
+        {
+          "id": "ads_capacity_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "ads_capacity.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ads_landing_screen",
+          "text": "Как предложение в объявлении продолжается на странице перехода?",
+          "fact_ids": [
+            "ads_landing.signal"
+          ],
+          "answer_set": "ads_landing"
+        },
+        {
+          "id": "ads_landing_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "ads_landing.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ads_optimization_screen",
+          "text": "Какое действие передаётся рекламной системе как результат?",
+          "fact_ids": [
+            "ads_optimization.signal"
+          ],
+          "answer_set": "ads_optimization"
+        },
+        {
+          "id": "ads_optimization_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "ads_optimization.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ads_retarget_screen",
+          "text": "Кому показывают повторную рекламу и как учитывают уже совершённую покупку?",
+          "fact_ids": [
+            "ads_retarget.signal"
+          ],
+          "answer_set": "ads_retarget"
+        },
+        {
+          "id": "ads_retarget_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "ads_retarget.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ads_feed_screen",
+          "text": "Как сверяются цены и наличие товара в рекламе с магазином?",
+          "fact_ids": [
+            "ads_feed.signal"
+          ],
+          "answer_set": "ads_feed"
+        },
+        {
+          "id": "ads_feed_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "ads_feed.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ads_spread_screen",
+          "text": "Как выбираются кампании для бюджета и критерии окончания проверки?",
+          "fact_ids": [
+            "ads_spread.signal"
+          ],
+          "answer_set": "ads_spread"
+        },
+        {
+          "id": "ads_spread_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "ads_spread.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ads_ownership_screen",
+          "text": "Кому принадлежит кабинет и кто может получить историю расходов и настроек?",
+          "fact_ids": [
+            "ads_ownership.signal"
+          ],
+          "answer_set": "ads_ownership"
+        },
+        {
+          "id": "ads_ownership_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "ads_ownership.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ads_creatives_screen",
+          "text": "Что изменилось в отклике на объявления и какие ещё условия менялись?",
+          "fact_ids": [
+            "ads_creatives.signal"
+          ],
+          "answer_set": "ads_creatives"
+        },
+        {
+          "id": "ads_creatives_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "ads_creatives.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ads_restart_screen",
+          "text": "Почему остановили прошлую рекламу и какие данные остались?",
+          "fact_ids": [
+            "ads_restart.signal"
+          ],
+          "answer_set": "ads_restart"
+        },
+        {
+          "id": "ads_restart_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "ads_restart.details"
+          ],
+          "answer_set": null
+        }
+      ]
+    },
+    {
+      "id": "ux",
+      "questions": [
+        {
+          "id": "ux_scope",
+          "text": "Нужно ли обсудить путь от посещения до заявки или покупки?",
+          "fact_ids": [
+            "ux.applicable"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ux_impact",
+          "text": "Что меняется для бизнеса из-за этой ситуации?",
+          "fact_ids": [
+            "ux.impact"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ux_history_1",
+          "text": "Что уже делали по этой теме, когда и как долго?",
+          "fact_ids": [
+            "ux.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ux_history_2",
+          "text": "Какого результата ждали и кто выполнял работу?",
+          "fact_ids": [
+            "ux.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ux_history_3",
+          "text": "Что получилось и по каким данным оценивали результат?",
+          "fact_ids": [
+            "ux.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ux_history_4",
+          "text": "Работа продолжается? Если остановили или изменили подход, почему?",
+          "fact_ids": [
+            "ux.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ux_checkout_screen",
+          "text": "На каком шаге оформления заказа люди останавливаются и откуда вы это знаете?",
+          "fact_ids": [
+            "ux_checkout.signal"
+          ],
+          "answer_set": "ux_checkout"
+        },
+        {
+          "id": "ux_checkout_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "ux_checkout.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ux_form_screen",
+          "text": "Что происходит после заполнения формы: есть ли примеры неотправленных или не дошедших обращений?",
+          "fact_ids": [
+            "ux_form.signal"
+          ],
+          "answer_set": "ux_form"
+        },
+        {
+          "id": "ux_form_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "ux_form.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ux_mobile_screen",
+          "text": "Какие действия на сайте пользователям телефона удаются хуже, чем на компьютере?",
+          "fact_ids": [
+            "ux_mobile.signal"
+          ],
+          "answer_set": "ux_mobile"
+        },
+        {
+          "id": "ux_mobile_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "ux_mobile.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ux_navigation_screen",
+          "text": "Как посетители находят нужный товар или услугу, и где возникают затруднения?",
+          "fact_ids": [
+            "ux_navigation.signal"
+          ],
+          "answer_set": "ux_navigation"
+        },
+        {
+          "id": "ux_navigation_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "ux_navigation.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ux_cost_screen",
+          "text": "Когда покупатель узнаёт итоговую стоимость, доставку и ограничения и бывают ли отказы после этого?",
+          "fact_ids": [
+            "ux_cost.signal"
+          ],
+          "answer_set": "ux_cost"
+        },
+        {
+          "id": "ux_cost_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "ux_cost.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ux_product_screen",
+          "text": "Какие вопросы о товаре люди задают перед покупкой, хотя ответ ожидали найти на странице?",
+          "fact_ids": [
+            "ux_product.signal"
+          ],
+          "answer_set": "ux_product"
+        },
+        {
+          "id": "ux_product_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "ux_product.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ux_service_screen",
+          "text": "Какие сведения о вашей работе клиенты просят проверить перед обращением или договором?",
+          "fact_ids": [
+            "ux_service.signal"
+          ],
+          "answer_set": "ux_service"
+        },
+        {
+          "id": "ux_service_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "ux_service.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ux_contact_screen",
+          "text": "Понимают ли посетители, как связаться с вами или получить расчёт; какие обращения на это указывают?",
+          "fact_ids": [
+            "ux_contact.signal"
+          ],
+          "answer_set": "ux_contact"
+        },
+        {
+          "id": "ux_contact_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "ux_contact.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ux_accessibility_screen",
+          "text": "Известны ли ситуации, когда человек не может пользоваться сайтом из-за способа ввода, размера текста или подачи информации?",
+          "fact_ids": [
+            "ux_accessibility.signal"
+          ],
+          "answer_set": "ux_accessibility"
+        },
+        {
+          "id": "ux_accessibility_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "ux_accessibility.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ux_redesign_screen",
+          "text": "Что должно измениться после редизайна и какими наблюдениями подтверждается необходимость этих изменений?",
+          "fact_ids": [
+            "ux_redesign.signal"
+          ],
+          "answer_set": "ux_redesign"
+        },
+        {
+          "id": "ux_redesign_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "ux_redesign.details"
+          ],
+          "answer_set": null
+        }
+      ]
+    },
+    {
+      "id": "development",
+      "questions": [
+        {
+          "id": "development_scope",
+          "text": "Нужно ли обсудить новый сайт, функции и изменение платформы?",
+          "fact_ids": [
+            "development.applicable"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "development_impact",
+          "text": "Что меняется для бизнеса из-за этой ситуации?",
+          "fact_ids": [
+            "development.impact"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "development_history_1",
+          "text": "Что уже делали по этой теме, когда и как долго?",
+          "fact_ids": [
+            "development.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "development_history_2",
+          "text": "Какого результата ждали и кто выполнял работу?",
+          "fact_ids": [
+            "development.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "development_history_3",
+          "text": "Что получилось и по каким данным оценивали результат?",
+          "fact_ids": [
+            "development.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "development_history_4",
+          "text": "Работа продолжается? Если остановили или изменили подход, почему?",
+          "fact_ids": [
+            "development.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "dev_launch_screen",
+          "text": "Что уже известно о спросе и задачах посетителей будущего сайта?",
+          "fact_ids": [
+            "dev_launch.signal"
+          ],
+          "answer_set": "dev_launch"
+        },
+        {
+          "id": "dev_launch_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "dev_launch.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "dev_shop_screen",
+          "text": "Какие операции покупки клиент должен выполнять на сайте и какие из них сейчас доступны?",
+          "fact_ids": [
+            "dev_shop.signal"
+          ],
+          "answer_set": "dev_shop"
+        },
+        {
+          "id": "dev_shop_detail",
+          "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
+          "fact_ids": [
+            "dev_shop.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "dev_b2b_screen",
+          "text": "Как клиент выбирает сложную продукцию и передаёт состав запроса на расчёт?",
+          "fact_ids": [
+            "dev_b2b.signal"
+          ],
+          "answer_set": "dev_b2b"
+        },
+        {
+          "id": "dev_b2b_detail",
+          "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
+          "fact_ids": [
+            "dev_b2b.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "dev_cabinet_screen",
+          "text": "Какие сведения и документы клиенты регулярно запрашивают у сотрудников?",
+          "fact_ids": [
+            "dev_cabinet.signal"
+          ],
+          "answer_set": "dev_cabinet"
+        },
+        {
+          "id": "dev_cabinet_detail",
+          "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
+          "fact_ids": [
+            "dev_cabinet.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "dev_portal_screen",
+          "text": "Какие внутренние задачи требуют переходов между разными каналами и где это мешает работе?",
+          "fact_ids": [
+            "dev_portal.signal"
+          ],
+          "answer_set": "dev_portal"
+        },
+        {
+          "id": "dev_portal_detail",
+          "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
+          "fact_ids": [
+            "dev_portal.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "dev_platform_screen",
+          "text": "Какая нужная функция не получается на текущем сайте и что уже проверяли?",
+          "fact_ids": [
+            "dev_platform.signal"
+          ],
+          "answer_set": "dev_platform"
+        },
+        {
+          "id": "dev_platform_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "dev_platform.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "dev_editor_screen",
+          "text": "Как сотрудники меняют цены, страницы и материалы и что мешает делать это вовремя?",
+          "fact_ids": [
+            "dev_editor.signal"
+          ],
+          "answer_set": "dev_editor"
+        },
+        {
+          "id": "dev_editor_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "dev_editor.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "dev_languages_screen",
+          "text": "Для каких языков и рынков нужен сайт и как будут обновляться материалы каждой версии?",
+          "fact_ids": [
+            "dev_languages.signal"
+          ],
+          "answer_set": "dev_languages"
+        },
+        {
+          "id": "dev_languages_detail",
+          "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
+          "fact_ids": [
+            "dev_languages.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "dev_booking_screen",
+          "text": "Как клиент выбирает время услуги и где сотрудники проверяют свободные интервалы?",
+          "fact_ids": [
+            "dev_booking.signal"
+          ],
+          "answer_set": "dev_booking"
+        },
+        {
+          "id": "dev_booking_detail",
+          "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
+          "fact_ids": [
+            "dev_booking.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "dev_mvp_screen",
+          "text": "Какие функции обязательны для первого использования, а какие можно отложить?",
+          "fact_ids": [
+            "dev_mvp.signal"
+          ],
+          "answer_set": "dev_mvp"
+        },
+        {
+          "id": "dev_mvp_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "dev_mvp.details"
+          ],
+          "answer_set": null
+        }
+      ]
+    },
+    {
+      "id": "support",
+      "questions": [
+        {
+          "id": "support_scope",
+          "text": "Нужно ли обсудить работоспособность, обновления и регулярные задачи?",
+          "fact_ids": [
+            "support.applicable"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "support_impact",
+          "text": "Что меняется для бизнеса из-за этой ситуации?",
+          "fact_ids": [
+            "support.impact"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "support_history_1",
+          "text": "Что уже делали по этой теме, когда и как долго?",
+          "fact_ids": [
+            "support.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "support_history_2",
+          "text": "Какого результата ждали и кто выполнял работу?",
+          "fact_ids": [
+            "support.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "support_history_3",
+          "text": "Что получилось и по каким данным оценивали результат?",
+          "fact_ids": [
+            "support.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "support_history_4",
+          "text": "Работа продолжается? Если остановили или изменили подход, почему?",
+          "fact_ids": [
+            "support.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "support_outages_screen",
+          "text": "Когда сайт был недоступен, для кого и как это обнаружили?",
+          "fact_ids": [
+            "support_outages.signal"
+          ],
+          "answer_set": "support_outages"
+        },
+        {
+          "id": "support_outages_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "support_outages.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "support_speed_screen",
+          "text": "Какое действие на сайте выполняется медленно, на каких устройствах и при каких условиях?",
+          "fact_ids": [
+            "support_speed.signal"
+          ],
+          "answer_set": "support_speed"
+        },
+        {
+          "id": "support_speed_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "support_speed.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "support_updates_screen",
+          "text": "Как принимается решение об обновлениях сайта и где проверяются изменения?",
+          "fact_ids": [
+            "support_updates.signal"
+          ],
+          "answer_set": "support_updates"
+        },
+        {
+          "id": "support_updates_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "support_updates.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "support_backup_screen",
+          "text": "Когда последний раз проверяли восстановление сайта и данных из резервной копии?",
+          "fact_ids": [
+            "support_backup.signal"
+          ],
+          "answer_set": "support_backup"
+        },
+        {
+          "id": "support_backup_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "support_backup.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "support_regressions_screen",
+          "text": "Какие работающие функции ломались после последних изменений и как это заметили?",
+          "fact_ids": [
+            "support_regressions.signal"
+          ],
+          "answer_set": "support_regressions"
+        },
+        {
+          "id": "support_regressions_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "support_regressions.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "support_access_screen",
+          "text": "У кого находятся доступы к домену, хостингу и системе сайта и доступны ли они компании?",
+          "fact_ids": [
+            "support_access.signal"
+          ],
+          "answer_set": "support_access"
+        },
+        {
+          "id": "support_access_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "support_access.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "support_backlog_screen",
+          "text": "Как поступают небольшие задачи по сайту и как выбираете, что делать первым?",
+          "fact_ids": [
+            "support_backlog.signal"
+          ],
+          "answer_set": "support_backlog"
+        },
+        {
+          "id": "support_backlog_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "support_backlog.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "support_regular_screen",
+          "text": "Какой объём задач по сайту повторяется каждый месяц и насколько он предсказуем?",
+          "fact_ids": [
+            "support_regular.signal"
+          ],
+          "answer_set": "support_regular"
+        },
+        {
+          "id": "support_regular_detail",
+          "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
+          "fact_ids": [
+            "support_regular.details"
+          ],
+          "answer_set": null
+        }
+      ]
+    },
+    {
+      "id": "crm",
+      "questions": [
+        {
+          "id": "crm_scope",
+          "text": "Нужно ли обсудить учёт, распределение и сопровождение продаж?",
+          "fact_ids": [
+            "crm.applicable"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "crm_impact",
+          "text": "Что меняется для бизнеса из-за этой ситуации?",
+          "fact_ids": [
+            "crm.impact"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "crm_history_1",
+          "text": "Что уже делали по этой теме, когда и как долго?",
+          "fact_ids": [
+            "crm.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "crm_history_2",
+          "text": "Какого результата ждали и кто выполнял работу?",
+          "fact_ids": [
+            "crm.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "crm_history_3",
+          "text": "Что получилось и по каким данным оценивали результат?",
+          "fact_ids": [
+            "crm.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "crm_history_4",
+          "text": "Работа продолжается? Если остановили или изменили подход, почему?",
+          "fact_ids": [
+            "crm.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "crm_capture_screen",
+          "text": "Где собираются обращения из форм, звонков и сообщений и как проверяете, что ничего не потеряно?",
+          "fact_ids": [
+            "crm_capture.signal"
+          ],
+          "answer_set": "crm_capture"
+        },
+        {
+          "id": "crm_capture_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "crm_capture.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "crm_owner_screen",
+          "text": "Как обращению назначается ответственный и бывают ли случаи, когда никто его не принимает?",
+          "fact_ids": [
+            "crm_owner.signal"
+          ],
+          "answer_set": "crm_owner"
+        },
+        {
+          "id": "crm_owner_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "crm_owner.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "crm_response_screen",
+          "text": "Сколько обычно ждут первого ответа и по каким данным это известно?",
+          "fact_ids": [
+            "crm_response.signal"
+          ],
+          "answer_set": "crm_response"
+        },
+        {
+          "id": "crm_response_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "crm_response.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "crm_stages_screen",
+          "text": "Что означает каждый этап сделки и по каким признакам её переводят дальше?",
+          "fact_ids": [
+            "crm_stages.signal"
+          ],
+          "answer_set": "crm_stages"
+        },
+        {
+          "id": "crm_stages_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "crm_stages.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "crm_duplicates_screen",
+          "text": "Как распознаёте повторное обращение одного клиента и что происходит с дубликатами?",
+          "fact_ids": [
+            "crm_duplicates.signal"
+          ],
+          "answer_set": "crm_duplicates"
+        },
+        {
+          "id": "crm_duplicates_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "crm_duplicates.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "crm_calls_screen",
+          "text": "Где сотрудник видит звонок, результат разговора и связанную сделку?",
+          "fact_ids": [
+            "crm_calls.signal"
+          ],
+          "answer_set": "crm_calls"
+        },
+        {
+          "id": "crm_calls_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "crm_calls.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "crm_handoff_screen",
+          "text": "Что передаётся от продаж исполнению и поддержке и какая информация при этом теряется?",
+          "fact_ids": [
+            "crm_handoff.signal"
+          ],
+          "answer_set": "crm_handoff"
+        },
+        {
+          "id": "crm_handoff_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "crm_handoff.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "crm_adoption_screen",
+          "text": "Какие действия сотрудники выполняют вне CRM и почему?",
+          "fact_ids": [
+            "crm_adoption.signal"
+          ],
+          "answer_set": "crm_adoption"
+        },
+        {
+          "id": "crm_adoption_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "crm_adoption.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "crm_migration_screen",
+          "text": "Какие данные и историю нужно сохранить при смене CRM и как будете проверять перенос?",
+          "fact_ids": [
+            "crm_migration.signal"
+          ],
+          "answer_set": "crm_migration"
+        },
+        {
+          "id": "crm_migration_detail",
+          "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
+          "fact_ids": [
+            "crm_migration.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "crm_orders_screen",
+          "text": "Как согласуются статусы, остатки и действия по заказам из разных каналов?",
+          "fact_ids": [
+            "crm_orders.signal"
+          ],
+          "answer_set": "crm_orders"
+        },
+        {
+          "id": "crm_orders_detail",
+          "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
+          "fact_ids": [
+            "crm_orders.details"
+          ],
+          "answer_set": null
+        }
+      ]
+    },
+    {
+      "id": "retention",
+      "questions": [
+        {
+          "id": "retention_scope",
+          "text": "Нужно ли обсудить работа с уже покупавшими клиентами?",
+          "fact_ids": [
+            "retention.applicable"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "retention_impact",
+          "text": "Что меняется для бизнеса из-за этой ситуации?",
+          "fact_ids": [
+            "retention.impact"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "retention_history_1",
+          "text": "Что уже делали по этой теме, когда и как долго?",
+          "fact_ids": [
+            "retention.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "retention_history_2",
+          "text": "Какого результата ждали и кто выполнял работу?",
+          "fact_ids": [
+            "retention.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "retention_history_3",
+          "text": "Что получилось и по каким данным оценивали результат?",
+          "fact_ids": [
+            "retention.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "retention_history_4",
+          "text": "Работа продолжается? Если остановили или изменили подход, почему?",
+          "fact_ids": [
+            "retention.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "retention_measure_screen",
+          "text": "Как различаете первую и повторную покупку и за какой период сравниваете клиентов?",
+          "fact_ids": [
+            "retention_measure.signal"
+          ],
+          "answer_set": "retention_measure"
+        },
+        {
+          "id": "retention_measure_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "retention_measure.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "retention_segments_screen",
+          "text": "Как различаются предложения новым, активным и давно не покупавшим клиентам?",
+          "fact_ids": [
+            "retention_segments.signal"
+          ],
+          "answer_set": "retention_segments"
+        },
+        {
+          "id": "retention_segments_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "retention_segments.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "retention_permissions_screen",
+          "text": "Как фиксируются разрешённые каналы связи, предпочтения клиента и отказ от сообщений?",
+          "fact_ids": [
+            "retention_permissions.signal"
+          ],
+          "answer_set": "retention_permissions"
+        },
+        {
+          "id": "retention_permissions_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "retention_permissions.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "retention_triggers_screen",
+          "text": "Какие события после покупки требуют сообщения клиенту и как оно отправляется сейчас?",
+          "fact_ids": [
+            "retention_triggers.signal"
+          ],
+          "answer_set": "retention_triggers"
+        },
+        {
+          "id": "retention_triggers_detail",
+          "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
+          "fact_ids": [
+            "retention_triggers.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "retention_loyalty_screen",
+          "text": "Как проверяете влияние бонусов и скидок на повторные покупки и прибыль?",
+          "fact_ids": [
+            "retention_loyalty.signal"
+          ],
+          "answer_set": "retention_loyalty"
+        },
+        {
+          "id": "retention_loyalty_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "retention_loyalty.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "retention_winback_screen",
+          "text": "Что известно о причинах, по которым ранее покупавшие клиенты перестают возвращаться?",
+          "fact_ids": [
+            "retention_winback.signal"
+          ],
+          "answer_set": "retention_winback"
+        },
+        {
+          "id": "retention_winback_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "retention_winback.details"
+          ],
+          "answer_set": null
+        }
+      ]
+    },
+    {
+      "id": "marketplace",
+      "questions": [
+        {
+          "id": "marketplace_scope",
+          "text": "Нужно ли обсудить карточки, заказы и экономика площадок?",
+          "fact_ids": [
+            "marketplace.applicable"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "marketplace_impact",
+          "text": "Что меняется для бизнеса из-за этой ситуации?",
+          "fact_ids": [
+            "marketplace.impact"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "marketplace_history_1",
+          "text": "Что уже делали по этой теме, когда и как долго?",
+          "fact_ids": [
+            "marketplace.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "marketplace_history_2",
+          "text": "Какого результата ждали и кто выполнял работу?",
+          "fact_ids": [
+            "marketplace.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "marketplace_history_3",
+          "text": "Что получилось и по каким данным оценивали результат?",
+          "fact_ids": [
+            "marketplace.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "marketplace_history_4",
+          "text": "Работа продолжается? Если остановили или изменили подход, почему?",
+          "fact_ids": [
+            "marketplace.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "market_entry_screen",
+          "text": "Что уже посчитано для продаж на площадке: закупка, комиссии, доставка, реклама и возвраты?",
+          "fact_ids": [
+            "market_entry.signal"
+          ],
+          "answer_set": "market_entry"
+        },
+        {
+          "id": "market_entry_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "market_entry.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "market_click_screen",
+          "text": "Как соотносятся показы и открытия карточек и для каких товаров заметна разница?",
+          "fact_ids": [
+            "market_click.signal"
+          ],
+          "answer_set": "market_click"
+        },
+        {
+          "id": "market_click_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "market_click.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "market_order_screen",
+          "text": "Что известно о заказах после просмотра карточки, наличии и условиях доставки?",
+          "fact_ids": [
+            "market_order.signal"
+          ],
+          "answer_set": "market_order"
+        },
+        {
+          "id": "market_order_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "market_order.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "market_ads_screen",
+          "text": "Как рекламные расходы связаны с прибылью по продвигаемым товарам?",
+          "fact_ids": [
+            "market_ads.signal"
+          ],
+          "answer_set": "market_ads"
+        },
+        {
+          "id": "market_ads_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "market_ads.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "market_returns_screen",
+          "text": "Какие причины возвратов повторяются и по каким товарам это видно?",
+          "fact_ids": [
+            "market_returns.signal"
+          ],
+          "answer_set": "market_returns"
+        },
+        {
+          "id": "market_returns_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "market_returns.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "market_sync_screen",
+          "text": "Какие товары площадка отклоняет при загрузке и какие причины указаны в сообщениях об ошибке?",
+          "fact_ids": [
+            "market_sync.signal"
+          ],
+          "answer_set": "market_sync"
+        },
+        {
+          "id": "market_sync_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "market_sync.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "market_stock_screen",
+          "text": "Как часто заказы не выполняются из-за остатков, резерва или передачи в доставку?",
+          "fact_ids": [
+            "market_stock.signal"
+          ],
+          "answer_set": "market_stock"
+        },
+        {
+          "id": "market_stock_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "market_stock.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "market_dependence_screen",
+          "text": "Какую роль одна площадка играет в продажах и что произойдёт при изменении её условий?",
+          "fact_ids": [
+            "market_dependence.signal"
+          ],
+          "answer_set": "market_dependence"
+        },
+        {
+          "id": "market_dependence_detail",
+          "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
+          "fact_ids": [
+            "market_dependence.details"
+          ],
+          "answer_set": null
+        }
+      ]
+    },
+    {
+      "id": "reputation",
+      "questions": [
+        {
+          "id": "reputation_scope",
+          "text": "Нужно ли обсудить карты, отзывы и информация о компании?",
+          "fact_ids": [
+            "reputation.applicable"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "reputation_impact",
+          "text": "Что меняется для бизнеса из-за этой ситуации?",
+          "fact_ids": [
+            "reputation.impact"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "reputation_history_1",
+          "text": "Что уже делали по этой теме, когда и как долго?",
+          "fact_ids": [
+            "reputation.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "reputation_history_2",
+          "text": "Какого результата ждали и кто выполнял работу?",
+          "fact_ids": [
+            "reputation.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "reputation_history_3",
+          "text": "Что получилось и по каким данным оценивали результат?",
+          "fact_ids": [
+            "reputation.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "reputation_history_4",
+          "text": "Работа продолжается? Если остановили или изменили подход, почему?",
+          "fact_ids": [
+            "reputation.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "rep_missing_screen",
+          "text": "Как клиенты ищут вашу точку или выездную услугу и где представлена компания на картах?",
+          "fact_ids": [
+            "rep_missing.signal"
+          ],
+          "answer_set": "rep_missing"
+        },
+        {
+          "id": "rep_missing_detail",
+          "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
+          "fact_ids": [
+            "rep_missing.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "rep_details_screen",
+          "text": "Есть ли примеры, когда клиент увидел неверный адрес, телефон или время работы?",
+          "fact_ids": [
+            "rep_details.signal"
+          ],
+          "answer_set": "rep_details"
+        },
+        {
+          "id": "rep_details_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "rep_details.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "rep_branches_screen",
+          "text": "Как обновляются сведения о разных филиалах и кто отвечает за каждый?",
+          "fact_ids": [
+            "rep_branches.signal"
+          ],
+          "answer_set": "rep_branches"
+        },
+        {
+          "id": "rep_branches_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "rep_branches.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "rep_response_screen",
+          "text": "Кто замечает новые отзывы и как определяется, что на них нужно ответить или передать проблему?",
+          "fact_ids": [
+            "rep_response.signal"
+          ],
+          "answer_set": "rep_response"
+        },
+        {
+          "id": "rep_response_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "rep_response.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "rep_root_screen",
+          "text": "Какие претензии повторяются и что меняли в самом обслуживании после них?",
+          "fact_ids": [
+            "rep_root.signal"
+          ],
+          "answer_set": "rep_root"
+        },
+        {
+          "id": "rep_root_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "rep_root.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "rep_search_screen",
+          "text": "Проверяете ли вы, что видит человек при поиске названия компании и отзывов о ней?",
+          "fact_ids": [
+            "rep_search.signal"
+          ],
+          "answer_set": "rep_search"
+        },
+        {
+          "id": "rep_search_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "rep_search.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "rep_crisis_screen",
+          "text": "Были ли резкие всплески обращений или отзывов и как согласовывалась реакция команды?",
+          "fact_ids": [
+            "rep_crisis.signal"
+          ],
+          "answer_set": "rep_crisis"
+        },
+        {
+          "id": "rep_crisis_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "rep_crisis.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "rep_false_screen",
+          "text": "Какая конкретная информация о компании не соответствует действительности и чем это подтверждается?",
+          "fact_ids": [
+            "rep_false.signal"
+          ],
+          "answer_set": "rep_false"
+        },
+        {
+          "id": "rep_false_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "rep_false.details"
+          ],
+          "answer_set": null
+        }
+      ]
+    },
+    {
+      "id": "content",
+      "questions": [
+        {
+          "id": "content_scope",
+          "text": "Нужно ли обсудить полезные материалы, сообщества и обращения?",
+          "fact_ids": [
+            "content.applicable"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "content_impact",
+          "text": "Что меняется для бизнеса из-за этой ситуации?",
+          "fact_ids": [
+            "content.impact"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "content_history_1",
+          "text": "Что уже делали по этой теме, когда и как долго?",
+          "fact_ids": [
+            "content.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "content_history_2",
+          "text": "Какого результата ждали и кто выполнял работу?",
+          "fact_ids": [
+            "content.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "content_history_3",
+          "text": "Что получилось и по каким данным оценивали результат?",
+          "fact_ids": [
+            "content.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "content_history_4",
+          "text": "Работа продолжается? Если остановили или изменили подход, почему?",
+          "fact_ids": [
+            "content.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "content_goal_screen",
+          "text": "Для кого выпускаются материалы и какое действие или понимание они должны дать?",
+          "fact_ids": [
+            "content_goal.signal"
+          ],
+          "answer_set": "content_goal"
+        },
+        {
+          "id": "content_goal_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "content_goal.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "content_process_screen",
+          "text": "На каком этапе подготовки материалов возникают задержки и кто принимает итоговый текст?",
+          "fact_ids": [
+            "content_process.signal"
+          ],
+          "answer_set": "content_process"
+        },
+        {
+          "id": "content_process_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "content_process.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "content_expertise_screen",
+          "text": "Кто проверяет факты, цифры и профессиональные утверждения перед публикацией?",
+          "fact_ids": [
+            "content_expertise.signal"
+          ],
+          "answer_set": "content_expertise"
+        },
+        {
+          "id": "content_expertise_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "content_expertise.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "content_intent_screen",
+          "text": "Какие вопросы люди рассчитывают решить с помощью материалов и что показывает их обратная связь?",
+          "fact_ids": [
+            "content_intent.signal"
+          ],
+          "answer_set": "content_intent"
+        },
+        {
+          "id": "content_intent_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "content_intent.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "content_next_screen",
+          "text": "Что читатель может сделать после полезного материала и связано ли это с его задачей?",
+          "fact_ids": [
+            "content_next.signal"
+          ],
+          "answer_set": "content_next"
+        },
+        {
+          "id": "content_next_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "content_next.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "social_quality_screen",
+          "text": "Какие результаты сообщества, кроме числа подписчиков и реакций, вы отслеживаете?",
+          "fact_ids": [
+            "social_quality.signal"
+          ],
+          "answer_set": "social_quality"
+        },
+        {
+          "id": "social_quality_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "social_quality.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "social_moderation_screen",
+          "text": "Как обрабатываются вопросы и жалобы в комментариях и личных сообщениях?",
+          "fact_ids": [
+            "social_moderation.signal"
+          ],
+          "answer_set": "social_moderation"
+        },
+        {
+          "id": "social_moderation_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "social_moderation.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "social_promotion_screen",
+          "text": "Как выбираете площадки размещения и проверяете результат каждого выхода?",
+          "fact_ids": [
+            "social_promotion.signal"
+          ],
+          "answer_set": "social_promotion"
+        },
+        {
+          "id": "social_promotion_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "social_promotion.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "content_capacity_screen",
+          "text": "Какие форматы команда может выпускать регулярно и где план расходится с возможностями?",
+          "fact_ids": [
+            "content_capacity.signal"
+          ],
+          "answer_set": "content_capacity"
+        },
+        {
+          "id": "content_capacity_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "content_capacity.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "content_reuse_screen",
+          "text": "Какие полезные материалы уже есть и можно ли законно и содержательно использовать их повторно?",
+          "fact_ids": [
+            "content_reuse.signal"
+          ],
+          "answer_set": "content_reuse"
+        },
+        {
+          "id": "content_reuse_detail",
+          "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
+          "fact_ids": [
+            "content_reuse.details"
+          ],
+          "answer_set": null
+        }
+      ]
+    },
+    {
+      "id": "brand",
+      "questions": [
+        {
+          "id": "brand_scope",
+          "text": "Нужно ли обсудить идентичность бренда и презентация предложения?",
+          "fact_ids": [
+            "brand.applicable"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "brand_impact",
+          "text": "Что меняется для бизнеса из-за этой ситуации?",
+          "fact_ids": [
+            "brand.impact"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "brand_history_1",
+          "text": "Что уже делали по этой теме, когда и как долго?",
+          "fact_ids": [
+            "brand.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "brand_history_2",
+          "text": "Какого результата ждали и кто выполнял работу?",
+          "fact_ids": [
+            "brand.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "brand_history_3",
+          "text": "Что получилось и по каким данным оценивали результат?",
+          "fact_ids": [
+            "brand.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "brand_history_4",
+          "text": "Работа продолжается? Если остановили или изменили подход, почему?",
+          "fact_ids": [
+            "brand.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "brand_position_screen",
+          "text": "За что клиенты выбирают вас и чем это подтверждается в продажах или обратной связи?",
+          "fact_ids": [
+            "brand_position.signal"
+          ],
+          "answer_set": "brand_position"
+        },
+        {
+          "id": "brand_position_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "brand_position.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "brand_consistency_screen",
+          "text": "Где оформление и описание компании расходятся и создаёт ли это затруднения?",
+          "fact_ids": [
+            "brand_consistency.signal"
+          ],
+          "answer_set": "brand_consistency"
+        },
+        {
+          "id": "brand_consistency_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "brand_consistency.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "brand_name_screen",
+          "text": "Есть ли конкретные случаи, когда ваше название путают с другой компанией или неправильно находят?",
+          "fact_ids": [
+            "brand_name.signal"
+          ],
+          "answer_set": "brand_name"
+        },
+        {
+          "id": "brand_name_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "brand_name.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "brand_presentation_screen",
+          "text": "Какие вопросы остаются у клиента после вашей презентации и что приходится объяснять отдельно?",
+          "fact_ids": [
+            "brand_presentation.signal"
+          ],
+          "answer_set": "brand_presentation"
+        },
+        {
+          "id": "brand_presentation_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "brand_presentation.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "brand_templates_screen",
+          "text": "Как готовят коммерческие материалы для разных клиентов и что в них повторяется?",
+          "fact_ids": [
+            "brand_templates.signal"
+          ],
+          "answer_set": "brand_templates"
+        },
+        {
+          "id": "brand_templates_detail",
+          "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
+          "fact_ids": [
+            "brand_templates.details"
+          ],
+          "answer_set": null
+        }
+      ]
+    },
+    {
+      "id": "ai",
+      "questions": [
+        {
+          "id": "ai_scope",
+          "text": "Нужно ли обсудить повторяемые операции, знания и контроль AI?",
+          "fact_ids": [
+            "ai.applicable"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ai_impact",
+          "text": "Что меняется для бизнеса из-за этой ситуации?",
+          "fact_ids": [
+            "ai.impact"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ai_history_1",
+          "text": "Что уже делали по этой теме, когда и как долго?",
+          "fact_ids": [
+            "ai.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ai_history_2",
+          "text": "Какого результата ждали и кто выполнял работу?",
+          "fact_ids": [
+            "ai.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ai_history_3",
+          "text": "Что получилось и по каким данным оценивали результат?",
+          "fact_ids": [
+            "ai.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ai_history_4",
+          "text": "Работа продолжается? Если остановили или изменили подход, почему?",
+          "fact_ids": [
+            "ai.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ai_process_screen",
+          "text": "Какую повторяемую задачу хотите улучшить с помощью AI и как оцениваете её выполнение сейчас?",
+          "fact_ids": [
+            "ai_process.signal"
+          ],
+          "answer_set": "ai_process"
+        },
+        {
+          "id": "ai_process_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "ai_process.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ai_knowledge_screen",
+          "text": "Откуда помощник должен брать ответы и кто отвечает за актуальность этих материалов?",
+          "fact_ids": [
+            "ai_knowledge.signal"
+          ],
+          "answer_set": "ai_knowledge"
+        },
+        {
+          "id": "ai_knowledge_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "ai_knowledge.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ai_handoff_screen",
+          "text": "Что происходит, когда AI не может ответить, клиент возражает или нужен сотрудник?",
+          "fact_ids": [
+            "ai_handoff.signal"
+          ],
+          "answer_set": "ai_handoff"
+        },
+        {
+          "id": "ai_handoff_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "ai_handoff.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ai_actions_screen",
+          "text": "Какие изменения AI может делать в системах и какие из них требуют проверки человеком?",
+          "fact_ids": [
+            "ai_actions.signal"
+          ],
+          "answer_set": "ai_actions"
+        },
+        {
+          "id": "ai_actions_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "ai_actions.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ai_eval_screen",
+          "text": "Как проверяется качество AI на типовых, сложных и неизвестных ему запросах?",
+          "fact_ids": [
+            "ai_eval.signal"
+          ],
+          "answer_set": "ai_eval"
+        },
+        {
+          "id": "ai_eval_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "ai_eval.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ai_speech_screen",
+          "text": "Какие вопросы о разговорах хотите проверять и как сейчас оценивается выборка?",
+          "fact_ids": [
+            "ai_speech.signal"
+          ],
+          "answer_set": "ai_speech"
+        },
+        {
+          "id": "ai_speech_detail",
+          "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
+          "fact_ids": [
+            "ai_speech.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ai_prediction_screen",
+          "text": "Какие данные и история доступны для предполагаемого прогноза и с чем будете сравнивать результат?",
+          "fact_ids": [
+            "ai_prediction.signal"
+          ],
+          "answer_set": "ai_prediction"
+        },
+        {
+          "id": "ai_prediction_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "ai_prediction.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ai_access_screen",
+          "text": "К каким данным должен обращаться AI и как различаются права его пользователей?",
+          "fact_ids": [
+            "ai_access.signal"
+          ],
+          "answer_set": "ai_access"
+        },
+        {
+          "id": "ai_access_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "ai_access.details"
+          ],
+          "answer_set": null
+        }
+      ]
+    },
+    {
+      "id": "mobile",
+      "questions": [
+        {
+          "id": "mobile_scope",
+          "text": "Нужно ли обсудить сценарии приложения, установки и удержание?",
+          "fact_ids": [
+            "mobile.applicable"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "mobile_impact",
+          "text": "Что меняется для бизнеса из-за этой ситуации?",
+          "fact_ids": [
+            "mobile.impact"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "mobile_history_1",
+          "text": "Что уже делали по этой теме, когда и как долго?",
+          "fact_ids": [
+            "mobile.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "mobile_history_2",
+          "text": "Какого результата ждали и кто выполнял работу?",
+          "fact_ids": [
+            "mobile.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "mobile_history_3",
+          "text": "Что получилось и по каким данным оценивали результат?",
+          "fact_ids": [
+            "mobile.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "mobile_history_4",
+          "text": "Работа продолжается? Если остановили или изменили подход, почему?",
+          "fact_ids": [
+            "mobile.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "mobile_need_screen",
+          "text": "Что клиент должен регулярно делать в приложении и почему текущий сайт не решает эту задачу?",
+          "fact_ids": [
+            "mobile_need.signal"
+          ],
+          "answer_set": "mobile_need"
+        },
+        {
+          "id": "mobile_need_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "mobile_need.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "mobile_onboarding_screen",
+          "text": "На каком шаге после установки люди останавливаются до выполнения первой полезной задачи?",
+          "fact_ids": [
+            "mobile_onboarding.signal"
+          ],
+          "answer_set": "mobile_onboarding"
+        },
+        {
+          "id": "mobile_onboarding_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "mobile_onboarding.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "mobile_transaction_screen",
+          "text": "Какие покупки, записи или другие основные действия в приложении не удаётся завершить?",
+          "fact_ids": [
+            "mobile_transaction.signal"
+          ],
+          "answer_set": "mobile_transaction"
+        },
+        {
+          "id": "mobile_transaction_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "mobile_transaction.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "mobile_store_screen",
+          "text": "Что известно о переходах к странице приложения и установках после просмотра?",
+          "fact_ids": [
+            "mobile_store.signal"
+          ],
+          "answer_set": "mobile_store"
+        },
+        {
+          "id": "mobile_store_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "mobile_store.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "mobile_return_screen",
+          "text": "Как часто приложение должно быть полезно и что известно о повторном использовании?",
+          "fact_ids": [
+            "mobile_return.signal"
+          ],
+          "answer_set": "mobile_return"
+        },
+        {
+          "id": "mobile_return_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "mobile_return.details"
+          ],
+          "answer_set": null
+        }
+      ]
+    },
+    {
+      "id": "integration",
+      "questions": [
+        {
+          "id": "integration_scope",
+          "text": "Нужно ли обсудить учётные системы и интеграции?",
+          "fact_ids": [
+            "integration.applicable"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "integration_impact",
+          "text": "Что меняется для бизнеса из-за этой ситуации?",
+          "fact_ids": [
+            "integration.impact"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "integration_history_1",
+          "text": "Что уже делали по этой теме, когда и как долго?",
+          "fact_ids": [
+            "integration.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "integration_history_2",
+          "text": "Какого результата ждали и кто выполнял работу?",
+          "fact_ids": [
+            "integration.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "integration_history_3",
+          "text": "Что получилось и по каким данным оценивали результат?",
+          "fact_ids": [
+            "integration.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "integration_history_4",
+          "text": "Работа продолжается? Если остановили или изменили подход, почему?",
+          "fact_ids": [
+            "integration.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "integration_catalog_screen",
+          "text": "Какие цены, остатки или характеристики расходятся между 1С и сайтом и как часто?",
+          "fact_ids": [
+            "integration_catalog.signal"
+          ],
+          "answer_set": "integration_catalog"
+        },
+        {
+          "id": "integration_catalog_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "integration_catalog.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "integration_orders_screen",
+          "text": "Как заказ и его изменения проходят между сайтом, CRM и 1С и где возникают расхождения?",
+          "fact_ids": [
+            "integration_orders.signal"
+          ],
+          "answer_set": "integration_orders"
+        },
+        {
+          "id": "integration_orders_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "integration_orders.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "integration_update_screen",
+          "text": "Что мешает обновлению 1С и какие собственные доработки нужно сохранить?",
+          "fact_ids": [
+            "integration_update.signal"
+          ],
+          "answer_set": "integration_update"
+        },
+        {
+          "id": "integration_update_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "integration_update.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "integration_migration_screen",
+          "text": "Какие остатки, справочники, документы и историю нужно сохранить при переходе?",
+          "fact_ids": [
+            "integration_migration.signal"
+          ],
+          "answer_set": "integration_migration"
+        },
+        {
+          "id": "integration_migration_detail",
+          "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
+          "fact_ids": [
+            "integration_migration.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "integration_manual_screen",
+          "text": "Какие сведения сотрудники повторно переносят между системами и какие ошибки при этом возникают?",
+          "fact_ids": [
+            "integration_manual.signal"
+          ],
+          "answer_set": "integration_manual"
+        },
+        {
+          "id": "integration_manual_detail",
+          "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
+          "fact_ids": [
+            "integration_manual.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "integration_reports_screen",
+          "text": "Сколько ручной работы занимает сборка согласованных показателей из 1С для регулярного отчёта?",
+          "fact_ids": [
+            "integration_reports.signal"
+          ],
+          "answer_set": "integration_reports"
+        },
+        {
+          "id": "integration_reports_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "integration_reports.details"
+          ],
+          "answer_set": null
+        }
+      ]
+    }
+  ],
+  "context": [
+    {
+      "id": "context_business",
+      "text": "Что вы предлагаете и кто обычно это покупает?",
+      "fact_ids": [
+        "context.business"
+      ]
+    },
+    {
+      "id": "context_model",
+      "text": "Как у вас проходит продажа: онлайн-покупка, заявка и общение с сотрудником, офлайн или сочетание?",
+      "fact_ids": [
+        "context.model"
+      ]
+    },
+    {
+      "id": "context_geography",
+      "text": "В каких регионах вы фактически обслуживаете клиентов?",
+      "fact_ids": [
+        "context.geography"
+      ]
+    },
+    {
+      "id": "context_assets",
+      "text": "Где сейчас представлены ваши услуги или товары и какие системы используете в работе?",
+      "fact_ids": [
+        "context.assets"
+      ]
+    },
+    {
+      "id": "context_goal",
+      "text": "Какой результат для бизнеса сейчас важнее всего?",
+      "fact_ids": [
+        "context.goal"
+      ]
+    },
+    {
+      "id": "context_goal_period",
+      "text": "К какому сроку нужен этот результат?",
+      "fact_ids": [
+        "context.goal_period"
+      ]
+    },
+    {
+      "id": "context_channels",
+      "text": "Откуда сейчас приходят клиенты и какие каналы для вас наиболее значимы?",
+      "fact_ids": [
+        "context.channels"
+      ]
+    },
+    {
+      "id": "context_budget",
+      "text": "Есть ли бюджетный ориентир? Уточните сумму или диапазон, период и что в него входит.",
+      "fact_ids": [
+        "context.budget"
+      ]
+    },
+    {
+      "id": "context_resources",
+      "text": "Кто сможет внедрять изменения и сколько времени на это реально есть?",
+      "fact_ids": [
+        "context.resources"
+      ]
+    },
+    {
+      "id": "context_priority",
+      "text": "В какой части работы сейчас больше всего неопределённости или затруднений? Можно назвать несколько.",
+      "fact_ids": [
+        "context.priority"
+      ]
+    },
+    {
+      "id": "context_constraints",
+      "text": "Какие сроки, обязательства или ограничения нужно учитывать?",
+      "fact_ids": [
+        "context.constraints"
+      ]
+    },
+    {
+      "id": "context_confirmation",
+      "text": "Верно ли я зафиксировал основные сведения? Что нужно исправить или добавить?",
+      "fact_ids": [
+        "context.confirmation"
+      ]
+    },
+    {
+      "id": "context_audience",
+      "text": "Ваши покупатели — компании, частные лица или обе группы?",
+      "fact_ids": [
+        "context.audience"
+      ]
+    },
+    {
+      "id": "context_stage",
+      "text": "Проект запускается, уже работает, расширяется или меняет модель?",
+      "fact_ids": [
+        "context.stage"
+      ]
+    },
+    {
+      "id": "context_scale",
+      "text": "Какой масштаб важен для задачи: сайты, точки, товары, обращения или заказы?",
+      "fact_ids": [
+        "context.scale"
+      ]
+    },
+    {
+      "id": "context_measurement",
+      "text": "Это данные отчёта, приблизительная оценка или показатель пока не измеряется?",
+      "fact_ids": [
+        "context.measurement"
+      ]
+    },
+    {
+      "id": "context_regularity",
+      "text": "Такие задачи разовые, возникают нерегулярно или повторяются постоянно?",
+      "fact_ids": [
+        "context.regularity"
+      ]
+    }
+  ]
+}

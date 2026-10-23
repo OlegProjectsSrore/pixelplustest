@@ -1,0 +1,33 @@
+{
+  "name": "pixelplus-ai",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "node ../scripts/test-worker.mjs",
+    "test:browser": "node ../dist/assets/audit-browser.test.mjs",
+    "check:library": "node --experimental-strip-types ../scripts/build-audit-assets.mjs --check",
+    "build": "wrangler deploy --dry-run --outdir ../.artifacts/worker-build",
+    "build:sdk": "node ../scripts/build-voice-sdk.mjs",
+    "smoke": "node --experimental-strip-types ../scripts/smoke-worker.mjs",
+    "smoke:deployed": "node ../scripts/smoke-deployed-worker.mjs",
+    "dev": "wrangler dev"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20261022.1",
+    "@types/node": "22.18.13",
+    "esbuild": "0.28.2",
+    "typescript": "7.0.2",
+    "wrangler": "4.152.0"
+  },
+  "dependencies": {
+    "ultravox-client": "0.6.0"
+  },
+  "overrides": {
+    "ultravox-client": { "livekit-client": "2.20.1" }
+  }
+}
