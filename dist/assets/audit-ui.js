@@ -58,22 +58,15 @@ export function createAuditView(handlers = {}) {
   };
 
   const dialog = element('dialog', 'audit-dialog');
-  dialog.setAttribute('aria-labelledby', `${prefix}-title`);
-  dialog.setAttribute('aria-describedby', `${prefix}-intro`);
+  dialog.setAttribute('aria-label', 'Чат с AI-помощником');
 
   const header = element('header', 'audit-header');
-  const titleGroup = element('div', 'audit-title-group');
-  const title = element('h2', 'audit-title', 'Эксперт');
-  title.id = `${prefix}-title`;
-  const intro = element('p', 'audit-intro', 'Искусственный интеллект');
-  intro.id = `${prefix}-intro`;
-  titleGroup.append(title, intro);
   const callButton = button('', 'call');
   callButton.setAttribute('aria-label', 'Переключиться на голос');
   callButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7 12.8 12.8 0 0 0 .7 2.8 2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5 12.8 12.8 0 0 0 2.8.7 2 2 0 0 1 1.8 2.1Z"/></svg>';
   const closeButton = button('×', 'close');
   closeButton.setAttribute('aria-label', 'Закрыть окно опроса');
-  header.append(titleGroup, callButton, closeButton);
+  header.append(callButton, closeButton);
 
   const body = element('div', 'audit-body');
   const toolbar = element('div', 'audit-toolbar');
