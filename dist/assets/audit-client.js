@@ -418,7 +418,7 @@ document.addEventListener('click', event => {
   if (!button || !['chat', 'voice'].includes(button.dataset.aiAction)) return;
   event.preventDefault();
   if (!document.querySelector('link[data-audit-styles]')) {
-    const link = document.createElement('link'); link.rel = 'stylesheet'; link.href = new URL('./audit-ui.css?v=debaf60b6f', import.meta.url).href; link.dataset.auditStyles = ''; document.head.append(link);
+    const link = document.createElement('link'); link.rel = 'stylesheet'; link.href = new URL('./audit-ui.css?v=53ad4881dc', import.meta.url).href; link.dataset.auditStyles = ''; document.head.append(link);
   }
   client ||= createAuditClient({ config: window.PIXELPLUS_AUDIT_CONFIG });
   void client.open(button.dataset.aiAction);
