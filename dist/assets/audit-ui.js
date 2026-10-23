@@ -61,24 +61,22 @@ export function createAuditView(handlers = {}) {
   dialog.setAttribute('aria-label', 'Чат с AI-помощником');
 
   const header = element('header', 'audit-header');
-  const callButton = button('', 'call');
-  callButton.setAttribute('aria-label', 'Переключиться на голос');
-  callButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7 12.8 12.8 0 0 0 .7 2.8 2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5 12.8 12.8 0 0 0 2.8.7 2 2 0 0 1 1.8 2.1Z"/></svg>';
   const closeButton = button('×', 'close');
   closeButton.setAttribute('aria-label', 'Закрыть окно опроса');
   const time = element('p', 'audit-time');
   time.setAttribute('aria-live', 'off');
-  header.append(callButton, time, closeButton);
 
   const body = element('div', 'audit-body');
-  const toolbar = element('div', 'audit-toolbar');
   const channels = element('div', 'audit-channels');
   channels.setAttribute('role', 'group');
   channels.setAttribute('aria-label', 'Способ ответить');
   const chatButton = button('Чат', 'channel');
-  const voiceButton = button('Голос', 'channel');
+  const voiceButton = button('', 'channel');
+  voiceButton.classList.add('audit-button--voice');
+  voiceButton.setAttribute('aria-label', 'Голос');
+  voiceButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7 12.8 12.8 0 0 0 .7 2.8 2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5 12.8 12.8 0 0 0 2.8.7 2 2 0 0 1 1.8 2.1Z"/></svg>';
   channels.append(chatButton, voiceButton);
-  toolbar.append(channels);
+  header.append(channels, time, closeButton);
 
   const status = element('p', 'audit-status');
   status.setAttribute('role', 'status');
@@ -182,7 +180,7 @@ export function createAuditView(handlers = {}) {
   const greeting = element('p', 'audit-greeting', 'Здравствуйте! Помогу разобраться, что мешает росту вашего бизнеса. Ответьте на вопросы — по итогам вы получите PDF с предварительным аудитом. Опрос займёт до 15 минут.');
   body.append(greeting, status, voiceStatus, notice, error, challengeElement,
     messages, questionSection, readySection, recovery);
-  dialog.append(header, toolbar, body, footer);
+  dialog.append(header, body, footer);
   document.body.append(dialog);
 
   function call(name, ...args) {
@@ -273,7 +271,6 @@ export function createAuditView(handlers = {}) {
   });
   chatButton.addEventListener('click', () => call('onChannel', 'chat'));
   voiceButton.addEventListener('click', () => call('onChannel', 'voice'));
-  callButton.addEventListener('click', () => call('onChannel', 'voice'));
   pauseButton.addEventListener('click', () => call('onPause'));
   resumeButton.addEventListener('click', () => call('onResume'));
   finishButton.addEventListener('click', () => call('onFinish'));
@@ -324,7 +321,7 @@ export function createAuditView(handlers = {}) {
       : PHASE_TEXT[phase] || PHASE_TEXT.unavailable;
     status.hidden = phase === 'interview' && !busy;
     greeting.hidden = Boolean(model.messages?.length) || completed;
-    toolbar.hidden = completed || !['interview', 'paused'].includes(phase);
+    channels.hidden = completed || !['interview', 'paused'].includes(phase);
     voiceStatus.textContent = safeText(model.voice_status);
     voiceStatus.hidden = model.mode !== 'voice' || !voiceStatus.textContent || completed;
     error.textContent = safeText(model.error);
@@ -333,9 +330,6 @@ export function createAuditView(handlers = {}) {
     voiceButton.setAttribute('aria-pressed', String(model.mode === 'voice'));
     chatButton.disabled = busy || !capabilities.chat || (model.mode === 'chat' && phase !== 'idle');
     voiceButton.disabled = busy || !capabilities.voice || (model.mode === 'voice' && phase !== 'idle');
-    callButton.disabled = voiceButton.disabled || completed || model.launchPending;
-    callButton.setAttribute('aria-pressed', String(model.mode === 'voice'));
-    callButton.title = model.launchPending ? 'Голосовой разговор будет доступен после запуска опроса' : model.mode === 'voice' ? 'Голосовой режим включён' : 'Переключиться на голос';
 
     const seconds = model.remaining_seconds;
     const hasTime = Number.isFinite(seconds) && seconds >= 0 && (interviewing || paused);

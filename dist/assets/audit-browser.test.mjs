@@ -105,14 +105,15 @@ try {
         capabilities: { chat: true, voice: true, pause: true, resume: true, finish: true, email: true } }), phase);
       assert.equal(await page.locator('dialog').evaluate(node => node.scrollWidth > node.clientWidth || node.querySelector('.audit-body').scrollWidth > node.querySelector('.audit-body').clientWidth), false, `${width}px ${phase}`);
       assert.equal(await page.locator('.audit-header > .audit-time').count(), 1, 'Timer stays in the header');
+      assert.equal(await page.locator('.audit-header > .audit-channels').count(), 1, 'Chat and voice controls stay in the header');
     }
   }
   await page.evaluate(() => auditView.render({ phase: 'interview', mode: 'chat', launchPending: false, capabilities: { voice: true } }));
-  await page.getByRole('button', { name: 'Переключиться на голос' }).click();
+  await page.getByRole('button', { name: 'Голос' }).click();
   assert.deepEqual(await page.evaluate(() => channelCalls), ['voice']);
   await page.evaluate(() => auditView.render({ phase: 'unavailable', launchPending: true }));
-  assert.equal(await page.locator('.audit-button--call').isVisible(), true);
-  assert.equal(await page.locator('.audit-button--call').isDisabled(), true);
+  assert.equal(await page.locator('.audit-button--call').count(), 0);
+  assert.equal(await page.getByRole('button', { name: 'Голос' }).count(), 0);
   assert.equal(await page.locator('dialog img, dialog script').count(), 0);
   await page.setViewportSize({ width: 390, height: 800 });
   await page.locator('.audit-button--close').focus(); await page.keyboard.press('Shift+Tab');

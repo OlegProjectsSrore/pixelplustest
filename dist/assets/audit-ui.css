@@ -35,18 +35,17 @@
 
 .audit-dialog .audit-header {
   display: flex;
-  align-items: flex-start;
-  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   padding: 18px 20px 14px;
   border-bottom: 1px solid #e5e5e5;
   flex: 0 0 auto;
 }
-.audit-dialog .audit-title-group { min-width: 0; flex: 1; }
-.audit-dialog .audit-title { font-size: 22px; font-weight: 700; line-height: 1.2; letter-spacing: -.025em; }
-.audit-dialog .audit-intro { margin-top: 3px; color: var(--audit-muted); font-size: 14px; line-height: 1.5; }
 .audit-dialog .audit-body { flex: 1; position: relative; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 20px; }
-.audit-dialog .audit-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; flex: 0 0 auto; padding: 10px 20px; border-bottom: 1px solid #e5e5e5; }
-.audit-dialog .audit-channels { display: inline-flex; gap: 8px; }
+.audit-dialog .audit-channels { display: inline-flex; flex: 0 0 auto; gap: 8px; }
+.audit-dialog .audit-button--voice { width: 44px; min-width: 44px; padding: 10px; }
+.audit-dialog .audit-button--voice svg { display: block; width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .audit-dialog .audit-time { color: var(--audit-muted); font-size: 14px; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .audit-dialog .audit-greeting { margin-bottom: 20px; line-height: 1.6; }
 .audit-dialog .audit-status { color: var(--audit-muted); font-size: 14px; }
@@ -80,7 +79,7 @@
 .audit-dialog .audit-button--primary { border-color: var(--audit-red); background: var(--audit-red); color: #fff; }
 .audit-dialog .audit-button--primary:hover:not(:disabled) { background: #b00000; }
 .audit-dialog .audit-button--quiet { border-color: transparent; color: var(--audit-muted); font-weight: 400; }
-.audit-dialog .audit-button--channel { min-width: 80px; }
+.audit-dialog .audit-button--channel { min-width: 72px; }
 .audit-dialog .audit-button--channel[aria-pressed="true"] { border-color: var(--audit-red); color: var(--audit-red); background: #fff5f5; }
 .audit-dialog .audit-button--channel[aria-pressed="true"]:disabled { opacity: 1; cursor: default; }
 .audit-dialog .audit-button--close { width: 44px; min-width: 44px; padding: 0; border: 0; font: 400 30px/1 Ubuntu, sans-serif; flex: 0 0 auto; }
@@ -130,8 +129,7 @@
 @media (max-width: 600px) {
   .audit-dialog { inset: 0; width: 100%; height: 100dvh; max-height: 100dvh; border: 0; border-radius: 0; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
   .audit-dialog .audit-header { padding: 18px 16px 16px; gap: 6px; }
-  .audit-dialog .audit-title { font-size: 22px; }
-  .audit-dialog .audit-intro { font-size: 13px; }
+  .audit-dialog .audit-channels { gap: 6px; }
   .audit-dialog .audit-body { padding: 16px; }
   .audit-dialog .audit-footer { padding: 12px 16px; }
   .audit-dialog .audit-message { max-width: 96%; }
@@ -152,17 +150,3 @@
 .audit-dialog .audit-email-row { flex-wrap: wrap; }
 .audit-dialog .audit-email-row .audit-input { flex-basis: 200px; }
 .audit-dialog .audit-body { touch-action: pan-y pinch-zoom; overflow-anchor: none; scrollbar-gutter: stable; }
-
-/* Voice shortcut reuses the phone icon and red accent of the Expert button. */
-.audit-dialog .audit-button--call { flex: 0 0 44px; width: 44px; height: 44px; padding: 10px; border-color: var(--audit-red); background: var(--audit-red); color: #fff; }
-.audit-dialog .audit-button--call:hover:not(:disabled) { background: #b00000; }
-.audit-dialog .audit-button--call svg { display: block; width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-
-/* Mirror the phone and close controls at the two edges of the header. */
-.audit-dialog .audit-header { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 3px 12px; }
-.audit-dialog .audit-title-group { display: contents; }
-.audit-dialog .audit-title { grid-column: 1; grid-row: 1; }
-.audit-dialog .audit-intro { grid-column: 1 / -1; grid-row: 2; margin-top: 0; }
-.audit-dialog .audit-button--call { grid-column: 1; grid-row: 1; justify-self: start; }
-.audit-dialog .audit-time { grid-column: 2; grid-row: 1; justify-self: center; }
-.audit-dialog .audit-button--close { grid-column: 3; grid-row: 1; justify-self: end; }
