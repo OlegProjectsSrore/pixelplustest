@@ -164,6 +164,25 @@ test('transcript Retry removes acknowledged outbox revisions and records server 
   assert.equal(f.stored.transcript_boundaries.call1, 'voice:call1:0:1');
 });
 
+test('live voice captions update both sides in the chat and survive a view refresh', async t => {
+  const f = fixture(t, { initial: null });
+  await f.client.open('voice');
+  const event = (ordinal, role, text, revision) => ({ id: `voice:call1:${ordinal}`, role, text,
+    source_revision: revision, data: { medium: 'voice', is_final: revision > 0 } });
+  f.voice.onTranscript(event(0, 'user', 'Мне нужен', 0));
+  f.voice.onTranscript(event(0, 'user', 'Мне нужен аудит', 1));
+  f.voice.onTranscript(event(1, 'assistant', 'Помогу', 0));
+  f.voice.onTranscript(event(1, 'assistant', 'Помогу разобраться', 1));
+  f.voice.onTranscript(event(0, 'user', 'Мне нужен', 0));
+  assert.deepEqual(f.model.messages.map(message => [message.role, message.text]), [
+    ['user', 'Мне нужен аудит'], ['assistant', 'Помогу разобраться'],
+  ]);
+  assert.equal(f.calls.some(call => call.path === '/api/voice/transcript'), false,
+    'captions must appear before any server acknowledgement');
+  await f.client.refresh();
+  assert.deepEqual(f.stored.messages.map(message => message.text), ['Мне нужен аудит', 'Помогу разобраться']);
+});
+
 test('microphone denial prevents paid voice start and permits switching to chat', async t => {
   const f = fixture(t, { initial: null, microphone: async () => { throw new Error('microphone denied'); } });
   await f.client.open('voice');

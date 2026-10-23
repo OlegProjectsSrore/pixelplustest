@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { checkMicrophone, createVoiceAdapter } from './audit-voice.js';
 
 function deferred() { let resolve; let reject; const promise = new Promise((a, b) => { resolve = a; reject = b; }); return { promise, resolve, reject }; }
-function fixture({ onEvents = async () => {}, onTool = async () => ({}), joinFailure = false } = {}) {
+function fixture({ onEvents = async () => {}, onTranscript, onTool = async () => ({}), joinFailure = false } = {}) {
   let instance;
   const errors = [];
   class Session extends EventTarget {
@@ -12,9 +12,9 @@ function fixture({ onEvents = async () => {}, onTool = async () => ({}), joinFai
     joinCall() { queueMicrotask(() => this.setStatus(joinFailure ? 'disconnected' : 'listening')); }
     async leaveCall() { if (this.failLeave) throw new Error('leave unknown'); this.setStatus('disconnected'); }
     setStatus(value) { this.status = value; this.dispatchEvent(new Event('status')); }
-    transcript(text, isFinal = false) { this.transcripts[0] = { ordinal: 0, speaker: 'user', text, isFinal, medium: 'voice' }; this.dispatchEvent(new Event('transcripts')); }
+    transcript(text, isFinal = false, speaker = 'user', ordinal = 0) { this.transcripts[ordinal] = { ordinal, speaker, text, isFinal, medium: 'voice' }; this.dispatchEvent(new Event('transcripts')); }
   }
-  const adapter = createVoiceAdapter({ sdk: { UltravoxSession: Session }, onState() {}, onEvents, onTool, onError: error => errors.push(error) });
+  const adapter = createVoiceAdapter({ sdk: { UltravoxSession: Session }, onState() {}, onEvents, onTranscript, onTool, onError: error => errors.push(error) });
   return { adapter, get instance() { return instance; }, errors };
 }
 
@@ -23,6 +23,22 @@ test('microphone permission denial creates no stream and successful probing rele
   let stopped = 0;
   await checkMicrophone({ getUserMedia: async () => ({ getTracks: () => [{ stop: () => stopped++ }, { stop: () => stopped++ }] }) });
   assert.equal(stopped, 2);
+});
+
+test('both speakers appear on transcript events before server delivery and revisions replace the same utterance', async () => {
+  const shown = []; const batches = [];
+  const f = fixture({ onTranscript: event => shown.push(structuredClone(event)), onEvents: async events => batches.push(events) });
+  await f.adapter.start({ call_id: 'c1', join_url: 'wss://voice.example' });
+  f.instance.transcript('Мне нужен', false, 'user', 0);
+  f.instance.transcript('Мне нужен аудит', true, 'user', 0);
+  f.instance.transcript('Помогу', false, 'agent', 1);
+  f.instance.transcript('Помогу разобраться', true, 'agent', 1);
+  assert.deepEqual(shown.map(event => [event.role, event.text, event.source_revision]), [
+    ['user', 'Мне нужен', 0], ['user', 'Мне нужен аудит', 1],
+    ['assistant', 'Помогу', 0], ['assistant', 'Помогу разобраться', 1],
+  ]);
+  assert.equal(batches.length, 0, 'rendering must not wait for the server flush');
+  await f.adapter.stop();
 });
 
 test('async connection failure cleans local session without pretending the server ended it', async () => {

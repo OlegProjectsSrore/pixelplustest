@@ -1,7 +1,7 @@
 import { createAuditView } from './audit-ui.js?v=dad5eddb9c';
 import { createAuditTransport, createAuditStorage, AuditRequestError } from './audit-http.js';
 import { getTurnstileToken } from './audit-turnstile.js';
-import { checkMicrophone, createVoiceAdapter, loadVoiceSdk } from './audit-voice.js';
+import { checkMicrophone, createVoiceAdapter, loadVoiceSdk } from './audit-voice.js?v=7f69e524a9';
 
 const THANKS = 'Спасибо за предоставленную информацию, сейчас вам предоставим отчёт предварительного аудита.';
 const VOICE_STATUS = { connecting: 'Соединяемся…', listening: 'Слушаю Вас', thinking: 'Обрабатываю ответ…', speaking: 'Помощник говорит', idle: 'Соединение установлено', disconnected: 'Голосовой разговор отключён', disconnecting: 'Завершаем соединение…' };
@@ -86,6 +86,15 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
   function addMessage(id, role, text) {
     if (!text || saved.messages.some(message => message.id === id)) return;
     saved.messages.push({ id, role, text });
+  }
+  function showVoiceTranscript(event) {
+    if (event.data?.medium !== 'voice' || !event.text?.trim()) return;
+    const index = saved.messages.findIndex(message => message.id === event.id);
+    if (index >= 0 && saved.messages[index].source_revision >= event.source_revision) return;
+    const message = { id: event.id, role: event.role, text: event.text, source_revision: event.source_revision };
+    if (index < 0) saved.messages.push(message);
+    else saved.messages[index] = message;
+    persist(); render();
   }
   function accept(data) {
     const session = data?.session || (typeof data?.session_id === 'string' ? data : null);
@@ -257,6 +266,7 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
       render();
     },
       onEvents: postTranscript,
+      onTranscript: showVoiceTranscript,
       onError(problem) { error = problem.message; render(); },
       onTool(name, args, callId) {
         return enqueue(async () => {

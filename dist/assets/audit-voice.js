@@ -23,7 +23,7 @@ export async function loadVoiceSdk(url) {
   return module;
 }
 
-export function createVoiceAdapter({ sdk, onState, onEvents, onTool, onError, now = Date.now }) {
+export function createVoiceAdapter({ sdk, onState, onEvents, onTranscript, onTool, onError, now = Date.now }) {
   let session = null;
   let callId = null;
   let snapshots = new Map();
@@ -48,12 +48,14 @@ export function createVoiceAdapter({ sdk, onState, onEvents, onTool, onError, no
       const revision = previous ? previous.revision + 1 : 0;
       const occurredAt = previous?.occurredAt ?? now();
       snapshots.set(key, { content, revision, occurredAt });
-      pending.set(key, {
+      const event = {
         id: `voice:${key}`, source: 'voice', source_key: key, source_revision: revision,
         local_order: transcript.ordinal, role: transcript.speaker === 'user' ? 'user' : 'assistant',
         kind: 'utterance', text: transcript.text, call_id: callId, occurred_at: occurredAt,
         data: { is_final: transcript.isFinal === true, medium: transcript.medium || 'voice' },
-      });
+      };
+      pending.set(key, event);
+      try { onTranscript?.(event); } catch (error) { onError(error); }
     }
   }
 
