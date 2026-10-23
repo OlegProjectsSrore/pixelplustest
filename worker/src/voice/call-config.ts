@@ -3,7 +3,6 @@ import { createInterviewTools } from './client-tools.ts';
 import { callId, nonempty, remainingSeconds } from './validation.ts';
 
 export const CLOSING_MESSAGE = 'Спасибо за предоставленную информацию, сейчас вам предоставим отчёт предварительного аудита.';
-const SLOW_RUSSIAN_VOICE = '9303a29e-578a-4953-a927-2e1921683d27';
 
 /** Only assembles provider configuration; authorization and account selection belong to the caller. */
 export function buildCallConfig(input: VoiceCallConfig): { body: UltravoxCallRequest; prior_call_id?: string } {
@@ -21,7 +20,6 @@ export function buildCallConfig(input: VoiceCallConfig): { body: UltravoxCallReq
   const body: UltravoxCallRequest = {
     systemPrompt: nonempty(input.system_prompt, 'system prompt'), model: nonempty(input.model, 'model', 256),
     voice: nonempty(input.voice, 'voice', 256), languageHint: 'ru', temperature: 0,
-    ...(input.voice === SLOW_RUSSIAN_VOICE ? { voiceOverrides: { elevenLabs: { speed: 0.7 } } } : {}),
     maxDuration: `${remainingSeconds(input.remaining_seconds)}s`, joinTimeout: '30s', recordingEnabled: false,
     transcriptOptional: false, initialOutputMedium: 'MESSAGE_MEDIUM_VOICE',
     medium: { webRtc: { dataMessages: { transcript: true, clientToolInvocation: true } } },

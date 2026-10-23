@@ -29,8 +29,8 @@ test('call configuration pins WebRTC evidence, signing and remaining budget on c
   assert.equal(output.body.timeExceededMessage, CLOSING_MESSAGE);
   assert.equal('initialMessages' in output.body, false);
   assert.equal('voiceOverrides' in output.body, false);
-  const slower = buildCallConfig({ ...config, voice: '9303a29e-578a-4953-a927-2e1921683d27' });
-  assert.deepEqual(slower.body.voiceOverrides, { elevenLabs: { speed: 0.7 } });
+  const defaultVoice = buildCallConfig({ ...config, voice: '9303a29e-578a-4953-a927-2e1921683d27' });
+  assert.equal('voiceOverrides' in defaultVoice.body, false);
   assert.throws(() => buildCallConfig({ ...config, prior_call_id: id, initial_messages: [] }), /mutually exclusive/);
   assert.throws(() => buildCallConfig({ ...config, remaining_seconds: 901 }), /Remaining/);
   assert.throws(() => buildCallConfig({ ...config, remaining_seconds: 0 }), /Remaining/);
