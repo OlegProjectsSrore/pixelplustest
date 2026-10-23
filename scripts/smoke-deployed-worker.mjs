@@ -54,11 +54,11 @@ assert.equal(absentReport.status, 404);
 
 const closed = await request('/api/session', {
   method: 'POST', headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ operation_id: randomBytes(32).toString('base64url'), channel: 'chat' }),
+  body: JSON.stringify({ operation_id: randomBytes(32).toString('base64url'), channel: mode === '--open' ? 'invalid-probe-channel' : 'chat' }),
 });
 if (mode === '--open') {
-  await errorResponse(closed, 400, 'invalid_request');
-  console.log('PASS open Worker: CORS, authorization, D1 lookup, missing report, creation requires Turnstile. No audit session or provider request created.');
+  await errorResponse(closed, 400, 'invalid_channel');
+  console.log('PASS open Worker: CORS, authorization, D1 lookup, missing report, invalid creation is rejected before allocating resources. No audit session or provider request created.');
 } else {
   await errorResponse(closed, 503, 'sessions_not_released');
   assert.ok(Number(closed.headers.get('retry-after')) > 0);

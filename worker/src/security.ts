@@ -98,6 +98,7 @@ export function originAllowed(request: Request, env: Env): string | null {
   return origin;
 }
 export async function verifyTurnstile(request: Request, token: unknown, env: Env, action: 'session' | 'voice_start', fetcher: typeof fetch = fetch): Promise<void> {
+  if (env.TURNSTILE_ENABLED === 'false') return;
   const responseToken = textField(token, 'turnstile_token', 2048);
   const hostnames = (env.TURNSTILE_HOSTNAMES ?? '').split(',').map(s => s.trim()).filter(Boolean);
   if (!env.TURNSTILE_SECRET || !hostnames.length) fail(503, 'configuration_required', 'Не настроена проверка доступа.');

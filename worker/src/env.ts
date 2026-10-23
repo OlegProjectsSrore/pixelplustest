@@ -9,6 +9,7 @@ export interface Env {
   ALLOWED_ORIGINS?: string;
   TURNSTILE_HOSTNAMES?: string;
   TURNSTILE_SECRET?: string;
+  TURNSTILE_ENABLED?: string;
   IP_HASH_SALT?: string;
   ALLOW_DRAFT_LIBRARY?: string;
   PUBLIC_SESSIONS_ENABLED?: string;

@@ -13,6 +13,7 @@
   "vars": {
     "PUBLIC_WORKER_URL": "https://pixelplus-ai.rudiskiyoleg.workers.dev",
     "ALLOWED_ORIGINS": "https://olegprojectssrore.github.io",
+    "TURNSTILE_ENABLED": "false",
     "TURNSTILE_HOSTNAMES": "olegprojectssrore.github.io",
     "ULTRAVOX_MODEL": "ultravox-v0.7",
     "ULTRAVOX_VOICE": "83b2a94f-8078-4321-935c-a0798b2ac621",

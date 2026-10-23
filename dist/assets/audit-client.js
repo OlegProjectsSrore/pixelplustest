@@ -45,7 +45,7 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
       persist();
     }
   }
-  function hasConfig() { return !!(config?.apiBaseUrl && config?.turnstileSiteKey); }
+  function hasConfig() { return !!(config?.apiBaseUrl && (config?.turnstileEnabled === false || config?.turnstileSiteKey)); }
   function ensureApi() {
     if (!api) {
       if (!hasConfig()) throw new Error('Предварительный аудит пока недоступен. Пожалуйста, зайдите позже.');
@@ -222,7 +222,7 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
     finally { busy = false; render(); schedulePoll(); }
   }
   async function create(channel) {
-    const turnstile_token = await challenge(view.challengeElement, config?.turnstileSiteKey, 'session');
+    const turnstile_token = config?.turnstileEnabled === false ? undefined : await challenge(view.challengeElement, config?.turnstileSiteKey, 'session');
     saved.pending = { path: '/api/session', body: { operation_id: creationNonce(), channel, turnstile_token } };
     persist();
     await sendPending();
@@ -290,7 +290,7 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
     if (saved.voice_call || voice?.active) throw new Error('Остановка предыдущего звонка ещё не подтверждена. Повторите проверку состояния.');
     await microphone();
     const adapter = await getVoice();
-    const turnstile_token = await challenge(view.challengeElement, config?.turnstileSiteKey, 'voice_start');
+    const turnstile_token = config?.turnstileEnabled === false ? undefined : await challenge(view.challengeElement, config?.turnstileSiteKey, 'voice_start');
     const data = await enqueue(() => mutate('/api/voice/start', { turnstile_token }));
     await adapter.start({ call_id: data.call_id, join_url: data.join_url });
   }

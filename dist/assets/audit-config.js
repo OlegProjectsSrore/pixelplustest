@@ -3,6 +3,7 @@ window.PIXELPLUS_AUDIT_CONFIG = Object.freeze({
   // Public sessions are enabled on the Worker; provider keys stay server-side.
   publicSessionsEnabled: true,
   apiBaseUrl: 'https://pixelplus-ai.rudiskiyoleg.workers.dev',
+  turnstileEnabled: false,
   turnstileSiteKey: '0x4AAAAAAFhfOxQMNL2gKzND',
   ultravoxSdkUrl: new URL('./ultravox-sdk.js', import.meta.url).href,
 });

@@ -171,3 +171,22 @@ test('different request body with same mutation key is rejected; old reserved bu
   await assert.rejects(core.reserve('new_sessions', 1, 'provider-test'), (error: unknown) => error instanceof HttpError && error.code === 'operation_already_reserved');
   app.db.close();
 });
+
+
+test('explicitly disabled Turnstile permits session and voice checks without contacting Cloudflare, retaining budgets and auth', async () => {
+  const app = setup();
+  try {
+    app.env.TURNSTILE_ENABLED = 'false';
+    for (const action of ['session', 'voice_start'] as const) {
+      await verifyTurnstile(new Request('https://audit.example'), undefined, app.env, action, async () => { throw new Error('Must not contact Turnstile'); });
+    }
+    const response = await app.call('/api/session', { operation_id: randomToken(), channel: 'chat' });
+    assert.equal(response.status, 201);
+    const data = await response.json() as any;
+    assert.equal((await app.call(`/api/session/${data.session.session_id}`)).status, 401);
+    app.env.BUDGETS_JSON = '{}';
+    assert.equal((await app.call('/api/session', { operation_id: randomToken(), channel: 'chat' })).status, 503);
+    delete app.env.TURNSTILE_ENABLED;
+    await assert.rejects(verifyTurnstile(new Request('https://audit.example'), undefined, app.env, 'session'), /turnstile_token/);
+  } finally { app.db.close(); }
+});

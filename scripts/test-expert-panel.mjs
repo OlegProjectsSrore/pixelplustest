@@ -35,7 +35,7 @@ try {
           return route.fulfill({ contentType: types[path.extname(filename)] || 'application/octet-stream', body });
         } catch { return route.fulfill({ status: 404 }); }
       }
-      if (url.hostname === 'challenges.cloudflare.com') return route.fulfill({ contentType: 'text/javascript', body: `window.turnstile={render(node,options){setTimeout(()=>options.callback('test-only-challenge'),0);return 'stub';},remove(){}};` });
+      if (url.hostname === 'challenges.cloudflare.com') assert.fail('Turnstile must not load when disabled');
       if (url.origin === api) {
         if (route.request().method() === 'OPTIONS') return route.fulfill({ status: 204, headers: { 'Access-Control-Allow-Origin': origin, 'Access-Control-Allow-Methods': 'POST, GET, OPTIONS', 'Access-Control-Allow-Headers': 'content-type, authorization' } });
         const body = route.request().postDataJSON();
