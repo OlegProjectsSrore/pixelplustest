@@ -30,6 +30,8 @@ try {
         try {
           let body = await readFile(filename);
           if (['.html', '.css', '.js', '.json', '.svg', '.txt'].includes(path.extname(filename))) body = Buffer.from(body.toString().replaceAll('/assets/', '/pixelplustest/assets/'));
+          // Exercise the future released flow only against the isolated fake backend.
+          if (name === 'assets/audit-config.js') body = Buffer.from(body.toString().replace('publicSessionsEnabled: false', 'publicSessionsEnabled: true'));
           return route.fulfill({ contentType: types[path.extname(filename)] || 'application/octet-stream', body });
         } catch { return route.fulfill({ status: 404 }); }
       }

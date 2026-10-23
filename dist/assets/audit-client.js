@@ -60,7 +60,7 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
     return Math.max(0, Math.ceil((session.remaining_ms - (active ? Math.max(0, now() - observedAt) : 0)) / 1000));
   }
   function phase() {
-    if (!hasConfig() && !transport) return 'unavailable';
+    if ((!saved.session && config?.publicSessionsEnabled === false) || (!hasConfig() && !transport)) return 'unavailable';
     const session = saved.session;
     if (!session) return busy ? 'loading' : error ? 'failed' : 'idle';
     if (session.status !== 'in_progress') return session.status;
@@ -75,6 +75,7 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
     const canManage = !!saved.management_token && session?.access_expires_at > now();
     const allowed = active && canManage && !busy && !saved.pending;
     view?.render({ mode, phase: phase(), question,
+      launchPending: !session && config?.publicSessionsEnabled === false,
       messages: saved.messages || [], remaining_seconds: remaining(), busy,
       voice_status: voiceStatus, email_status: emailStatus, error,
       capabilities: { chat: !!allowed, voice: !!allowed && !!config?.ultravoxSdkUrl,
@@ -340,6 +341,7 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
     downloads.set(url, setTimeout(() => { URL.revokeObjectURL(url); downloads.delete(url); }, 60000));
   }
   async function retry() {
+    if (!saved.session && config?.publicSessionsEnabled === false) return;
     let pendingPath;
     let result;
     if (saved.pending) { pendingPath = saved.pending.path; result = await enqueue(sendPending); }
@@ -384,7 +386,7 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
   }
   async function open(channel = 'chat') {
     ensureView(); visible = true; mode = saved.session?.active_channel || channel; view.open(); render();
-    if (!hasConfig() && !transport) return;
+    if ((!saved.session && config?.publicSessionsEnabled === false) || (!hasConfig() && !transport)) return;
     const work = async () => {
       discardExpiredManagement();
       if (saved.pending) { error = 'Есть неподтверждённая отправка. Нажмите «Повторить».'; return; }

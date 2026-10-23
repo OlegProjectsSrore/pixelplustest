@@ -322,7 +322,9 @@ export function createAuditView(handlers = {}) {
     dialog.dataset.phase = phase;
     body.setAttribute('aria-busy', String(Boolean(busy)));
 
-    status.textContent = PHASE_TEXT[phase] || PHASE_TEXT.unavailable;
+    status.textContent = model.launchPending
+      ? 'Аудит готовится к запуску. Начать опрос пока нельзя. Пожалуйста, зайдите позже.'
+      : PHASE_TEXT[phase] || PHASE_TEXT.unavailable;
     status.hidden = phase === 'interview' && !busy;
     greeting.hidden = Boolean(model.messages?.length) || completed;
     toolbar.hidden = completed || !['interview', 'paused'].includes(phase);
@@ -408,7 +410,7 @@ export function createAuditView(handlers = {}) {
     emailStatus.hidden = !emailStatus.textContent;
     if (previousPhase === 'ready' && !ready) consent.checked = false;
 
-    recovery.hidden = phase !== 'failed' && phase !== 'unavailable' && !error.textContent;
+    recovery.hidden = model.launchPending || (phase !== 'failed' && phase !== 'unavailable' && !error.textContent);
     retryButton.disabled = Boolean(busy);
     pauseButton.hidden = !interviewing;
     pauseButton.disabled = busy || !capabilities.pause;

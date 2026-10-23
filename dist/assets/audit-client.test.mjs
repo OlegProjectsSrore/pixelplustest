@@ -16,7 +16,7 @@ const state = (patch = {}) => ({ session_id: 's1', status: 'in_progress', revisi
 const record = session => ({ version: 1, session, management_token: 'management', report_token: 'report',
   pending: null, draft: '', messages: [], transcript_outbox: [] });
 
-function fixture(t, { initial = record(state()), request, challenge, microphone, storage } = {}) {
+function fixture(t, { initial = record(state()), request, challenge, microphone, storage, publicSessionsEnabled } = {}) {
   let stored = structuredClone(initial);
   let server = structuredClone(initial?.session || state());
   const calls = [];
@@ -28,7 +28,7 @@ function fixture(t, { initial = record(state()), request, challenge, microphone,
   let stopFailure = false;
   let voiceStarts = 0;
   const persistence = storage || { load: () => structuredClone(stored), save: value => { stored = structuredClone(value); } };
-  const client = createAuditClient({ config: { apiBaseUrl: 'https://audit.example', turnstileSiteKey: 'test', ultravoxSdkUrl: '/sdk.js' },
+  const client = createAuditClient({ config: { publicSessionsEnabled, apiBaseUrl: 'https://audit.example', turnstileSiteKey: 'test', ultravoxSdkUrl: '/sdk.js' },
     persistence, challenge: challenge || (async () => 'challenge'), microphone: microphone || (async () => {}), sdkLoader: async () => ({}),
     viewFactory(callbacks) {
       handlers = callbacks;
@@ -333,4 +333,16 @@ test('closed release refuses creation without retaining an expired challenge for
   assert.equal(challenges, 2);
   assert.equal(f.calls.at(-1).body.turnstile_token, 'challenge-2');
   assert.equal(f.client.session.active_channel, 'chat');
+});
+
+
+test('published closed mode opens the panel without a pointless challenge or session request', async t => {
+  let challenges = 0;
+  const f = fixture(t, { initial: null, publicSessionsEnabled: false, challenge: async () => { challenges++; return 'unused'; } });
+  await f.client.open('chat');
+  assert.equal(f.model.phase, 'unavailable');
+  assert.equal(f.model.launchPending, true);
+  await f.client.retry();
+  assert.equal(challenges, 0);
+  assert.equal(f.calls.length, 0);
 });
