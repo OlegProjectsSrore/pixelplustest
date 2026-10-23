@@ -1,0 +1,423 @@
+import { createAuditView } from './audit-ui.js';
+import { createAuditTransport, createAuditStorage, AuditRequestError } from './audit-http.js';
+import { getTurnstileToken } from './audit-turnstile.js';
+import { checkMicrophone, createVoiceAdapter, loadVoiceSdk } from './audit-voice.js';
+
+const THANKS = 'Спасибо за предоставленную информацию, сейчас вам предоставим отчёт предварительного аудита.';
+const VOICE_STATUS = { connecting: 'Соединяемся…', listening: 'Слушаю Вас', thinking: 'Обрабатываю ответ…', speaking: 'Помощник говорит', idle: 'Соединение установлено', disconnected: 'Голосовой разговор отключён', disconnecting: 'Завершаем соединение…' };
+const EMAIL_STATUS = { pending: 'Письмо ожидает отправки.', sending: 'Отправляем письмо…', sent: 'Письмо отправлено.', unknown: 'Результат отправки пока не подтверждён. Повторное письмо автоматически не отправляем.', failed: 'Не удалось отправить письмо. PDF можно скачать.' };
+
+function creationNonce() {
+  return btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+export function createAuditClient({ config, viewFactory = createAuditView, transport, persistence,
+  challenge = getTurnstileToken, microphone = checkMicrophone, sdkLoader = loadVoiceSdk,
+  voiceFactory = createVoiceAdapter, now = Date.now } = {}) {
+  const store = persistence || createAuditStorage(localStorage);
+  let saved = { version: 1, session: null, messages: [], pending: null, transcript_outbox: [],
+    transcript_boundaries: {}, draft: '', ...store.load() };
+  // A restored browser cannot prove that a previous provider call has ended.
+  if (saved.session?.active_channel === 'voice' && !saved.session.paused && !saved.voice_call) saved.voice_call = { state: 'unknown' };
+  let api = transport;
+  let view;
+  let voice;
+  let busy = false;
+  let visible = false;
+  let error = '';
+  let voiceStatus = '';
+  let emailStatus = '';
+  let mode = saved.session?.active_channel || 'chat';
+  let observedAt = now();
+  let serial = Promise.resolve();
+  let pollTimer;
+  let tickTimer;
+  let destroyed = false;
+  let timeFinishRequested = false;
+  let readyFile = null;
+  let pollDelay = 5000;
+  const downloads = new Map();
+
+  function persist() { saved.draft = view?.getDraft?.() ?? saved.draft; store.save(saved); }
+  function discardExpiredManagement(force = false) {
+    if (saved.management_token && (force || saved.session?.access_expires_at <= now())) {
+      delete saved.management_token;
+      persist();
+    }
+  }
+  function hasConfig() { return !!(config?.apiBaseUrl && config?.turnstileSiteKey); }
+  function ensureApi() {
+    if (!api) {
+      if (!hasConfig()) throw new Error('Предварительный аудит пока недоступен. Пожалуйста, зайдите позже.');
+      api = createAuditTransport(config.apiBaseUrl);
+    }
+    return api;
+  }
+  function remaining() {
+    const session = saved.session;
+    if (!session) return 900;
+    const active = session.status === 'in_progress' && !session.paused;
+    return Math.max(0, Math.ceil((session.remaining_ms - (active ? Math.max(0, now() - observedAt) : 0)) / 1000));
+  }
+  function phase() {
+    if (!hasConfig() && !transport) return 'unavailable';
+    const session = saved.session;
+    if (!session) return busy ? 'loading' : error ? 'failed' : 'idle';
+    if (session.status !== 'in_progress') return session.status;
+    return session.paused ? 'paused' : 'interview';
+  }
+  function render() {
+    const session = saved.session;
+    const serverQuestion = session?.question;
+    const question = serverQuestion?.id === 'context_priority' && Array.isArray(serverQuestion.fact_ids) && serverQuestion.fact_ids.includes('context.priority')
+      ? { ...serverQuestion, answer_mode: 'multiple' } : serverQuestion ?? null;
+    const active = session?.status === 'in_progress';
+    const canManage = !!saved.management_token && session?.access_expires_at > now();
+    const allowed = active && canManage && !busy && !saved.pending;
+    view?.render({ mode, phase: phase(), question,
+      messages: saved.messages || [], remaining_seconds: remaining(), busy,
+      voice_status: voiceStatus, email_status: emailStatus, error,
+      capabilities: { chat: !!allowed, voice: !!allowed && !!config?.ultravoxSdkUrl,
+        resume: !!allowed && session.paused, pause: !!allowed && !session.paused,
+        finish: !!allowed, email: session?.status === 'ready' && canManage && !busy && !saved.pending },
+    });
+  }
+  function addMessage(id, role, text) {
+    if (!text || saved.messages.some(message => message.id === id)) return;
+    saved.messages.push({ id, role, text });
+  }
+  function accept(data) {
+    const session = data?.session || (typeof data?.session_id === 'string' ? data : null);
+    if (session) {
+      if (saved.session && saved.session.session_id !== session.session_id) throw new Error('Получен ответ другой сессии.');
+      if (!Number.isSafeInteger(session.revision) || !Number.isFinite(session.remaining_ms)) throw new Error('Получено некорректное состояние опроса.');
+      if (!saved.session || session.revision >= saved.session.revision) {
+        saved.session = session; mode = session.active_channel; observedAt = now();
+      }
+    }
+    if (data?.management_token) saved.management_token = data.management_token;
+    if (data?.report_token) saved.report_token = data.report_token;
+    const reply = data?.reply?.text || data?.operation?.text;
+    const replyId = data?.reply?.id || data?.operation?.operation_id || saved.pending?.body?.operation_id;
+    if (reply && replyId) addMessage(`reply:${replyId}`, 'assistant', reply);
+    if (saved.session && ['closing', 'preparing', 'ready'].includes(saved.session.status)) addMessage('closing-message', 'assistant', THANKS);
+  }
+  function enqueue(task) {
+    const next = serial.then(task, task);
+    serial = next.catch(() => {});
+    return next;
+  }
+  async function refresh() {
+    discardExpiredManagement();
+    if (!saved.session || saved.session.status === 'ready') return;
+    const reportPhase = ['closing', 'preparing', 'failed'].includes(saved.session.status);
+    if (saved.management_token && saved.session.access_expires_at > now()) {
+      try {
+        const data = await ensureApi().request(`/api/session/${encodeURIComponent(saved.session.session_id)}`, { token: saved.management_token });
+        accept(data); persist(); render(); return;
+      } catch (problem) {
+        if (problem.status === 401) discardExpiredManagement(true);
+        if (problem.status !== 401 || !reportPhase || !saved.report_token) throw problem;
+      }
+    }
+    if (!reportPhase || !saved.report_token) throw new Error('Время управления опросом истекло.');
+    const report = await ensureApi().request(`/api/report/${encodeURIComponent(saved.report_token)}`, { pdf: true });
+    if (report instanceof Blob) {
+      readyFile = report;
+      saved.session.status = 'ready';
+    } else {
+      saved.session.status = 'preparing';
+      pollDelay = Math.max(5000, Number(report.retry_after_seconds || 10) * 1000);
+    }
+    persist(); render();
+  }
+  function mutationBody(extra) {
+    const session = saved.session;
+    if (!session) throw new Error('Сначала начните опрос.');
+    return { ...extra, session_id: session.session_id, operation_id: crypto.randomUUID(), expected_revision: session.revision,
+      channel_revision: session.channel_revision, library_version: session.library_version };
+  }
+  async function sendPending() {
+    const pending = saved.pending;
+    if (!pending) return null;
+    // Also required on Retry: a failed local write must never become an unlogged request.
+    persist();
+    if (pending.path !== '/api/session') {
+      discardExpiredManagement();
+      if (!saved.management_token) throw new Error('Время управления опросом истекло. Готовый PDF можно скачать отдельно.');
+    }
+    let data;
+    try {
+      data = await ensureApi().request(pending.path, { method: 'POST', token: pending.path === '/api/session' ? undefined : saved.management_token, body: pending.body });
+    } catch (problem) {
+      if (problem.status === 401) discardExpiredManagement(true);
+      // These explicit release refusals happen before a session or challenge is accepted.
+      const releaseClosed = pending.path === '/api/session' && problem instanceof AuditRequestError
+        && ['sessions_not_released', 'library_not_approved'].includes(problem.code);
+      const definite = releaseClosed || problem instanceof AuditRequestError && problem.status >= 400 && problem.status < 500 && problem.status !== 429;
+      if (definite && problem.code !== 'creation_already_accepted') {
+        saved.pending = null; persist();
+        if (problem.status === 409) await refresh().catch(() => {});
+      }
+      throw problem;
+    }
+    if (pending.path !== '/api/email/send' && (!data?.session || !Number.isSafeInteger(data.session.revision))) {
+      throw new AuditRequestError('Сервис не подтвердил состояние опроса. Повторите сохранённый запрос.', { code: 'invalid_response' });
+    }
+    if (pending.path === '/api/session' && (!data.management_token || !data.report_token)) {
+      throw new AuditRequestError('Сервис не подтвердил создание сессии. Повторите сохранённый запрос.', { code: 'invalid_response' });
+    }
+    const previous = structuredClone(saved);
+    const clearDraft = pending.clear_draft && (view?.getDraft?.() ?? saved.draft).trim() === pending.user_text;
+    try {
+      accept(data);
+      if (pending.path === '/api/voice/transcript') {
+        const acceptedIds = data.accepted_event_ids;
+        const acknowledged = Array.isArray(data.accepted_events) ? data.accepted_events
+          : Array.isArray(acceptedIds) && acceptedIds.length === pending.body.events.length && acceptedIds.every(id => typeof id === 'string' && id.length)
+            ? pending.body.events.map((event, index) => ({ source_key: event.source_key, source_revision: event.source_revision, event_id: acceptedIds[index] })) : [];
+        const revisions = new Map(acknowledged.map(event => [event.source_key, event.source_revision]));
+        if (pending.body.events.some(event => revisions.get(event.source_key) !== event.source_revision) || typeof data.through_event_id !== 'string') {
+          throw new AuditRequestError('Доставка реплик не подтверждена полностью. Повторите сохранённый запрос.', { code: 'invalid_response' });
+        }
+        saved.transcript_outbox = saved.transcript_outbox.filter(event => event.source_revision > (revisions.get(event.source_key) ?? -1));
+        saved.transcript_boundaries[pending.body.call_id] = data.through_event_id;
+      }
+      if (pending.path === '/api/session/channel') {
+        saved.voice_call = null;
+        if (saved.control_intent?.action === pending.body.action) saved.control_intent = null;
+      }
+      if (pending.path === '/api/audit/finish' && ['closing', 'preparing', 'ready'].includes(saved.session.status)) saved.control_intent = null;
+      if (pending.followup?.path === '/api/audit/finish') saved.control_intent = { action: 'finish', reason: pending.followup.extra.reason };
+      if (pending.path === '/api/voice/start') saved.voice_call = { call_id: data.call_id, state: 'unconfirmed' };
+      if (pending.user_text) addMessage(`user:${pending.body.operation_id}`, 'user', pending.user_text);
+      if (clearDraft) saved.draft = '';
+      // Persist the second step before sending it, including its new revision/operation ID.
+      saved.pending = pending.followup ? { path: pending.followup.path, body: mutationBody(pending.followup.extra) } : null;
+      store.save(saved);
+    } catch (problem) {
+      saved = previous;
+      throw problem;
+    }
+    if (clearDraft) view.clearDraft();
+    render();
+    return saved.pending ? sendPending() : data;
+  }
+  async function mutate(path, extra, { userText, clearDraft = false, followup } = {}) {
+    if (saved.pending) throw new Error('Сначала повторите неподтверждённую отправку.');
+    saved.pending = { path, body: mutationBody(extra), user_text: userText, clear_draft: clearDraft, followup };
+    persist();
+    return sendPending();
+  }
+  async function action(task) {
+    if (busy || destroyed) return;
+    busy = true; error = ''; render();
+    try { await task(); }
+    catch (problem) {
+      error = ['sessions_not_released', 'library_not_approved'].includes(problem?.code)
+        ? 'Аудит готовится к запуску. Начать опрос пока нельзя. Пожалуйста, зайдите позже.'
+        : problem?.message || 'Операция временно недоступна.';
+    }
+    finally { busy = false; render(); schedulePoll(); }
+  }
+  async function create(channel) {
+    const turnstile_token = await challenge(view.challengeElement, config?.turnstileSiteKey, 'session');
+    saved.pending = { path: '/api/session', body: { operation_id: creationNonce(), channel, turnstile_token } };
+    persist();
+    await sendPending();
+  }
+  async function postTranscript(events, callId) {
+    const known = new Map(saved.transcript_outbox.map(event => [event.source_key, event]));
+    for (const event of events) if (!known.has(event.source_key) || known.get(event.source_key).source_revision <= event.source_revision) known.set(event.source_key, event);
+    saved.transcript_outbox = Array.from(known.values()); persist();
+    return enqueue(async () => {
+      for (;;) {
+        const outstanding = saved.transcript_outbox.filter(event => event.call_id === callId);
+        if (!outstanding.length) return;
+        const batch = [];
+        for (const event of outstanding) {
+          const candidate = [...batch, event];
+          // Leave room for the mutation envelope inside the router's 64 KiB limit.
+          if (candidate.length > 40 || new TextEncoder().encode(JSON.stringify(candidate)).byteLength > 48 * 1024) break;
+          batch.push(event);
+        }
+        if (!batch.length) throw new Error('Одна реплика слишком велика для отправки. Она сохранена в браузере.');
+        await mutate('/api/voice/transcript', { call_id: callId, events: batch });
+      }
+    });
+  }
+  async function getVoice() {
+    if (voice) return voice;
+    const sdk = await sdkLoader(config?.ultravoxSdkUrl);
+    voice = voiceFactory({ sdk, onState(status) {
+      voiceStatus = VOICE_STATUS[status] || 'Голосовой опрос';
+      if (status === 'disconnected' && saved.session?.status === 'in_progress') error = 'Голосовое соединение прервано. Для продолжения нажмите «Попробовать ещё раз».';
+      if (status === 'disconnected' && saved.control_intent?.action === 'pause') void action(performControlIntent);
+      render();
+    },
+      onEvents: postTranscript,
+      onError(problem) { error = problem.message; render(); },
+      onTool(name, args, callId) {
+        return enqueue(async () => {
+          if (!['saveAnswers', 'finishAudit', 'offTopicReply'].includes(name)) throw new Error('Неизвестный инструмент разговора.');
+          const boundary = saved.transcript_boundaries[callId];
+          const payload = name === 'offTopicReply'
+            ? Object.fromEntries(['kind', 'certain', 'safe_category_ids', 'excluded_joke_ids', 'previous_topic_category_ids'].filter(key => args[key] !== undefined).map(key => [key, args[key]]))
+            : { answers: args.answers };
+          const extra = { ...payload, call_id: callId, ...(boundary ? { through_event_id: boundary } : {}) };
+          let result;
+          if (name === 'finishAudit') {
+            // Raw voice candidates must pass the voice normalizer before core.finish.
+            result = await mutate('/api/voice/answers', { answers: args.answers, call_id: callId, ...(boundary ? { through_event_id: boundary } : {}) }, {
+              followup: { path: '/api/audit/finish', extra: { reason: args.reason, call_id: callId, ...(boundary ? { through_event_id: boundary } : {}) } },
+            });
+          } else result = await mutate('/api/voice/answers', { ...extra, ...(name === 'offTopicReply' ? { tool: name } : {}) });
+          if (name === 'offTopicReply' && args.kind === 'pause' && (result?.stop_required === true || result?.status === 'stopping')) {
+            saved.control_intent = { action: 'pause' }; persist();
+          }
+          if (name === 'finishAudit' && ['closing', 'preparing', 'ready'].includes(result?.session?.status)) {
+            schedulePoll();
+            return { accepted: true, closing_message: THANKS };
+          }
+          return result;
+        });
+      },
+    });
+    return voice;
+  }
+  async function startVoice() {
+    if (saved.voice_call || voice?.active) throw new Error('Остановка предыдущего звонка ещё не подтверждена. Повторите проверку состояния.');
+    await microphone();
+    const adapter = await getVoice();
+    const turnstile_token = await challenge(view.challengeElement, config?.turnstileSiteKey, 'voice_start');
+    const data = await enqueue(() => mutate('/api/voice/start', { turnstile_token }));
+    await adapter.start({ call_id: data.call_id, join_url: data.join_url });
+  }
+  async function stopVoice() {
+    if (voice) await voice.stop();
+  }
+  async function switchChannel(channel) {
+    if (!saved.session) { await create(channel); if (channel === 'voice') await startVoice(); return; }
+    saved.control_intent = { action: 'switch', channel }; persist();
+    await performControlIntent();
+  }
+  async function performControlIntent() {
+    const intent = saved.control_intent;
+    if (!intent) return;
+    await stopVoice();
+    if (intent.action === 'finish') {
+      await enqueue(() => mutate('/api/audit/finish', { reason: intent.reason }));
+    } else {
+      await enqueue(() => mutate('/api/session/channel', intent));
+      if (intent.action !== 'pause' && mode === 'voice') await startVoice();
+    }
+  }
+  async function control(intent) {
+    saved.control_intent = intent; persist();
+    await performControlIntent();
+  }
+  function schedulePoll() {
+    clearTimeout(pollTimer);
+    if (destroyed || !visible || !saved.session) return;
+    if (!['closing', 'preparing'].includes(saved.session.status)) return;
+    pollTimer = setTimeout(() => {
+      if (busy) { schedulePoll(); return; }
+      void refresh().catch(problem => {
+        error = problem.message;
+        if (problem.retryAfter) pollDelay = Math.max(5000, problem.retryAfter * 1000);
+        if ([404, 410].includes(problem.status) || problem.code === 'failed') saved.session.status = 'failed';
+        render();
+      }).finally(schedulePoll);
+    }, Math.max(pollDelay, (saved.session.retry_after_seconds || 5) * 1000));
+  }
+  async function download() {
+    if (!saved.report_token) throw new Error('Не найдено право на получение отчёта.');
+    const file = readyFile || await ensureApi().request(`/api/report/${encodeURIComponent(saved.report_token)}`, { pdf: true });
+    if (!(file instanceof Blob)) { error = 'Отчёт ещё готовится. Повторите скачивание немного позже.'; return; }
+    const url = URL.createObjectURL(file);
+    const link = document.createElement('a'); link.href = url; link.download = 'ПРЕДВАРИТЕЛЬНЫЙ АУДИТ.pdf';
+    link.rel = 'noreferrer'; document.body.append(link); link.click(); link.remove();
+    downloads.set(url, setTimeout(() => { URL.revokeObjectURL(url); downloads.delete(url); }, 60000));
+  }
+  async function retry() {
+    let pendingPath;
+    let result;
+    if (saved.pending) { pendingPath = saved.pending.path; result = await enqueue(sendPending); }
+    else if (!saved.session) { await create(mode); }
+    else await refresh();
+    for (const callId of new Set(saved.transcript_outbox.map(event => event.call_id))) await postTranscript([], callId);
+    if (saved.control_intent && !saved.pending) { await performControlIntent(); return; }
+    if (pendingPath === '/api/voice/start' && result?.join_url) {
+      await microphone();
+      const adapter = await getVoice();
+      await adapter.start({ call_id: result.call_id, join_url: result.join_url });
+    } else if (saved.session?.status === 'in_progress' && !saved.session.paused && mode === 'voice' && !voice?.active) {
+      await stopVoice();
+      if (saved.voice_call) await enqueue(() => mutate('/api/session/channel', { action: 'resume' }));
+      await startVoice();
+    }
+  }
+  function ensureView() {
+    if (view) return;
+    view = viewFactory({
+      onText: text => action(() => enqueue(() => mutate('/api/chat', { question_id: saved.session?.question?.id ?? null, input: { kind: 'text', text } }, { userText: text, clearDraft: true }))),
+      onSelection: ids => action(() => enqueue(() => mutate('/api/chat', { question_id: saved.session?.question?.id ?? null, input: { kind: 'selection', option_ids: ids } }, { userText: ids.map(id => saved.session.question.options.find(option => option.id === id)?.text || id).join(', ') }))),
+      onSkip: () => action(() => enqueue(() => mutate('/api/chat', { question_id: saved.session?.question?.id ?? null, input: { kind: 'text', text: 'Предпочитаю не отвечать на этот вопрос.' } }))),
+      onChannel: channel => action(() => switchChannel(channel)),
+      onPause: () => action(() => control({ action: 'pause' })),
+      onResume: () => action(() => control({ action: 'resume' })),
+      onFinish: () => action(() => control({ action: 'finish', reason: 'visitor_request' })),
+      onEmail: email => action(async () => { const result = await enqueue(() => mutate('/api/email/send', { email, consent: { accepted: true, version: 'audit-email-v1' } })); emailStatus = EMAIL_STATUS[result.status] || 'Запрос на отправку принят.'; }),
+      onDownload: () => action(download), onRetry: () => action(retry),
+      onClose() { visible = false; clearTimeout(pollTimer); persist(); },
+    });
+    view.setDraft?.(saved.draft || '');
+    tickTimer = setInterval(() => {
+      if (!saved.session) return;
+      try { discardExpiredManagement(); } catch (problem) { error = problem.message; }
+      render();
+      if (!busy && !saved.pending && saved.session.status === 'in_progress' && !saved.session.paused && remaining() === 0 && !timeFinishRequested) {
+        timeFinishRequested = true;
+        void action(() => control({ action: 'finish', reason: 'time_limit' }));
+      }
+    }, 1000);
+  }
+  async function open(channel = 'chat') {
+    ensureView(); visible = true; mode = saved.session?.active_channel || channel; view.open(); render();
+    if (!hasConfig() && !transport) return;
+    const work = async () => {
+      discardExpiredManagement();
+      if (saved.pending) { error = 'Есть неподтверждённая отправка. Нажмите «Повторить».'; return; }
+      if (saved.session) { await refresh(); return; }
+      await create(channel);
+      if (channel === 'voice') await startVoice();
+    };
+    await action(work);
+  }
+  const onStorage = event => {
+    if (event.key !== 'pixelplus.audit.v1') return;
+    error = 'Сессия изменена в другой вкладке. Обновите её состояние перед продолжением.';
+    void voice?.stop().catch(() => {}); render();
+  };
+  window.addEventListener('storage', onStorage);
+  return { open, refresh, retry, get session() { return saved.session; },
+    async destroy() {
+      destroyed = true; clearTimeout(pollTimer); clearInterval(tickTimer); window.removeEventListener('storage', onStorage);
+      for (const [url, timer] of downloads) { clearTimeout(timer); URL.revokeObjectURL(url); }
+      downloads.clear();
+      try { await stopVoice(); } finally { view?.destroy(); }
+    },
+  };
+}
+
+let client;
+document.addEventListener('click', event => {
+  const button = event.target.closest?.('[data-ai-action]');
+  if (!button || !['chat', 'voice'].includes(button.dataset.aiAction)) return;
+  event.preventDefault();
+  if (!document.querySelector('link[data-audit-styles]')) {
+    const link = document.createElement('link'); link.rel = 'stylesheet'; link.href = new URL('./audit-ui.css', import.meta.url).href; link.dataset.auditStyles = ''; document.head.append(link);
+  }
+  client ||= createAuditClient({ config: window.PIXELPLUS_AUDIT_CONFIG });
+  void client.open(button.dataset.aiAction);
+});

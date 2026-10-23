@@ -13,7 +13,7 @@ destination = ROOT / 'outputs' / 'github-pages'
 (destination / 'index.html').unlink(missing_ok=True)
 
 for source in (ROOT / 'dist').rglob('*'):
-    if not source.is_file():
+    if not source.is_file() or source.name.endswith('.test.mjs') or source.suffix == '.md':
         continue
     relative = source.relative_to(ROOT / 'dist')
     # Publish /main/ only; keep the root snapshot out of GitHub Pages.

@@ -1,0 +1,336 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { AuditRequestError } from './audit-http.js';
+
+globalThis.window = { addEventListener() {}, removeEventListener() {} };
+globalThis.document = {
+  addEventListener() {}, body: { append() {} },
+  createElement() { return { click() {}, remove() {} }; },
+};
+const { createAuditClient } = await import('./audit-client.js');
+
+const state = (patch = {}) => ({ session_id: 's1', status: 'in_progress', revision: 0,
+  channel_revision: 0, library_version: 'test', active_channel: 'chat', paused: false,
+  remaining_ms: 900000, access_expires_at: Date.now() + 86400000,
+  question: { id: 'q1', text: 'Вопрос', options: [{ id: 'a1', text: 'Ответ' }] }, ...patch });
+const record = session => ({ version: 1, session, management_token: 'management', report_token: 'report',
+  pending: null, draft: '', messages: [], transcript_outbox: [] });
+
+function fixture(t, { initial = record(state()), request, challenge, microphone, storage } = {}) {
+  let stored = structuredClone(initial);
+  let server = structuredClone(initial?.session || state());
+  const calls = [];
+  let handlers;
+  let model;
+  let draft = '';
+  let voiceCallbacks;
+  let voiceActive = false;
+  let stopFailure = false;
+  let voiceStarts = 0;
+  const persistence = storage || { load: () => structuredClone(stored), save: value => { stored = structuredClone(value); } };
+  const client = createAuditClient({ config: { apiBaseUrl: 'https://audit.example', turnstileSiteKey: 'test', ultravoxSdkUrl: '/sdk.js' },
+    persistence, challenge: challenge || (async () => 'challenge'), microphone: microphone || (async () => {}), sdkLoader: async () => ({}),
+    viewFactory(callbacks) {
+      handlers = callbacks;
+      return { render(value) { model = value; }, open() {}, close() {}, notify() {}, destroy() {}, challengeElement: {},
+        getDraft: () => draft, setDraft: value => { draft = value; }, clearDraft: () => { draft = ''; } };
+    },
+    voiceFactory(callbacks) {
+      voiceCallbacks = callbacks;
+      return { get active() { return voiceActive; }, async start() { voiceStarts++; voiceActive = true; },
+        async stop() { if (stopFailure) throw new Error('leave unknown'); voiceActive = false; } };
+    },
+    transport: { async request(path, options = {}) {
+      calls.push({ path, ...structuredClone(options) });
+      if (request) {
+        const result = await request(path, options, { get server() { return server; }, set server(value) { server = value; }, calls });
+        if (result !== undefined) return result;
+      }
+      if (path.startsWith('/api/report/')) return new Blob(['%PDF-test'], { type: 'application/pdf' });
+      if (options.method !== 'POST') return structuredClone(server);
+      if (path === '/api/session') {
+        server = state({ active_channel: options.body.channel });
+        return { session: structuredClone(server), management_token: 'management', report_token: 'report' };
+      }
+      server.revision++;
+      if (path === '/api/session/channel') {
+        server.channel_revision++;
+        server.paused = options.body.action === 'pause';
+        if (options.body.channel) server.active_channel = options.body.channel;
+      }
+      if (path === '/api/audit/finish') server.status = 'closing';
+      return { session: structuredClone(server), ...(path === '/api/voice/start' ? { call_id: `call${server.revision}`, join_url: 'wss://voice.example/join' } : {}),
+        ...(path === '/api/voice/transcript' ? { through_event_id: 'voice:call1:0:1', accepted_events: options.body.events.map(event => ({ event_id: `server:${event.source_key}:${event.source_revision}`, source_key: event.source_key, source_revision: event.source_revision })) } : {}) };
+    } },
+  });
+  t.after(async () => { stopFailure = false; await client.destroy(); });
+  return { client, calls, get handlers() { return handlers; }, get model() { return model; }, get stored() { return stored; },
+    set draft(value) { draft = value; }, get draft() { return draft; }, get voice() { return voiceCallbacks; },
+    set stopFailure(value) { stopFailure = value; }, get voiceStarts() { return voiceStarts; } };
+}
+
+test('Retry creates a session after a challenge failure without nesting a busy action', async t => {
+  let challenges = 0;
+  const f = fixture(t, { initial: null, challenge: async () => { if (!challenges++) throw new Error('challenge unavailable'); return 'ok'; } });
+  await f.client.open();
+  assert.equal(f.model.phase, 'failed');
+  await f.handlers.onRetry();
+  assert.equal(f.model.phase, 'interview');
+  assert.equal(f.calls.filter(call => call.path === '/api/session').length, 1);
+});
+
+test('lost chat ACK survives reload and retries the exact operation before clearing draft', async t => {
+  let count = 0;
+  const f = fixture(t, { request(path, options, context) {
+    if (path === '/api/chat' && !count++) {
+      context.server.revision++;
+      throw new AuditRequestError('lost ACK');
+    }
+  } });
+  await f.client.open(); f.draft = 'Мой ответ'; await f.handlers.onText(f.draft);
+  const pending = structuredClone(f.stored.pending);
+  assert.equal(f.draft, 'Мой ответ');
+  await f.client.destroy();
+  const recovered = fixture(t, { initial: f.stored });
+  await recovered.client.open(); await recovered.handlers.onRetry();
+  const sent = recovered.calls.find(call => call.path === '/api/chat');
+  assert.deepEqual(sent.body, pending.body);
+  assert.equal(recovered.stored.pending, null);
+  assert.equal(recovered.draft, '');
+  assert.equal(recovered.stored.messages.filter(message => message.role === 'user').length, 1);
+});
+
+test('a definite revision conflict during Retry clears pending but preserves the draft', async t => {
+  let count = 0;
+  const f = fixture(t, { request(path, options, context) {
+    if (path === '/api/chat') {
+      if (++count === 1) throw new AuditRequestError('network');
+      if (count === 2) { context.server.revision = 7; throw new AuditRequestError('conflict', { status: 409, code: 'revision_conflict', retryable: false }); }
+    }
+  } });
+  await f.client.open(); f.draft = 'Черновик'; await f.handlers.onText(f.draft);
+  const oldId = f.stored.pending.body.operation_id;
+  await f.handlers.onRetry();
+  assert.equal(f.stored.pending, null); assert.equal(f.draft, 'Черновик');
+  assert.equal(f.client.session.revision, 7);
+  await f.handlers.onText(f.draft);
+  const latest = f.calls.filter(call => call.path === '/api/chat').at(-1);
+  assert.notEqual(latest.body.operation_id, oldId); assert.equal(latest.body.expected_revision, 7);
+});
+
+test('a failed persistence write prevents dispatch, including on Retry', async t => {
+  const f = fixture(t, { storage: { load: () => record(state()), save() { throw new AuditRequestError('storage blocked'); } } });
+  await f.client.open(); f.draft = 'Ответ'; await f.handlers.onText(f.draft); await f.handlers.onRetry();
+  assert.equal(f.calls.filter(call => call.method === 'POST').length, 0);
+  assert.equal(f.draft, 'Ответ');
+});
+
+test('malformed mutation success keeps the exact operation pending', async t => {
+  const f = fixture(t, { request: path => path === '/api/chat' ? {} : undefined });
+  await f.client.open(); await f.handlers.onText('Ответ');
+  assert.equal(f.stored.pending.path, '/api/chat');
+  assert.match(f.model.error, /не подтвердил/);
+});
+
+test('finishAudit persists candidates then finish; lost first ACK preserves the second step', async t => {
+  let count = 0;
+  const f = fixture(t, { initial: null, request(path) { if (path === '/api/voice/answers' && !count++) throw new AuditRequestError('lost final packet ACK'); } });
+  await f.client.open('voice');
+  const candidates = [{ question_id: 'q1', fact_id: 'f1', state: 'known', value: 'x', source_quotes: ['x'] }];
+  await assert.rejects(f.voice.onTool('finishAudit', { answers: candidates, reason: 'visitor_request', operation_id: 'forged' }, 'call1'));
+  const first = structuredClone(f.stored.pending);
+  assert.equal(first.path, '/api/voice/answers');
+  assert.equal(first.followup.path, '/api/audit/finish');
+  await f.handlers.onRetry();
+  const packets = f.calls.filter(call => ['/api/voice/answers', '/api/audit/finish'].includes(call.path));
+  assert.deepEqual(packets[0].body, packets[1].body);
+  assert.deepEqual(packets[1].body.answers, candidates);
+  assert.equal(packets[2].path, '/api/audit/finish');
+  assert.equal('answers' in packets[2].body, false);
+  assert.equal(packets[2].body.expected_revision, packets[1].body.expected_revision + 1);
+  assert.notEqual(packets[1].body.operation_id, 'forged');
+  assert.equal(f.client.session.status, 'closing');
+});
+
+test('transcript Retry removes acknowledged outbox revisions and records server event boundary', async t => {
+  let count = 0;
+  const f = fixture(t, { initial: null, request(path) { if (path === '/api/voice/transcript' && !count++) throw new AuditRequestError('lost transcript ACK'); } });
+  await f.client.open('voice');
+  const event = { id: 'untrusted-browser-id', call_id: 'call1', source_key: 'call1:0', source_revision: 1, text: 'Ответ' };
+  await assert.rejects(f.voice.onEvents([event], 'call1'));
+  assert.equal(f.stored.transcript_outbox.length, 1);
+  await f.handlers.onRetry();
+  assert.equal(f.stored.transcript_outbox.length, 0);
+  assert.equal(f.stored.transcript_boundaries.call1, 'voice:call1:0:1');
+});
+
+test('microphone denial prevents paid voice start and permits switching to chat', async t => {
+  const f = fixture(t, { initial: null, microphone: async () => { throw new Error('microphone denied'); } });
+  await f.client.open('voice');
+  assert.equal(f.calls.some(call => call.path === '/api/voice/start'), false);
+  await f.handlers.onChannel('chat');
+  assert.equal(f.client.session.active_channel, 'chat');
+});
+
+test('restored unknown voice call blocks a new start until server accepts channel ownership', async t => {
+  let stopped = false;
+  const f = fixture(t, { initial: record(state({ active_channel: 'voice' })), request(path) {
+    if (path === '/api/session/channel' && !stopped) throw new AuditRequestError('call unknown', { status: 409, code: 'channel_stop_pending' });
+  } });
+  await f.client.open('voice'); await f.handlers.onRetry();
+  assert.equal(f.calls.some(call => call.path === '/api/voice/start'), false);
+  stopped = true; await f.handlers.onRetry();
+  assert.equal(f.voiceStarts, 1);
+});
+
+test('pause waits for local stop and server ACK; resume creates voice only afterward', async t => {
+  const f = fixture(t, { initial: null }); await f.client.open('voice');
+  f.stopFailure = true; await f.handlers.onPause();
+  assert.equal(f.calls.some(call => call.path === '/api/session/channel'), false);
+  f.stopFailure = false; await f.handlers.onPause();
+  assert.equal(f.client.session.paused, true);
+  await f.handlers.onResume();
+  assert.equal(f.client.session.paused, false); assert.equal(f.voiceStarts, 2);
+});
+
+test('ready PDF downloads using report token after management expiry', async t => {
+  const f = fixture(t, { initial: record(state({ status: 'ready', access_expires_at: 1 })) });
+  await f.client.open(); await f.handlers.onDownload();
+  assert.equal(f.model.phase, 'ready'); assert.equal(f.model.capabilities.email, false);
+  assert.deepEqual(f.calls.map(call => call.path), ['/api/report/report']);
+  assert.equal(f.calls[0].token, undefined);
+  assert.equal(f.stored.management_token, undefined);
+  assert.equal(f.stored.report_token, 'report');
+});
+
+test('report polling falls back to report token, respects retry delay, stops on ready', async t => {
+  t.mock.timers.enable({ apis: ['setTimeout', 'setInterval'] });
+  let reads = 0;
+  const f = fixture(t, { initial: record(state({ status: 'preparing', access_expires_at: 1 })), request(path) {
+    if (path.startsWith('/api/report/')) return ++reads === 1 ? { status: 'preparing', retry_after_seconds: 10 } : new Blob(['%PDF']);
+  } });
+  await f.client.open();
+  t.mock.timers.tick(9999); await new Promise(setImmediate); assert.equal(reads, 1);
+  t.mock.timers.tick(1); await new Promise(setImmediate); assert.equal(reads, 2);
+  assert.equal(f.model.phase, 'ready');
+  t.mock.timers.tick(60000); await new Promise(setImmediate); assert.equal(reads, 2);
+  assert.equal(f.calls.some(call => call.path.startsWith('/api/session/')), false);
+});
+
+test('creation already accepted preserves nonce instead of silently creating a second session', async t => {
+  const initial = { ...record(null), pending: { path: '/api/session', body: { operation_id: 'nonce', channel: 'chat', turnstile_token: 'used' } } };
+  const f = fixture(t, { initial, request: () => { throw new AuditRequestError('lost credentials', { status: 409, code: 'creation_already_accepted' }); } });
+  await f.client.open(); await f.handlers.onRetry();
+  assert.equal(f.stored.pending.body.operation_id, 'nonce');
+  assert.equal(f.calls.length, 1);
+});
+
+test('a newer draft is not erased by acknowledgement of an older text', async t => {
+  let fail = true;
+  const f = fixture(t, { request(path) { if (path === '/api/chat' && fail) { fail = false; throw new AuditRequestError('offline'); } } });
+  await f.client.open(); f.draft = 'Первый ответ'; await f.handlers.onText(f.draft);
+  f.draft = 'Новое уточнение'; await f.handlers.onRetry();
+  assert.equal(f.draft, 'Новое уточнение');
+  assert.equal(f.stored.draft, 'Новое уточнение');
+});
+
+test('large transcript backlog is split by byte size and every server ACK removes only its chunk', async t => {
+  const f = fixture(t, { initial: null }); await f.client.open('voice');
+  const events = Array.from({ length: 230 }, (_, index) => ({ call_id: 'call1', source_key: `call1:${index}`, source_revision: 0,
+    text: 'Ответ посетителя '.repeat(100), local_order: index }));
+  await f.voice.onEvents(events, 'call1');
+  const packets = f.calls.filter(call => call.path === '/api/voice/transcript');
+  assert.ok(packets.length > 1);
+  assert.equal(packets.flatMap(packet => packet.body.events).length, events.length);
+  for (const packet of packets) {
+    assert.ok(packet.body.events.length <= 40);
+    assert.ok(new TextEncoder().encode(JSON.stringify(packet.body)).byteLength < 64 * 1024);
+  }
+  assert.equal(f.stored.transcript_outbox.length, 0);
+});
+
+test('pause intent survives server stop-pending conflict and Retry does not reconnect instead', async t => {
+  let stopPending = true;
+  const f = fixture(t, { initial: null, request(path, options) {
+    if (path === '/api/session/channel' && options.body.action === 'pause' && stopPending) throw new AuditRequestError('wait stop', { status: 409, code: 'channel_stop_pending' });
+  } });
+  await f.client.open('voice'); await f.handlers.onPause();
+  assert.equal(f.stored.control_intent.action, 'pause');
+  stopPending = false; await f.handlers.onRetry();
+  assert.equal(f.client.session.paused, true); assert.equal(f.voiceStarts, 1);
+  assert.equal(f.stored.control_intent, null);
+});
+
+test('primary bridge accepted_event_ids uses server IDs in request order', async t => {
+  const f = fixture(t, { initial: null, request(path, options, context) {
+    if (path === '/api/voice/transcript') return { session: { ...context.server, revision: context.server.revision + 1 }, accepted_event_ids: ['ve:server-hash'], through_event_id: 've:server-hash' };
+  } });
+  await f.client.open('voice');
+  await f.voice.onEvents([{ call_id: 'call1', source_key: 'call1:0', source_revision: 0, text: 'Да' }], 'call1');
+  assert.equal(f.stored.transcript_outbox.length, 0);
+  assert.equal(f.stored.transcript_boundaries.call1, 've:server-hash');
+});
+
+test('rejected final candidates never become a finish request on Retry', async t => {
+  const f = fixture(t, { initial: null, request(path) {
+    if (path === '/api/voice/answers') throw new AuditRequestError('invalid candidates', { status: 400, code: 'invalid_answers' });
+  } });
+  await f.client.open('voice');
+  await assert.rejects(f.voice.onTool('finishAudit', { answers: [{}], reason: 'visitor_request' }, 'call1'));
+  await f.handlers.onRetry();
+  assert.equal(f.calls.some(call => call.path === '/api/audit/finish'), false);
+});
+
+test('401 removes management credential and uses the independent report token', async t => {
+  const f = fixture(t, { initial: record(state({ status: 'preparing' })), request(path) {
+    if (path.startsWith('/api/session/')) throw new AuditRequestError('expired remotely', { status: 401, code: 'unauthorized' });
+  } });
+  await f.client.open();
+  assert.equal(f.stored.management_token, undefined);
+  assert.equal(f.stored.report_token, 'report');
+  assert.equal(f.model.phase, 'ready');
+});
+
+test('context_priority renders multiple choice and submits every selected domain ID', async t => {
+  const question = { id: 'context_priority', fact_ids: ['context.priority'], text: 'Какие направления важнее?',
+    options: [{ id: 'seo', text: 'Поиск' }, { id: 'analytics', text: 'Аналитика' }] };
+  const f = fixture(t, { initial: record(state({ question })) });
+  await f.client.open();
+  assert.equal(f.model.question.answer_mode, 'multiple');
+  assert.equal(f.client.session.question.answer_mode, undefined, 'UI mapping must not mutate server state');
+  await f.handlers.onSelection(['seo', 'analytics']);
+  const sent = f.calls.find(call => call.path === '/api/chat');
+  assert.equal(sent.body.question_id, 'context_priority');
+  assert.deepEqual(sent.body.input, { kind: 'selection', option_ids: ['seo', 'analytics'] });
+});
+
+test('multiple-choice mapping requires both the exact question ID and priority fact', async t => {
+  for (const question of [
+    { id: 'context_priority', fact_ids: ['context.industry'], answer_mode: 'single' },
+    { id: 'another_question', fact_ids: ['context.priority'] },
+  ]) {
+    const f = fixture(t, { initial: record(state({ question: { text: 'Вопрос', options: [], ...question } })) });
+    await f.client.open();
+    assert.equal(f.model.question.answer_mode, question.answer_mode);
+  }
+});
+
+
+test('closed release refuses creation without retaining an expired challenge for Retry', async t => {
+  let challenges = 0;
+  let closed = true;
+  const f = fixture(t, { initial: null, challenge: async () => `challenge-${++challenges}`,
+    request(path) {
+      if (path === '/api/session' && closed) throw new AuditRequestError('Closed', { status: 503, code: 'sessions_not_released' });
+    },
+  });
+  await f.client.open('chat');
+  assert.equal(f.stored.pending, null);
+  assert.equal(f.stored.session, null);
+  assert.match(f.model.error, /Аудит готовится к запуску/);
+  closed = false;
+  await f.client.retry();
+  assert.equal(challenges, 2);
+  assert.equal(f.calls.at(-1).body.turnstile_token, 'challenge-2');
+  assert.equal(f.client.session.active_channel, 'chat');
+});
