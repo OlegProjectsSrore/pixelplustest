@@ -81,7 +81,14 @@ try {
     const composerAfter = await page.locator('.audit-text-form').boundingBox();
     assert.equal(composerBefore.y, composerAfter.y, 'Composer stays fixed while conversation scrolls');
     await page.locator('.audit-textarea').fill('Черновик ответа');
-    await page.keyboard.press('Escape');
+    if (width > 600) {
+      const requestCount = requests.length;
+      await expert.click();
+      assert.equal(await page.locator('.audit-dialog').evaluate(node => node.open), false, 'Second expert click closes the panel');
+      assert.equal(requests.length, requestCount, 'Closing does not send API requests');
+    } else {
+      await page.keyboard.press('Escape');
+    }
     assert.equal(await expert.getAttribute('aria-expanded'), 'false');
     assert(await expert.evaluate(node => node === document.activeElement));
     await expert.click();

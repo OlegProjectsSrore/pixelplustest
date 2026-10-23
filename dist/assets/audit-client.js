@@ -402,7 +402,12 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
     void voice?.stop().catch(() => {}); render();
   };
   window.addEventListener('storage', onStorage);
-  return { open, refresh, retry, get session() { return saved.session; },
+  return { open, refresh, retry,
+    toggle(channel = 'chat') {
+      if (visible) { visible = false; view.close(); return; }
+      return open(channel);
+    },
+    get session() { return saved.session; },
     async destroy() {
       destroyed = true; clearTimeout(pollTimer); clearInterval(tickTimer); window.removeEventListener('storage', onStorage);
       for (const [url, timer] of downloads) { clearTimeout(timer); URL.revokeObjectURL(url); }
@@ -421,5 +426,5 @@ document.addEventListener('click', event => {
     const link = document.createElement('link'); link.rel = 'stylesheet'; link.href = new URL('./audit-ui.css?v=53ad4881dc', import.meta.url).href; link.dataset.auditStyles = ''; document.head.append(link);
   }
   client ||= createAuditClient({ config: window.PIXELPLUS_AUDIT_CONFIG });
-  void client.open(button.dataset.aiAction);
+  void client.toggle(button.dataset.aiAction);
 });
