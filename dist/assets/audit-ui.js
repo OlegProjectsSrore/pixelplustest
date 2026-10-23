@@ -179,7 +179,7 @@ export function createAuditView(handlers = {}) {
   const footerNote = element('p', 'audit-footer-note', 'Рекомендации будут в PDF после опроса.');
   footer.append(textForm, sessionActions, footerNote);
 
-  const greeting = element('p', 'audit-greeting', 'Здравствуйте! Помогу разобраться, что мешает росту вашего бизнеса. Ответьте на вопросы — по итогам вы получите PDF с предварительным аудитом. Опрос займёт до 15 минут.');
+  const greeting = element('p', 'audit-greeting', 'Здравствуйте! Помогу разобраться, что мешает росту вашего бизнеса. Ответьте на вопросы — по итогам вы получите PDF с предварительным аудитом. На голосовой разговор отведено до 15 минут.');
   body.append(greeting, status, voiceStatus, notice, error, challengeElement,
     messages, questionSection, readySection, recovery);
   dialog.append(header, body, footer);

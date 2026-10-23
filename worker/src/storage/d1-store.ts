@@ -34,7 +34,7 @@ function callRow(row: Row): VoiceCall {
 }
 
 export function elapsedMs(state: AuditState, now: number): number {
-  return Math.min(INTERVIEW_BUDGET_MS, state.elapsed_ms + (state.active_since === null ? 0 : Math.max(0, now - state.active_since)));
+  return Math.min(INTERVIEW_BUDGET_MS, state.elapsed_ms + (state.active_channel !== 'voice' || state.active_since === null ? 0 : Math.max(0, now - state.active_since)));
 }
 
 /** Each dependent statement checks the winning revision AND a fresh batch nonce.
@@ -119,8 +119,8 @@ export class D1Store {
     next.through_seq = state.through_seq + 1;
     next.elapsed_ms = used;
     next.active_channel = action === 'channel' ? input.state.active_channel : state.active_channel;
-    next.active_since = action === 'pause' ? null : action === 'finish' ? (state.active_channel === 'voice' && current.activeCallId && state.active_since !== null ? input.now : null) : action === 'channel' ? (next.active_channel === 'chat' ? input.now : null) : (state.active_since === null ? null : input.now);
-    next.paused = next.active_since === null;
+    next.active_since = action === 'pause' ? null : action === 'finish' ? (state.active_channel === 'voice' && current.activeCallId && state.active_since !== null ? input.now : null) : action === 'channel' ? null : (state.active_channel === 'voice' && state.active_since !== null ? input.now : null);
+    next.paused = action === 'pause' ? true : action === 'channel' ? next.active_channel === 'voice' : action === 'finish' ? next.active_since === null : state.paused;
     next.status = action === 'finish' ? 'closing' : state.status;
     next.finish_reason = action === 'finish' ? reason ?? 'visitor_request' : state.finish_reason;
     if (action === 'recovery') next.extracted_through_seq = Math.max(state.extracted_through_seq, Math.min(input.state.extracted_through_seq, state.through_seq));
@@ -435,7 +435,7 @@ export class D1Store {
   }
 
   async closeExpiredSessions(now: number, limit = 10): Promise<number> {
-    const rows = await this.stmt(`SELECT id FROM audit_sessions WHERE status='in_progress' AND MIN(access_expires_at, COALESCE(active_started_at + 900000 - used_ms, access_expires_at))<=? ORDER BY MIN(access_expires_at, COALESCE(active_started_at + 900000 - used_ms, access_expires_at)) LIMIT ?`, now, Math.min(limit, 50)).all<Row>();
+    const rows = await this.stmt(`SELECT id FROM audit_sessions WHERE status='in_progress' AND MIN(access_expires_at, CASE WHEN active_channel='voice' AND active_started_at IS NOT NULL THEN active_started_at + 900000 - used_ms ELSE access_expires_at END)<=? ORDER BY MIN(access_expires_at, CASE WHEN active_channel='voice' AND active_started_at IS NOT NULL THEN active_started_at + 900000 - used_ms ELSE access_expires_at END) LIMIT ?`, now, Math.min(limit, 50)).all<Row>();
     let closed = 0;
     for (const row of rows.results) {
       const session = await this.requireSession(String(row.id));

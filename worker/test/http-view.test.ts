@@ -102,13 +102,16 @@ test('creation token aliases stay private to creation and replay returns the cur
   } finally { f.db.close(); }
 });
 
-test('legacy timer keeps millisecond precision and option labels support both client formats', async () => {
+test('chat timer stays fixed; voice timer keeps millisecond precision and option labels support both client formats', async () => {
   const f = await fixture();
   try {
     f.setNow(createdAt + 1234);
     f.core.view = async () => ({ question: { id: 'question', text: 'Вопрос', fact_ids: [library.facts[0]!.id], options: [{ id: 'option', text: 'Вариант', rule: 'hidden-rule' }] } });
     const view = object(await sessionView(f.core, f.session));
-    assert.equal(view.remaining_seconds, 898); assert.equal(view.remaining_ms, 898_766); assert.equal(view.elapsed_ms, 1234);
+    assert.equal(view.remaining_seconds, 900); assert.equal(view.remaining_ms, 900_000); assert.equal(view.elapsed_ms, 0);
+    f.session.state.active_channel = 'voice'; f.session.state.paused = false; f.session.state.active_since = createdAt;
+    const voiceView = object(await sessionView(f.core, f.session));
+    assert.equal(voiceView.remaining_seconds, 898); assert.equal(voiceView.remaining_ms, 898_766); assert.equal(voiceView.elapsed_ms, 1234);
     const question = object(view.question!);
     assert.deepEqual(question.options, [{ id: 'option', label: 'Вариант', text: 'Вариант' }]);
     assert.deepEqual(question.fact_ids, [library.facts[0]!.id]); assert.equal(JSON.stringify(view).includes('hidden-rule'), false);

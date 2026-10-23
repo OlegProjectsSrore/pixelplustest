@@ -148,7 +148,7 @@ export function initialAuditState(libraryVersion: string, channel: Channel, now:
   return {
     library_version: libraryVersion, revision: 0, channel_revision: 0, active_channel: channel,
     status: 'in_progress', current_question_id: null, facts: {}, contradictions: [], missing_facts: [], candidate_blocks: [],
-    elapsed_ms: 0, active_since: channel === 'chat' ? now : null, paused: channel === 'voice', finish_reason: null,
+    elapsed_ms: 0, active_since: null, paused: channel === 'voice', finish_reason: null,
     humor: { enabled: true, reserved_ids: [], used_ids: [], operations: {} }, through_seq: 0, extracted_through_seq: 0, history_status: 'pending',
   };
 }

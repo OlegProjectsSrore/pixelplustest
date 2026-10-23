@@ -1,4 +1,4 @@
-import { createAuditView } from './audit-ui.js?v=b809242336';
+import { createAuditView } from './audit-ui.js?v=dad5eddb9c';
 import { createAuditTransport, createAuditStorage, AuditRequestError } from './audit-http.js';
 import { getTurnstileToken } from './audit-turnstile.js';
 import { checkMicrophone, createVoiceAdapter, loadVoiceSdk } from './audit-voice.js';
@@ -56,7 +56,7 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
   function remaining() {
     const session = saved.session;
     if (!session) return 900;
-    const active = session.status === 'in_progress' && !session.paused;
+    const active = session.status === 'in_progress' && session.active_channel === 'voice' && !session.paused;
     return Math.max(0, Math.ceil((session.remaining_ms - (active ? Math.max(0, now() - observedAt) : 0)) / 1000));
   }
   function phase() {

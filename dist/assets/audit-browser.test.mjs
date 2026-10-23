@@ -112,6 +112,11 @@ try {
   await page.evaluate(() => auditView.render({ phase: 'interview', mode: 'chat', launchPending: false, capabilities: { voice: true } }));
   await page.getByRole('button', { name: 'Голос' }).click();
   assert.deepEqual(await page.evaluate(() => channelCalls), ['voice']);
+  await page.evaluate(() => auditView.render({ phase: 'interview', mode: 'voice', capabilities: { chat: true, voice: true } }));
+  assert.equal(await page.getByRole('button', { name: 'Голос' }).getAttribute('aria-pressed'), 'true');
+  assert.equal(await page.getByRole('button', { name: 'Голос' }).evaluate(node => getComputedStyle(node).borderColor), 'rgb(204, 0, 0)');
+  await page.getByRole('button', { name: 'Чат' }).click();
+  assert.deepEqual(await page.evaluate(() => channelCalls), ['voice', 'chat']);
   await page.evaluate(() => auditView.render({ phase: 'unavailable', launchPending: true }));
   assert.equal(await page.locator('.audit-button--call').count(), 0);
   assert.equal(await page.getByRole('button', { name: 'Голос' }).count(), 0);

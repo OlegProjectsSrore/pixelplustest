@@ -177,6 +177,7 @@ test('prompt excludes unrelated/catalog data and keeps source values separate fr
   assert.equal(prompt.includes('do-not-leak'), false);
   assert.equal(prompt.includes('not-for-model'), false);
   assert.match(prompt, /"remaining_seconds":59/);
+  assert.match(prompt, /В чате этот лимит не расходуется/);
   assert.match(prompt, /95% стандартных ответов — цель/);
   assert.match(prompt, /Только после принятого finishAudit/);
   assert.match(prompt, /confirmation_candidate — лишь предположение/);

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { D1Store, StoreError } from '../src/storage/d1-store.ts';
+import { D1Store, StoreError, elapsedMs } from '../src/storage/d1-store.ts';
 import { initialAuditState, INTERVIEW_BUDGET_MS, type AuditAnswer, type AuditEvent, type AuditSnapshot } from '../src/audit/contracts.ts';
 import { SqliteD1 } from './helpers/d1.ts';
 
@@ -47,16 +47,19 @@ test('SQL error rolls back the revision, event, and all dependent inserts', asyn
   assert.equal((await store.requireSession('s1')).state.revision, 0); assert.equal(count(db, 'audit_events'), 0); assert.equal(count(db, 'audit_answers'), 0);
 });
 
-test('pause and resume preserve the shared budget and reject answers after the limit', async t => {
+test('chat time does not consume voice minutes, including across pause and resume', async t => {
   const { db, store } = await setup(); t.after(() => db.close());
   const pause = await store.pause({ sessionId: 's1', expectedRevision: 0, channelRevision: 0, operationId: 'pause', now: NOW + 10000 });
-  assert.equal(pause.session.state.elapsed_ms, 10000); assert.equal(pause.session.state.active_since, null);
+  assert.equal(pause.session.state.elapsed_ms, 0); assert.equal(pause.session.state.active_since, null);
+  assert.equal(pause.session.state.paused, true);
   const resume = await store.changeChannel({ sessionId: 's1', expectedRevision: 1, channelRevision: 0, operationId: 'resume', channel: 'chat', now: NOW + 50000 });
-  assert.equal(resume.session.state.elapsed_ms, 10000); assert.equal(resume.session.state.channel_revision, 1);
-  await assert.rejects(store.commit({ sessionId: 's1', expectedRevision: 2, channelRevision: 1, operationId: 'late', state: resume.session.state, event: event('late'), now: NOW + 50000 + INTERVIEW_BUDGET_MS }), (error: unknown) => error instanceof StoreError && error.code === 'time_limit');
-  assert.equal(await store.closeExpiredSessions(NOW + 50000 + INTERVIEW_BUDGET_MS), 1);
-  assert.equal(await store.closeExpiredSessions(NOW + 50000 + INTERVIEW_BUDGET_MS + 1), 0);
-  assert.equal(count(db, 'audit_jobs'), 1);
+  assert.equal(resume.session.state.elapsed_ms, 0); assert.equal(resume.session.state.active_since, null);
+  assert.equal(resume.session.state.paused, false); assert.equal(resume.session.state.channel_revision, 1);
+  const late = await store.commit({ sessionId: 's1', expectedRevision: 2, channelRevision: 1, operationId: 'late', state: resume.session.state, event: event('late'), now: NOW + 50000 + INTERVIEW_BUDGET_MS });
+  assert.equal(late.kind, 'accepted'); assert.equal(late.session.state.elapsed_ms, 0);
+  assert.equal(await store.closeExpiredSessions(NOW + 50000 + INTERVIEW_BUDGET_MS), 0);
+  db.sqlite.prepare("UPDATE audit_sessions SET active_started_at=? WHERE id='s1'").run(NOW);
+  assert.equal(await store.closeExpiredSessions(NOW + 50000 + INTERVIEW_BUDGET_MS), 0, 'An older chat row with a stale start time must not close');
 });
 
 test('finish races create one job, while a lost finish CAS cannot update report', async t => {
@@ -135,6 +138,11 @@ test('voice slots and channel ownership prevent overlapping calls and preserve e
   const stopped = await store.requireSession('s1'); assert.equal(stopped.state.elapsed_ms, 1000);
   const changed = await store.changeChannel({ sessionId: 's1', expectedRevision: stopped.state.revision, channelRevision: 0, operationId: 'switch', now: NOW + 5000, channel: 'chat' });
   assert.equal(changed.session.state.elapsed_ms, 1000); assert.equal(changed.session.state.channel_revision, 1);
+  assert.equal(changed.session.state.active_since, null); assert.equal(changed.session.state.paused, false);
+  assert.equal(elapsedMs(changed.session.state, NOW + 5000 + 600000), 1000);
+  const back = await store.changeChannel({ sessionId: 's1', expectedRevision: changed.session.state.revision, channelRevision: 1, operationId: 'back', now: NOW + 5000 + 600000, channel: 'voice' });
+  assert.equal(back.session.state.elapsed_ms, 1000); assert.equal(back.session.state.active_since, null);
+  assert.equal(back.session.state.paused, true);
 });
 
 test('report read permission outlives session management but not the original retention', async t => {

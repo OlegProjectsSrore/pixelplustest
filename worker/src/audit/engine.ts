@@ -170,7 +170,7 @@ export function deriveFacts(answers: AuditAnswer[], lib: AuditLibrary = library)
 }
 
 export function elapsedInterviewMs(state: AuditState, now: number): number {
-  return Math.min(INTERVIEW_BUDGET_MS, Math.max(0, state.elapsed_ms + (state.active_since === null || state.paused ? 0 : Math.max(0, now - state.active_since))));
+  return Math.min(INTERVIEW_BUDGET_MS, Math.max(0, state.elapsed_ms + (state.active_channel !== 'voice' || state.active_since === null || state.paused ? 0 : Math.max(0, now - state.active_since))));
 }
 function questionDomain(question: Question): string | undefined {
   return question.domain ?? question.fact_ids.find(id => !id.startsWith('context.'))?.split('.')[0];

@@ -130,11 +130,13 @@ test('selection skips collected context and does not infer domain applicability'
   assert.equal(nextQuestion({ ...state, paused: true }, now, library, preview), null);
 });
 
-test('switching channels cannot reset elapsed budget; pause closes counted interval', () => {
+test('chat holds accumulated voice time; only an active voice interval spends it', () => {
   const state = { ...initialAuditState(library.version, 'chat', now), elapsed_ms: 120_000 };
-  assert.equal(elapsedInterviewMs(state, now + 60_000), 180_000);
-  assert.equal(elapsedInterviewMs({ ...state, active_channel: 'voice' }, now + 60_000), 180_000);
-  assert.equal(elapsedInterviewMs({ ...state, paused: true }, now + 600_000), 120_000);
+  assert.equal(elapsedInterviewMs(state, now + 60_000), 120_000);
+  const voice = { ...state, active_channel: 'voice' as const, active_since: now, paused: false };
+  assert.equal(elapsedInterviewMs(voice, now + 60_000), 180_000);
+  assert.equal(elapsedInterviewMs({ ...voice, paused: true }, now + 600_000), 120_000);
+  assert.equal(elapsedInterviewMs({ ...voice, active_channel: 'chat' }, now + 600_000), 120_000);
 });
 
 test('draft blocks and tariffs cannot appear in a report, even after complete interview evidence', () => {

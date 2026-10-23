@@ -14,7 +14,7 @@ const { createAuditClient } = await import('../../dist/assets/audit-client.js');
 const { createAuditTransport } = await import('../../dist/assets/audit-http.js');
 
 test('real client/transport/Worker: creation, text, multi-selection, lost ACK retry, pause and finish', async () => {
-  const db = new SqliteD1(), now = Date.parse('2026-10-22T20:00:00Z');
+  const db = new SqliteD1(); let now = Date.parse('2026-10-22T20:00:00Z');
   const jobs: Promise<unknown>[] = [];
   let providerCalls = 0, stored: any = null, handlers: any, model: any, dropSelectionAck = true;
   const selectionBodies: string[] = [];
@@ -53,7 +53,9 @@ test('real client/transport/Worker: creation, text, multi-selection, lost ACK re
     await client.open('chat');
     assert.equal(model.error, ''); assert.equal(client.session.question.id, 'context_business');
     assert.equal(stored.management_token.length, 43); assert.notEqual(stored.management_token, stored.report_token);
+    now += 600000;
     await handlers.onText('Магазин. Рост продаж. Сайт.');
+    assert.equal(model.remaining_seconds, 900, 'Ten minutes in chat do not consume the voice timer');
     assert.equal(model.error, ''); assert.equal(client.session.question.id, 'context_priority');
     assert.equal(model.question.answer_mode, 'multiple');
     await handlers.onSelection(['strategy', 'analytics']);

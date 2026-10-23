@@ -155,7 +155,7 @@ test('revision, pinned version, question, channel, closed session and time failu
     ['question_conflict', (_h, b) => { b.question_id = 'different-question'; }],
     ['channel_conflict', h => { h.session.state.active_channel = 'voice'; }],
     ['interview_closed', h => { h.session.state.status = 'closing'; }],
-    ['time_limit', h => { h.setTime(NOW + INTERVIEW_BUDGET_MS); }],
+    ['time_limit', h => { h.session.state.elapsed_ms = INTERVIEW_BUDGET_MS; }],
     ['unauthorized', h => { h.session.accessExpiresAt = NOW; }],
   ];
   for (const [code, modify] of cases) {
@@ -247,7 +247,7 @@ test('content filtering uses a safe clarification without a repeated provider at
 test('time and revision are checked again before a second external attempt', async () => {
   for (const change of ['time', 'revision'] as const) {
     const harness = setup(() => {
-      if (change === 'time') harness.setTime(NOW + INTERVIEW_BUDGET_MS); else harness.session.state.revision++;
+      if (change === 'time') harness.session.state.elapsed_ms = INTERVIEW_BUDGET_MS; else harness.session.state.revision++;
       return '{invalid-json';
     });
     await rejectsCode(harness.execute(), change === 'time' ? 'time_limit' : 'revision_conflict');
@@ -255,15 +255,15 @@ test('time and revision are checked again before a second external attempt', asy
   }
 });
 
-test('slow context or runtime preparation cannot start a provider call after the time budget', async () => {
+test('slow chat preparation does not consume voice time', async () => {
   const slowContext = setup();
   slowContext.dependencies.context = async () => { slowContext.setTime(NOW + INTERVIEW_BUDGET_MS); return {}; };
-  await rejectsCode(slowContext.execute(), 'time_limit');
-  assert.deepEqual(slowContext.counters.runtime, []); assert.equal(slowContext.counters.fetch, 0);
+  await slowContext.execute();
+  assert.deepEqual(slowContext.counters.runtime, [0]); assert.equal(slowContext.counters.fetch, 1);
   const slowRuntime = setup(), original = slowRuntime.dependencies.runtime;
   slowRuntime.dependencies.runtime = async (...args) => { const runtime = await original(...args); slowRuntime.setTime(NOW + INTERVIEW_BUDGET_MS); return runtime; };
-  await rejectsCode(slowRuntime.execute(), 'time_limit');
-  assert.deepEqual(slowRuntime.counters.runtime, [0]); assert.equal(slowRuntime.counters.fetch, 0); assert.equal(slowRuntime.counters.commit, 0);
+  await slowRuntime.execute();
+  assert.deepEqual(slowRuntime.counters.runtime, [0]); assert.equal(slowRuntime.counters.fetch, 1); assert.equal(slowRuntime.counters.commit, 1);
 });
 
 test('a concurrent completed operation is replayed before the second provider attempt', async () => {
