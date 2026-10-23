@@ -1,4 +1,4 @@
-import { createAuditView } from './audit-ui.js?v=f8d77b91e5';
+import { createAuditView } from './audit-ui.js?v=b809242336';
 import { createAuditTransport, createAuditStorage, AuditRequestError } from './audit-http.js';
 import { getTurnstileToken } from './audit-turnstile.js';
 import { checkMicrophone, createVoiceAdapter, loadVoiceSdk } from './audit-voice.js';
@@ -423,7 +423,7 @@ document.addEventListener('click', event => {
   if (!button || !['chat', 'voice'].includes(button.dataset.aiAction)) return;
   event.preventDefault();
   if (!document.querySelector('link[data-audit-styles]')) {
-    const link = document.createElement('link'); link.rel = 'stylesheet'; link.href = new URL('./audit-ui.css?v=b95aae296a', import.meta.url).href; link.dataset.auditStyles = ''; document.head.append(link);
+    const link = document.createElement('link'); link.rel = 'stylesheet'; link.href = new URL('./audit-ui.css?v=f637460bc4', import.meta.url).href; link.dataset.auditStyles = ''; document.head.append(link);
   }
   client ||= createAuditClient({ config: window.PIXELPLUS_AUDIT_CONFIG });
   void client.toggle(button.dataset.aiAction);

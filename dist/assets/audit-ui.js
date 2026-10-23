@@ -70,7 +70,9 @@ export function createAuditView(handlers = {}) {
   const channels = element('div', 'audit-channels');
   channels.setAttribute('role', 'group');
   channels.setAttribute('aria-label', 'Способ ответить');
-  const chatButton = button('Чат', 'channel');
+  const chatButton = button('', 'channel');
+  chatButton.setAttribute('aria-label', 'Чат');
+  chatButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"/><path d="M8 10h8M8 14h5"/></svg>';
   const voiceButton = button('', 'channel');
   voiceButton.classList.add('audit-button--voice');
   voiceButton.setAttribute('aria-label', 'Голос');

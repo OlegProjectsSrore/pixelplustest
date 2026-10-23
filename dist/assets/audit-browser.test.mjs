@@ -106,6 +106,7 @@ try {
       assert.equal(await page.locator('dialog').evaluate(node => node.scrollWidth > node.clientWidth || node.querySelector('.audit-body').scrollWidth > node.querySelector('.audit-body').clientWidth), false, `${width}px ${phase}`);
       assert.equal(await page.locator('.audit-header > .audit-time').count(), 1, 'Timer stays in the header');
       assert.equal(await page.locator('.audit-header > .audit-channels').count(), 1, 'Chat and voice controls stay in the header');
+      assert.equal(await page.locator('.audit-channels button:first-child svg').count(), 1, 'Chat button uses an icon');
     }
   }
   await page.evaluate(() => auditView.render({ phase: 'interview', mode: 'chat', launchPending: false, capabilities: { voice: true } }));

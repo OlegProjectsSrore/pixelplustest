@@ -44,8 +44,7 @@
 }
 .audit-dialog .audit-body { flex: 1; position: relative; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 20px; }
 .audit-dialog .audit-channels { display: inline-flex; flex: 0 0 auto; gap: 8px; }
-.audit-dialog .audit-button--voice { width: 44px; min-width: 44px; padding: 10px; }
-.audit-dialog .audit-button--voice svg { display: block; width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.audit-dialog .audit-button--channel svg { display: block; width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .audit-dialog .audit-time { color: var(--audit-muted); font-size: 14px; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .audit-dialog .audit-greeting { margin-bottom: 20px; line-height: 1.6; }
 .audit-dialog .audit-status { color: var(--audit-muted); font-size: 14px; }
@@ -79,7 +78,7 @@
 .audit-dialog .audit-button--primary { border-color: var(--audit-red); background: var(--audit-red); color: #fff; }
 .audit-dialog .audit-button--primary:hover:not(:disabled) { background: #b00000; }
 .audit-dialog .audit-button--quiet { border-color: transparent; color: var(--audit-muted); font-weight: 400; }
-.audit-dialog .audit-button--channel { min-width: 72px; }
+.audit-dialog .audit-button--channel { width: 44px; min-width: 44px; padding: 10px; }
 .audit-dialog .audit-button--channel[aria-pressed="true"] { border-color: var(--audit-red); color: var(--audit-red); background: #fff5f5; }
 .audit-dialog .audit-button--channel[aria-pressed="true"]:disabled { opacity: 1; cursor: default; }
 .audit-dialog .audit-button--close { width: 44px; min-width: 44px; padding: 0; border: 0; font: 400 30px/1 Ubuntu, sans-serif; flex: 0 0 auto; }
