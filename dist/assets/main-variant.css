@@ -109,7 +109,7 @@
 
 /* Match the rendered hero's Online application button, including its border. */
 .ai-header .ai-button[data-ai-action="chat"],
-.ai-header .ai-button[data-ai-action="voice"] {
+.ai-header .ai-button--expert {
   display: inline-flex;
   justify-self: center;
   width: 182.890625px;
@@ -121,36 +121,36 @@
   line-height: 18px;
 }
 
-.ai-header [data-ai-action="voice"] svg {
+.ai-header .ai-button--expert svg {
   width: 16px;
   height: 16px;
 }
 
-.ai-header [data-ai-action="voice"] .ai-button__label {
+.ai-header .ai-button--expert .ai-button__label {
   gap: 0;
   line-height: 18px;
 }
 
-.ai-header [data-ai-action="voice"] .ai-button__label > :first-child {
+.ai-header .ai-button--expert .ai-button__label > :first-child {
   display: inline-flex;
   align-items: center;
   gap: 6px;
 }
 
-.ai-header [data-ai-action="voice"] .ai-button__description {
+.ai-header .ai-button--expert .ai-button__description {
   white-space: nowrap;
 }
 
 @media (max-width: 767px) {
   .ai-header .ai-button[data-ai-action="chat"],
-  .ai-header .ai-button[data-ai-action="voice"] {
+  .ai-header .ai-button--expert {
     width: 160.28125px;
     height: 42.9375px;
     padding: 3px 4px;
     border-radius: 7px;
   }
 
-  .ai-header [data-ai-action="voice"] .ai-button__description {
+  .ai-header .ai-button--expert .ai-button__description {
     font-size: 12px;
     line-height: 16px;
   }
@@ -225,15 +225,15 @@
   }
 
   .ai-header .ai-button[data-ai-action="chat"],
-  .ai-header .ai-button[data-ai-action="voice"] {
+  .ai-header .ai-button--expert {
     width: 100%;
   }
 
-  .ai-header .ai-button[data-ai-action="chat"] {
+  .ai-header .ai-button[data-ai-action="chat"]:not(.ai-button--expert) {
     gap: 6px;
   }
 
-  .ai-header [data-ai-action="voice"] .ai-button__description {
+  .ai-header .ai-button--expert .ai-button__description {
     font-size: min(12px, calc(4vw - 2.4px));
   }
 
