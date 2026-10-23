@@ -16,7 +16,7 @@
     "TURNSTILE_ENABLED": "false",
     "TURNSTILE_HOSTNAMES": "olegprojectssrore.github.io",
     "ULTRAVOX_MODEL": "ultravox-v0.7",
-    "ULTRAVOX_VOICE": "83b2a94f-8078-4321-935c-a0798b2ac621",
+    "ULTRAVOX_VOICE": "9303a29e-578a-4953-a927-2e1921683d27",
     "ALLOW_DRAFT_LIBRARY": "false",
     "PUBLIC_SESSIONS_ENABLED": "true",
     "SMTP_HOST": "smtp.gmail.com",
