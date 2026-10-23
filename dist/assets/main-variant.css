@@ -134,7 +134,7 @@
 .ai-header .ai-button--expert .ai-button__label > :first-child {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
 }
 
 .ai-header .ai-button--expert .ai-button__description {
