@@ -157,3 +157,11 @@
 .audit-dialog .audit-button--call { flex: 0 0 44px; width: 44px; height: 44px; padding: 10px; border-color: var(--audit-red); background: var(--audit-red); color: #fff; }
 .audit-dialog .audit-button--call:hover:not(:disabled) { background: #b00000; }
 .audit-dialog .audit-button--call svg { display: block; width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Keep the phone on the window centreline, independently of the title and close control. */
+.audit-dialog .audit-header { display: grid; grid-template-columns: minmax(0, 1fr) 44px minmax(0, 1fr); align-items: center; gap: 3px 12px; }
+.audit-dialog .audit-title-group { display: contents; }
+.audit-dialog .audit-title { grid-column: 1; grid-row: 1; }
+.audit-dialog .audit-intro { grid-column: 1 / -1; grid-row: 2; margin-top: 0; }
+.audit-dialog .audit-button--call { grid-column: 2; grid-row: 1; }
+.audit-dialog .audit-button--close { grid-column: 3; grid-row: 1; justify-self: end; }
