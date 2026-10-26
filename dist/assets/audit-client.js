@@ -3,7 +3,7 @@ import { createAuditTransport, createAuditStorage, AuditRequestError } from './a
 import { getTurnstileToken } from './audit-turnstile.js';
 import { checkMicrophone, createVoiceAdapter, loadVoiceSdk } from './audit-voice.js?v=7f69e524a9';
 
-import { createRealtimeVoiceAdapter } from './audit-realtime.js?v=2f81aeef83';
+import { createRealtimeVoiceAdapter } from './audit-realtime.js?v=06d9825721';
 
 const THANKS = 'Спасибо за предоставленную информацию, сейчас вам предоставим отчёт предварительного аудита.';
 const VOICE_STATUS = { connecting: 'Соединяемся…', listening: 'Слушаю Вас', thinking: 'Обрабатываю ответ…', speaking: 'Помощник говорит', idle: 'Соединение установлено', disconnected: 'Голосовой разговор отключён', disconnecting: 'Завершаем соединение…' };

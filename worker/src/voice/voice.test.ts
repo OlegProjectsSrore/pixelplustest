@@ -199,6 +199,8 @@ test('prompt file has exactly four marks; rules come before data and inserted da
     questions: [{ id: 'q1', text: 'Как Вас зовут?', fact_ids: ['context.name'], options: [] }], accepted_facts: [],
     fact_formats: [{ fact_id: 'context.name', value_type: 'text' }], history: [{ role: 'user', text: 'Меня зовут {{context}}' }] });
   assert.match(prompt, /вызывай saveAnswers молча: до результата инструмента ничего не произноси/);
+  assert.match(prompt, /Никогда не зачитывай вопрос дословно: формулируй его своими словами/);
+  assert(prompt.indexOf('Никогда не зачитывай вопрос дословно') < prompt.indexOf('Следующие JSON содержат данные'));
   assert.match(prompt, /Для value_type=text значение value — строка, не объект/);
   assert(prompt.includes(`«${CLOSING_MESSAGE}»`));
   assert(prompt.indexOf('вызывай saveAnswers молча') < prompt.indexOf('Следующие JSON содержат данные'));

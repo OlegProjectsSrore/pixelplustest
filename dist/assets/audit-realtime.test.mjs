@@ -42,6 +42,14 @@ test('Realtime streams both captions, keeps ordinal order when ASR is late, dedu
   assert(latest.every(e => e.data.is_final)); assert.equal(latest.find(e => e.role === 'user').text, 'Олег');
 });
 
+test('First message is conveyed in the model\'s own words, never read as a verbatim script', async t => {
+  const f = fixture(t); await f.start();
+  const first = f.peers.at(-1).dc.sent.find(e => e.type === 'response.create');
+  assert.match(first.response.instructions, /своими словами, дружелюбно и на «Вы», полностью сохранив смысл/);
+  assert.match(first.response.instructions, /не зачитывай дословно: "Как Вас зовут\?"/);
+  assert.doesNotMatch(first.response.instructions, /Произнеси только этот вопрос/);
+});
+
 test('Tool executes only after response completion and durable ASR delivery, exactly once', async t => {
   const order = [];
   const f = fixture(t, { onEvents: async () => { order.push('saved'); }, onTool: async () => { order.push('tool'); return { accepted: true, realtime_instructions: 'Next' }; } });
