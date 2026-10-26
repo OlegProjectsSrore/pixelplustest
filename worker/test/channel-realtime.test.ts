@@ -63,6 +63,37 @@ test('Realtime tools retain strict answer evidence schema and finish/pause seman
   assert(answer.required.includes('source_quotes')); assert.equal(answer.additionalProperties, false);
 });
 
+test('gpt-realtime-2.1 and gpt-realtime-2.1-mini get the same instructions and tools, including the off-topic rule', async t => {
+  const configs: Record<string, any>[] = [];
+  for (const model of ['gpt-realtime-2.1-mini', 'gpt-realtime-2.1']) {
+    const f = await fixture(); t.after(() => f.db.close());
+    f.env.OPENAI_REALTIME_MODEL = model;
+    f.respond(async (_url, init) => { configs.push(JSON.parse(String((init!.body as FormData).get('session')))); return new Response(SDP, { status: 201, headers: { Location: '/v1/realtime/calls/rtc_model' } }); });
+    await f.start();
+  }
+  assert.deepEqual(configs.map(c => c.model), ['gpt-realtime-2.1-mini', 'gpt-realtime-2.1']);
+  assert.equal(configs[0].instructions, configs[1].instructions); assert.deepEqual(configs[0].tools, configs[1].tools);
+  assert.match(configs[0].instructions, /молча вызови offTopicReply с kind=off_topic/);
+  assert.match(configs[0].tools.find((tool: Record<string, any>) => tool.name === 'offTopicReply').description, /^Вызывать молча при любом уходе/);
+});
+
+test('Voice off-topic: the server classifies the saved replica and returns a library joke with a return phrase', async t => {
+  const f = await fixture(); t.after(() => f.db.close());
+  const classified: string[] = [];
+  // The same DeepSeek intent classifier as in chat decides; the model's own kind and categories are not trusted.
+  const adapters = createRealtimeAdapters({ assessIntent: async ({ events }) => { classified.push(events[0].text ?? ''); return { kind: 'off_topic', certain: true, safe_category_ids: ['weather'], now: NOW }; } });
+  const call = await f.start(); f.tick(2000);
+  const line = (ordinal: number, role: string, text: string) => ({ source: 'voice', source_key: `${call.call_id}:${ordinal}`, source_revision: 0, local_order: ordinal,
+    call_id: call.call_id, role, kind: 'utterance', text, occurred_at: NOW, data: { is_final: true, medium: 'voice' } });
+  await f.invoke(adapters.voiceTranscript!, await f.body(undefined, { call_id: call.call_id, events: [line(0, 'assistant', 'Как Вас зовут?'), line(1, 'user', 'Какая завтра погода в Москве?')] }));
+  const reply = await f.invoke(adapters.voiceAnswers!, await f.body(undefined, { call_id: call.call_id, tool: 'offTopicReply', kind: 'off_topic', certain: true, safe_category_ids: [] }));
+  const joke = library.jokes.categories.find(category => category.id === 'weather')!.jokes[0];
+  assert.deepEqual(classified, ['Какая завтра погода в Москве?']);
+  assert.deepEqual(obj(reply.operation), { joke_id: joke.id, text: `${joke.text} ${library.jokes.return_phrases[0]}`, question_id: 'context_name', operation_id: obj(reply.operation).operation_id });
+  assert.match(reply.realtime_instructions, /произнеси operation\.text дословно/);
+  assert.deepEqual((await f.core.store.requireSession('s1')).state.humor.reserved_ids, [joke.id]);
+});
+
 test('Missing key, malformed SDP and stale revision never start a paid call', async t => {
   const f = await fixture(); t.after(() => f.db.close());
   delete f.env.OPENAI_API_KEY; await assert.rejects(f.start(), code('not_configured'));

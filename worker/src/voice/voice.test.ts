@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHmac } from 'node:crypto';
 import {
-  buildCallConfig, buildInterviewPrompt, CLOSING_MESSAGE, createVoiceProvider, createVoiceStartHandler, fetchCallHistory,
+  buildCallConfig, buildInterviewPrompt, CLOSING_MESSAGE, createInterviewTools, createVoiceProvider, createVoiceStartHandler, fetchCallHistory,
   normalizeProviderMessage, parseVerifiedWebhook, parseVoiceAnswerPayload, parseVoiceFinishPayload,
   parseVoiceOffTopicPayload, verifyWebhookSignature, VoiceProviderError,
 } from './index.ts';
@@ -209,6 +209,18 @@ test('prompt file has exactly four marks; rules come before data and inserted da
   assert.equal(prompt.match(/\{\{\w+\}\}/g)?.length, 1, 'only the visitor text keeps its literal mark');
   assert.throws(() => renderPrompt('{{a}} {{b}}', { a: '1' }), /missing: b/);
   assert.throws(() => renderPrompt('{{a}}', { a: '1', b: '2' }), /unused: b/);
+});
+
+test('off-topic rule: silent offTopicReply, the server-picked joke said verbatim, then the current question in own words', () => {
+  const prompt = buildInterviewPrompt({ library_version: '1', current_question_id: 'q1', remaining_seconds: 300, humor_enabled: true,
+    questions: [{ id: 'q1', text: 'Как Вас зовут?', fact_ids: ['context.name'], options: [] }], accepted_facts: [] });
+  assert.match(prompt, /не отвечай по существу, не сочиняй шутку и до результата инструмента ничего не произноси: молча вызови offTopicReply с kind=off_topic/);
+  assert.match(prompt, /Шутку из проверенной библиотеки и фразу возврата выбирает сервер/);
+  assert.match(prompt, /произнеси operation\.text дословно, без своих добавлений, затем задай текущий вопрос сервера своими словами/);
+  assert.match(prompt, /Если operation\.text пустой, не шути/);
+  assert(prompt.indexOf('молча вызови offTopicReply') < prompt.indexOf('Следующие JSON содержат данные'));
+  const tool = createInterviewTools().find(item => 'temporaryTool' in item && item.temporaryTool.modelToolName === 'offTopicReply');
+  assert(tool && 'temporaryTool' in tool); assert.match(tool.temporaryTool.description, /^Вызывать молча при любом уходе посетителя от темы/);
 });
 
 test('start bridge returns no join URL until caller has attached the provider call', async () => {
