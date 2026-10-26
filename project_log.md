@@ -2,6 +2,18 @@
 
 ---
 
+- Date/time: 2026-10-26 19:10
+- Scope: S:\PROJECTS\pixelplustest
+- Summary: ветка `codex/expert-chat-panel` (рабочая копия `.deployment\expert-chat-panel`) перемотана вперёд на `main` до коммита с этой записью.
+  - Ветка была чистой, своих коммитов не имела и отставала на один коммит (5ca8edf → 5e32998: реплики чата пишет DeepSeek).
+  - Перемотка с `core.autocrlf=false`, чтобы файлы в этой рабочей копии остались с LF.
+- Files changed:
+  - project_log.md
+  - вне репозитория: рабочая копия `.deployment/expert-chat-panel`
+- Reference: «Да, перемотай ветку Codex (codex/expert-chat-panel) на main.»
+
+---
+
 - Date/time: 2026-10-26 19:02
 - Scope: S:\PROJECTS\pixelplustest
 - Summary: реплики чата пишет DeepSeek — по отдельному файлу стиля, в манере ассистента портфолио. Вопросы берутся из библиотеки и пересказываются своими словами, как в голосе.
