@@ -89,6 +89,7 @@
 .audit-dialog .audit-message--user { margin-left: auto; background: #fff3f3; }
 .audit-dialog .audit-message-role { display: block; margin-bottom: 3px; color: var(--audit-muted); font-size: 12px; }
 .audit-dialog .audit-message-text { overflow-wrap: anywhere; white-space: pre-wrap; }
+.audit-dialog .audit-message-link { color: var(--audit-red); text-decoration: underline; }
 .audit-dialog .audit-question { margin-top: 24px; }
 .audit-dialog .audit-question-title { font-size: 17px; line-height: 1.5; font-weight: 700; overflow-wrap: anywhere; }
 .audit-dialog .audit-selection-form { margin: 16px 0 0; padding: 0; }

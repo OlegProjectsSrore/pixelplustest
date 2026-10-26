@@ -58,7 +58,7 @@ test('Realtime reserves before OpenAI, uses exact model/speed, replays encrypted
 });
 
 test('Realtime tools retain strict answer evidence schema and finish/pause semantics', () => {
-  const tools = realtimeTools().map(obj); assert.deepEqual(tools.map(t => t.name), ['saveAnswers', 'finishAudit', 'offTopicReply', 'hangUp']);
+  const tools = realtimeTools().map(obj); assert.deepEqual(tools.map(t => t.name), ['saveAnswers', 'finishAudit', 'offTopicReply', 'hangUp', 'searchKnowledge']);
   const answer = tools[0].parameters.properties.answers.items;
   assert(answer.required.includes('source_quotes')); assert.equal(answer.additionalProperties, false);
 });

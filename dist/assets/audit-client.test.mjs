@@ -485,3 +485,16 @@ test('DeepSeek wording replaces the library question only for the question it wa
   await f.handlers.onText('другой');
   assert.equal(f.model.question.text, 'Третий вопрос?', 'wording for another question is never shown');
 });
+
+test('the voice searchKnowledge tool reads /api/tools/search with the session token, outside the mutation queue', async t => {
+  const f = fixture(t, { request(path) {
+    if (path.startsWith('/api/tools/search')) return { ok: true, corpus: 'c', snippets: [{ id: 'd#0', title: 'Битрикс', heading: 'Сайты', url: 'https://pixelplus.ru/razrabotka-sajtov/cms/bitrix/', text: 'Создаём сайты на Битрикс.' }] };
+  } });
+  await f.client.open(); await f.handlers.onChannel('voice');
+  const result = await f.voice.onTool('searchKnowledge', { query: '  сайты на Битрикс ' }, 'call1');
+  assert.deepEqual(result, { found: true, fragments: [{ title: 'Битрикс', url: 'https://pixelplus.ru/razrabotka-sajtov/cms/bitrix/', text: 'Создаём сайты на Битрикс.' }] });
+  const call = f.calls.find(item => item.path.startsWith('/api/tools/search'));
+  assert.equal(call.path, `/api/tools/search?session_id=s1&q=${encodeURIComponent('сайты на Битрикс')}`);
+  assert.equal(call.token, 'management'); assert.equal(call.method, undefined);
+  await assert.rejects(f.voice.onTool('searchKnowledge', { query: ' ' }, 'call1'), /Поиск недоступен/);
+});

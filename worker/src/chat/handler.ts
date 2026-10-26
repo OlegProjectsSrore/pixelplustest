@@ -15,9 +15,11 @@ export interface PreparedChatTurn {
   event: AuditEvent;
   answers: AuditAnswer[];
   classification: Classification | null;
-  action: 'answer' | 'clarify' | 'faq' | 'off_topic' | 'sensitive' | 'role_change' | 'humor_preference' | 'pause' | 'resume' | 'finish';
+  action: 'answer' | 'clarify' | 'faq' | 'question' | 'off_topic' | 'sensitive' | 'role_change' | 'humor_preference' | 'pause' | 'resume' | 'finish';
   /** Only an approved service entry or a deterministic clarification; never a recommendation. */
   service_text: string | null;
+  /** When the request started; the core keeps the whole turn within the browser's wait. */
+  started_at: number;
 }
 export interface ChatHandlerDependencies {
   /** Must claim an external attempt atomically and persist its outcome before replay. */
@@ -56,7 +58,7 @@ export function createChatHandler(dependencies: ChatHandlerDependencies): Adapte
     throw new Error('Chat handler requires runtime and atomic commitTurn dependencies');
   }
   return async (request, context) => {
-    const body = object(context.body), input = mutation(body), core = context.core;
+    const body = object(context.body), input = mutation(body), core = context.core, startedAt = core.now();
     // Do not rely on a caller-provided session object for access control.
     const session = await core.authenticate(request, input.session_id);
     if (input.library_version !== session.state.library_version) fail(409, 'library_mismatch', 'Версия библиотеки изменилась.');
@@ -140,6 +142,6 @@ export function createChatHandler(dependencies: ChatHandlerDependencies): Adapte
       if (action === 'clarify' && serviceText === null) serviceText = clarifyText;
       if (session.state.paused && !['resume', 'finish'].includes(action)) fail(409, 'session_paused', 'Сначала возобновите опрос.');
     } else fail(400, 'invalid_input', 'Неизвестный вид ответа.');
-    return dependencies.commitTurn(request, context, session, { input, request_hash: hash, event, answers, classification, action, service_text: serviceText });
+    return dependencies.commitTurn(request, context, session, { input, request_hash: hash, event, answers, classification, action, service_text: serviceText, started_at: startedAt });
   };
 }

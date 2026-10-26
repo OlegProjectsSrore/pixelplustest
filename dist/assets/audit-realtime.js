@@ -61,19 +61,26 @@ export function createRealtimeVoiceAdapter({ onState, onEvents, onTranscript, on
         while (playingAudio && now() < deadline && !closing) await new Promise(resolve => setTimeout(resolve, 50));
         await stop(); return;
       }
-      if (!['saveAnswers', 'finishAudit', 'offTopicReply'].includes(event.name)) throw error('Неизвестный инструмент разговора.');
+      if (!['saveAnswers', 'finishAudit', 'offTopicReply', 'searchKnowledge'].includes(event.name)) throw error('Неизвестный инструмент разговора.');
       const args = JSON.parse(event.arguments);
-      // Input transcription is asynchronous and may finish after the tool call.
-      const deadline = now() + 10000;
-      while (pendingInputs.size && now() < deadline && !closing) await new Promise(resolve => setTimeout(resolve, 50));
-      if (current !== generation || closing) return;
-      await flush();
-      result = await onTool(event.name, args, callId);
-      if (result?.realtime_instructions) send({ type: 'session.update', session: { type: 'realtime', instructions: result.realtime_instructions } });
+      // A knowledge search changes no interview state: no transcript barrier, no save semantics.
+      if (event.name === 'searchKnowledge') result = await onTool(event.name, args, callId);
+      else {
+        // Input transcription is asynchronous and may finish after the tool call.
+        const deadline = now() + 10000;
+        while (pendingInputs.size && now() < deadline && !closing) await new Promise(resolve => setTimeout(resolve, 50));
+        if (current !== generation || closing) return;
+        await flush();
+        result = await onTool(event.name, args, callId);
+        if (result?.realtime_instructions) send({ type: 'session.update', session: { type: 'realtime', instructions: result.realtime_instructions } });
+      }
     } catch (problem) {
-      result = { accepted: false, error: problem.code || 'delivery_pending', message: 'Ответ пока не сохранён. Не переходи к новому вопросу. Проверь question_id, fact_id и формат value по инструкции. Используй точные цитаты из доставленных реплик, затем повтори сохранение.',
-        user_transcripts: [...items.values()].filter(i => i.role === 'user' && i.final).slice(-6).map(i => ({ ordinal: i.ordinal, text: i.text })) };
-      if (!['invalid_answers', 'pending_evidence', 'invalid_request'].includes(problem.code)) onError?.(error('Не удалось сохранить голосовой ответ. Повторяем сохранение.'));
+      if (event.name === 'searchKnowledge') result = { found: false, fragments: [], message: 'Поиск по материалам Pixel Plus сейчас недоступен. Скажи об этом коротко и вернись к вопросу экспресс-диагностики.' };
+      else {
+        result = { accepted: false, error: problem.code || 'delivery_pending', message: 'Ответ пока не сохранён. Не переходи к новому вопросу. Проверь question_id, fact_id и формат value по инструкции. Используй точные цитаты из доставленных реплик, затем повтори сохранение.',
+          user_transcripts: [...items.values()].filter(i => i.role === 'user' && i.final).slice(-6).map(i => ({ ordinal: i.ordinal, text: i.text })) };
+        if (!['invalid_answers', 'pending_evidence', 'invalid_request'].includes(problem.code)) onError?.(error('Не удалось сохранить голосовой ответ. Повторяем сохранение.'));
+      }
     }
     if (current !== generation || closing) return;
     send({ type: 'conversation.item.create', item: { type: 'function_call_output', call_id: event.call_id, output: JSON.stringify(result) } });

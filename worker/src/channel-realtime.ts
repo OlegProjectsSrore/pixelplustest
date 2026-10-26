@@ -24,7 +24,10 @@ export function realtimeTools(): Json[] {
       properties: Object.fromEntries(t.dynamicParameters.map(p => [p.name, p.schema])),
       required: t.dynamicParameters.filter(p => p.required).map(p => p.name),
     } };
-  });
+  }).concat([{ type: 'function', name: 'searchKnowledge',
+    description: 'Найти в материалах Pixel Plus ответ на вопрос посетителя об услугах, ценах, сроках, условиях, кейсах или компании. Возвращает фрагменты страниц pixelplus.ru; отвечай только по ним.',
+    parameters: { type: 'object', additionalProperties: false, required: ['query'],
+      properties: { query: { type: 'string', description: 'Короткий поисковый запрос по-русски по смыслу вопроса посетителя.' } } } }]);
 }
 
 export async function realtimeInstructions(core: CoreServices, session: StoredSession): Promise<string> {

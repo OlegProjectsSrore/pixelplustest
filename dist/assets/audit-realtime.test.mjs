@@ -107,3 +107,24 @@ test('User speech during a tool request cannot create overlapping responses', as
   f.emit({ type: 'response.done', response: { status: 'cancelled', output: [] } }); await turn();
   assert.equal(f.peers[0].dc.sent.filter(e => e.type === 'response.create').length, 3);
 });
+
+test('searchKnowledge reads fragments without the save barrier; a failed search tells the model to move on', async t => {
+  const calls = [];
+  const f = fixture(t, { onTool: async (name, args) => {
+    calls.push([name, args]);
+    if (args.query === 'сбой') throw new Error('offline');
+    return { found: true, fragments: [{ title: 'Битрикс', url: 'https://pixelplus.ru/razrabotka-sajtov/cms/bitrix/', text: 'Создаём сайты на Битрикс.' }] };
+  } });
+  await f.start();
+  const dc = f.peers.at(-1).dc;
+  const search = (id, query) => f.emit({ type: 'response.done', response: { status: 'completed', output: [{ type: 'function_call', call_id: id, name: 'searchKnowledge', arguments: JSON.stringify({ query }) }] } });
+  const outputs = () => dc.sent.filter(event => event.type === 'conversation.item.create' && event.item.type === 'function_call_output').map(event => JSON.parse(event.item.output));
+  f.emit({ type: 'input_audio_buffer.speech_started', item_id: 'pending-user' });
+  search('s1', 'сайты на Битрикс'); await turn(); await turn();
+  assert.equal(outputs()[0].found, true, 'an unfinished transcription does not delay a search');
+  assert.equal(outputs()[0].fragments[0].url, 'https://pixelplus.ru/razrabotka-sajtov/cms/bitrix/');
+  search('s2', 'сбой'); await turn(); await turn();
+  assert.equal(outputs()[1].found, false); assert.match(outputs()[1].message, /вернись к вопросу экспресс-диагностики/);
+  assert.equal(f.errors.length, 0, 'a failed search is not shown as a save error');
+  assert.deepEqual(calls.map(([name, args]) => [name, args.query]), [['searchKnowledge', 'сайты на Битрикс'], ['searchKnowledge', 'сбой']]);
+});

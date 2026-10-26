@@ -1,9 +1,9 @@
-import { createAuditView } from './audit-ui.js?v=c963e6d179';
+import { createAuditView } from './audit-ui.js?v=852604f24f';
 import { createAuditTransport, createAuditStorage, AuditRequestError } from './audit-http.js';
 import { getTurnstileToken } from './audit-turnstile.js';
 import { checkMicrophone, createVoiceAdapter, loadVoiceSdk } from './audit-voice.js?v=7f69e524a9';
 
-import { createRealtimeVoiceAdapter } from './audit-realtime.js?v=06d9825721';
+import { createRealtimeVoiceAdapter } from './audit-realtime.js?v=c1ac73b94d';
 
 const THANKS = 'Спасибо за предоставленную информацию, сейчас вам предоставим отчёт предварительного аудита.';
 const VOICE_STATUS = { connecting: 'Соединяемся…', listening: 'Слушаю Вас', thinking: 'Обрабатываю ответ…', speaking: 'Помощник говорит', idle: 'Соединение установлено', disconnected: 'Голосовой разговор отключён', disconnecting: 'Завершаем соединение…' };
@@ -289,6 +289,8 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
       onTranscript: showVoiceTranscript,
       onError(problem) { error = problem.message; render(); },
       onTool(name, args, callId) {
+        // A knowledge search reads only; it bypasses the mutation queue so it never waits behind a save.
+        if (name === 'searchKnowledge') return searchKnowledge(args?.query);
         return enqueue(async () => {
           if (!['saveAnswers', 'finishAudit', 'offTopicReply'].includes(name)) throw new Error('Неизвестный инструмент разговора.');
           const boundary = saved.transcript_boundaries[callId];
@@ -329,6 +331,13 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
       await adapter.stop().catch(() => {});
       throw problem;
     }
+  }
+  async function searchKnowledge(query) {
+    if (typeof query !== 'string' || !query.trim() || !saved.session || !saved.management_token) throw new Error('Поиск недоступен.');
+    const path = '/api/tools/search?session_id=' + encodeURIComponent(saved.session.session_id) + '&q=' + encodeURIComponent(query.trim().slice(0, 300));
+    const data = await ensureApi().request(path, { token: saved.management_token });
+    const fragments = Array.isArray(data?.snippets) ? data.snippets.map(({ title, url, text }) => ({ title, url, text })) : [];
+    return { found: fragments.length > 0, fragments };
   }
   async function stopVoice() {
     if (voice) await voice.stop();
@@ -493,7 +502,7 @@ document.addEventListener('click', event => {
   if (!button || !['chat', 'voice'].includes(button.dataset.aiAction)) return;
   event.preventDefault();
   if (!document.querySelector('link[data-audit-styles]')) {
-    const link = document.createElement('link'); link.rel = 'stylesheet'; link.href = new URL('./audit-ui.css?v=687d491244', import.meta.url).href; link.dataset.auditStyles = ''; document.head.append(link);
+    const link = document.createElement('link'); link.rel = 'stylesheet'; link.href = new URL('./audit-ui.css?v=76c4514707', import.meta.url).href; link.dataset.auditStyles = ''; document.head.append(link);
   }
   client ||= createAuditClient({ config: window.PIXELPLUS_AUDIT_CONFIG });
   void client.toggle(button.dataset.aiAction);

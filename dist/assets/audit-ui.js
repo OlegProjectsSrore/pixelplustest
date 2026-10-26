@@ -30,6 +30,23 @@ function button(text, variant = 'secondary') {
   return node;
 }
 
+// Only pixelplus.ru pages in assistant messages become links; message text is never parsed as HTML.
+const SITE_LINK = /https:\/\/(?:www\.)?pixelplus\.ru\/[^\s«»"<>]*[^\s«»"<>.,;:!?)]/g;
+function messageText(text, linkify) {
+  const node = element('p', 'audit-message-text');
+  if (!linkify) { node.textContent = text; return node; }
+  let last = 0;
+  for (const match of text.matchAll(SITE_LINK)) {
+    node.append(text.slice(last, match.index));
+    const link = element('a', 'audit-message-link', match[0]);
+    link.href = match[0]; link.target = '_blank'; link.rel = 'noopener';
+    node.append(link);
+    last = match.index + match[0].length;
+  }
+  node.append(text.slice(last));
+  return node;
+}
+
 function safeText(value) {
   return typeof value === 'string' ? value : '';
 }
@@ -181,7 +198,7 @@ export function createAuditView(handlers = {}) {
   const footerNote = element('p', 'audit-footer-note', 'Рекомендации будут в PDF после опроса.');
   footer.append(textForm, sessionActions, footerNote);
 
-  const greeting = element('p', 'audit-greeting', 'Здравствуйте! Помогу разобраться, что мешает росту вашего бизнеса. Ответьте на вопросы — по итогам вы получите PDF с предварительным аудитом. На голосовой разговор отведено до 15 минут.');
+  const greeting = element('p', 'audit-greeting', 'Здравствуйте! Я могу ответить на вопросы об услугах Pixel Plus, помочь подобрать подходящее решение или провести небольшую экспресс-диагностику вашего бизнеса. По её итогам вы получите персональный PDF-отчёт с основными проблемами, приоритетами и рекомендациями.');
   body.append(greeting, status, voiceStatus, notice, error, challengeElement,
     messages, questionSection, readySection, recovery);
   dialog.append(header, body, footer);
@@ -354,7 +371,7 @@ export function createAuditView(handlers = {}) {
         const user = message.role === 'user';
         const item = element('div', `audit-message${user ? ' audit-message--user' : ''}`);
         const role = element('span', 'audit-message-role', user ? 'Вы' : 'Ассистент');
-        const text = element('p', 'audit-message-text', safeText(message.text));
+        const text = messageText(safeText(message.text), !user);
         item.append(role, text);
         return item;
       }));

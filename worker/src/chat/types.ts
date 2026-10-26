@@ -1,7 +1,7 @@
 import type { AuditAnswer, AuditEvent, AuditFact, FactStatus, Json } from '../audit/contracts.ts';
 import type { FactDefinition, Question } from '../audit/library.ts';
 
-export const INTENTS = ['answer', 'mixed', 'clarify', 'faq', 'off_topic', 'sensitive', 'role_change', 'humor_preference', 'decline', 'pause', 'resume', 'finish', 'unknown'] as const;
+export const INTENTS = ['answer', 'mixed', 'clarify', 'faq', 'question', 'off_topic', 'sensitive', 'role_change', 'humor_preference', 'decline', 'pause', 'resume', 'finish', 'unknown'] as const;
 export type Intent = typeof INTENTS[number];
 
 /** A strict, deliberately small schema supplied by the core, never by the visitor/model. */

@@ -11,6 +11,7 @@ import type { Env } from '../src/env.ts';
 import type { AdapterContext } from '../src/integration.ts';
 import type { Classification, ClassifierContext } from '../src/chat/types.ts';
 import { reserveDeepseekMicros } from '../src/deepseek-cost.ts';
+import knowledgeIndex from '../src/search/kb-index.mjs';
 
 const now = Date.parse('2026-10-22T20:00:00Z');
 const bearer = 'a'.repeat(43);
@@ -270,5 +271,58 @@ test('the next wording sees the reactions already shown in this session', async 
     await f.handler(f.request, f.context(f.body('turn-2', 1, { kind: 'text', text: 'не знаю, что сказать' }, 'context_position')));
     assert.deepEqual(seen.map(context => context.previous_replies), [[], ['Рады знакомству, Олег.']]);
     assert.deepEqual(await f.core.store.recentReplies(f.session.id), ['Рады знакомству, Олег.', 'Уточните, пожалуйста, ответ.']);
+  } finally { f.db.close(); }
+});
+
+function enableKnowledge(f: Awaited<ReturnType<typeof fixture>>) {
+  f.env.KNOWLEDGE_ANSWERS_ENABLED = 'true';
+  f.env.BUDGETS_JSON = JSON.stringify({ ...JSON.parse(f.env.BUDGETS_JSON!), knowledge_searches: 10 });
+  const insert = f.db.sqlite.prepare('INSERT INTO kb_chunks VALUES (?,?,?,?,?,?)');
+  f.db.sqlite.exec('BEGIN');
+  for (const [id, d, heading] of knowledgeIndex.chunks) insert.run(id, knowledgeIndex.docs[d][2], knowledgeIndex.docs[d][3], heading, knowledgeIndex.docs[d][4], `${knowledgeIndex.docs[d][3]}. ${heading}`);
+  f.db.sqlite.exec('COMMIT');
+  f.db.sqlite.prepare(`INSERT INTO kb_meta VALUES ('corpus', ?)`).run(knowledgeIndex.corpus);
+}
+const asked = (text: string) => ({ kind: 'text', text });
+
+test('a service question is answered from the knowledge base; the survey question stays and nothing is saved', async () => {
+  const seen: { question: string; fragments: { url: string }[] }[] = [];
+  const f = await fixture(context => {
+    if ('fragments' in context) { seen.push(context as never); return { answer: 'Да, мы создаём сайты на Битрикс.', sources: [(context as never as { fragments: { url: string }[] }).fragments[0].url] }; }
+    return intent('question');
+  });
+  enableKnowledge(f); f.env.CHAT_COMPOSER_ENABLED = 'true';
+  try {
+    const response = await f.handler(f.request, f.context(f.body('q-1', 0, asked('Делаете ли вы сайты на Битриксе?')))) as { operation: Record<string, Json> };
+    assert.equal(response.operation.question_id, 'context_name'); assert.equal(response.operation.question_text, null, 'the unchanged question is not reworded');
+    assert.match(String(response.operation.text), /^Да, мы создаём сайты на Битрикс\.\nПодробнее: https:\/\/pixelplus\.ru\//);
+    assert.equal(seen[0].question, 'Делаете ли вы сайты на Битриксе?');
+    assert(seen[0].fragments.length > 0 && seen[0].fragments.length <= 6); assert(seen[0].fragments.some(fragment => fragment.url.includes('bitrix')));
+    assert.equal((await f.core.store.listAnswers(f.session.id)).length, 0); assert.equal(f.calls(), 2, 'classifier and answer only');
+    assert.equal(f.db.sqlite.prepare(`SELECT COUNT(*) n FROM usage_reservations WHERE kind='knowledge_searches' AND state='settled'`).get()!.n, 1);
+  } finally { f.db.close(); }
+});
+
+test('an unchecked answer falls back to the closest page; nothing found or the feature off gives an honest reply', async () => {
+  const f = await fixture(context => 'fragments' in context ? { answer: 'Продвижение стоит от 1 рубля навсегда.', sources: [(context as never as { fragments: { url: string }[] }).fragments[0].url] } : intent('question'));
+  enableKnowledge(f);
+  try {
+    const page = await f.handler(f.request, f.context(f.body('q-1', 0, asked('Сколько стоит продвижение сайта?')))) as { operation: Record<string, Json> };
+    assert.match(String(page.operation.text), /^Подробнее об этом — на странице «.+»: https:\/\/pixelplus\.ru\//);
+    const none = await f.handler(f.request, f.context(f.body('q-2', 1, asked('zzqx')))) as { operation: Record<string, Json> };
+    assert.match(String(none.operation.text), /точного ответа на этот вопрос нет/);
+    f.env.KNOWLEDGE_ANSWERS_ENABLED = 'false';
+    const off = await f.handler(f.request, f.context(f.body('q-3', 2, asked('Делаете ли вы сайты на Битриксе?')))) as { operation: Record<string, Json> };
+    assert.match(String(off.operation.text), /точного ответа на этот вопрос нет/);
+  } finally { f.db.close(); }
+});
+
+test('a mixed reply saves its facts, answers the question and moves on to the next survey question', async () => {
+  const f = await fixture(context => 'fragments' in context ? { answer: 'Да, мы создаём сайты на Битрикс.', sources: [(context as never as { fragments: { url: string }[] }).fragments[0].url] } : reportFromText(context, 'mixed'));
+  enableKnowledge(f);
+  try {
+    const response = await f.handler(f.request, f.context(f.body('m-1', 0, asked('Олег, а сайты на Битриксе делаете?')))) as { operation: Record<string, Json> };
+    assert.equal(response.operation.question_id, 'context_position'); assert.match(String(response.operation.text), /^Да, мы создаём сайты на Битрикс\./);
+    assert.equal((await f.core.store.listAnswers(f.session.id)).length, 1);
   } finally { f.db.close(); }
 });

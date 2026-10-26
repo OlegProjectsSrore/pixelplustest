@@ -5,6 +5,9 @@ export interface Env {
   DB: D1Database;
   REPORTS_KV: KVNamespace;
   BROWSER?: BrowserBinding;
+  /** Workers AI (bge-m3 query embeddings) and the pixelplus-services Vectorize index for hybrid knowledge search. */
+  AI?: Ai;
+  VECTORIZE?: Vectorize;
   REQUEST_LIMITER?: { limit(input: { key: string }): Promise<{ success: boolean }> };
   ALLOWED_ORIGINS?: string;
   TURNSTILE_HOSTNAMES?: string;
@@ -21,6 +24,8 @@ export interface Env {
   OPENAI_REALTIME_VOICE?: string;
   /** "true" lets DeepSeek word chat replies and questions; anything else keeps the library texts. */
   CHAT_COMPOSER_ENABLED?: string;
+  /** "true" enables hybrid knowledge search and answers to visitor questions in chat and voice. */
+  KNOWLEDGE_ANSWERS_ENABLED?: string;
   OPENAI_TRANSCRIPTION_MODEL?: string;
   VOICE_PROVIDER?: string;
   ULTRAVOX_MODEL?: string;

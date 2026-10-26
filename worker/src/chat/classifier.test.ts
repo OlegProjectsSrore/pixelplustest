@@ -151,7 +151,7 @@ test('prompt file has only the intents mark; every intent is listed and visitor 
   assert.doesNotMatch(system.content, /\{\{\w+\}\}/);
   assert(system.content.includes(`intent только из списка: ${INTENTS.join(', ')}.`));
   assert.match(system.content, /Схема JSON: \{"intent":"unknown","answers":\[\],"clarification_question_id":null,"faq_id":null,"joke_category_id":null,"humor_preference":null\}/);
-  assert.equal(system.content.split('\n').length, 15);
+  assert.equal(system.content.split('\n').length, 16);
   assert(user.content.includes('Мой ответ {{intents}}'), 'the user message is data and is not rendered');
 });
 

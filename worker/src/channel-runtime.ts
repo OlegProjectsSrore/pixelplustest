@@ -1,6 +1,8 @@
 import { createChatHandler as createPreparedChatHandler, type PreparedChatTurn } from './chat/handler.ts';
 import type { ClassifierRuntime } from './chat/types.ts';
 import { composeChatMessage, type ComposeInput, type Composed } from './chat/composer.ts';
+import { answerQuestion, formatAnswer } from './chat/answerer.ts';
+import { searchKnowledge } from './search/service.ts';
 import type { AdapterContext, AdapterHandler, ChannelAdapters } from './integration.ts';
 import type { StoredSession, UsageReservation } from './storage/types.ts';
 import { INTERVIEW_BUDGET_MS, type AuditEvent, type Json } from './audit/contracts.ts';
@@ -54,6 +56,10 @@ export async function createChatRuntime(context: AdapterContext, session: Stored
 
 // Classification uses attempts 0 and 1 of an operation; wording takes its own metered attempt.
 const COMPOSE_ATTEMPT = 2;
+const ANSWER_ATTEMPT = 3;
+// The browser waits 30 s for a turn; classification, search, answer and wording share this budget.
+const TURN_BUDGET_MS = 24_000;
+const NOT_FOUND = 'В материалах Pixel Plus точного ответа на этот вопрос нет. Уточнить детали можно у специалистов студии: https://pixelplus.ru/contact/zakaz/';
 // FAQ answers and jokes are approved texts shown verbatim; other notices are reworded by DeepSeek.
 const APPROVED_TEXT_ACTIONS = ['faq', 'off_topic', 'humor_preference', 'role_change'];
 
@@ -66,6 +72,21 @@ async function composeTurn(context: AdapterContext, session: StoredSession, oper
     return remaining > 0 ? await composeChatMessage(input, { ...runtime, max_tokens: 600, timeout_ms: Math.min(timeoutMs, remaining) }) : null;
   } catch (error) {
     console.warn(JSON.stringify({ event: 'chat_compose_failed', reason: error instanceof Error ? error.message : 'unknown' }));
+    return null;
+  }
+}
+/** Answers a visitor question from the knowledge base; null when the feature is off or fails, so the turn is never blocked. */
+async function answerFromKnowledge(context: AdapterContext, session: StoredSession, operationId: string, question: string, history: { role: string; text: string }[], timeoutMs: number): Promise<string | null> {
+  if (context.env.KNOWLEDGE_ANSWERS_ENABLED !== 'true' || !question.trim() || timeoutMs < 2_000) return null;
+  try {
+    const { fragments } = await searchKnowledge(context, session, question.slice(0, 500), { limit: 6, maxChars: 1500 });
+    if (!fragments.length) return NOT_FOUND;
+    const runtime = await createChatRuntime(context, session, operationId, ANSWER_ATTEMPT);
+    const answered = await answerQuestion({ question, fragments, history }, { ...runtime, max_tokens: 900, timeout_ms: timeoutMs });
+    // Without a checked answer the closest page is still useful and honest.
+    return answered ? formatAnswer(answered) : 'Подробнее об этом — на странице «' + fragments[0].title + '»: ' + fragments[0].url;
+  } catch (error) {
+    console.warn(JSON.stringify({ event: 'knowledge_answer_failed', reason: error instanceof Error ? error.message : 'unknown' }));
     return null;
   }
 }
@@ -133,11 +154,17 @@ export async function commitChatTurn(request: Request, context: AdapterContext, 
     state.humor.operations[turn.input.operation_id] = { ...reply, status: 'reserved' };
   }
   if (turn.action === 'sensitive') serviceText = 'Я услышал Вас. Можно сделать паузу или завершить разговор.';
+  const timeLeft = () => turn.started_at + TURN_BUDGET_MS - core.now();
+  // A question about services is answered from the knowledge base; a mixed reply also keeps its facts and advances.
+  const asksKnowledge = turn.action === 'question' || (turn.classification?.intent === 'mixed' && !turn.service_text);
+  if (asksKnowledge) serviceText = await answerFromKnowledge(context, session, turn.input.operation_id, turn.event.text ?? '', dialog(evidence), Math.min(12_000, timeLeft()))
+    ?? (turn.action === 'question' ? NOT_FOUND : serviceText);
   const libraryText = serviceText;
   let questionText: string | null = null;
-  if (turn.action !== 'sensitive') {
-    const approved = APPROVED_TEXT_ACTIONS.includes(turn.action) ? serviceText : null;
-    const composed = await composeTurn(context, session, turn.input.operation_id, COMPOSE_ATTEMPT, 8_000, { visitor_text: turn.event.text ?? null,
+  // The survey question does not change after a pure question, so its earlier wording stays.
+  if (turn.action !== 'sensitive' && turn.action !== 'question' && timeLeft() > 1_500) {
+    const approved = APPROVED_TEXT_ACTIONS.includes(turn.action) || asksKnowledge ? serviceText : null;
+    const composed = await composeTurn(context, session, turn.input.operation_id, COMPOSE_ATTEMPT, Math.min(8_000, timeLeft()), { visitor_text: turn.event.text ?? null,
       // A clarification of the current question would only repeat it; ask for a clearer answer instead.
       approved_text: approved, notice_to_rephrase: approved ? null : serviceText && serviceText === question?.text ? 'Ответ не удалось однозначно понять: попросите уточнить его.' : serviceText,
       question: question ? { text: question.text, options: question.options.map(option => option.text) } : null, history: dialog(evidence),

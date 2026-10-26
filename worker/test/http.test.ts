@@ -9,6 +9,8 @@ import { library } from '../src/audit/library.ts';
 import type { Env } from '../src/env.ts';
 import type { ChannelAdapters } from '../src/integration.ts';
 import { createChatAdapter } from '../src/channel-runtime.ts';
+import { createKnowledgeSearchHandler } from '../src/search/service.ts';
+import knowledgeIndex from '../src/search/kb-index.mjs';
 
 const now = Date.UTC(2026, 9, 22, 20);
 const origin = 'https://olegprojectssrore.github.io';
@@ -225,4 +227,25 @@ test('HTTP chat: DeepSeek words the first question at creation and later questio
     const plain = await call('/api/session', { operation_id: randomToken(), channel: 'chat', turnstile_token: 'test-token' });
     assert.equal(plain.status, 201); assert.equal(((await plain.json()) as any).data.question_phrasing, undefined, 'a provider failure keeps the library question');
   } finally { db.close(); }
+});
+
+test('HTTP knowledge search for the voice tool needs the session token and returns pixelplus.ru fragments', async () => {
+  const app = setup({ search: createKnowledgeSearchHandler() });
+  app.env.KNOWLEDGE_ANSWERS_ENABLED = 'true';
+  app.env.BUDGETS_JSON = JSON.stringify({ ...JSON.parse(app.env.BUDGETS_JSON!), knowledge_searches: 10 });
+  const insert = app.db.sqlite.prepare('INSERT INTO kb_chunks VALUES (?,?,?,?,?,?)');
+  app.db.sqlite.exec('BEGIN');
+  for (const [id, d, heading] of knowledgeIndex.chunks) insert.run(id, knowledgeIndex.docs[d][2], knowledgeIndex.docs[d][3], heading, knowledgeIndex.docs[d][4], `Текст: ${knowledgeIndex.docs[d][3]}`);
+  app.db.sqlite.exec('COMMIT');
+  app.db.sqlite.prepare(`INSERT INTO kb_meta VALUES ('corpus', ?)`).run(knowledgeIndex.corpus);
+  try {
+    const { data } = await app.create();
+    const path = `/api/tools/search?session_id=${data.session.session_id}&q=${encodeURIComponent('сайты на Битрикс')}`;
+    assert.equal((await app.call(path)).status, 401);
+    const body = await (await app.call(path, undefined, data.management_token)).json() as any;
+    assert.equal(body.data.corpus, knowledgeIndex.corpus);
+    assert(body.data.snippets.length > 0 && body.data.snippets.length <= 4);
+    assert(body.data.snippets.every((snippet: { url: string }) => snippet.url.startsWith('https://pixelplus.ru/')));
+    assert(body.data.snippets.some((snippet: { url: string }) => snippet.url.includes('bitrix')));
+  } finally { app.db.close(); }
 });
