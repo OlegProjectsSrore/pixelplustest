@@ -2,6 +2,18 @@
 
 ---
 
+- Date/time: 2026-10-26 21:13
+- Scope: S:\PROJECTS\pixelplustest
+- Summary: ветка `codex/expert-chat-panel` (рабочая копия `.deployment\expert-chat-panel`) перемотана вперёд на `main` до коммита с этой записью.
+  - Ветка была чистой, своих коммитов не имела и отставала на два коммита (280cba9 → a1a840f): шутки голосовых моделей при уходе от темы и мягкая проверка `offTopicReply` с отбрасыванием лишнего `answer_id`.
+  - Перемотка с `core.autocrlf=false`, чтобы файлы в этой рабочей копии остались с LF.
+- Files changed:
+  - project_log.md
+  - вне репозитория: рабочая копия `.deployment/expert-chat-panel`
+- Reference: «Ветки синхронизируй»
+
+---
+
 - Date/time: 2026-10-26 21:12
 - Scope: S:\PROJECTS\pixelplustest
 - Summary: голосовой `offTopicReply` больше не отказывает из-за формы списков категорий; отказы `offTopicReply` пишут в журнал форму аргументов; лишний `answer_id` у фактов без вариантов отбрасывается.
