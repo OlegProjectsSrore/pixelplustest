@@ -44,11 +44,15 @@
   font-size: 15px;
   line-height: 1.45;
   color: #555;
-  text-wrap: wrap;
+  white-space: nowrap;
+  text-wrap: nowrap;
   text-align-last: justify;
 }
 
 .ai-header .ai-result strong {
+  position: relative;
+  top: -1px;
+  font-size: .92em;
   font-weight: 500;
 }
 
