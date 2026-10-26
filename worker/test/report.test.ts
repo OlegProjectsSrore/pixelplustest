@@ -64,6 +64,23 @@ test("PDF content shows evidence-matched tariff alternatives with prices, scope 
   assert.match(html, /НДС на странице не указан.</);
 });
 
+test("PDF opens repeated work with the approved path and tells the earlier work in the visitor's words", () => {
+  const answer = (id: string, fact: string, value: AuditAnswer['value']): AuditAnswer => ({ id, question_id: library.questions.find(question => question.fact_ids.includes(fact))!.id, fact_id: fact,
+    state: 'known', value, event_ids: ['visitor-1'], channel: 'chat', method: 'selection', confirmation: 'explicit', library_version: library.version, created_at: date });
+  const history = { attempts_status: 'tried', result: 'no_result', attempts: [{ attempt_id: 'attempt-1', work: { state: 'known', value: 'Подключали сквозную аналитику' },
+    period_and_duration: { state: 'known', value: 'Весной, три месяца' }, measurement: { state: 'not_measured', value: null } }] };
+  const snapshot: AuditSnapshot = { id: 'history-snapshot', session_id: 'session', library_version: library.version, created_at: date, through_seq: 1,
+    answers: [answer('a1', 'analytics.applicable', true), answer('a2', 'analytics_sales.signal', 'target'),
+      answer('a3', 'analytics_sales.details', { description: { state: 'known', value: 'Продажи не связаны с источниками' } }), answer('a4', 'analytics.history', history)],
+    state: initialAuditState(library.version, 'chat', date), limitations: [] };
+  const html = buildReportContent(analyzeAudit(snapshot, library), snapshot, library).html;
+  const path = library.priorAttemptPaths.items.find(item => item.id === 'no_result')!;
+  assert.ok(html.includes(`<p>${path.intro}</p>`));
+  assert.ok(html.indexOf(path.steps[0]) < html.indexOf(library.solutions.find(block => block.id === 'analytics_sales')!.solution.steps[0].text));
+  assert.match(html, /что делали — Подключали сквозную аналитику; когда и как долго — Весной, три месяца; как оценивали — не измерялось/);
+  assert.doesNotMatch(html, /attempt_id|attempts_status|attempt-1/);
+});
+
 test("every price is shown: no period caveat, no «individual» and no «price is specified later» for any approved tariff", () => {
   const answer = (id: string, fact: string, value: AuditAnswer['value']): AuditAnswer => ({ id, question_id: library.questions.find(question => question.fact_ids.includes(fact))!.id, fact_id: fact,
     state: 'known', value, event_ids: ['visitor-1'], channel: 'chat', method: 'selection', confirmation: 'explicit', library_version: library.version, created_at: date });

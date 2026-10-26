@@ -1,4 +1,4 @@
-import { INTERVIEW_BUDGET_MS } from './contracts.ts';
+import { INTERVIEW_BUDGET_MS, PRIOR_ATTEMPT_RESULTS } from './contracts.ts';
 import type { AuditAction, AuditFact, AuditResult, AuditSituation, AuditSolution, AuditState, AuditTariff, Contradiction, HumorState } from './contracts.ts';
 
 /** Structural JSON Schema for persisted Worker contracts. Library membership, approval,
@@ -121,7 +121,8 @@ export const runtimeResultSchema = {
     }),
     Solution: closed<AuditSolution>({
       id: text, title: text, text, service_ids: strings(), action_ids: strings(), limitations: strings(),
-    }),
+      prior_attempts: closed<NonNullable<AuditSolution['prior_attempts']>>({ result: { type: 'string', enum: [...PRIOR_ATTEMPT_RESULTS] }, intro: text }),
+    }, ['prior_attempts']),
     Action: closed<AuditAction>({ id: text, text, after: strings(), parallel_with: strings(), deferred_reason: nullableText }),
     Tariff: closed<AuditTariff>({ id: text, title: text, details: jsonMap, source_urls: strings() }),
   },

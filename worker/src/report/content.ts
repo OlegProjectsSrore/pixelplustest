@@ -47,6 +47,18 @@ function tariffPrice(details: Record<string, Json>): string {
   return [value, unit, period].filter(Boolean).join(" · ");
 }
 
+const historyFields: [string, string][] = [["work", "что делали"], ["period_and_duration", "когда и как долго"], ["goal", "какого результата ждали"], ["executor_and_resources", "исполнитель и ресурсы"],
+  ["outcome", "что получилось"], ["measurement", "как оценивали"], ["current_status", "сейчас"], ["stop_reason", "причина остановки"]];
+/** A short account of earlier work in the visitor's words: reported fields only, no bookkeeping IDs. */
+function historyText(history: Record<string, Json>): string {
+  if (history.attempts_status === "not_tried") return "ранее не предпринимались";
+  if (history.attempts_status === "unknown") return "неизвестно";
+  if (history.attempts_status === "declined") return "ответ не предоставлен";
+  const attempts = Array.isArray(history.attempts) ? history.attempts.map(object).filter(item => item !== null) : [];
+  const told = attempts.map(attempt => historyFields.filter(([key]) => object(attempt[key])).map(([key, label]) => `${label} — ${textValue(attempt[key])}`).join("; ")).filter(Boolean);
+  return told.length ? told.join(" / ") : "работы были, подробности не сообщены";
+}
+
 /** Produces fixed, escaped HTML before any provider call. Subsequent attempts use this exact HTML. */
 export function buildReportContent(result: AuditResult, snapshot: AuditSnapshot, library: AuditLibrary, maxBytes = 1_000_000): ReportContent {
   if (result.template_version !== TEMPLATE_VERSION || result.library_version !== snapshot.library_version || result.snapshot_id !== snapshot.id) {
@@ -55,8 +67,7 @@ export function buildReportContent(result: AuditResult, snapshot: AuditSnapshot,
   const factLabel = (id: string) => library.facts.find(fact => fact.id === id)?.label ?? id;
   const factValue = (id: string, value: Json) => library.facts.find(item => item.id === id)?.values?.find(option => option.id === value)?.label ?? textValue(value);
   const factText = (fact: AuditFact) => {
-    const history = object(fact.value);
-    const displayed = fact.fact_id.endsWith(".history") && history?.attempts_status === "not_tried" ? "ранее не предпринимались" : factValue(fact.fact_id, fact.value);
+    const displayed = fact.fact_id.endsWith(".history") && object(fact.value) ? historyText(object(fact.value)!) : factValue(fact.fact_id, fact.value);
     return `${factLabel(fact.fact_id)}: ${displayed} (${states[fact.state]}${fact.confirmation === "disputed" ? "; оспаривается" : ""})`;
   };
   const approvedSourceUrls = new Set(library.sources.map(source => source.url));
@@ -68,7 +79,7 @@ export function buildReportContent(result: AuditResult, snapshot: AuditSnapshot,
       return `<article><h3>${escapeHtml(situation.title)}</h3><p>${escapeHtml(labels[situation.evidence_status] ?? situation.evidence_status)}. Значимость: ${escapeHtml(labels[situation.significance.level] ?? situation.significance.level)}.</p><p>${escapeHtml(situation.significance.reason)}</p>${list(evidence)}${list(situation.limitations)}</article>`;
     }).join("")),
     section("Ранее выполненные работы", list(result.previous_work.map(factText))),
-    section("Решения и необходимые проверки", result.solutions.map(solution => `<article><h3>${escapeHtml(solution.title)}</h3><p>${escapeHtml(solution.text)}</p>${list(solution.limitations)}</article>`).join("")),
+    section("Решения и необходимые проверки", result.solutions.map(solution => `<article><h3>${escapeHtml(solution.title)}</h3>${solution.prior_attempts ? `<p>${escapeHtml(solution.prior_attempts.intro)}</p>` : ""}<p>${escapeHtml(solution.text)}</p>${list(solution.limitations)}</article>`).join("")),
     section("Порядок действий", result.actions.length ? `<ol>${result.actions.map(action => `<li>${escapeHtml(action.text)}${action.deferred_reason ? `<p>Отложено: ${escapeHtml(action.deferred_reason)}</p>` : ""}${action.after.length ? `<p>После: ${escapeHtml(action.after.map(id => result.actions.find(item => item.id === id)?.text ?? id).join("; "))}</p>` : ""}${action.parallel_with.length ? `<p>Можно параллельно: ${escapeHtml(action.parallel_with.map(id => result.actions.find(item => item.id === id)?.text ?? id).join("; "))}</p>` : ""}</li>`).join("")}</ol>` : ""),
     section("Предварительные тарифные варианты", result.tariffs.length ? `<p>Варианты относятся к выявленным направлениям работ. Конкретный пакет, объём и итоговая стоимость требуют уточнения; это не индивидуальная смета.</p>` + result.tariffs.map(tariff => {
       for (const url of tariff.source_urls) if (!approvedSourceUrls.has(url) || new URL(url).protocol !== "https:") throw new ReportFailure("REPORT_UNVERIFIED_SOURCE", false);

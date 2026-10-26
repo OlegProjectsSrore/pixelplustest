@@ -443,17 +443,23 @@
         "not_asked",
         "conflicting"
       ],
-      "version": "0.1.1",
+      "version": "0.1.2",
       "status": "approved",
       "author": "Codex — подготовка по методике и локальным источникам",
       "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
+      "approved_at": "2026-10-26T22:26:15.000Z",
       "fields": {
         "attempts_status": [
           "not_tried",
           "tried",
           "unknown",
           "declined"
+        ],
+        "result": [
+          "ongoing",
+          "no_result",
+          "partial_or_stopped",
+          "unknown"
         ],
         "attempts": {
           "type": "array",
@@ -568,17 +574,23 @@
         "not_asked",
         "conflicting"
       ],
-      "version": "0.1.1",
+      "version": "0.1.2",
       "status": "approved",
       "author": "Codex — подготовка по методике и локальным источникам",
       "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
+      "approved_at": "2026-10-26T22:26:15.000Z",
       "fields": {
         "attempts_status": [
           "not_tried",
           "tried",
           "unknown",
           "declined"
+        ],
+        "result": [
+          "ongoing",
+          "no_result",
+          "partial_or_stopped",
+          "unknown"
         ],
         "attempts": {
           "type": "array",
@@ -693,17 +705,23 @@
         "not_asked",
         "conflicting"
       ],
-      "version": "0.1.1",
+      "version": "0.1.2",
       "status": "approved",
       "author": "Codex — подготовка по методике и локальным источникам",
       "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
+      "approved_at": "2026-10-26T22:26:15.000Z",
       "fields": {
         "attempts_status": [
           "not_tried",
           "tried",
           "unknown",
           "declined"
+        ],
+        "result": [
+          "ongoing",
+          "no_result",
+          "partial_or_stopped",
+          "unknown"
         ],
         "attempts": {
           "type": "array",
@@ -818,17 +836,23 @@
         "not_asked",
         "conflicting"
       ],
-      "version": "0.1.1",
+      "version": "0.1.2",
       "status": "approved",
       "author": "Codex — подготовка по методике и локальным источникам",
       "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
+      "approved_at": "2026-10-26T22:26:15.000Z",
       "fields": {
         "attempts_status": [
           "not_tried",
           "tried",
           "unknown",
           "declined"
+        ],
+        "result": [
+          "ongoing",
+          "no_result",
+          "partial_or_stopped",
+          "unknown"
         ],
         "attempts": {
           "type": "array",
@@ -943,17 +967,23 @@
         "not_asked",
         "conflicting"
       ],
-      "version": "0.1.1",
+      "version": "0.1.2",
       "status": "approved",
       "author": "Codex — подготовка по методике и локальным источникам",
       "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
+      "approved_at": "2026-10-26T22:26:15.000Z",
       "fields": {
         "attempts_status": [
           "not_tried",
           "tried",
           "unknown",
           "declined"
+        ],
+        "result": [
+          "ongoing",
+          "no_result",
+          "partial_or_stopped",
+          "unknown"
         ],
         "attempts": {
           "type": "array",
@@ -1068,17 +1098,23 @@
         "not_asked",
         "conflicting"
       ],
-      "version": "0.1.1",
+      "version": "0.1.2",
       "status": "approved",
       "author": "Codex — подготовка по методике и локальным источникам",
       "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
+      "approved_at": "2026-10-26T22:26:15.000Z",
       "fields": {
         "attempts_status": [
           "not_tried",
           "tried",
           "unknown",
           "declined"
+        ],
+        "result": [
+          "ongoing",
+          "no_result",
+          "partial_or_stopped",
+          "unknown"
         ],
         "attempts": {
           "type": "array",
@@ -1193,17 +1229,23 @@
         "not_asked",
         "conflicting"
       ],
-      "version": "0.1.1",
+      "version": "0.1.2",
       "status": "approved",
       "author": "Codex — подготовка по методике и локальным источникам",
       "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
+      "approved_at": "2026-10-26T22:26:15.000Z",
       "fields": {
         "attempts_status": [
           "not_tried",
           "tried",
           "unknown",
           "declined"
+        ],
+        "result": [
+          "ongoing",
+          "no_result",
+          "partial_or_stopped",
+          "unknown"
         ],
         "attempts": {
           "type": "array",
@@ -1318,17 +1360,23 @@
         "not_asked",
         "conflicting"
       ],
-      "version": "0.1.1",
+      "version": "0.1.2",
       "status": "approved",
       "author": "Codex — подготовка по методике и локальным источникам",
       "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
+      "approved_at": "2026-10-26T22:26:15.000Z",
       "fields": {
         "attempts_status": [
           "not_tried",
           "tried",
           "unknown",
           "declined"
+        ],
+        "result": [
+          "ongoing",
+          "no_result",
+          "partial_or_stopped",
+          "unknown"
         ],
         "attempts": {
           "type": "array",
@@ -1443,17 +1491,23 @@
         "not_asked",
         "conflicting"
       ],
-      "version": "0.1.1",
+      "version": "0.1.2",
       "status": "approved",
       "author": "Codex — подготовка по методике и локальным источникам",
       "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
+      "approved_at": "2026-10-26T22:26:15.000Z",
       "fields": {
         "attempts_status": [
           "not_tried",
           "tried",
           "unknown",
           "declined"
+        ],
+        "result": [
+          "ongoing",
+          "no_result",
+          "partial_or_stopped",
+          "unknown"
         ],
         "attempts": {
           "type": "array",
@@ -1568,17 +1622,23 @@
         "not_asked",
         "conflicting"
       ],
-      "version": "0.1.1",
+      "version": "0.1.2",
       "status": "approved",
       "author": "Codex — подготовка по методике и локальным источникам",
       "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
+      "approved_at": "2026-10-26T22:26:15.000Z",
       "fields": {
         "attempts_status": [
           "not_tried",
           "tried",
           "unknown",
           "declined"
+        ],
+        "result": [
+          "ongoing",
+          "no_result",
+          "partial_or_stopped",
+          "unknown"
         ],
         "attempts": {
           "type": "array",
@@ -1693,17 +1753,23 @@
         "not_asked",
         "conflicting"
       ],
-      "version": "0.1.1",
+      "version": "0.1.2",
       "status": "approved",
       "author": "Codex — подготовка по методике и локальным источникам",
       "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
+      "approved_at": "2026-10-26T22:26:15.000Z",
       "fields": {
         "attempts_status": [
           "not_tried",
           "tried",
           "unknown",
           "declined"
+        ],
+        "result": [
+          "ongoing",
+          "no_result",
+          "partial_or_stopped",
+          "unknown"
         ],
         "attempts": {
           "type": "array",
@@ -1818,17 +1884,23 @@
         "not_asked",
         "conflicting"
       ],
-      "version": "0.1.1",
+      "version": "0.1.2",
       "status": "approved",
       "author": "Codex — подготовка по методике и локальным источникам",
       "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
+      "approved_at": "2026-10-26T22:26:15.000Z",
       "fields": {
         "attempts_status": [
           "not_tried",
           "tried",
           "unknown",
           "declined"
+        ],
+        "result": [
+          "ongoing",
+          "no_result",
+          "partial_or_stopped",
+          "unknown"
         ],
         "attempts": {
           "type": "array",
@@ -1943,17 +2015,23 @@
         "not_asked",
         "conflicting"
       ],
-      "version": "0.1.1",
+      "version": "0.1.2",
       "status": "approved",
       "author": "Codex — подготовка по методике и локальным источникам",
       "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
+      "approved_at": "2026-10-26T22:26:15.000Z",
       "fields": {
         "attempts_status": [
           "not_tried",
           "tried",
           "unknown",
           "declined"
+        ],
+        "result": [
+          "ongoing",
+          "no_result",
+          "partial_or_stopped",
+          "unknown"
         ],
         "attempts": {
           "type": "array",
@@ -2068,17 +2146,23 @@
         "not_asked",
         "conflicting"
       ],
-      "version": "0.1.1",
+      "version": "0.1.2",
       "status": "approved",
       "author": "Codex — подготовка по методике и локальным источникам",
       "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
+      "approved_at": "2026-10-26T22:26:15.000Z",
       "fields": {
         "attempts_status": [
           "not_tried",
           "tried",
           "unknown",
           "declined"
+        ],
+        "result": [
+          "ongoing",
+          "no_result",
+          "partial_or_stopped",
+          "unknown"
         ],
         "attempts": {
           "type": "array",
@@ -2193,17 +2277,23 @@
         "not_asked",
         "conflicting"
       ],
-      "version": "0.1.1",
+      "version": "0.1.2",
       "status": "approved",
       "author": "Codex — подготовка по методике и локальным источникам",
       "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
+      "approved_at": "2026-10-26T22:26:15.000Z",
       "fields": {
         "attempts_status": [
           "not_tried",
           "tried",
           "unknown",
           "declined"
+        ],
+        "result": [
+          "ongoing",
+          "no_result",
+          "partial_or_stopped",
+          "unknown"
         ],
         "attempts": {
           "type": "array",
@@ -2318,17 +2408,23 @@
         "not_asked",
         "conflicting"
       ],
-      "version": "0.1.1",
+      "version": "0.1.2",
       "status": "approved",
       "author": "Codex — подготовка по методике и локальным источникам",
       "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
+      "approved_at": "2026-10-26T22:26:15.000Z",
       "fields": {
         "attempts_status": [
           "not_tried",
           "tried",
           "unknown",
           "declined"
+        ],
+        "result": [
+          "ongoing",
+          "no_result",
+          "partial_or_stopped",
+          "unknown"
         ],
         "attempts": {
           "type": "array",

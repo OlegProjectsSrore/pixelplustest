@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { initialAuditState, type AuditAnswer, type AuditEvent, type AuditSnapshot } from '../src/audit/contracts.ts';
+import { initialAuditState, type AuditAnswer, type AuditEvent, type AuditSnapshot, type Json } from '../src/audit/contracts.ts';
 import { advanceAudit, analyzeAudit, deriveFacts, elapsedInterviewMs, interviewSufficiency, nextQuestion, validateAnswers } from '../src/audit/engine.ts';
 import { compileVoiceBlocks, getLibrary, library, validateLibrary, validateLibraryManifest, type AuditLibrary } from '../src/audit/library.ts';
 import { evaluateRule, validateRule } from '../src/audit/rules.ts';
@@ -113,6 +113,16 @@ test('approved library has valid links while a draft fixture remains closed', ()
   assert.equal(result.productionReady, true);
   assert.ok(result.counts.solutions > 100);
   assert.throws(() => nextQuestion(initialAuditState(library.version, 'chat', now), now, draftForTest()), /LIBRARY_NOT_APPROVED/);
+  // The approved order of work: 4–6 steps per problem, mirrored in the PDF block.
+  for (const block of library.solutions) {
+    assert.ok(block.solution.steps.length >= 4 && block.solution.steps.length <= 6, block.id);
+    assert.deepEqual(block.solution.steps.map(step => step.order), block.solution.steps.map((_, index) => index + 1));
+    assert.deepEqual(block.pdf.next_steps, block.solution.steps.map(step => step.text));
+  }
+  const missingPath = structuredClone(library); missingPath.priorAttemptPaths.items.pop();
+  assert.match(validateLibrary(missingPath).errors.join(), /Invalid prior-attempt paths/);
+  const otherResults = structuredClone(library); (otherResults.facts.find(fact => fact.id === 'seo.history')!.fields as Record<string, unknown>).result = ['ongoing'];
+  assert.match(validateLibrary(otherResults).errors.join(), /seo\.history: prior-attempt results differ/);
 });
 
 test('unknown evidence is not false, including under negation', () => {
@@ -219,28 +229,70 @@ test('draft blocks and tariffs cannot appear in a report, even after complete in
   assert.match(result.limitations.join(' '), /экспертной проверке/);
 });
 
-test('approved rules separate sufficiency from significance and block repeated work', () => {
+test('approved rules separate sufficiency from significance and open repeated work with an approved path', () => {
   const lib = approvedForTest();
   const answers = [answer('strategy.applicable', true), answer('strategy_goal.signal', 'target', 'answer-2'), answer('strategy_goal.details', { description: { state: 'known', value: 'Показатель не определён' } }, 'answer-3')];
   let result = analyzeAudit(snapshot(answers), lib);
   assert.equal(result.situations[0].evidence_status, 'supported');
   assert.equal(result.situations[0].significance.level, 'unknown');
-  assert.equal(result.solutions.length, 0);
+  // No history yet: the «unknown» path restores it first; the history stays among the gaps.
+  assert.deepEqual(result.solutions[0].prior_attempts, { result: 'unknown', intro: 'О прошлых работах по этой теме сведений нет. Начнём с их восстановления.' });
+  assert.deepEqual(result.actions.slice(0, 2).map(action => [action.text, action.after]), [
+    ['Восстановить сведения о прошлых работах по теме: что делали, с каким результатом и почему остановили', []],
+    [lib.solutions.find(block => block.id === 'strategy_goal')!.solution.steps[0].text, ['strategy.history:unknown:1']]]);
+  assert.ok(result.gaps.includes('strategy.history'));
+  // Unapproved paths keep repeated work blocked, as before.
+  const unapproved = structuredClone(lib); unapproved.priorAttemptPaths.status = 'draft';
+  assert.equal(analyzeAudit(snapshot(answers), unapproved).solutions.length, 0);
   answers.push(answer('strategy.history', { attempts_status: 'not_tried', attempts: [] }, 'answer-4'));
   result = analyzeAudit(snapshot(answers), lib);
   assert.equal(result.solutions.length, 1);
+  assert.equal(result.solutions[0].prior_attempts, undefined);
+  assert.ok(result.actions.length >= 4 && result.actions.length <= 6);
+  assert.deepEqual(result.actions[0].after, []);
   assert.deepEqual(result.actions[1].after, [result.actions[0].id]);
   // Prices everywhere: a strategy problem shows the complex-marketing range that includes the audit and the strategy.
   assert.deepEqual(result.tariffs.map(tariff => [tariff.id, (tariff.details.price as Record<string, unknown>).min, (tariff.details.price as Record<string, unknown>).max]), [['marketing_audit_complex', 99500, 515610]]);
 });
 
+test('earlier work picks the approved path by its result; problems of one topic share its steps', () => {
+  const details = (blockId: string) => Object.fromEntries(library.facts.find(fact => fact.id === `${blockId}.details`)!.required_fields!.map(field => [field, { state: 'known', value: 'Пример из ответа' }]));
+  const base = [answer('analytics.applicable', true), answer('analytics_sales.signal', 'target', 'answer-2'), answer('analytics_sales.details', details('analytics_sales'), 'answer-3'),
+    answer('analytics_goals.signal', 'target', 'answer-5'), answer('analytics_goals.details', details('analytics_goals'), 'answer-6')];
+  const attempt = { attempt_id: 'attempt-1', work: { state: 'known', value: 'Настраивали аналитику' } };
+  for (const path of library.priorAttemptPaths.items) {
+    const history: Json = { attempts_status: 'tried', ...(path.id === 'unknown' ? {} : { result: path.id }), attempts: [attempt] };
+    const ready = snapshot([...base, answer('analytics.history', history, 'answer-4')]);
+    const result = analyzeAudit(ready, library);
+    assert.equal(result.solutions.length, 2);
+    assert.ok(result.solutions.every(solution => solution.prior_attempts?.result === path.id && solution.prior_attempts.intro === path.intro));
+    const shared = path.steps.map((_, index) => `analytics.history:${path.id}:${index + 1}`);
+    assert.deepEqual(result.actions.filter(action => action.id.startsWith('analytics.history:')).map(action => action.text), path.steps);
+    for (const solution of result.solutions) {
+      assert.deepEqual(solution.action_ids.slice(0, shared.length), shared);
+      assert.deepEqual(result.actions.find(action => action.id === solution.action_ids[shared.length])!.after, [shared.at(-1)]);
+    }
+    assert.equal(result.gaps.includes('analytics.history'), path.id === 'unknown');
+    assert.ok(result.tariffs.length > 0);
+    const altered = structuredClone(result); altered.solutions[0].prior_attempts!.intro = 'Свой текст';
+    assert.throws(() => validateAuditResult(altered, library, ready), /prior-attempt path is not approved/);
+    const reordered = structuredClone(result); reordered.solutions[0].action_ids.reverse();
+    assert.throws(() => validateAuditResult(reordered, library, ready), /prior-attempt steps/);
+  }
+  // A not-tried history carries no result; unknown or declined history takes the «unknown» path.
+  assert.throws(() => validateAnswers([answer('analytics.history', { attempts_status: 'not_tried', result: 'ongoing', attempts: [] })], [event()], [], library));
+  for (const status of ['unknown', 'declined']) assert.equal(analyzeAudit(snapshot([...base, answer('analytics.history', { attempts_status: status, attempts: [] }, 'answer-4')]), library).solutions[0].prior_attempts?.result, 'unknown');
+});
+
 test('approved tariffs become preliminary options only for a supported service and matching evidence', () => {
   const base = [answer('analytics.applicable', true), answer('analytics_sales.signal', 'target', 'answer-2'),
     answer('analytics_sales.details', { description: { state: 'known', value: 'Продажи не связаны с источниками' } }, 'answer-3')];
-  const missingHistory = analyzeAudit(snapshot(base), library);
-  assert.deepEqual(missingHistory.tariffs, []);
   const ready = snapshot([...base, answer('analytics.history', { attempts_status: 'not_tried', attempts: [] }, 'answer-4')]);
   const result = analyzeAudit(ready, library);
+  // Missing history opens with restoring it, but the problem keeps the same priced options.
+  const missingHistory = analyzeAudit(snapshot(base), library);
+  assert.equal(missingHistory.solutions[0].prior_attempts?.result, 'unknown');
+  assert.deepEqual(missingHistory.tariffs, result.tariffs);
   // The problem's services are analytics and CRM integration: options of both are offered.
   assert.deepEqual(result.tariffs.map(tariff => tariff.id), ['analytics_once', 'analytics_month', 'analytics_advanced', 'crm_integration_bitrix']);
   assert.ok(result.tariffs.every(tariff => tariff.details.selection_status === 'option_requires_scope_confirmation'));

@@ -50,7 +50,10 @@ export function runtimeSchemaForFact(fact: FactDefinition, blockIds: readonly st
     const fields: Record<string, RuntimeValueSchema> = { attempt_id: text,
       applies_to_block_ids: { type: 'array', items: blockIds.length ? { type: 'string', enum: blockIds } : text } };
     for (const field of HISTORY_FIELDS) if (Object.hasOwn(declared, field)) fields[field] = statefulField();
-    return object({ attempts_status: { type: 'string', enum: fact.fields.attempts_status }, attempts: { type: 'array', items: object(fields, ['attempt_id']) } });
+    const results = fact.fields.result;
+    return object({ attempts_status: { type: 'string', enum: fact.fields.attempts_status },
+      ...(Array.isArray(results) && results.every(value => typeof value === 'string') ? { result: { type: 'string', enum: results } as RuntimeValueSchema } : {}),
+      attempts: { type: 'array', items: object(fields, ['attempt_id']) } });
   }
   if (fact.id.endsWith('.impact') && record(fact.fields) && Array.isArray(fact.fields.level) && fact.fields.level.every(value => typeof value === 'string') &&
       Object.keys(fact.fields).every(field => ['level', 'description', 'period'].includes(field))) {
@@ -89,6 +92,9 @@ export function validateRuntimeValue(value: unknown, schema: RuntimeValueSchema,
 /** Merge only compatible observations. History array identity is explicit, never positional. */
 export function mergeStructuredValues(first: Json, second: Json, path = ''): Json {
   if (JSON.stringify(first) === JSON.stringify(second)) return structuredClone(first);
+  // A history's result is the assistant's summary of the answers so far, not a visitor statement: the newer summary replaces the older,
+  // except that «unknown» never erases a known result and «no result» stays when the work was later abandoned.
+  if (path === 'result' && typeof first === 'string' && typeof second === 'string') return second === 'unknown' || (first === 'no_result' && second === 'partial_or_stopped') ? first : second;
   if (record(first) && record(second)) {
     if (['unknown', 'ambiguous', 'declined'].includes(String(first.state)) && second.state === 'known') return structuredClone(second) as Json;
     if (['unknown', 'ambiguous', 'declined'].includes(String(second.state)) && first.state === 'known') return structuredClone(first) as Json;

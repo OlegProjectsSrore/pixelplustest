@@ -102,7 +102,14 @@ export interface AuditSituation {
   significance: { level: 'high' | 'medium' | 'low' | 'unknown'; reason: string };
   limitations: string[];
 }
-export interface AuditSolution { id: string; title: string; text: string; service_ids: string[]; action_ids: string[]; limitations: string[] }
+/** What the visitor's earlier work on a topic came to; each value has its own approved opening of the recommendation. */
+export const PRIOR_ATTEMPT_RESULTS = ['ongoing', 'no_result', 'partial_or_stopped', 'unknown'] as const;
+export type PriorAttemptResult = typeof PRIOR_ATTEMPT_RESULTS[number];
+export interface AuditSolution {
+  id: string; title: string; text: string; service_ids: string[]; action_ids: string[]; limitations: string[];
+  /** Present when the visitor already worked on the topic or it is unknown: the approved path's result and opening. */
+  prior_attempts?: { result: PriorAttemptResult; intro: string };
+}
 export interface AuditAction { id: string; text: string; after: string[]; parallel_with: string[]; deferred_reason: string | null }
 export interface AuditTariff { id: string; title: string; details: Record<string, Json>; source_urls: string[] }
 export interface AuditResult {

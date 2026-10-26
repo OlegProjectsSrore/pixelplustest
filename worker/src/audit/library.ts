@@ -14,7 +14,7 @@ import resultSchemaData from './data/audit-result.schema.json' with { type: 'jso
 import { evaluateRule, isRecord, validateRule, type Rule, type RuleFact, type Truth } from './rules.ts';
 import { runtimeSchemaForFact, type RuntimeValueSchema } from './value-schemas.ts';
 import { runtimeStateSchema, runtimeResultSchema } from './runtime-schemas.ts';
-import { INTERVIEW_BUDGET_MS } from './contracts.ts';
+import { INTERVIEW_BUDGET_MS, PRIOR_ATTEMPT_RESULTS, type PriorAttemptResult } from './contracts.ts';
 
 export interface Governed { id: string; version: string; status: string; reviewer: string | null; approved_at: string | null }
 export interface FactDefinition extends Governed {
@@ -56,6 +56,8 @@ export interface Scenario {
   phases: { id: string; next?: string; terminal?: boolean }[];
   routing: { max_clarifications_per_fact: number };
 }
+export interface PriorAttemptPath { id: PriorAttemptResult; label: string; intro: string; steps: string[] }
+export interface PriorAttemptPaths { version: string; status: string; reviewer: string | null; approved_at: string | null; items: PriorAttemptPath[] }
 export interface JokeCategory { id: string; selection_source: string; do_not_use_when: string; jokes: { id: string; text: string }[] }
 export interface JokeLibrary {
   library_version: string; joke_count: number; categories: JokeCategory[]; return_phrases: string[]; questions_return_phrases?: string[]; neutral_replies: Record<string, string>;
@@ -63,6 +65,8 @@ export interface JokeLibrary {
 export interface AuditLibrary {
   version: string; rulesVersion: string; tariffVersion: string; templateVersion: string;
   status: string; facts: FactDefinition[]; questions: Question[]; solutions: Solution[]; tariffs: Tariff[]; sources: Source[];
+  /** Recommendation openings for visitors who already worked on a topic; unapproved paths keep such recommendations blocked. */
+  priorAttemptPaths: PriorAttemptPaths;
   answers: { id: string; fact_id: string; standard_values: { value: string; meaning: string }[] }[];
   domains: { id: string; title: string }[];
   relationships: { a: string; b: string; relation: string }[];
@@ -78,6 +82,7 @@ export const library: AuditLibrary = {
   status: solutionsData.status,
   facts: (factsData.items as FactDefinition[]).map(fact => ({ ...fact, runtime_schema: runtimeSchemaForFact(fact, solutionsData.items.map(block => block.id)) })), questions: questionsData.items as Question[],
   solutions: solutionsData.items as unknown as Solution[], tariffs: tariffsData.items as unknown as Tariff[],
+  priorAttemptPaths: solutionsData.prior_attempt_paths as PriorAttemptPaths,
   sources: sourcesData.items as Source[], answers: answersData.items,
   domains: domainsData.items, relationships: domainsData.relationships, jokes: jokesData as JokeLibrary,
   scenario: scenarioData, services: servicesData.items as Service[], cases: casesData.items,
@@ -206,6 +211,14 @@ export function validateLibrary(lib: AuditLibrary = library, options: { ruleChec
   }
   // Every approved problem must be able to show at least one priced option of its services.
   for (const block of lib.solutions.filter(isApproved)) if (!lib.tariffs.some(tariff => block.services.includes(tariff.service_id) && isApproved(tariff) && tariff.commercial_approval === 'approved' && pricedTariff(tariff))) errors.push(`${block.id}: no approved priced tariff for its services`);
+  // One approved path per prior-attempt result, and every history fact offers exactly these results.
+  const paths = lib.priorAttemptPaths;
+  if (!paths || !Array.isArray(paths.items) || paths.items.map(path => path.id).join() !== PRIOR_ATTEMPT_RESULTS.join() ||
+      paths.items.some(path => !path.label?.trim() || !path.intro?.trim() || !Array.isArray(path.steps) || !path.steps.length || path.steps.some(step => typeof step !== 'string' || !step.trim()))) errors.push('Invalid prior-attempt paths');
+  for (const fact of lib.facts.filter(fact => fact.id.endsWith('.history'))) {
+    const results = isRecord(fact.fields) ? fact.fields.result : undefined;
+    if (!Array.isArray(results) || results.join() !== PRIOR_ATTEMPT_RESULTS.join()) errors.push(`fact ${fact.id}: prior-attempt results differ from the paths`);
+  }
   for (const service of lib.services) { ref(service.source_id, sourceIds, service.id); for (const id of service.tariff_ids) ref(id, tariffIds, service.id); for (const id of service.block_ids) ref(id, solutionIds, service.id); }
   for (const item of lib.cases) { ref(item.source_id, sourceIds, item.id); item.block_ids.forEach(id => ref(id, solutionIds, item.id)); if (item.visitor_forecast !== false) errors.push(`${item.id}: a case must not forecast the visitor's result`); }
   for (const id of lib.scenario.entry_questions) ref(id, questionIds, 'scenario entry');

@@ -82,6 +82,26 @@ test('history merges by server-reserved attempt ID and never requires invented a
   assert.throws(() => validateAnswers([answer('strategy.history', { attempts_status: 'not_tried', attempts: first.attempts })], [event], [], library, preview));
 });
 
+test('a history result is classified within the pinned values and the newer summary replaces the older', () => {
+  const first = { attempts_status: 'tried', result: 'unknown', attempts: [{ attempt_id: 'attempt-one', work: { state: 'known', value: 'Настраивали аналитику' } }] };
+  const second = { result: 'partial_or_stopped', attempts: [{ attempt_id: 'attempt-one', stop_reason: { state: 'known', value: 'Закончился бюджет' } }] };
+  assert.deepEqual(classify('strategy.history', first).value, first);
+  assert.throws(() => classify('strategy.history', { ...first, result: 'success' }));
+  const answers = [answer('strategy.history', first), answer('strategy.history', second, 'next')];
+  validateAnswers(answers, [event], [], library, preview);
+  const fact = deriveFacts(answers).facts['strategy.history'];
+  assert.equal(fact.state, 'known');
+  assert.equal((fact.value as any).result, 'partial_or_stopped');
+  // «Unknown» never erases a known result; «no result» stays when the work was abandoned later; otherwise the newer wins.
+  assert.equal((deriveFacts([...answers].reverse()).facts['strategy.history'].value as any).result, 'partial_or_stopped');
+  assert.deepEqual(mergeStructuredValues({ result: 'no_result' }, { result: 'partial_or_stopped' }), { result: 'no_result' });
+  assert.deepEqual(mergeStructuredValues({ result: 'partial_or_stopped' }, { result: 'no_result' }), { result: 'no_result' });
+  assert.deepEqual(mergeStructuredValues({ result: 'ongoing' }, { result: 'unknown' }), { result: 'ongoing' });
+  assert.deepEqual(mergeStructuredValues({ result: 'ongoing' }, { result: 'partial_or_stopped' }), { result: 'partial_or_stopped' });
+  // Other differing fields still conflict.
+  assert.throws(() => mergeStructuredValues({ attempts_status: 'tried' }, { attempts_status: 'not_tried' }));
+});
+
 test('overlapping structured facts and histories conflict when their reported values disagree', () => {
   const one = answer('strategy_channels.details', { object: { state: 'known', value: 'Сайт A' } });
   const two = answer('strategy_channels.details', { object: { state: 'known', value: 'Сайт B' } }, 'other');

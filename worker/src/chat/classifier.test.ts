@@ -151,7 +151,9 @@ test('prompt file has only the intents mark; every intent is listed and visitor 
   assert.doesNotMatch(system.content, /\{\{\w+\}\}/);
   assert(system.content.includes(`intent только из списка: ${INTENTS.join(', ')}.`));
   assert.match(system.content, /Схема JSON: \{"intent":"unknown","answers":\[\],"clarification_question_id":null,"faq_id":null,"joke_category_id":null,"humor_preference":null\}/);
-  assert.equal(system.content.split('\n').length, 17);
+  assert.equal(system.content.split('\n').length, 18);
+  assert.match(system.content, /передавай result — итог прошлых работ по теме по всем сведениям: accepted_facts, history и текущей реплике\. Выбирай первое подходящее по порядку: ongoing — работа идёт сейчас; no_result — результата не было или его не измеряли, даже если работу потом бросили или остановили из-за денег; partial_or_stopped — результат частичный/);
+  assert.match(system.content, /При каждом новом ответе о прошлых работах передавай result заново по всем сведениям\./);
   assert.match(system.content, /start_diagnostic — посетитель хочет начать или продолжить экспресс-диагностику бизнеса: «экспресс-диагностика», «аудит бизнеса», «персональный отчёт»/);
   assert.match(system.content, /Вопрос о цене или составе услуги аудита Pixel Plus \(например, SEO-аудита сайта\) — question, а не start_diagnostic\./);
   assert.match(system.content, /mixed без хотя бы одного кандидата в answers не бывает\. Начатая, но не законченная фраза \(«Меня зовут…», «Я…»\) — не факт и не ambiguous: не создавай для неё кандидата, в том числе ради mixed\./);

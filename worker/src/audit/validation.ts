@@ -103,10 +103,21 @@ export function validateAuditResult(value: unknown, lib: AuditLibrary = library,
   actionIds.forEach(visit);
   list(value.solutions, 'result.solutions');
   for (const item of value.solutions) {
-    record(item, 'solution'); fields(item, ['id', 'title', 'text', 'service_ids', 'action_ids', 'limitations']);
+    record(item, 'solution'); fields(item, ['id', 'title', 'text', 'service_ids', 'action_ids', 'limitations'], ['prior_attempts']);
     const block = lib.solutions.find(block => block.id === item.id); if (!block || !isApproved(block)) fail('solution is not approved');
     text(item.title, 'solution.title'); text(item.text, 'solution.text'); strings(item.limitations, 'solution limitations'); strings(item.action_ids, 'solution actions'); strings(item.service_ids, 'solution services');
     if (item.action_ids.some(id => !actionIds.has(id)) || item.service_ids.some(id => !lib.services.some(service => service.id === id))) fail('solution reference');
+    const prior = item.prior_attempts;
+    if (prior !== undefined) {
+      // A prior-attempt opening is the approved path text word for word, and its steps lead the solution's actions.
+      record(prior, 'solution.prior_attempts'); fields(prior, ['result', 'intro']);
+      const result = prior.result;
+      const path = isApproved(lib.priorAttemptPaths) ? lib.priorAttemptPaths.items.find(path => path.id === result) : undefined;
+      if (!path || prior.intro !== path.intro) fail('prior-attempt path is not approved');
+      const leading = item.action_ids.slice(0, path.steps.length);
+      const steps = leading.map(id => (value.actions as { id: string; text: string }[]).find(action => action.id === id)?.text);
+      if (steps.join('\n') !== path.steps.join('\n')) fail('prior-attempt steps differ from the approved path');
+    }
   }
   list(value.tariffs, 'result.tariffs');
   const tariffIds = new Set<string>();

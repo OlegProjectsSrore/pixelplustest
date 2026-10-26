@@ -123,7 +123,9 @@ test('past failure or unknown history prevents a blind restart',()=>{
 test('explicit absence of prior attempts allows scoping, not a guaranteed result',()=>{
  const fixture=checks.find(c=>c.id==='analytics_sales_positive').fact_fixture;
  const out=buildReportPreview(blocks,[...fixture,f('analytics.history',{attempts_status:'not_tried',attempts:[]}),f('context.resources','Responsible employee available')]);
- assert.equal(out.findings[0].readiness,'ready_for_scoping');assert.equal(out.findings[0].actions.length,2);
+ assert.equal(out.findings[0].readiness,'ready_for_scoping');
+ // The approved order of work: 4–6 steps per problem, the same in the preview as in the library.
+ assert.deepEqual(out.findings[0].actions,blocks.find(b=>b.id==='analytics_sales').solution.steps.map(s=>s.text));assert(out.findings[0].actions.length>=4);
  assert.equal(out.tariff_ids.length,0);assert.equal(out.preview,true);
  assert.throws(()=>buildReportPreview(blocks,[],{preview:false}),/editorial previews only/);
 });

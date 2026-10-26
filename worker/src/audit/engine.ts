@@ -1,5 +1,5 @@
 import { INTERVIEW_BUDGET_MS, MAX_VOICE_QUESTIONS, type AuditAnswer, type AuditEvent, type AuditFact, type AuditResult, type AuditSnapshot, type AuditState, type Contradiction, type Json, type QuestionView } from './contracts.ts';
-import { assertLibraryReady, isApproved, library, type AuditLibrary, type FactDefinition, type Question, type Solution } from './library.ts';
+import { assertLibraryReady, isApproved, library, type AuditLibrary, type FactDefinition, type PriorAttemptPath, type Question, type Solution } from './library.ts';
 import { evaluateRule, isRecord } from './rules.ts';
 import { validateAuditResult, validateAuditState } from './validation.ts';
 import { mergeStructuredValues, validateRuntimeValue } from './value-schemas.ts';
@@ -78,6 +78,7 @@ function validateValue(definition: FactDefinition, answer: AuditAnswer): void {
 function validateHistory(value: Record<string, unknown>): void {
   if (value.attempts_status === 'not_tried') {
     if (value.attempts !== undefined && (!Array.isArray(value.attempts) || value.attempts.length !== 0)) throw new Error('Not tried cannot contain attempts');
+    if (value.result !== undefined) throw new Error('Not tried has no prior-attempt result');
     return;
   }
   if (value.attempts === undefined) return;
@@ -279,11 +280,18 @@ export function interviewSufficiency(state: AuditState, now: number, lib: AuditL
   return { sufficient: remaining === null, reason: remaining === null ? 'sufficient' : 'questions_remaining', missing: [] };
 }
 
-function previousWorkAllows(block: Solution, facts: Record<string, AuditFact>): boolean {
-  if (!block.previous_attempts.required_before_recommendation) return true;
+/** How earlier work shapes the recommendation: 'direct' when there was none, an approved path when there was some or it is unknown. */
+function priorAttemptPath(block: Solution, facts: Record<string, AuditFact>, lib: AuditLibrary): 'direct' | 'blocked' | PriorAttemptPath {
+  if (!block.previous_attempts.required_before_recommendation) return 'direct';
   const history = facts[block.previous_attempts.fact];
-  // Repeating prior work needs an explicitly approved difference rule; free text is not executable authority.
-  return known(history) && isRecord(history.value) && history.value.attempts_status === 'not_tried';
+  const value = known(history) && isRecord(history.value) ? history.value : null;
+  if (value?.attempts_status === 'not_tried') return 'direct';
+  // Repeating prior work needs an approved path; without one the recommendation stays blocked.
+  if (!isApproved(lib.priorAttemptPaths)) return 'blocked';
+  // Only reported work has a result; unknown, declined, unconfirmed or missing history all take the «unknown» path.
+  const tried = value !== null && (value.attempts_status === 'tried' || value.attempts_status === undefined);
+  const result = tried && typeof value.result === 'string' ? value.result : 'unknown';
+  return lib.priorAttemptPaths.items.find(path => path.id === result) ?? lib.priorAttemptPaths.items.find(path => path.id === 'unknown') ?? 'blocked';
 }
 
 /** Only approved material may become a recommendation, including when an interview is a draft preview. */
@@ -314,17 +322,26 @@ export function analyzeAudit(snapshot: AuditSnapshot, lib: AuditLibrary = librar
     selected.add(block.id);
     // Significance prose is not a numeric/ordinal approved rule. Unknown is preserved until such a rule exists.
     result.situations.push({ id: block.id, title: status === 'supported' ? block.pdf.heading as string || block.title : `Требует проверки: ${block.title}`, kind: block.type === 'opportunity' ? 'opportunity' : block.type === 'reported_issue' ? 'problem' : block.type === 'data_gap' ? 'verification' : 'hypothesis', evidence_status: status, evidence_answer_ids: evidence, significance: { level: 'unknown', reason: 'Значимость не установлена утверждённым правилом по полученным сведениям.' }, limitations: [...block.solution.limitations, ...(status !== 'supported' ? ['Недостаточно оснований для утверждения проблемы.'] : [])] });
-    if (status !== 'supported' || !previousWorkAllows(block, facts)) { result.gaps.push(block.previous_attempts.fact); continue; }
+    const prior = priorAttemptPath(block, facts, lib);
+    if (status !== 'supported' || prior === 'blocked') { result.gaps.push(block.previous_attempts.fact); continue; }
     const conflict = lib.relationships.some(relation => relation.relation === 'alternatives_require_comparison' && ((relation.a === block.id && selected.has(relation.b)) || (relation.b === block.id && selected.has(relation.a))));
     if (conflict) { result.limitations.push(`Для «${block.title}» требуется сравнение альтернатив до назначения работ.`); continue; }
-    const actions = [...block.solution.steps].sort((a, b) => a.order - b.order).map((step, index, steps) => ({ id: `${block.id}:${step.order}`, text: step.text, after: index ? [`${block.id}:${steps[index - 1].order}`] : [], parallel_with: [] as string[], deferred_reason: block.solution.prerequisites.length ? block.solution.prerequisites.join('; ') : null }));
+    // The path's steps belong to the topic's history, so problems of one topic share them and list them once.
+    const priorIds = prior === 'direct' ? [] : prior.steps.map((_, index) => `${block.previous_attempts.fact}:${prior.id}:${index + 1}`);
+    if (prior !== 'direct') {
+      if (prior.id === 'unknown') result.gaps.push(block.previous_attempts.fact);
+      if (!result.actions.some(action => action.id === priorIds[0])) result.actions.push(...prior.steps.map((text, index) => ({ id: priorIds[index], text, after: index ? [priorIds[index - 1]] : [], parallel_with: [] as string[], deferred_reason: null })));
+    }
+    const actions = [...block.solution.steps].sort((a, b) => a.order - b.order).map((step, index, steps) => ({ id: `${block.id}:${step.order}`, text: step.text, after: index ? [`${block.id}:${steps[index - 1].order}`] : priorIds.slice(-1), parallel_with: [] as string[], deferred_reason: block.solution.prerequisites.length ? block.solution.prerequisites.join('; ') : null }));
     result.actions.push(...actions);
-    result.solutions.push({ id: block.id, title: block.title, text: block.solution.deliverable, service_ids: block.services, action_ids: actions.map(action => action.id), limitations: block.solution.limitations });
+    result.solutions.push({ id: block.id, title: block.title, text: block.solution.deliverable, service_ids: block.services, action_ids: [...priorIds, ...actions.map(action => action.id)], limitations: block.solution.limitations,
+      ...(prior === 'direct' ? {} : { prior_attempts: { result: prior.id, intro: prior.intro } }) });
   }
   for (const relation of lib.relationships) {
     if (!['measurement_before_optimization', 'configure_then_validate', 'permissions_before_contact', 'access_before_actions', 'validation_before_rollout', 'restore_before_change', 'validate_task_before_build', 'goal_before_production'].includes(relation.relation)) continue;
     const before = result.solutions.find(solution => solution.id === relation.a), after = result.solutions.find(solution => solution.id === relation.b);
-    if (before && after) { const action = result.actions.find(item => item.id === after.action_ids[0]); if (action) action.after.push(before.action_ids[before.action_ids.length - 1]); }
+    // Link the problems' own steps: shared prior-attempt steps come before both and must not depend on either.
+    if (before && after) { const action = result.actions.find(item => item.id === after.action_ids.find(id => id.startsWith(`${after.id}:`))); if (action) action.after.push(before.action_ids[before.action_ids.length - 1]); }
   }
   const services = new Set(result.solutions.flatMap(solution => solution.service_ids));
   for (const tariff of lib.tariffs) {
