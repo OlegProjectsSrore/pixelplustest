@@ -128,3 +128,27 @@ test('searchKnowledge reads fragments without the save barrier; a failed search 
   assert.equal(f.errors.length, 0, 'a failed search is not shown as a save error');
   assert.deepEqual(calls.map(([name, args]) => [name, args.query]), [['searchKnowledge', 'сайты на Битрикс'], ['searchKnowledge', 'сбой']]);
 });
+
+test('A rejected tool call tells the model to stay silent about it, fix it once or ask the question again', async t => {
+  const failure = (code, message) => Object.assign(new Error(message), { code });
+  const replies = { saveAnswers: failure('invalid_answers', 'Ответ модели не прошёл проверку формата.'), offTopicReply: failure('invalid_answers', 'Ответ модели не прошёл проверку формата.'), finishAudit: failure('pending_evidence', 'Цитата не найдена однозначно в доставленных репликах посетителя.') };
+  const f = fixture(t, { onTool: async name => { throw replies[name]; } });
+  await f.start();
+  const dc = f.peers.at(-1).dc;
+  const outputs = () => dc.sent.filter(event => event.type === 'conversation.item.create' && event.item.type === 'function_call_output').map(event => JSON.parse(event.item.output));
+  f.emit({ type: 'conversation.item.input_audio_transcription.completed', item_id: 'u1', transcript: 'Меня зовут, как у тебя, кстати, настроение?' });
+  for (const [id, name] of [['t1', 'saveAnswers'], ['t2', 'offTopicReply'], ['t3', 'finishAudit']]) {
+    f.emit({ type: 'response.done', response: { status: 'completed', output: [{ type: 'function_call', call_id: id, name, arguments: '{}' }] } });
+    await turn(); await turn();
+  }
+  const [save, offTopic, finish] = outputs();
+  assert.equal(save.accepted, false); assert.equal(save.error, 'invalid_answers'); assert.equal(save.reason, 'Ответ модели не прошёл проверку формата.');
+  assert.match(save.message, /Ничего не говори посетителю о сохранении, формате или ошибке/);
+  assert.match(save.message, /для unknown, declined, not_measured и not_applicable value — null\) и повтори его один раз/);
+  assert.match(save.message, /Если ответа в реплике нет, ничего не сохраняй: при уходе от темы вызови offTopicReply, иначе задай текущий вопрос заново своими словами/);
+  assert.doesNotMatch(save.message, /повтори сохранение/);
+  assert.deepEqual(save.user_transcripts, [{ ordinal: 0, text:'Меня зовут, как у тебя, кстати, настроение?' }]);
+  assert.match(offTopic.message, /^Готовой реплики нет\. Ничего не говори посетителю об ошибке/);
+  assert.match(finish.message, /^Реплика посетителя ещё доставляется\. Ничего не говори об этом посетителю; молча повтори вызов один раз/);
+  assert.equal(f.errors.length, 0, 'validation and delivery rejections are not shown to the visitor as errors');
+});

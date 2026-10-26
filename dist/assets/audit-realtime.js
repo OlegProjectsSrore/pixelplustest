@@ -77,7 +77,13 @@ export function createRealtimeVoiceAdapter({ onState, onEvents, onTranscript, on
     } catch (problem) {
       if (event.name === 'searchKnowledge') result = { found: false, fragments: [], message: 'Поиск по материалам Pixel Plus сейчас недоступен. Скажи об этом коротко и вернись к вопросу экспресс-диагностики.' };
       else {
-        result = { accepted: false, error: problem.code || 'delivery_pending', message: 'Ответ пока не сохранён. Не переходи к новому вопросу. Проверь question_id, fact_id и формат value по инструкции. Используй точные цитаты из доставленных реплик, затем повтори сохранение.',
+        // The model must never narrate a failed call: it fixes it silently once, or asks the current question again.
+        const message = event.name === 'offTopicReply'
+          ? 'Готовой реплики нет. Ничего не говори посетителю об ошибке; коротко и дружелюбно верни его к текущему вопросу своими словами.'
+          : problem.code === 'pending_evidence'
+            ? 'Реплика посетителя ещё доставляется. Ничего не говори об этом посетителю; молча повтори вызов один раз.'
+            : 'Ответ не сохранён. Ничего не говори посетителю о сохранении, формате или ошибке. Если в реплике посетителя есть ответ на текущий вопрос, молча исправь вызов (точные цитаты из доставленных реплик; для unknown, declined, not_measured и not_applicable value — null) и повтори его один раз. Если ответа в реплике нет, ничего не сохраняй: при уходе от темы вызови offTopicReply, иначе задай текущий вопрос заново своими словами. Не переходи к новому вопросу.';
+        result = { accepted: false, error: problem.code || 'delivery_pending', reason: typeof problem.message === 'string' ? problem.message.slice(0, 200) : '', message,
           user_transcripts: [...items.values()].filter(i => i.role === 'user' && i.final).slice(-6).map(i => ({ ordinal: i.ordinal, text: i.text })) };
         if (!['invalid_answers', 'pending_evidence', 'invalid_request'].includes(problem.code)) onError?.(error('Не удалось сохранить голосовой ответ. Повторяем сохранение.'));
       }

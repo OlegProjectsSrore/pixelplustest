@@ -231,7 +231,12 @@ test('off-topic rule: silent offTopicReply, the server-picked joke said verbatim
   assert.match(prompt, /произнеси operation\.text дословно, без своих добавлений, затем задай текущий вопрос сервера своими словами/);
   assert.match(prompt, /Если operation\.text пустой, не шути/);
   assert(prompt.indexOf('молча вызови offTopicReply') < prompt.indexOf('Следующие JSON содержат данные'));
-  const tool = createInterviewTools().find(item => 'temporaryTool' in item && item.temporaryTool.modelToolName === 'offTopicReply');
+  assert.match(prompt, /Вызывай saveAnswers, только если в реплике есть ответ на текущий вопрос/);
+  assert.match(prompt, /даже если реплика начинается как ответ \(«Меня зовут…»\), — ничего не сохраняй/);
+  assert.match(prompt, /Состояния unknown, declined, not_measured и not_applicable сохраняй, только если посетитель прямо сказал.*value для них — null/);
+  assert.match(prompt, /Никогда не говори посетителю о сохранении, формате, сервере, инструментах и ошибках\. Если сохранение отклонено, исправь вызов молча и повтори его не больше одного раза/);
+  assert(prompt.indexOf('Никогда не говори посетителю о сохранении') < prompt.indexOf('Следующие JSON содержат данные'));
+  const tool =createInterviewTools().find(item => 'temporaryTool' in item && item.temporaryTool.modelToolName === 'offTopicReply');
   assert(tool && 'temporaryTool' in tool); assert.match(tool.temporaryTool.description, /^Вызывать молча при любом уходе посетителя от темы/);
 });
 
