@@ -2,6 +2,27 @@
 
 ---
 
+- Date/time: 2026-10-26 21:12
+- Scope: S:\PROJECTS\pixelplustest
+- Summary: голосовой `offTopicReply` больше не отказывает из-за формы списков категорий; отказы `offTopicReply` пишут в журнал форму аргументов; лишний `answer_id` у фактов без вариантов отбрасывается.
+  - Причина — проверка владельца голосом 26.10 в 20:03 UTC (`gpt-realtime-2.1-mini`, Worker 177b9fdf). На «какая сегодня погода в Лондоне?» модель по новому правилу сразу вызвала `offTopicReply`, но сервер ответил 400 `invalid_answers` («Invalid model evidence»): список категорий пришёл не массивом. Модель ответила разрешённой нейтральной фразой без шутки. Сам этот список сервер не использует: тему реплики определяет классификатор DeepSeek.
+  - `parseVoiceOffTopicPayload`: `safe_category_ids`, `excluded_joke_ids`, `previous_topic_category_ids` принимаются в любом виде — нет или null → пусто, одна строка → один ID, непригодные элементы отбрасываются, не больше 32. `kind` и `certain` проверяются по-прежнему.
+  - `logRejectedAnswers`: для отклонённого `offTopicReply` в журнал пишется поле `arguments` — `kind` (если из списка инструмента) и типы остальных полей, без слов посетителя.
+  - `normalizeVoiceAnswers`: у факта без вариантов ответа (имя, должность) `answer_id` от модели отбрасывается, а не приводит к отказу «Answer option does not match value». В том же разговоре так был отклонён ответ «Винни и Пух»; модель сохранила его со второй попытки. Неуверенные состояния (`answer_id` = `state`) и домены приоритета не затронуты.
+  - Worker опубликован, версия 88840c56-eb3d-45a5-bded-b123b7b4e410. Сайт не менялся.
+- Files changed:
+  - worker/src/voice/client-tools.ts
+  - worker/src/channel-realtime.ts
+  - worker/src/channel-voice.ts
+  - worker/src/voice/voice.test.ts
+  - worker/test/channel-realtime.test.ts
+  - project_log.md
+  - внешнее состояние: Cloudflare Worker pixelplus-ai (версия 88840c56)
+- Validation: тесты — 379 из 379 (новые: разбор списков в любом виде; `offTopicReply` без списка, с null и со строкой даёт шутку; форма аргументов в журнале; `answer_id` у имени отброшен, ответ сохранён); проверка типов без ошибок; `check:library` — ошибок нет, productionReady; сборка прошла; smoke в Miniflare прошёл; после публикации `smoke-deployed-worker.mjs --open` — PASS.
+- Reference: «Да: offTopicReply принимает списки категорий в любом виде и не отказывает, журнал пишет форму аргументов, лишний answer_id у вопросов без вариантов отбрасывается. Тесты, проверки, публикация Worker, коммит и push.»
+
+---
+
 - Date/time: 2026-10-26 21:00
 - Scope: S:\PROJECTS\pixelplustest
 - Summary: голосовые модели `gpt-realtime-2.1-mini` и `gpt-realtime-2.1` отшучиваются при уходе от темы так же, как чат на DeepSeek.

@@ -181,6 +181,11 @@ export async function normalizeVoiceAnswers(core: CoreServices, session: StoredS
   const events = conversation.filter(event => event.role === 'user');
   const existing = candidates.some(candidate => candidate.is_correction) ? await core.store.listAnswers(session.id) : [];
   const replaced = new Set(existing.flatMap(answer => answer.replaces_answer_id ? [answer.replaces_answer_id] : []));
+  const facts = getLibrary(session.state.library_version).facts;
+  // A fact without answer options (a name, a position) has nothing for answer_id to point at: the model's extra ID is dropped,
+  // not a reason to reject the answer. Uncertain states and the priority domains keep their own answer_id rules.
+  const answerId = (candidate: VoiceAnswerCandidate): string | undefined => !candidate.answer_id || (candidate.fact_id !== 'context.priority'
+    && !facts.find(fact => fact.id === candidate.fact_id)?.values?.length && !(candidate.answer_id === candidate.state && candidate.state !== 'known')) ? undefined : candidate.answer_id;
   const answers: AuditAnswer[] = [];
   for (const candidate of candidates) {
     const evidence: AuditEvent[] = [];
@@ -194,7 +199,8 @@ export async function normalizeVoiceAnswers(core: CoreServices, session: StoredS
     const previous = existing.filter(answer => answer.fact_id === candidate.fact_id && answer.library_version === session.state.library_version && !replaced.has(answer.id));
     const correction = candidate.is_correction && confirmation && previous.length === 1 && candidates.filter(item => item.is_correction && item.fact_id === candidate.fact_id).length === 1 && evidence.some(event => event.kind === 'correction');
     // Ambiguous replacement targets or unverified correction speech preserve the dispute and history.
-    answers.push({ id: crypto.randomUUID(), question_id: candidate.question_id, fact_id: candidate.fact_id, ...(candidate.answer_id ? { answer_id: candidate.answer_id } : {}),
+    const optionId = answerId(candidate);
+    answers.push({ id: crypto.randomUUID(), question_id: candidate.question_id, fact_id: candidate.fact_id, ...(optionId ? { answer_id: optionId } : {}),
       state: candidate.state, value: candidate.value, ...(candidate.parameters ? { parameters: candidate.parameters } : {}), event_ids: evidence.map(event => event.id), channel: 'voice', method: 'voice_batch',
       confirmation: correction ? 'explicit' : candidate.is_correction ? 'disputed' : confirmation ? 'explicit' : 'unconfirmed',
       ...(correction ? { replaces_answer_id: previous[0].id } : {}), library_version: session.state.library_version, created_at: core.now() });

@@ -92,6 +92,11 @@ test('Voice off-topic: the server classifies the saved replica and returns a lib
   assert.deepEqual(obj(reply.operation), { joke_id: joke.id, text: `${joke.text} ${library.jokes.return_phrases[0]}`, question_id: 'context_name', operation_id: obj(reply.operation).operation_id });
   assert.match(reply.realtime_instructions, /произнеси operation\.text дословно/);
   assert.deepEqual((await f.core.store.requireSession('s1')).state.humor.reserved_ids, [joke.id]);
+  // The production call that failed sent the category list in a non-array shape; the server ignores it and still jokes.
+  for (const lists of [{}, { safe_category_ids: null, excluded_joke_ids: null }, { safe_category_ids: 'weather' }]) {
+    const again = await f.invoke(adapters.voiceAnswers!, await f.body(undefined, { call_id: call.call_id, tool: 'offTopicReply', kind: 'off_topic', certain: true, ...lists }));
+    assert.match(String(obj(again.operation).joke_id), /^weather_/, JSON.stringify(lists));
+  }
 });
 
 test('Missing key, malformed SDP and stale revision never start a paid call', async t => {
@@ -196,6 +201,14 @@ test('Extra model fields such as value_type are dropped and the voice answer is 
   assert.notDeepEqual(answers[0].event_ids, ['forged']);
 });
 
+test('An answer_id on a fact without answer options is dropped and the answer is saved', async t => {
+  const f = await fixture(); t.after(() => f.db.close());
+  const save = await nameCall(f, 'Меня зовут Винни.');
+  await f.invoke(f.adapters.voiceAnswers!, await save({ value: 'Винни', answer_id: 'context_name', source_quotes: ['Меня зовут Винни.'] }));
+  const answers = await f.core.store.listAnswers('s1');
+  assert.deepEqual(answers.map(a => [a.fact_id, a.value, a.answer_id]), [['context.name', 'Винни', undefined]]);
+});
+
 test('Malformed model arguments are a 400 invalid_answers, not a retryable 500', async t => {
   const f = await fixture(); t.after(() => f.db.close());
   const warn = t.mock.method(console, 'warn', () => {});
@@ -207,6 +220,8 @@ test('Malformed model arguments are a 400 invalid_answers, not a retryable 500',
   const [answer, offTopic] = warn.mock.calls.map(c => JSON.parse(String(c.arguments[0])));
   assert.equal(answer.status, 400); assert.equal(answer.detail, 'Uncertain answers require null');
   assert.equal(offTopic.tool, 'offTopicReply'); assert.equal(offTopic.detail, 'Invalid off-topic candidate');
+  assert.deepEqual(offTopic.arguments, { kind: 'string', certain: 'boolean', safe_category_ids: 'array(0)', excluded_joke_ids: 'undefined', previous_topic_category_ids: 'undefined' });
+  assert.equal(answer.arguments, undefined, 'argument shapes are logged for offTopicReply only');
   assert.equal((await f.core.store.listAnswers('s1')).length, 0);
 });
 

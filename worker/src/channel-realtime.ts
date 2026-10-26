@@ -56,10 +56,14 @@ export async function logRejectedAnswers(core: CoreServices, given: StoredSessio
         : { length: quote.length, exact: users.filter(event => event.text?.includes(quote)).length, matched: quoteMatches(users, quote, ordinals).length });
       return { question_id: id(answer.question_id), fact_id: id(answer.fact_id), state: id(answer.state), value: shape(answer.value), fields: Object.keys(answer).sort(), ordinals: ordinals ?? null, quotes };
     });
+    // offTopicReply arguments as shapes only; kind is logged when it is one of the tool's enum values.
+    const kinds = ['off_topic', 'mixed', 'answer', 'sensitive', 'clarification', 'complaint', 'role_change', 'humor_declined', 'pause', 'finish', 'ambiguous'];
+    const offTopic = body?.tool === 'offTopicReply' ? { kind: typeof body.kind === 'string' && kinds.includes(body.kind) ? body.kind : shape(body.kind), certain: shape(body.certain),
+      safe_category_ids: shape(body.safe_category_ids), excluded_joke_ids: shape(body.excluded_joke_ids), previous_topic_category_ids: shape(body.previous_topic_category_ids) } : undefined;
     console.warn(JSON.stringify({ event: 'voice_answers_rejected', status: error instanceof HttpError ? error.status : 500, code: error instanceof HttpError ? error.code : 'internal_error',
       message: error instanceof Error ? error.message : 'unknown', detail: error instanceof HttpError ? error.detail ?? null : null, tool: id(body?.tool), session: session?.id.slice(0, 12) ?? null,
       call_id: id(body?.call_id), current_question_id: question?.id ?? null, boundary: typeof body?.through_event_id === 'string',
-      user_replicas: users.map(event => ({ ordinal: event.local_order, length: event.text?.length ?? 0 })), answers }));
+      user_replicas: users.map(event => ({ ordinal: event.local_order, length: event.text?.length ?? 0 })), answers, ...(offTopic ? { arguments: offTopic } : {}) }));
   } catch { /* Logging must never change the client-visible outcome. */ }
 }
 

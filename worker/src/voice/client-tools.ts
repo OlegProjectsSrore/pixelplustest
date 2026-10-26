@@ -54,6 +54,11 @@ function stringList(value: unknown, maxLength: number, required = false): string
   if (!Array.isArray(value) || value.length > 32 || (required && !value.length)) throw new Error('Invalid model evidence');
   return value.map(item => nonempty(item, 'model string', maxLength));
 }
+/** Off-topic category and joke IDs are only hints: the server classifies the replica itself, so any shape is accepted (missing or null → none, one string → one ID, unusable items dropped). */
+function looseIds(value: unknown): string[] {
+  const items = Array.isArray(value) ? value : typeof value === 'string' ? [value] : [];
+  return items.filter((item): item is string => typeof item === 'string' && item.trim().length > 0 && item.length <= 128).slice(0, 32);
+}
 const answerFields = ['question_id', 'fact_id', 'answer_id', 'state', 'value', 'parameters', 'confirmation_candidate', 'source_quotes', 'source_ordinals', 'is_correction'];
 function parseAnswers(value: unknown): VoiceAnswerCandidate[] {
   if (!Array.isArray(value) || value.length > 64) throw new Error('Invalid model answer batch');
@@ -94,8 +99,8 @@ export function parseVoiceOffTopicPayload(value: unknown): VoiceOffTopicPayload 
   exactKeys(value, ['kind', 'certain', 'safe_category_ids', 'excluded_joke_ids', 'previous_topic_category_ids']);
   const kinds = ['off_topic', 'mixed', 'answer', 'sensitive', 'clarification', 'complaint', 'role_change', 'humor_declined', 'pause', 'finish', 'ambiguous'];
   if (!kinds.includes(String(value.kind)) || typeof value.certain !== 'boolean') throw new Error('Invalid off-topic candidate');
-  const result: VoiceOffTopicPayload = { kind: value.kind as VoiceOffTopicPayload['kind'], certain: value.certain, safe_category_ids: stringList(value.safe_category_ids, 128) };
-  if (value.excluded_joke_ids !== undefined) result.excluded_joke_ids = stringList(value.excluded_joke_ids, 128);
-  if (value.previous_topic_category_ids !== undefined) result.previous_topic_category_ids = stringList(value.previous_topic_category_ids, 128);
+  const result: VoiceOffTopicPayload = { kind: value.kind as VoiceOffTopicPayload['kind'], certain: value.certain, safe_category_ids: looseIds(value.safe_category_ids) };
+  if (value.excluded_joke_ids != null) result.excluded_joke_ids = looseIds(value.excluded_joke_ids);
+  if (value.previous_topic_category_ids != null) result.previous_topic_category_ids = looseIds(value.previous_topic_category_ids);
   return result;
 }

@@ -177,6 +177,18 @@ test('tool candidate boundary drops fabricated authority and rejects missing sou
   assert.throws(() => parseVoiceOffTopicPayload({ kind: 'off_topic', certain: true, safe_category_ids: [], now: 123 }), /Unexpected/);
 });
 
+test('offTopicReply accepts category and joke lists in any shape; only kind and certain are checked', () => {
+  const base = { kind: 'off_topic', certain: true };
+  assert.deepEqual(parseVoiceOffTopicPayload(base), { ...base, safe_category_ids: [] }, 'missing list');
+  assert.deepEqual(parseVoiceOffTopicPayload({ ...base, safe_category_ids: null, excluded_joke_ids: null, previous_topic_category_ids: undefined }), { ...base, safe_category_ids: [] });
+  assert.deepEqual(parseVoiceOffTopicPayload({ ...base, safe_category_ids: 'weather', excluded_joke_ids: 'weather_01' }), { ...base, safe_category_ids: ['weather'], excluded_joke_ids: ['weather_01'] });
+  assert.deepEqual(parseVoiceOffTopicPayload({ ...base, safe_category_ids: ['weather', 7, '', ' ', 'x'.repeat(129), { id: 'sports' }], previous_topic_category_ids: {} }),
+    { ...base, safe_category_ids: ['weather'], previous_topic_category_ids: [] });
+  assert.equal(parseVoiceOffTopicPayload({ ...base, safe_category_ids: Array.from({ length: 40 }, (_, i) => `c${i}`) }).safe_category_ids.length, 32);
+  assert.throws(() => parseVoiceOffTopicPayload({ ...base, kind: 'invented' }), /Invalid off-topic candidate/);
+  assert.throws(() => parseVoiceOffTopicPayload({ kind: 'off_topic', safe_category_ids: [] }), /Invalid off-topic candidate/);
+});
+
 test('prompt excludes unrelated/catalog data and keeps source values separate from instructions', () => {
   const prompt = buildInterviewPrompt({ library_version: '1', current_question_id: 'q1', remaining_seconds: 59, humor_enabled: false,
     questions: [{ id: 'q1', text: 'Что пробовали?', fact_ids: ['f1'], options: [] }],
