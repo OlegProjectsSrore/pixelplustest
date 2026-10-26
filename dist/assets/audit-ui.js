@@ -175,7 +175,9 @@ export function createAuditView(handlers = {}) {
   const pauseButton = button('На паузу');
   const resumeButton = button('Продолжить опрос', 'primary');
   const finishButton = button('Завершить опрос', 'quiet');
-  sessionActions.append(pauseButton, resumeButton, finishButton);
+  const restartButton = button('Пройти опрос заново', 'quiet');
+  restartButton.classList.add('audit-restart');
+  sessionActions.append(pauseButton, resumeButton, finishButton, restartButton);
   const footerNote = element('p', 'audit-footer-note', 'Рекомендации будут в PDF после опроса.');
   footer.append(textForm, sessionActions, footerNote);
 
@@ -276,6 +278,9 @@ export function createAuditView(handlers = {}) {
   pauseButton.addEventListener('click', () => call('onPause'));
   resumeButton.addEventListener('click', () => call('onResume'));
   finishButton.addEventListener('click', () => call('onFinish'));
+  restartButton.addEventListener('click', () => {
+    if (window.confirm('Начать опрос заново? Текущий разговор и ответы будут удалены из этого окна.')) call('onRestart');
+  });
   downloadButton.addEventListener('click', () => call('onDownload'));
   retryButton.addEventListener('click', () => call('onRetry'));
   skipButton.addEventListener('click', () => {
@@ -414,7 +419,9 @@ export function createAuditView(handlers = {}) {
     resumeButton.disabled = busy || !capabilities.resume;
     finishButton.hidden = !interviewing && !paused;
     finishButton.disabled = busy || !capabilities.finish;
-    sessionActions.hidden = !interviewing && !paused;
+    restartButton.hidden = !capabilities.restart;
+    restartButton.disabled = Boolean(busy);
+    sessionActions.hidden = !interviewing && !paused && !capabilities.restart;
     if (dialog.open && previousPhase !== 'interview' && interviewing && model.mode === 'chat' && dialog.contains(document.activeElement)) draft.focus({ preventScroll: true });
     const hasNewQuestion = previousQuestionId && previousQuestionId !== question?.id;
     if (dialog.open && (hasNewQuestion || (messagesChanged && nearEnd))) {

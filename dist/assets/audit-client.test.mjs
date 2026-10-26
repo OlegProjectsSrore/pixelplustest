@@ -68,7 +68,7 @@ function fixture(t, { initial = record(state()), request, challenge, microphone,
   t.after(async () => { stopFailure = false; await client.destroy(); });
   return { client, calls, get handlers() { return handlers; }, get model() { return model; }, get stored() { return stored; },
     set draft(value) { draft = value; }, get draft() { return draft; }, get voice() { return voiceCallbacks; },
-    set stopFailure(value) { stopFailure = value; }, set startFailure(value) { startFailure = value; }, get voiceStarts() { return voiceStarts; } };
+    set stopFailure(value) { stopFailure = value; }, set startFailure(value) { startFailure = value; }, get voiceStarts() { return voiceStarts; }, get voiceActive() { return voiceActive; } };
 }
 
 test('Retry creates a session after a challenge failure without nesting a busy action', async t => {
@@ -433,4 +433,32 @@ test('exhausted new-session budget explains the daily reset without enabling a b
   assert.equal(f.model.capabilities.chat, false);
   assert.equal(f.model.capabilities.voice, false);
   assert.equal(f.stored.pending.path, '/api/session', 'the original creation nonce remains available after the reset');
+});
+
+test('Restart forgets a blocked interview without sending its unconfirmed operation and starts a new chat session', async t => {
+  const blocked = { ...record(state({ session_id: 'old' })), messages: [{ id: 'm1', role: 'user', text: 'Старый ответ' }],
+    pending: { path: '/api/voice/answers', body: { operation_id: 'stuck' } }, transcript_outbox: [{ source_key: 'call1:1', call_id: 'call1' }] };
+  const f = fixture(t, { initial: blocked });
+  await f.client.open();
+  assert.match(f.model.error, /неподтверждённая отправка/);
+  assert.equal(f.model.capabilities.restart, true);
+  f.draft = 'Черновик';
+  await f.handlers.onRestart();
+  assert.deepEqual(f.calls.map(call => call.path), ['/api/session']);
+  assert.equal(f.stored.session.session_id, 's1'); assert.equal(f.stored.pending, null);
+  assert.deepEqual(f.stored.messages, []); assert.deepEqual(f.stored.transcript_outbox, []);
+  assert.equal(f.model.phase, 'interview'); assert.equal(f.model.mode, 'chat'); assert.equal(f.model.error, ''); assert.equal(f.draft, '');
+});
+
+test('Restart during a voice call releases the call first; nothing to restart before a session exists', async t => {
+  const f = fixture(t);
+  await f.client.open(); await f.handlers.onChannel('voice');
+  assert.equal(f.model.mode, 'voice'); assert.equal(f.voiceActive, true);
+  await f.handlers.onRestart();
+  assert.equal(f.voiceActive, false, 'the provider call is released before the session is forgotten');
+  assert.equal(f.model.voice_status, ''); assert.equal(f.model.mode, 'chat'); assert.equal(f.client.session.active_channel, 'chat');
+  assert.equal(f.calls.filter(call => call.path === '/api/session').length, 1);
+  const empty = fixture(t, { initial: null, challenge: async () => { throw new Error('challenge unavailable'); } });
+  await empty.client.open();
+  assert.equal(empty.model.capabilities.restart, false);
 });

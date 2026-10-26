@@ -1,4 +1,4 @@
-import { createAuditView } from './audit-ui.js?v=8abb6cc982';
+import { createAuditView } from './audit-ui.js?v=c963e6d179';
 import { createAuditTransport, createAuditStorage, AuditRequestError } from './audit-http.js';
 import { getTurnstileToken } from './audit-turnstile.js';
 import { checkMicrophone, createVoiceAdapter, loadVoiceSdk } from './audit-voice.js?v=7f69e524a9';
@@ -82,7 +82,8 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
       voice_status: voiceStatus, email_status: emailStatus, error,
       capabilities: { chat: !!allowed, voice: !!allowed && !!(config?.voiceProvider === 'openai' || config?.ultravoxSdkUrl),
         resume: !!allowed && session.paused, pause: !!allowed && !session.paused,
-        finish: !!allowed, email: session?.status === 'ready' && canManage && !busy && !saved.pending },
+        finish: !!allowed, email: session?.status === 'ready' && canManage && !busy && !saved.pending,
+        restart: !!(session || saved.pending) },
     });
   }
   function addMessage(id, role, text) {
@@ -327,6 +328,17 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
   async function stopVoice() {
     if (voice) await voice.stop();
   }
+  // Forgets this browser's interview, including an unconfirmed send, and starts a new session.
+  // The abandoned server session is not reused and simply expires.
+  async function restart() {
+    await stopVoice().catch(() => {});
+    clearTimeout(pollTimer);
+    timeFinishRequested = false; readyFile = null; error = ''; voiceStatus = ''; emailStatus = ''; mode = 'chat';
+    saved = { version: 1, session: null, messages: [], pending: null, transcript_outbox: [], transcript_boundaries: {}, draft: '' };
+    view?.clearDraft?.();
+    persist(); render();
+    await create('chat');
+  }
   async function switchChannel(channel) {
     if (!saved.session) { await create(channel); if (channel === 'voice') await startVoice(); return; }
     saved.control_intent = { action: 'switch', channel }; persist();
@@ -423,7 +435,7 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
       onResume: () => action(() => control({ action: 'resume' })),
       onFinish: () => action(() => control({ action: 'finish', reason: 'visitor_request' })),
       onEmail: email => action(async () => { const result = await enqueue(() => mutate('/api/email/send', { email, consent: { accepted: true, version: 'audit-email-v1' } })); emailStatus = EMAIL_STATUS[result.status] || 'Запрос на отправку принят.'; }),
-      onDownload: () => action(download), onRetry: () => action(retry),
+      onDownload: () => action(download), onRetry: () => action(retry), onRestart: () => action(restart),
       onClose() { visible = false; clearTimeout(pollTimer); persist(); },
     });
     view.setDraft?.(saved.draft || '');
@@ -476,7 +488,7 @@ document.addEventListener('click', event => {
   if (!button || !['chat', 'voice'].includes(button.dataset.aiAction)) return;
   event.preventDefault();
   if (!document.querySelector('link[data-audit-styles]')) {
-    const link = document.createElement('link'); link.rel = 'stylesheet'; link.href = new URL('./audit-ui.css?v=f637460bc4', import.meta.url).href; link.dataset.auditStyles = ''; document.head.append(link);
+    const link = document.createElement('link'); link.rel = 'stylesheet'; link.href = new URL('./audit-ui.css?v=687d491244', import.meta.url).href; link.dataset.auditStyles = ''; document.head.append(link);
   }
   client ||= createAuditClient({ config: window.PIXELPLUS_AUDIT_CONFIG });
   void client.toggle(button.dataset.aiAction);

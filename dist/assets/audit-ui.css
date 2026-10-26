@@ -146,6 +146,7 @@
 }
 
 .audit-dialog .audit-session-actions .audit-button { min-height: 36px; padding: 6px 10px; font-size: 13px; }
+.audit-dialog .audit-session-actions .audit-restart { margin-left: auto; }
 .audit-dialog .audit-email-row { flex-wrap: wrap; }
 .audit-dialog .audit-email-row .audit-input { flex-basis: 200px; }
 .audit-dialog .audit-body { touch-action: pan-y pinch-zoom; overflow-anchor: none; scrollbar-gutter: stable; }

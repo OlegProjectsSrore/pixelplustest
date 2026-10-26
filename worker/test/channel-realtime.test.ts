@@ -40,7 +40,7 @@ test('Realtime reserves before OpenAI, uses exact model/speed, replays encrypted
     assert.equal(f.db.sqlite.prepare("SELECT COUNT(*) n FROM usage_reservations WHERE state='reserved'").get()!.n, 2);
     const form = init!.body as FormData, config = JSON.parse(String(form.get('session')));
     assert.equal(form.get('sdp'), SDP); assert.equal(config.model, 'gpt-realtime-2.1-mini');
-    assert.equal(config.audio.output.speed, 1); assert.equal(config.audio.output.voice, 'cedar');
+    assert.equal(config.audio.output.speed, 1); assert.equal(config.audio.output.voice, 'ash');
     assert.equal(config.audio.input.transcription.language, 'ru');
     assert.match(config.instructions, /Как Вас зовут/);
     assert.match(config.instructions, /вызывай saveAnswers молча/);

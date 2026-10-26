@@ -112,7 +112,7 @@ export function createRealtimeAdapters(options: VoiceBridgeOptions = {}): Partia
     const config = { type: 'realtime', model, instructions: await realtimeInstructions(core, session), output_modalities: ['audio'], max_output_tokens: 2048,
       audio: { input: { transcription: { model: core.env.OPENAI_TRANSCRIPTION_MODEL || 'gpt-live-transcribe', language: 'ru' },
         turn_detection: { type: 'semantic_vad', eagerness: 'medium', create_response: false, interrupt_response: true } },
-        output: { voice: core.env.OPENAI_REALTIME_VOICE || 'cedar', speed: 1.0 } }, tools: realtimeTools(), tool_choice: 'auto' };
+        output: { voice: core.env.OPENAI_REALTIME_VOICE || 'ash', speed: 1.0 } }, tools: realtimeTools(), tool_choice: 'auto' };
     // Validate encryption before reserving or making any billable request.
     await encryptJoinUrl(core, session.id, input.operation_id, 'configuration-check');
     const question = nextQuestion({ ...session.state, paused: false }, core.now(), getLibrary(session.state.library_version), core.engineOptions);
