@@ -2,6 +2,36 @@
 
 ---
 
+- Date/time: 2026-10-26 18:35
+- Scope: S:\PROJECTS\pixelplustest
+- Summary: промпт DeepSeek вынесен в отдельный файл с меткой, по образцу голосового.
+  - Системное сообщение классификатора (15 строк правил) перенесено из `worker/src/chat/prompt.ts` в `worker/src/chat/classifier-prompt.ts`. Внутри только текст и одна метка `{{intents}}`; её заполняет `buildClassifierPrompt` списком `INTENTS`. Пользовательское сообщение по-прежнему содержит данные хода в JSON и не обрабатывается как шаблон.
+  - Комментарий в файле предупреждает: схема JSON и имена полей — контракт с `parseClassification` в `chat/validation.ts`, менять их нужно вместе.
+  - Функция подстановки меток `renderPrompt` перенесена из `voice/prompt.ts` в общий `worker/src/prompt-template.ts`. Ею пользуются оба промпта.
+  - Текст промпта при переносе не менялся: файл собран программно из прежнего вывода, и итоговые сообщения для DeepSeek совпадают с прежними байт в байт.
+  - Worker опубликован, версия effbc032-9ae4-4409-b9ce-e16d665588d3. Голос ash, переменные (15), ключи (10) и Workers Logs не менялись.
+- Files changed:
+  - worker/src/chat/classifier-prompt.ts (новый)
+  - worker/src/prompt-template.ts (новый)
+  - worker/src/chat/prompt.ts
+  - worker/src/voice/prompt.ts
+  - worker/src/chat/classifier.test.ts
+  - worker/src/voice/voice.test.ts
+  - project_log.md
+  - внешнее состояние: Cloudflare Worker pixelplus-ai (версия effbc032)
+- Validation:
+  - сравнение прежнего и нового промпта DeepSeek — идентичны;
+  - новый тест: в файле только метка `{{intents}}`, все намерения перечислены, схема JSON на месте, 15 строк, текст посетителя с меткой остаётся данными;
+  - проверка типов без ошибок;
+  - тесты — 348 из 348;
+  - `check:library` — productionReady;
+  - сборка прошла;
+  - smoke в Miniflare — внешних запросов 0;
+  - после публикации `smoke-deployed-worker.mjs --open` — PASS; промпт найден в опубликованном коде.
+- Reference: «Да: вынеси промпт DeepSeek в отдельный файл с метками, как у голосового. Тесты, проверки, публикация Worker, коммит и push.»
+
+---
+
 - Date/time: 2026-10-26 18:26
 - Scope: S:\PROJECTS\pixelplustest
 - Summary: ветки синхронизированы.

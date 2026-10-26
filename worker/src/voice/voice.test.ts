@@ -7,7 +7,7 @@ import {
   parseVoiceOffTopicPayload, verifyWebhookSignature, VoiceProviderError,
 } from './index.ts';
 import type { VoiceCallConfig, VoiceDependencies } from './types.ts';
-import { renderPrompt } from './prompt.ts';
+import { renderPrompt } from '../prompt-template.ts';
 import { INTERVIEW_PROMPT } from './interview-prompt.ts';
 import type { AdapterContext } from '../integration.ts';
 
