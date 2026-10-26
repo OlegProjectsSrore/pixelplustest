@@ -2,6 +2,18 @@
 
 ---
 
+- Date/time: 2026-10-26 20:01
+- Scope: S:\PROJECTS\pixelplustest
+- Summary: ветка `codex/expert-chat-panel` (рабочая копия `.deployment\expert-chat-panel`) перемотана вперёд на `main` до коммита с этой записью.
+  - Ветка была чистой, своих коммитов не имела и отставала на один коммит (0d92651 → 2421ecb: разнообразные реакции в чате, температура 1,3).
+  - Перемотка с `core.autocrlf=false`, чтобы файлы в этой рабочей копии остались с LF.
+- Files changed:
+  - project_log.md
+  - вне репозитория: рабочая копия `.deployment/expert-chat-panel`
+- Reference: «Да, перемотай ветку Codex (codex/expert-chat-panel) на main.»
+
+---
+
 - Date/time: 2026-10-26 19:41
 - Scope: S:\PROJECTS\pixelplustest
 - Summary: реакции DeepSeek в чате стали разнообразнее и больше не пересказывают ответ; разброс формулировок вопросов вырос.
