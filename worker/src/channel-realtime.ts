@@ -115,7 +115,7 @@ export function createRealtimeAdapters(options: VoiceBridgeOptions = {}): Partia
     if (!sdp.startsWith('v=0') || !sdp.includes('m=audio')) fail(400, 'invalid_sdp', 'Некорректное предложение голосового соединения.');
     const remaining = Math.ceil((INTERVIEW_BUDGET_MS - elapsedMs(session.state, core.now())) / 1000);
     if (remaining <= 0) fail(409, 'time_limit', 'Время голосового разговора закончилось.');
-    const model = core.env.OPENAI_REALTIME_MODEL || 'gpt-realtime-2.1-mini';
+    const model = core.env.OPENAI_REALTIME_MODEL || 'gpt-realtime-2.1';
     const config = { type: 'realtime', model, instructions: await realtimeInstructions(core, session), output_modalities: ['audio'], max_output_tokens: 2048,
       audio: { input: { transcription: { model: core.env.OPENAI_TRANSCRIPTION_MODEL || 'gpt-live-transcribe', language: 'ru' },
         turn_detection: { type: 'semantic_vad', eagerness: 'medium', create_response: false, interrupt_response: true } },

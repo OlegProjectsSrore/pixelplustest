@@ -42,12 +42,15 @@ test('Realtime streams both captions, keeps ordinal order when ASR is late, dedu
   assert(latest.every(e => e.data.is_final)); assert.equal(latest.find(e => e.role === 'user').text, 'Олег');
 });
 
-test('First message is conveyed in the model\'s own words, never read as a verbatim script', async t => {
+test('First message keeps the whole interview prompt in force: a system item, never response-level instructions', async t => {
   const f = fixture(t); await f.start();
-  const first = f.peers.at(-1).dc.sent.find(e => e.type === 'response.create');
-  assert.match(first.response.instructions, /своими словами, дружелюбно и на «Вы», полностью сохранив смысл/);
-  assert.match(first.response.instructions, /не зачитывай дословно: "Как Вас зовут\?"/);
-  assert.doesNotMatch(first.response.instructions, /Произнеси только этот вопрос/);
+  const sent = f.peers.at(-1).dc.sent;
+  const item = sent.findIndex(e => e.type === 'conversation.item.create' && e.item.role === 'system');
+  const first = sent.findIndex(e => e.type === 'response.create');
+  assert(item >= 0 && first > item, 'the question is added before the reply is requested');
+  assert.equal(sent[first].response, undefined, 'response-level instructions would replace the session prompt for this reply');
+  assert.equal(sent[item].item.content[0].text, 'Начни разговор с текущего вопроса сервера и жди ответа. Смысл вопроса: "Как Вас зовут?".');
+  assert.doesNotMatch(sent[item].item.content[0].text, /своими словами|сохранив смысл|дословно/, 'no phrasing advice that the model could read aloud');
 });
 
 test('Tool executes only after response completion and durable ASR delivery, exactly once', async t => {

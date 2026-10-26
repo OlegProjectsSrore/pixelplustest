@@ -193,8 +193,13 @@ export function createRealtimeVoiceAdapter({ onState, onEvents, onTranscript, on
       await pc.setRemoteDescription({ type: 'answer', sdp: sdp_answer });
       await connected;
       if (closing || current !== generation) return;
-      // The server text is the meaning to convey, not a script: the interview prompt forbids reading questions verbatim.
-      if (first_message) queueResponse({ instructions: `Скажи посетителю по-русски только это, своими словами, дружелюбно и на «Вы», полностью сохранив смысл; не зачитывай дословно: ${JSON.stringify(first_message)}. Затем жди ответа.` });
+      // Response-level instructions would replace the whole interview prompt for this reply, so the first question
+      // arrives as a system item and the reply follows every session rule (own words, no service talk).
+      if (first_message) {
+        send({ type: 'conversation.item.create', item: { type: 'message', role: 'system', content: [{ type: 'input_text', text:
+          `Начни разговор с текущего вопроса сервера и жди ответа. Смысл вопроса: ${JSON.stringify(first_message)}.` }] } });
+        queueResponse();
+      }
       heartbeatTimer = setInterval(() => { void onControl?.('heartbeat', callId).catch(problem => { onError?.(problem); void stop().catch(onError); }); }, 15000);
       deadlineTimer = setTimeout(() => { void stop().catch(onError); }, Math.max(1, session?.remaining_ms ?? 900000));
     } catch (problem) { await stop().catch(onError); throw problem; }

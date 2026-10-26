@@ -35,7 +35,7 @@ test('real workerd creates multipart Realtime calls and hangs up; credentials ne
     if (redirect) return new Response(null, { status: 302, headers: { Location: 'https://attacker.example/' } });
     if (request.url.endsWith('/hangup')) return new Response(null, { status: 200 });
     const form = await request.formData(), config = JSON.parse(String(form.get('session')));
-    assert.equal(config.model, 'gpt-realtime-2.1-mini'); assert.equal(config.audio.output.speed, 1);
+    assert.equal(config.model, 'gpt-realtime-2.1'); assert.equal(config.audio.output.speed, 1);
     assert.match(String(form.get('sdp')), /^v=0/);
     return new Response('v=0\r\nm=audio', { status: 201, headers: { Location: '/v1/realtime/calls/rtc_runtime' } });
   } } } }] });

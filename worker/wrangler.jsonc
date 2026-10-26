@@ -19,7 +19,7 @@
     "TURNSTILE_ENABLED": "false",
     "TURNSTILE_HOSTNAMES": "olegprojectssrore.github.io",
     "VOICE_PROVIDER": "openai",
-    "OPENAI_REALTIME_MODEL": "gpt-realtime-2.1-mini",
+    "OPENAI_REALTIME_MODEL": "gpt-realtime-2.1",
     "OPENAI_REALTIME_VOICE": "ash",
     "OPENAI_TRANSCRIPTION_MODEL": "gpt-live-transcribe",
     "ULTRAVOX_MODEL": "ultravox-v0.7",
