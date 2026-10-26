@@ -2,6 +2,25 @@
 
 ---
 
+- Date/time: 2026-10-26 20:36
+- Scope: S:\PROJECTS\pixelplustest
+- Summary: суточный лимит новых опросов поднят с 7 до 33, потому что владелец упёрся в «Суточный лимит новых опросов исчерпан».
+  - В `BUDGETS_JSON` изменены `new_sessions` 7 → 33 и `sessions_per_ip` 7 → 33: с одного адреса иначе снова было бы 7. `voice_starts` 14 → 66 — по закреплённому в тесте правилу «два подключения голоса на опрос».
+  - Остальные суточные лимиты не менялись. `voice_seconds` 7200 — 2 ч голоса на всех. `pdf_renders` 20 при `browser_seconds` 600: это 10 минут Browser Rendering, бесплатный предел, так что при 33 опросах PDF может не хватить. `email_attempts` 14.
+  - `worker/README.md` и `test/budget-config.test.ts` приведены к новым значениям; тест теперь создаёт настроенное число сессий и проверяет отказ следующей.
+  - Worker опубликован, версия 746eda84-e3f6-40b0-b735-eef098f3a566. Новый лимит действует сразу, сегодняшние опросы засчитываются в него.
+  - Закоммичено и отправлено на GitHub по просьбе владельца; ветка `codex/expert-chat-panel` (рабочая копия `.deployment\expert-chat-panel`, чистая, без своих коммитов) перемотана вперёд на этот коммит с `core.autocrlf=false`.
+- Files changed:
+  - worker/wrangler.jsonc
+  - worker/README.md
+  - worker/test/budget-config.test.ts
+  - project_log.md
+  - внешнее состояние: Cloudflare Worker pixelplus-ai (версия 746eda84); вне репозитория: рабочая копия `.deployment/expert-chat-panel`
+- Validation: тесты — 373 из 373; проверка типов без ошибок; сборка прошла; smoke в Miniflare прошёл; после публикации `smoke-deployed-worker.mjs --open` — PASS; Cloudflare показывает `new_sessions` 33, `sessions_per_ip` 33, `voice_starts` 66.
+- Reference: «Суточный лимит новых опросов исчерпан… Поменяй лимит на 33 опроса»
+
+---
+
 - Date/time: 2026-10-26 20:32
 - Scope: S:\PROJECTS\pixelplustest
 - Summary: ветка `codex/expert-chat-panel` (рабочая копия `.deployment\expert-chat-panel`) перемотана вперёд на `main` до коммита с этой записью.
