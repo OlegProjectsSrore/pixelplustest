@@ -1,11 +1,11 @@
-import { createAuditView } from './audit-ui.js?v=79170ad9a8';
+import { createAuditView } from './audit-ui.js?v=f01426c4fa';
 import { createAuditTransport, createAuditStorage, AuditRequestError } from './audit-http.js';
 import { getTurnstileToken } from './audit-turnstile.js';
 import { checkMicrophone, createVoiceAdapter, loadVoiceSdk } from './audit-voice.js?v=7f69e524a9';
 
 import { createRealtimeVoiceAdapter } from './audit-realtime.js?v=832b0b4a01';
 
-const THANKS = 'Спасибо за предоставленную информацию, сейчас вам предоставим отчёт предварительного аудита.';
+const THANKS = 'Спасибо за предоставленную информацию, сейчас подготовим результат предварительного аудита.';
 const VOICE_STATUS = { connecting: 'Соединяемся…', listening: 'Слушаю Вас', thinking: 'Обрабатываю ответ…', speaking: 'Помощник говорит', idle: 'Соединение установлено', disconnected: 'Голосовой разговор отключён', disconnecting: 'Завершаем соединение…' };
 const EMAIL_STATUS = { pending: 'Письмо ожидает отправки.', sending: 'Отправляем письмо…', sent: 'Письмо отправлено.', unknown: 'Результат отправки пока не подтверждён. Повторное письмо автоматически не отправляем.', failed: 'Не удалось отправить письмо. PDF можно скачать.' };
 
@@ -78,7 +78,9 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
     const active = session?.status === 'in_progress';
     const canManage = !!saved.management_token && session?.access_expires_at > now();
     const allowed = active && canManage && !busy && !saved.pending;
-    view?.render({ mode, phase: phase(), question, diagnostic: session?.diagnostic_started !== false,
+    // Too little information: the server sends a notice instead of the PDF.
+    const notice = session?.status === 'ready' && session.report?.outcome === 'insufficient' ? session.report.message || '' : null;
+    view?.render({ mode, phase: phase(), question, diagnostic: session?.diagnostic_started !== false, notice,
       launchPending: !session && config?.publicSessionsEnabled === false,
       messages: saved.messages || [], remaining_seconds: remaining(), busy,
       voice_status: voiceStatus, email_status: emailStatus, error,
@@ -143,6 +145,9 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
     if (report instanceof Blob) {
       readyFile = report;
       saved.session.status = 'ready';
+    } else if (report?.status === 'insufficient') {
+      saved.session.status = 'ready';
+      saved.session.report = { ...(saved.session.report || {}), status: 'ready', outcome: 'insufficient', message: report.message };
     } else {
       saved.session.status = 'preparing';
       pollDelay = Math.max(5000, Number(report.retry_after_seconds || 10) * 1000);
@@ -408,6 +413,7 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
   }
   async function download() {
     if (!saved.report_token) throw new Error('Не найдено право на получение отчёта.');
+    if (saved.session?.report?.outcome === 'insufficient') return;
     const file = readyFile || await ensureApi().request(`/api/report/${encodeURIComponent(saved.report_token)}`, { pdf: true });
     if (!(file instanceof Blob)) { error = 'Отчёт ещё готовится. Повторите скачивание немного позже.'; return; }
     const url = URL.createObjectURL(file);
@@ -450,7 +456,7 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
       onPause: () => action(() => control({ action: 'pause' })),
       onResume: () => action(() => control({ action: 'resume' })),
       onFinish: () => action(() => control({ action: 'finish', reason: 'visitor_request' })),
-      onEmail: email => action(async () => { const result = await enqueue(() => mutate('/api/email/send', { email, consent: { accepted: true, version: 'audit-email-v1' } })); emailStatus = EMAIL_STATUS[result.status] || 'Запрос на отправку принят.'; }),
+      onEmail: email => action(async () => { const result = await enqueue(() => mutate('/api/email/send', { email, consent: { accepted: true, version: 'audit-email-v1' } })); emailStatus = result.status === 'failed' && saved.session?.report?.outcome === 'insufficient' ? 'Не удалось отправить письмо.' : EMAIL_STATUS[result.status] || 'Запрос на отправку принят.'; }),
       onDownload: () => action(download), onRetry: () => action(retry), onRestart: () => action(restart),
       onClose() { visible = false; clearTimeout(pollTimer); persist(); },
     });

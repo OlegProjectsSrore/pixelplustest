@@ -10,7 +10,8 @@ export interface SmtpSocket {
 }
 export type SmtpConnect = (address: { hostname: string; port: number }, options: { secureTransport: "on" | "starttls" }) => SmtpSocket;
 export interface SmtpConfig { hostname: string; username: string; password: string; from: string; clientHostname: string; port?: 465 | 587; timeoutMs?: number }
-export interface ReportMail { to: string; reportId: string; pdf: ArrayBuffer; downloadUrl: string; now: number }
+/** The PDF with its download link, or — when the visitor gave too little information — only the notice text. */
+export type ReportMail = { to: string; reportId: string; now: number } & ({ pdf: ArrayBuffer; downloadUrl: string; notice?: undefined } | { notice: string; pdf?: undefined; downloadUrl?: undefined });
 export type MailOutcome = { status: "sent" | "failed" | "unknown"; error?: string };
 export interface MailTransport { send(message: ReportMail): Promise<MailOutcome> }
 
@@ -33,16 +34,18 @@ function wrap64(encoded: string): string { return encoded.match(/.{1,76}/g)?.joi
 export function buildMime(config: Pick<SmtpConfig, "from" | "clientHostname">, message: ReportMail): string {
   if (!validateMailbox(config.from) || !validateMailbox(message.to)) throw new Error("SMTP_INVALID_ADDRESS");
   if (!/^[a-zA-Z0-9.-]+$/.test(config.clientHostname)) throw new Error("SMTP_INVALID_CLIENT_HOSTNAME");
+  const headers = [`From: <${config.from}>`, `To: <${message.to}>`, `Subject: =?UTF-8?B?${encodeText("ПРЕДВАРИТЕЛЬНЫЙ АУДИТ")}?=`,
+    `Date: ${new Date(message.now).toUTCString()}`, `Message-ID: <${crypto.randomUUID()}@${config.clientHostname}>`, "MIME-Version: 1.0"];
+  if (message.notice !== undefined) {
+    if (!message.notice.trim()) throw new Error("SMTP_EMPTY_NOTICE");
+    return [...headers, 'Content-Type: text/plain; charset="UTF-8"', "Content-Transfer-Encoding: base64", "", wrap64(encodeText(message.notice)), ""].join("\r\n");
+  }
   const url = new URL(message.downloadUrl);
   if (url.protocol !== "https:") throw new Error("SMTP_INVALID_REPORT_URL");
   const boundary = `pixelplus-${crypto.randomUUID()}`;
   const body = `Ваш предварительный аудит приложен к письму.\nСкачать отчёт: ${url.href}\nСсылка действует в пределах срока хранения отчёта.\nЭто предварительный аудит по предоставленным вами сведениям.`;
   return [
-    `From: <${config.from}>`, `To: <${message.to}>`,
-    `Subject: =?UTF-8?B?${encodeText("ПРЕДВАРИТЕЛЬНЫЙ АУДИТ")}?=`,
-    `Date: ${new Date(message.now).toUTCString()}`,
-    `Message-ID: <${crypto.randomUUID()}@${config.clientHostname}>`,
-    "MIME-Version: 1.0", `Content-Type: multipart/mixed; boundary="${boundary}"`, "",
+    ...headers, `Content-Type: multipart/mixed; boundary="${boundary}"`, "",
     `--${boundary}`, 'Content-Type: text/plain; charset="UTF-8"', "Content-Transfer-Encoding: base64", "", wrap64(encodeText(body)),
     `--${boundary}`, 'Content-Type: application/pdf; name="preliminary-audit.pdf"', "Content-Transfer-Encoding: base64",
     'Content-Disposition: attachment; filename="preliminary-audit.pdf"', "", wrap64(base64(new Uint8Array(message.pdf))), `--${boundary}--`, "",

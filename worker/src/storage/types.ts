@@ -25,23 +25,28 @@ export interface ReportRecord {
   templateVersion: string | null; contentHash: string | null; pdfHash: string | null; status: SessionStatus; kvKey: string | null;
   prepareDeadline: number | null; reportExpiresAt: number | null; publishedAt: number | null;
   failedAt: number | null; errorCode: string | null; createdAt: number; updatedAt: number;
+  /** null before the check existed; 'insufficient' means a notice instead of the PDF. review: the verdict and reasons for the team. */
+  outcome: ReportOutcome | null; review: Json | null;
 }
+export type ReportOutcome = 'report' | 'insufficient';
 export type JobStage = 'reconcile' | 'analyze' | 'render';
 export type JobState = 'pending' | 'running' | 'retry_wait' | 'done' | 'failed';
 export interface AuditJob {
   id: string; sessionId: string; reportId: string; reportVersion: number; stage: JobStage; state: JobState;
-  attempts: Record<JobStage, number>; nextAttemptAt: number; leaseToken: string | null;
+  /** review counts calls of the information check, which retry within the analyze stage. */
+  attempts: Record<JobStage, number> & { review?: number }; nextAttemptAt: number; leaseToken: string | null;
   leaseExpiresAt: number | null; errorCode: string | null; createdAt: number; updatedAt: number;
 }
 export interface ReportPatch {
   snapshotId?: string; result?: AuditResult; content?: Json; rulesVersion?: string; tariffsVersion?: string;
   templateVersion?: string; contentHash?: string; pdfHash?: string; status?: SessionStatus; kvKey?: string;
   reportExpiresAt?: number; publishedAt?: number; failedAt?: number; errorCode?: string | null;
+  outcome?: ReportOutcome; review?: Json;
 }
 export interface CheckpointInput {
   stage?: JobStage; state?: JobState; nextAttemptAt?: number; errorCode?: string | null;
   reportPatch?: ReportPatch; snapshot?: { data: AuditSnapshot; hash: string };
-  sessionState?: AuditState; incrementAttempt?: JobStage; leaseMs?: number;
+  sessionState?: AuditState; incrementAttempt?: JobStage | 'review'; leaseMs?: number;
   expectedSessionRevision?: number;
 }
 export type EmailStatus = 'pending' | 'sending' | 'sent' | 'unknown' | 'failed';

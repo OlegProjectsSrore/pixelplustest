@@ -25,6 +25,35 @@ const introduction = () => [
   answer('context.company_size', '50 сотрудников', 'intro-size'),
 ];
 
+test('a key question without a usable answer is asked again with its reason, at most twice; other questions move on', () => {
+  const rules = library.scenario.required_for_report!;
+  assert.equal(rules.max_reasks, 2);
+  const keys = library.questions.filter(question => question.required_for_report);
+  assert.equal(keys.length, 315);
+  assert.deepEqual(['context_business', 'context_goal', 'context_priority'].map(id => library.questions.find(question => question.id === id)!.required_for_report), ['business', 'goal', 'topics']);
+  assert.equal(library.questions.find(question => question.id === 'context_name')!.required_for_report, undefined);
+  const uncertain = (fact: string, state: AuditAnswer['state'], id: string): AuditAnswer => ({ ...answer(fact, null, id), state });
+  let answers = [...introduction()];
+  let state = advanceAudit(initialAuditState(library.version, 'chat', now), answers, now, library);
+  assert.equal(state.current_question_id, 'context_business');
+  const replies: AuditAnswer['state'][] = ['unknown', 'declined', 'unknown'];
+  for (const [index, reply] of replies.entries()) {
+    answers = [...answers, uncertain('context.business', reply, `business-${index}`)];
+    state = advanceAudit(state, answers, now, library);
+    const question = nextQuestion(state, now, library);
+    // «Don't know» then a refusal is not a contradiction: the visitor simply has not answered yet.
+    assert.deepEqual(state.contradictions, []);
+    if (index < 2) assert.deepEqual([question?.id, question?.reask], ['context_business', { attempt: index + 1, reason: rules.reasons.business }]);
+    else assert.ok(question && question.id !== 'context_business' && !question.reask, 'after two re-asks the survey moves on');
+  }
+  // A real answer ends the re-asks at once.
+  const answered = advanceAudit(state, [...introduction(), uncertain('context.business', 'unknown', 'b1'), answer('context.business', 'Продаём мебель на заказ', 'b2')], now, library);
+  assert.notEqual(nextQuestion(answered, now, library)?.id, 'context_business');
+  // A question that is not key moves on after «don't know».
+  const assets = advanceAudit({ ...answered, current_question_id: 'context_assets' }, [...introduction(), answer('context.business', 'Мебель', 'b3'), uncertain('context.assets', 'unknown', 'a1')], now, library);
+  assert.notEqual(nextQuestion({ ...assets, current_question_id: 'context_assets' }, now, library)?.id, 'context_assets');
+});
+
 test('mandatory introduction has the same order and saved progress across repeated channel switches', () => {
   const expected = [
     ['context_name', 'Как Вас зовут?'],
@@ -236,7 +265,7 @@ test('approved rules separate sufficiency from significance and open repeated wo
   assert.equal(result.situations[0].evidence_status, 'supported');
   assert.equal(result.situations[0].significance.level, 'unknown');
   // No history yet: the «unknown» path restores it first; the history stays among the gaps.
-  assert.deepEqual(result.solutions[0].prior_attempts, { result: 'unknown', intro: 'О прошлых работах по этой теме сведений нет. Начнём с их восстановления.' });
+  assert.deepEqual(result.solutions[0].prior_attempts, { result: 'unknown', intro: 'Перед новыми работами восстановим, что уже делалось по этой теме.' });
   assert.deepEqual(result.actions.slice(0, 2).map(action => [action.text, action.after]), [
     ['Восстановить сведения о прошлых работах по теме: что делали, с каким результатом и почему остановили', []],
     [lib.solutions.find(block => block.id === 'strategy_goal')!.solution.steps[0].text, ['strategy.history:unknown:1']]]);

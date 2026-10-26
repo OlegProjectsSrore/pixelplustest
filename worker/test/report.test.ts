@@ -52,16 +52,17 @@ test("PDF content shows evidence-matched tariff alternatives with prices, scope 
     state: initialAuditState(library.version, 'chat', date), limitations: [] };
   const html = buildReportContent(analyzeAudit(snapshot, library), snapshot, library).html;
   assert.match(html, /Предварительные тарифные варианты/);
-  assert.match(html, /Конкретный пакет, объём и итоговая стоимость требуют уточнения/);
+  assert.match(html, /Это не индивидуальная смета: пакет, объём и итоговая стоимость определяются при подготовке коммерческого предложения/);
   assert.match(html, /Арифметика — разовая настройка/);
   assert.match(html, /14[\u00a0\u202f ]000 ₽/);
   assert.match(html, /от 60[\u00a0\u202f ]000 ₽/);
   assert.match(html, /Источник проверен: 2026-10-22/);
   assert.match(html, /Что входит/);
   assert.ok(html.indexOf('class="report-cover"') < html.indexOf('Предварительные тарифные варианты'));
-  // A range is shown as a range; an unstated VAT is said plainly, not attributed to the source.
+  // A range is shown as a range.
   assert.match(html, /3[   ]000 ₽–9[   ]500 ₽/);
-  assert.match(html, /НДС на странице не указан.</);
+  // VAT is mentioned only where the page states it; an unstated VAT is not a line in the report.
+  assert.doesNotMatch(html, /НДС на странице не указан|Что требует уточнения/);
 });
 
 test("PDF opens repeated work with the approved path and tells the earlier work in the visitor's words", () => {
@@ -77,7 +78,8 @@ test("PDF opens repeated work with the approved path and tells the earlier work 
   const path = library.priorAttemptPaths.items.find(item => item.id === 'no_result')!;
   assert.ok(html.includes(`<p>${path.intro}</p>`));
   assert.ok(html.indexOf(path.steps[0]) < html.indexOf(library.solutions.find(block => block.id === 'analytics_sales')!.solution.steps[0].text));
-  assert.match(html, /что делали — Подключали сквозную аналитику; когда и как долго — Весной, три месяца; как оценивали — не измерялось/);
+  assert.match(html, /что делали — Подключали сквозную аналитику; когда и как долго — Весной, три месяца</);
+  assert.doesNotMatch(html, /не измерялось/);
   assert.doesNotMatch(html, /attempt_id|attempts_status|attempt-1/);
 });
 
@@ -98,6 +100,27 @@ test("every price is shown: no period caveat, no «individual» and no «price i
     shown += result.tariffs.length;
   }
   assert.ok(shown >= library.solutions.length);
+});
+
+test("the report never says «unknown», «not stated» or «needs clarification», whatever the visitor left unanswered", () => {
+  const answer = (id: string, fact: string, value: AuditAnswer['value'], state: AuditAnswer['state'] = 'known'): AuditAnswer => ({ id, question_id: library.questions.find(question => question.fact_ids.includes(fact))!.id, fact_id: fact,
+    state, value: state === 'known' ? value : null, event_ids: ['visitor-1'], channel: 'chat', method: 'classification', confirmation: 'explicit', library_version: library.version, created_at: date });
+  // Lines about missing answers. Problem names from the library («Неизвестны причины ухода клиентов») are findings, not missing data.
+  const forbidden = /(?<!\p{L})неизвестно(?!\p{L})|(?<!\p{L})не указан[оаы]?(?!\p{L})|нет сведений|сведений нет|не измерялось|требу\S* уточнения|уточняются перед|недостаточно сведений|не выяснено|ответ не предоставлен|противоречивые сведения|не применимо|подробности не сообщены|Отложено:|Требует проверки|Значимость|Недостающие сведения|Стоимость уточняется/iu;
+  const histories: AuditAnswer['value'][] = [{ attempts_status: 'not_tried', attempts: [] }, ...library.priorAttemptPaths.items.map(path => ({ attempts_status: 'tried', ...(path.id === 'unknown' ? {} : { result: path.id }),
+    attempts: [{ attempt_id: 'attempt-1', work: { state: 'known', value: 'Работы' }, outcome: { state: 'unknown', value: null }, measurement: { state: 'not_measured', value: null } }] }))];
+  for (const block of library.solutions) for (const [index, history] of histories.entries()) {
+    const details = library.facts.find(fact => fact.id === `${block.id}.details`)!;
+    const value = Object.fromEntries((details.required_fields ?? []).map(field => [field, { state: 'known', value: 'Пример' }]));
+    // Unanswered introduction and context questions, a declined impact and another topic's unknown signal stay out of the PDF.
+    const snapshot: AuditSnapshot = { id: `snap-${block.id}-${index}`, session_id: 'session', library_version: library.version, created_at: date, through_seq: 1,
+      answers: [answer('n', 'context.name', null, 'declined'), answer('g', 'context.goal', null, 'unknown'), answer('i', `${block.domain}.impact`, null, 'declined'),
+        answer('a1', `${block.domain}.applicable`, true), answer('a2', `${block.id}.signal`, 'target'), answer('a3', `${block.id}.details`, value), answer('a4', `${block.domain}.history`, history),
+        ...library.solutions.filter(other => other.domain === block.domain && other.id !== block.id).slice(0, 1).map(other => answer('o', `${other.id}.signal`, null, 'unknown'))],
+      state: initialAuditState(library.version, 'chat', date), limitations: ['История разговора могла поступить не полностью.'] };
+    const html = buildReportContent(analyzeAudit(snapshot, library), snapshot, library).html.replace(/<style>[\s\S]*?<\/style>|data:[^"')]+/g, '');
+    assert.doesNotMatch(html, forbidden, `${block.id} / ${index}: ${html.match(forbidden)?.[0]}`);
+  }
 });
 
 test("KV cache misses only return waiting and never invoke rendering; expired report returns 410", async () => {

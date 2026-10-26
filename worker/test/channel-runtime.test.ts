@@ -382,3 +382,27 @@ test('a new attempt ID is offered only for the first attempt or when the questio
   assert.deepEqual(ids(null)['strategy.history'], ['saved-1']);
   assert.deepEqual(ids('strategy_history_2')['seo.history'], ['op:seo.history:1']);
 });
+
+test("chat: «don't know» to a key question brings the same question back with the reason it is needed for the report", async () => {
+  const unknown = (context: ClassifierContext): Classification => {
+    const source = context.source_events[0];
+    return { ...intent('answer'), answers: [{ question_id: 'context_business', fact_id: 'context.business', state: 'unknown', value: null, event_ids: [source.id], evidence: [{ event_id: source.id, text: source.text! }] }] };
+  };
+  const f = await fixture(unknown);
+  try {
+    // The introduction is done; the current question is what the company sells.
+    const intro: [string, string][] = [['context.name', 'Олег'], ['context.position', 'Директор'], ['context.responsibilities', 'Продажи'], ['context.company_size', '50 сотрудников']];
+    const answers = intro.map(([fact, value], index) => ({ id: `intro-${index}`, question_id: library.questions.find(question => question.fact_ids.includes(fact))!.id, fact_id: fact, state: 'known' as const, value,
+      event_ids: ['seed'], channel: 'chat' as const, method: 'classification' as const, confirmation: 'explicit' as const, library_version: library.version, created_at: now }));
+    for (const [index, answer] of answers.entries()) f.db.sqlite.prepare('INSERT INTO audit_answers(id,session_id,question_id,status,answer_json,library_version,event_seq,created_at) VALUES(?,?,?,?,?,?,?,?)')
+      .run(answer.id, f.session.id, answer.question_id, 'accepted', JSON.stringify(answer), library.version, index, now);
+    const state = advanceAudit(f.session.state, answers, now, library, { allowDraft: true });
+    assert.equal(state.current_question_id, 'context_business');
+    f.db.sqlite.prepare('UPDATE audit_sessions SET state_json=? WHERE id=?').run(JSON.stringify(state), f.session.id);
+    const response = await f.handler(f.request, f.context(f.body('turn-business', 0, { kind: 'text', text: 'Не знаю' }, 'context_business'))) as { operation: { text: string; question_id: string } };
+    assert.equal(response.operation.question_id, 'context_business');
+    assert.equal(response.operation.text, library.scenario.required_for_report!.reasons.business);
+    const session = await f.core.store.requireSession(f.session.id);
+    assert.deepEqual((await f.core.view(session) as { question: { reask: unknown } }).question.reask, { attempt: 1, reason: library.scenario.required_for_report!.reasons.business });
+  } finally { f.db.close(); }
+});

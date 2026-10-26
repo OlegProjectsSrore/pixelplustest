@@ -10,7 +10,9 @@ import { requestEmail, runOneJob } from './report/pipeline.ts';
 import { SmtpTransport, validateMailbox } from './report/smtp.ts';
 import { presentPayload, sessionView } from './http-view.ts';
 import { normalizeVoiceAnswers } from './channel-voice.ts';
-import { composeFirstQuestion } from './channel-runtime.ts';
+import { composeFirstQuestion, createChatRuntime } from './channel-runtime.ts';
+import { reviewReport } from './report/review.ts';
+import type { AdapterContext } from './integration.ts';
 import { parseVoiceAnswerPayload } from './voice/client-tools.ts';
 import type { AuditAnswer } from './audit/contracts.ts';
 
@@ -31,7 +33,9 @@ async function pipeline(core: CoreServices, adapters: ChannelAdapters) {
       from: env.SMTP_FROM, clientHostname: new URL(env.PUBLIC_WORKER_URL).hostname, port: env.SMTP_PORT === '587' ? 587 : 465 }, (address, settings) => connect(address, { ...settings, allowHalfOpen: false }));
   }
   return runOneJob({ store: core.store, kv: env.REPORTS_KV, browser: env.BROWSER, budgets: budgets(env),
-    publicWorkerUrl: env.PUBLIC_WORKER_URL ?? '', smtp, reconcile: adapters.reconcile ? (session, now) => adapters.reconcile!(session, now, core) : undefined, now: core.now, allowDraft: core.engineOptions.allowDraft });
+    publicWorkerUrl: env.PUBLIC_WORKER_URL ?? '', smtp, reconcile: adapters.reconcile ? (session, now) => adapters.reconcile!(session, now, core) : undefined, now: core.now, allowDraft: core.engineOptions.allowDraft,
+    // DeepSeek V4 Pro checks the information before the PDF; each try is metered like a chat call.
+    review: env.DEEPSEEK_API_KEY ? async (session, input, attempt) => reviewReport(input, { ...await createChatRuntime({ core, env } as AdapterContext, session, `report-review:${session.reportId}`, attempt), max_tokens: 800, timeout_ms: 35_000 }) : undefined });
 }
 export function createWorker(adapters: ChannelAdapters = channelAdapters, options: { now?: () => number; fetcher?: typeof fetch } = {}) {
   return {

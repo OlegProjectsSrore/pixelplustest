@@ -167,8 +167,12 @@ export function deriveFacts(answers: AuditAnswer[], lib: AuditLibrary = library)
         conflicted = false;
       } catch { conflicted = true; }
     }
-    const explicit = group.every(answer => answer.confirmation === 'explicit') || (variants.size === 1 && group.some(answer => answer.confirmation === 'explicit'));
-    facts[factId] = { fact_id: factId, state: conflicted ? 'conflicting' : first.state, value: conflicted ? null : merged, answer_ids: group.map(answer => answer.id), confirmation: conflicted ? 'disputed' : explicit ? 'explicit' : 'unconfirmed', ...(first.parameters && !conflicted ? { parameters: first.parameters } : {}) };
+    // «Don't know», a refusal and an unclear answer to the same question are not a contradiction: the latest one stands.
+    const uncertainOnly = group.every(answer => UNCERTAIN.includes(answer.state) && answer.confirmation !== 'disputed');
+    if (uncertainOnly) conflicted = false;
+    const shown = uncertainOnly ? group[group.length - 1]! : first;
+    const explicit = group.every(answer => answer.confirmation === 'explicit') || ((variants.size === 1 || uncertainOnly) && group.some(answer => answer.confirmation === 'explicit'));
+    facts[factId] = { fact_id: factId, state: conflicted ? 'conflicting' : shown.state, value: conflicted ? null : uncertainOnly ? null : merged, answer_ids: group.map(answer => answer.id), confirmation: conflicted ? 'disputed' : explicit ? 'explicit' : 'unconfirmed', ...(shown.parameters && !conflicted ? { parameters: shown.parameters } : {}) };
     if (conflicted) contradictions.push({ fact_id: factId, answer_ids: group.map(answer => answer.id), reason: 'Сведения не согласованы явным исправлением; последнее сообщение не имеет приоритета.' });
   }
   return { facts, contradictions };
@@ -225,6 +229,12 @@ export function nextQuestion(state: AuditState, now: number, lib: AuditLibrary =
     .map(id => lib.questions.find(question => question.id === id))
     .find(question => question && permitted(question, options) && needsQuestion(question, state, lib));
   if (mandatory) return { id: mandatory.id, text: mandatory[state.active_channel], fact_ids: mandatory.fact_ids, options: [] };
+  // A key question just answered with «don't know», a refusal or an unclear answer is asked again with its reason, a bounded number of times.
+  const rules = lib.scenario.required_for_report, previous = lib.questions.find(question => question.id === state.current_question_id);
+  if (rules && previous?.required_for_report && permitted(previous, options) && elapsed < lib.scenario.clock.closing_from * 1000 && elapsed + previous.estimated_seconds * 1000 <= INTERVIEW_BUDGET_MS) {
+    const attempt = keyAnswerMissing(previous, state, lib);
+    if (attempt > 0 && attempt <= rules.max_reasks) return { ...questionView(previous, state, lib), reask: { attempt, reason: rules.reasons[previous.required_for_report]! } };
+  }
   const activeBlocks = candidates(state, lib, options), domains = new Set(activeBlocks.map(block => block.domain));
   const priority = state.facts['context.priority'];
   const namedTopics = known(priority) && Array.isArray(priority.value) ? priority.value.filter((value): value is string => typeof value === 'string') : [];
@@ -257,8 +267,25 @@ export function nextQuestion(state: AuditState, now: number, lib: AuditLibrary =
     selected = weighted[0]?.question;
   }
   if (!selected) return null;
-  const optionsForQuestion = selected.id === 'context_priority' ? lib.domains.map(domain => ({ id: domain.id, text: domain.title })) : selected.fact_ids.flatMap(id => lib.facts.find(fact => fact.id === id)?.values?.map(value => ({ id: value.id, text: value.label })) ?? []);
-  return { id: selected.id, text: unresolved ? `Уточните противоречащие друг другу сведения. ${selected[state.active_channel]}` : ambiguous ? `Пожалуйста, уточните, верно ли записаны сведения. ${selected[state.active_channel]}` : selected[state.active_channel], fact_ids: selected.fact_ids, options: optionsForQuestion };
+  return questionView(selected, state, lib, unresolved ? 'Уточните противоречащие друг другу сведения. ' : ambiguous ? 'Пожалуйста, уточните, верно ли записаны сведения. ' : '');
+}
+function questionView(question: Question, state: AuditState, lib: AuditLibrary, prefix = ''): QuestionView {
+  const options = question.id === 'context_priority' ? lib.domains.map(domain => ({ id: domain.id, text: domain.title })) : question.fact_ids.flatMap(id => lib.facts.find(fact => fact.id === id)?.values?.map(value => ({ id: value.id, text: value.label })) ?? []);
+  return { id: question.id, text: prefix + question[state.active_channel], fact_ids: question.fact_ids, options };
+}
+const UNCERTAIN = ['unknown', 'declined', 'ambiguous'];
+/** For a key question: how many answers so far gave nothing usable — «don't know», a refusal, an unclear answer or a missing part of a description; 0 once answered. */
+function keyAnswerMissing(question: Question, state: AuditState, lib: AuditLibrary): number {
+  let missing = 0;
+  for (const id of question.fact_ids) {
+    const fact = state.facts[id];
+    if (!fact) continue;
+    const value = isRecord(fact.value) ? fact.value : null, required = lib.facts.find(item => item.id === id)?.required_fields ?? [];
+    const empty = UNCERTAIN.includes(fact.state) || (fact.state === 'known' && value !== null &&
+      ((id.endsWith('.history') && ['unknown', 'declined'].includes(String(value.attempts_status))) || required.some(field => isRecord(value[field]) && UNCERTAIN.includes(String(value[field].state)))));
+    if (empty) missing = Math.max(missing, fact.answer_ids.length);
+  }
+  return missing;
 }
 
 export function advanceAudit(state: AuditState, answers: AuditAnswer[], now: number, lib: AuditLibrary = library, options: EngineOptions = {}): AuditState {

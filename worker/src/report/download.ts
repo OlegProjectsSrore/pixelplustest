@@ -1,5 +1,6 @@
 import type { ReportRecord } from "../storage/types.ts";
 import { sha256, withTimeout } from "./pdf.ts";
+import { INSUFFICIENT_NOTICE } from "./review.ts";
 
 export interface ReportKv {
   get(key: string, type: "arrayBuffer"): Promise<ArrayBuffer | null>;
@@ -24,6 +25,9 @@ export async function getReportResponse(store: ReportReadStore, kv: ReportKv, to
   if (!report) return await store.lookupReportToken(tokenHash) ? statusResponse("expired", 410) : statusResponse("not_found", 404);
   if (report.reportExpiresAt !== null && now >= report.reportExpiresAt) return statusResponse("expired", 410);
   if (report.status === "failed") return statusResponse("failed", 503);
+  // Too little information: there is no PDF, only the notice.
+  if (report.status === "ready" && report.outcome === "insufficient") return Response.json({ status: "insufficient", message: INSUFFICIENT_NOTICE }, {
+    headers: { "Cache-Control": "no-store", "Referrer-Policy": "no-referrer" } });
   if (report.status !== "ready" || !report.kvKey) return statusResponse(report.status, 202, 10);
   try {
     const pdf = await withTimeout(kv.get(report.kvKey, "arrayBuffer"), 5000, "KV_READ_TIMEOUT");

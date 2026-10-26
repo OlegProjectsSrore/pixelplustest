@@ -7,11 +7,17 @@ import { library } from "../src/audit/library.ts";
 import { requestEmail, runOneJob } from "../src/report/pipeline.ts";
 import type { PipelineDependencies } from "../src/report/pipeline.ts";
 import { sha256 } from "../src/report/pdf.ts";
+import { getReportResponse } from "../src/report/download.ts";
+import { INSUFFICIENT_NOTICE } from "../src/report/review.ts";
+import { buildMime } from "../src/report/smtp.ts";
 
 const start = Date.parse("2026-10-22T12:00:00Z");
 const pdf = new TextEncoder().encode("%PDF-1.7\nfixture").buffer as ArrayBuffer;
 
-async function fixture(channel: "chat" | "voice" = "chat") {
+// One confirmed problem with a price: the analytics answers that pass the code minimum of the information check.
+const confirmedAnswers: [string, unknown][] = [["analytics.applicable", true], ["analytics_sales.signal", "target"],
+  ["analytics_sales.details", { description: { state: "known", value: "Продажи из CRM не связаны с рекламными источниками" } }], ["analytics.history", { attempts_status: "not_tried", attempts: [] }]];
+async function fixture(channel: "chat" | "voice" = "chat", answers = confirmedAnswers) {
   const db = new SqliteD1(); const store = new D1Store(db.binding());
   let now = start;
   let renders = 0;
@@ -19,6 +25,12 @@ async function fixture(channel: "chat" | "voice" = "chat") {
   const expirations: number[] = [];
   const state = initialAuditState(library.version, channel, now);
   await store.createSession({ id: "session", reportId: "report", tokenHash: "management-hash", reportTokenHash: await sha256("a".repeat(64)), state, now });
+  for (const [index, [factId, value]] of answers.entries()) {
+    const answer = { id: `answer-${index}`, question_id: library.questions.find(question => question.fact_ids.includes(factId))!.id, fact_id: factId, state: "known", value,
+      event_ids: ["visitor-1"], channel, method: "classification", confirmation: "explicit", library_version: library.version, created_at: now };
+    db.sqlite.prepare("INSERT INTO audit_answers(id,session_id,question_id,status,answer_json,library_version,event_seq,created_at) VALUES(?,?,?,?,?,?,?,?)")
+      .run(answer.id, "session", answer.question_id, "accepted", JSON.stringify(answer), library.version, index, now);
+  }
   const result = await store.finish({ sessionId: "session", expectedRevision: 0, channelRevision: 0, operationId: "finish", now,
     reason: "user_requested", state, event: { id: "finish-event", source: "system", source_key: "finish", source_revision: 1,
       local_order: 0, role: "system", kind: "finish", occurred_at: now, received_at: now, data: { last_event_seq: 0 } } });
@@ -239,7 +251,7 @@ test("duplicate email request has one delivery; accepted job survives management
     const first = await requestEmail(request); const duplicate = await requestEmail(request);
     assert.equal(duplicate.id, first.id); assert.equal(duplicate.duplicate, true);
     let sent = 0;
-    f.dependencies.smtp = { send: async message => { sent++; assert.ok(message.downloadUrl.startsWith("https://audit.example.com/api/report/")); assert.notEqual(message.downloadUrl.split("/").at(-1), "a".repeat(64)); return { status: "sent" }; } };
+    f.dependencies.smtp = { send: async message => { sent++; assert.ok(message.downloadUrl?.startsWith("https://audit.example.com/api/report/")); assert.notEqual(message.downloadUrl?.split("/").at(-1), "a".repeat(64)); return { status: "sent" }; } };
     f.setNow(start + 25 * 60 * 60 * 1000);
     await runOneJob(f.dependencies); await runOneJob(f.dependencies);
     assert.equal(sent, 1); assert.equal((await f.store.getEmail(first.id!))!.status, "sent");
@@ -261,4 +273,58 @@ test("KV miss delays email; SMTP unknown is terminal and is never automatically 
     assert.equal(sent, 1); assert.equal((await f.store.getEmail(request.id!))!.status, "unknown");
     assert.equal(f.renders, 1);
   } finally { f.db.close(); }
+});
+
+test("too little information: no PDF, the notice on the site and in an e-mail without attachment", async () => {
+  const f = await fixture("chat", []);
+  try {
+    await runOneJob(f.dependencies); await runOneJob(f.dependencies);
+    const report = (await f.store.getReport("report"))!;
+    // The code minimum stops the report before any model call.
+    assert.equal(report.status, "ready"); assert.equal(report.outcome, "insufficient"); assert.equal(report.kvKey, null); assert.equal(report.content, null);
+    assert.equal((report.review as Record<string, unknown>).by, "code"); assert.equal(f.renders, 0); assert.equal(f.files.size, 0);
+    assert.equal((await f.store.requireSession("session")).state.status, "ready");
+    assert.equal((await runOneJob(f.dependencies)).kind, "idle");
+    const response = await getReportResponse(f.store, f.dependencies.kv, "a".repeat(64), start);
+    assert.deepEqual(await response.json(), { status: "insufficient", message: INSUFFICIENT_NOTICE });
+    const mails: unknown[] = [];
+    f.dependencies.smtp = { send: async message => { mails.push(message); return { status: "sent" }; } };
+    const email = await requestEmail({ store: f.store, sessionId: "session", operationId: "notice", recipient: "person@example.com", consent: { accepted: true, version: "v1" }, now: start });
+    await runOneJob(f.dependencies);
+    assert.deepEqual(mails, [{ to: "person@example.com", reportId: "report", notice: INSUFFICIENT_NOTICE, now: start }]);
+    assert.equal((await f.store.getEmail(email.id!))!.status, "sent");
+    const mime = buildMime({ from: "audit@example.com", clientHostname: "audit.example.com" }, { to: "person@example.com", reportId: "report", notice: INSUFFICIENT_NOTICE, now: start });
+    assert.doesNotMatch(mime, /application\/pdf|multipart/);
+    assert.ok(mime.includes(btoa(String.fromCharCode(...new TextEncoder().encode(INSUFFICIENT_NOTICE))).slice(0, 60)));
+  } finally { f.db.close(); }
+});
+
+test("DeepSeek V4 Pro may stop the report; a failed check is retried, then the code minimum decides", async () => {
+  const stopped = await fixture();
+  try {
+    const inputs: unknown[] = [];
+    stopped.dependencies.review = async (_session, input) => { inputs.push(input); return { verdict: "insufficient", reasons: ["Описание проблемы слишком общее."] }; };
+    await runOneJob(stopped.dependencies); await runOneJob(stopped.dependencies);
+    const report = (await stopped.store.getReport("report"))!;
+    assert.equal(report.outcome, "insufficient"); assert.equal(stopped.renders, 0);
+    assert.deepEqual(report.review, { verdict: "insufficient", reasons: ["Описание проблемы слишком общее."], by: "deepseek-v4-pro" });
+    // The check sees the visitor's answers with their questions and the draft, never the library rules.
+    const input = inputs[0] as { answers: { question: string; value: unknown; key_for_report: boolean }[]; draft: { problems: { title: string; steps: string[] }[]; price_options: unknown[] } };
+    assert.ok(input.answers.some(item => item.value && JSON.stringify(item.value).includes("Продажи из CRM") && item.key_for_report));
+    assert.ok(input.draft.problems.length === 1 && input.draft.problems[0].steps.length >= 4 && input.draft.price_options.length > 0);
+  } finally { stopped.db.close(); }
+  const failing = await fixture();
+  try {
+    let calls = 0;
+    failing.dependencies.review = async () => { calls++; return null; };
+    await runOneJob(failing.dependencies); await runOneJob(failing.dependencies);
+    const job = failing.db.sqlite.prepare("SELECT state, attempts_json, next_attempt_at FROM audit_jobs").get() as { state: string; attempts_json: string; next_attempt_at: number };
+    assert.equal(job.state, "retry_wait"); assert.equal(JSON.parse(job.attempts_json).review, 1); assert.equal(job.next_attempt_at, start + 3 * 60_000);
+    for (let attempt = 1; attempt < 10; attempt++) { failing.setNow(start + attempt * 3 * 60_000); await runOneJob(failing.dependencies); }
+    assert.equal(calls, 10);
+    const analysed = (await failing.store.getReport("report"))!;
+    assert.equal(analysed.outcome, "report"); assert.equal((analysed.review as Record<string, unknown>).by, "code_after_review_failure");
+    await runOneJob(failing.dependencies);
+    assert.equal((await failing.store.getReport("report"))!.status, "ready"); assert.equal(failing.renders, 1);
+  } finally { failing.db.close(); }
 });

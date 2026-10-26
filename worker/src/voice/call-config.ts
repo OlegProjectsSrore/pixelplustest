@@ -2,7 +2,7 @@ import type { UltravoxCallRequest, VoiceCallConfig } from './types.ts';
 import { createInterviewTools } from './client-tools.ts';
 import { callId, nonempty, remainingSeconds } from './validation.ts';
 
-export const CLOSING_MESSAGE = 'Спасибо за предоставленную информацию, сейчас вам предоставим отчёт предварительного аудита.';
+export const CLOSING_MESSAGE = 'Спасибо за предоставленную информацию, сейчас подготовим результат предварительного аудита.';
 const NIKOLAI_VOICE_ID = '83b2a94f-8078-4321-935c-a0798b2ac621';
 
 /** Only assembles provider configuration; authorization and account selection belong to the caller. */

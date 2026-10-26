@@ -11,7 +11,7 @@ const PHASE_TEXT = {
   interview: 'Ответьте на вопрос — это поможет подготовить предварительный аудит.',
   paused: 'Опрос на паузе. Можно продолжить, когда будете готовы.',
   closing: 'Завершаем сбор информации…',
-  preparing: 'Спасибо за предоставленную информацию, сейчас вам предоставим отчёт предварительного аудита.',
+  preparing: 'Спасибо за предоставленную информацию, сейчас подготовим результат предварительного аудита.',
   ready: 'Ваш PDF-отчёт готов.',
   failed: 'Не удалось продолжить. Попробуйте ещё раз.',
   unavailable: 'Сейчас опрос недоступен.',
@@ -338,7 +338,7 @@ export function createAuditView(handlers = {}) {
 
     status.textContent = model.launchPending
       ? 'Аудит готовится к запуску. Начать опрос пока нельзя. Пожалуйста, зайдите позже.'
-      : PHASE_TEXT[phase] || PHASE_TEXT.unavailable;
+      : ready && typeof model.notice === 'string' ? model.notice || PHASE_TEXT.unavailable : PHASE_TEXT[phase] || PHASE_TEXT.unavailable;
     status.hidden = phase === 'interview' && !busy;
     greeting.hidden = Boolean(model.messages?.length) || completed || phase === 'failed';
     channels.hidden = completed || !['interview', 'paused', 'failed'].includes(phase);
@@ -413,6 +413,11 @@ export function createAuditView(handlers = {}) {
     updateAnswerButtons();
 
     readySection.hidden = !ready;
+    // Too little information: no PDF, the e-mail carries the notice instead.
+    const notice = ready && typeof model.notice === 'string';
+    reportLabel.hidden = notice; reportTitle.hidden = notice; downloadButton.hidden = notice;
+    emailLabel.textContent = notice ? 'Отправить ответ на почту' : 'Отправить отчёт на почту';
+    emailSubmit.textContent = notice ? 'Отправить письмо' : 'Отправить PDF';
     downloadButton.disabled = Boolean(busy);
     emailForm.hidden = !capabilities.email;
     email.disabled = busy || !capabilities.email;

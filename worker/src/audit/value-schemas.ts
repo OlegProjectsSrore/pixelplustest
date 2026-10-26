@@ -125,6 +125,8 @@ export function mergeStructuredValues(first: Json, second: Json, path = ''): Jso
   if (record(first) && record(second)) {
     if (['unknown', 'ambiguous', 'declined'].includes(String(first.state)) && second.state === 'known') return structuredClone(second) as Json;
     if (['unknown', 'ambiguous', 'declined'].includes(String(second.state)) && first.state === 'known') return structuredClone(first) as Json;
+    // «Don't know» followed by a refusal (or the other way round) is not a contradiction: the latest one stands.
+    if (uncertain(first) && uncertain(second)) return structuredClone(second) as Json;
     const merged = structuredClone(first) as Record<string, Json>;
     for (const [key, value] of Object.entries(second)) merged[key] = Object.hasOwn(merged, key) ? mergeStructuredValues(merged[key]!, value as Json, path ? `${path}.${key}` : key) : structuredClone(value) as Json;
     return merged;

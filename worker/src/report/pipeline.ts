@@ -10,6 +10,7 @@ import { randomReadToken, renderPdf, ReportFailure, sha256, withTimeout } from "
 import type { PdfBrowser } from "./pdf.ts";
 import { validateMailbox } from "./smtp.ts";
 import type { MailTransport } from "./smtp.ts";
+import { buildReviewInput, INSUFFICIENT_NOTICE, meetsMinimum, REVIEW_MODEL, type ReviewVerdict } from "./review.ts";
 
 export interface PipelineDependencies {
   store: D1Store;
@@ -20,8 +21,13 @@ export interface PipelineDependencies {
   smtp?: MailTransport;
   allowDraft?: boolean;
   reconcile?: (session: StoredSession, now: number) => Promise<{ complete: boolean; limitations: string[] }>;
+  /** The information check by DeepSeek V4 Pro; null when the call failed. Without it the code minimum decides. */
+  review?: (session: StoredSession, input: Json, attempt: number) => Promise<ReviewVerdict | null>;
   now?: () => number;
 }
+// A failed information check is retried for about half an hour; then the code minimum decides.
+const REVIEW_ATTEMPTS = 10;
+const REVIEW_RETRY_MS = 3 * 60_000;
 const LEASE_MS = 60_000;
 // Stop/status, provider history and metered extraction can each take up to 12s.
 // Leave lease time for rereading durable progress and committing the snapshot.
@@ -125,10 +131,33 @@ async function runAuditJob(dependencies: PipelineDependencies, candidate: AuditJ
       const result = analyzeAudit(snapshot, library, { allowDraft: dependencies.allowDraft });
       const content = buildReportContent(result, snapshot, library, 512_000);
       if (new TextEncoder().encode(JSON.stringify(result)).byteLength > 512_000) throw new ReportFailure("RESULT_TOO_LARGE", false);
+      // The information check: the code minimum first, then DeepSeek V4 Pro, which may only stop the report.
+      let review: ReviewVerdict & { by: string };
+      if (!meetsMinimum(result)) review = { verdict: "insufficient", reasons: ["Нет подтверждённой проблемы с порядком работ и вариантом стоимости."], by: "code" };
+      else if (!dependencies.review) review = { verdict: "sufficient", reasons: ["Проверка DeepSeek не подключена; решение по правилу кода."], by: "code" };
+      else {
+        const tries = job.attempts.review ?? 0;
+        const verdict = await dependencies.review(await store.requireSession(job.sessionId), buildReviewInput(snapshot, result, library), tries).catch(() => null);
+        if (!verdict && tries + 1 < REVIEW_ATTEMPTS) {
+          await store.checkpointJob(job.id, owner, nowOf(dependencies), { state: "retry_wait", errorCode: "REVIEW_UNAVAILABLE", nextAttemptAt: nowOf(dependencies) + REVIEW_RETRY_MS, incrementAttempt: "review" });
+          return true;
+        }
+        review = verdict ? { ...verdict, by: REVIEW_MODEL } : { verdict: "sufficient", reasons: ["DeepSeek V4 Pro не ответил за отведённое время; решение по правилу кода."], by: "code_after_review_failure" };
+      }
+      if (review.verdict === "insufficient") {
+        // No PDF: the site shows the notice and an e-mail carries it instead of the report.
+        const reportExpiresAt = report.reportExpiresAt ?? nowOf(dependencies) + REPORT_RETENTION_MS;
+        await store.checkpointJob(job.id, owner, nowOf(dependencies), { state: "done", errorCode: null, reportPatch: {
+          result, outcome: "insufficient", review: review as unknown as Json, status: "ready", reportExpiresAt, publishedAt: nowOf(dependencies), errorCode: null,
+          rulesVersion: result.rules_version, tariffsVersion: result.tariffs_version, templateVersion: result.template_version,
+        } });
+        return true;
+      }
       await store.checkpointJob(job.id, owner, nowOf(dependencies), {
         stage: "render", state: "pending", nextAttemptAt: nowOf(dependencies), reportPatch: {
           result, content: content as unknown as Json, contentHash: await sha256(JSON.stringify(content)),
           rulesVersion: result.rules_version, tariffsVersion: result.tariffs_version, templateVersion: result.template_version,
+          outcome: "report", review: review as unknown as Json,
         },
       });
       return true;
@@ -190,8 +219,19 @@ async function runEmailJob(dependencies: PipelineDependencies, candidate: EmailJ
   const reservationId = `email:${job.id}:${owner}`;
   try {
     const report = await store.getReport(job.reportId);
-    if (!report || report.status !== "ready" || !report.kvKey || !report.reportExpiresAt || report.reportExpiresAt <= nowOf(dependencies)) throw new ReportFailure("EMAIL_REPORT_UNAVAILABLE", false);
+    if (!report || report.status !== "ready" || !report.reportExpiresAt || report.reportExpiresAt <= nowOf(dependencies)) throw new ReportFailure("EMAIL_REPORT_UNAVAILABLE", false);
     if (!dependencies.smtp) throw new ReportFailure("EMAIL_NOT_CONFIGURED", false);
+    if (report.outcome === "insufficient") {
+      // Too little information: the letter carries the notice instead of the PDF and its link.
+      if (!await reserve(dependencies, "email_attempts", 1, reservationId)) throw new ReportFailure("EMAIL_BUDGET_WAIT", true, 60_000);
+      if (!await store.markEmailSending(job.id, owner, nowOf(dependencies))) { await store.settleUsage(reservationId, 0, nowOf(dependencies)); return true; }
+      smtpStarted = true;
+      const outcome = await withTimeout(dependencies.smtp.send({ to: job.recipient, reportId: report.id, notice: INSUFFICIENT_NOTICE, now: nowOf(dependencies) }), 22_000, "EMAIL_TIMEOUT");
+      await store.settleUsage(reservationId, 1, nowOf(dependencies));
+      await store.checkpointEmail(job.id, owner, nowOf(dependencies), { status: outcome.status, errorCode: outcome.error ?? null, outcome: outcome.status === "sent" ? "smtp_accepted" : outcome.status });
+      return true;
+    }
+    if (!report.kvKey) throw new ReportFailure("EMAIL_REPORT_UNAVAILABLE", false);
     const pdf = await withTimeout(dependencies.kv.get(report.kvKey, "arrayBuffer"), 5000, "KV_READ_TIMEOUT");
     if (!pdf) throw new ReportFailure("EMAIL_PDF_NOT_VISIBLE", true, 60_000);
     if (report.pdfHash && await sha256(pdf) !== report.pdfHash) throw new ReportFailure("EMAIL_PDF_HASH_MISMATCH", false);

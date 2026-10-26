@@ -68,3 +68,22 @@ test('stock openers and openings already used in the session drop the reaction b
   const [, user] = buildComposerPrompt(input({ previous_replies: ['Рады знакомству.'] }));
   assert.deepEqual(JSON.parse(user.content).previous_replies, ['Рады знакомству.']);
 });
+
+test('a re-asked key question explains why the answer is needed and may mention the report recommendations and cost of work', () => {
+  const reask = input({ visitor_text: 'Не знаю', notice_to_rephrase: 'Без Вашего примера в отчёт нельзя включить эту проблему с шагами и стоимостью работ.',
+    question: { text: 'Что именно сейчас не фиксируется?', options: [], reask: true } });
+  assert.deepEqual(checkComposed(out('Без живого примера мы не сможем включить эту проблему в отчёт с рекомендациями и стоимостью работ.', 'Можете привести хотя бы один случай, например заявку, которую не удалось отследить?'), reask),
+    { reply: 'Без живого примера мы не сможем включить эту проблему в отчёт с рекомендациями и стоимостью работ.', question_text: 'Можете привести хотя бы один случай, например заявку, которую не удалось отследить?' });
+  // Prices and advice stay forbidden; without the re-ask flag the report words are forbidden as before.
+  assert.equal(checkComposed(out('Работы стоят от 10 000 ₽.', 'Можете привести пример?'), reask), null);
+  assert.equal(checkComposed(out('Это важно для рекомендаций.', 'Можете привести пример?'), { ...reask, question: { text: 'Что именно сейчас не фиксируется?', options: [] } }), null);
+  assert.equal(checkComposed(out('', 'Можете привести пример?'), reask), null, 'the reason must be conveyed');
+  const prompt = buildComposerPrompt(reask);
+  assert.match(prompt[0].content, /Если next_question\.reask равен true, посетитель не ответил на обязательный для отчёта вопрос/);
+  assert.equal(JSON.parse(prompt[1].content).next_question.reask, true);
+});
+
+test('wording with Chinese or Korean characters goes back to the library texts', () => {
+  assert.equal(checkComposed(out('Рады знакомству.', 'Касается ли Вас эта тема, например «да, кас上一ется»?'), input()), null);
+  assert.equal(checkComposed(out('Рады 만나서 знакомству.', 'Кем Вы работаете в компании?'), input()), null);
+});

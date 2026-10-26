@@ -4,6 +4,7 @@ import { diagnosticStarted, INTERVIEW_BUDGET_MS } from './audit/contracts.ts';
 import { getLibrary } from './audit/library.ts';
 import { elapsedMs } from './storage/d1-store.ts';
 import type { ReportRecord, StoredSession } from './storage/types.ts';
+import { INSUFFICIENT_NOTICE } from './report/review.ts';
 
 function record(value: unknown): Record<string, unknown> | null {
   return value !== null && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : null;
@@ -25,8 +26,11 @@ function publicQuestion(coreQuestion: unknown, session: StoredSession): Json {
   });
   const multiple = question.id === 'context_priority' && facts.some(fact => fact.id === 'context.priority');
   const answerMode = multiple ? 'multiple' : options.length ? 'single' : facts.length === 1 && facts[0]!.value_type === 'number' ? 'number' : 'text';
+  // A key question asked again carries the re-ask number and the reason the answer is needed for the report.
+  const reask = record(question.reask);
   return { id: question.id, text: question.text, fact_ids: facts.map(fact => fact.id), answer_mode: answerMode, options,
-    can_skip: facts.length > 0 && facts.every(fact => fact.states.includes('declined') || fact.states.includes('unknown')) };
+    can_skip: facts.length > 0 && facts.every(fact => fact.states.includes('declined') || fact.states.includes('unknown')),
+    ...(reask && typeof reask.attempt === 'number' && typeof reask.reason === 'string' ? { reask: { attempt: reask.attempt, reason: reask.reason } } : {}) };
 }
 
 function publicMessage(event: AuditEvent, session: StoredSession): Json | null {
@@ -72,7 +76,9 @@ export async function sessionView(core: CoreServices, session: StoredSession, re
     ...(!readOnly ? { humor_enabled: state.humor.enabled, conversation_mode: state.mode ?? 'diagnostic', diagnostic_started: diagnosticStarted(state) } : {}),
     question: canInterview && !state.paused ? publicQuestion(publicBase?.question, session) : null,
     messages, voice: call ? { call_id: call.id, provider_call_id: call.providerCallId, status: call.status } : null,
-    report: { id: session.reportId, status: report?.status ?? state.status, expires_at: report?.reportExpiresAt ?? null },
+    // outcome 'insufficient': no PDF, the site shows the notice and the e-mail carries it.
+    report: { id: session.reportId, status: report?.status ?? state.status, expires_at: report?.reportExpiresAt ?? null, outcome: report?.outcome ?? null,
+      ...(report?.status === 'ready' && report.outcome === 'insufficient' ? { message: INSUFFICIENT_NOTICE } : {}) },
     report_id: session.reportId, report_status: report?.status ?? state.status, report_expires_at: report?.reportExpiresAt ?? null,
     retry_after_seconds: ['closing', 'preparing'].includes(status) ? 5 : null,
     capabilities: {

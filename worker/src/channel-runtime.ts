@@ -191,6 +191,8 @@ export async function commitChatTurn(request: Request, context: AdapterContext, 
   // gets an offer to help, never a survey prompt and never an empty reply.
   const offerHelp = state.mode === 'questions' && !asksKnowledge && turn.action !== 'sensitive' && (['answer', 'clarify'].includes(turn.action) || !serviceText);
   if (offerHelp) serviceText = HELP_NOTICE;
+  // A key question asked again: the visitor first hears why the answer is needed for the report.
+  if (question?.reask && !serviceText && ['answer', 'clarify'].includes(turn.action)) serviceText = question.reask.reason;
   const libraryText = serviceText;
   let questionText: string | null = null;
   // The survey question does not change after a pure question, so its earlier wording stays.
@@ -199,7 +201,7 @@ export async function commitChatTurn(request: Request, context: AdapterContext, 
     const composed = await composeTurn(context, session, turn.input.operation_id, COMPOSE_ATTEMPT, Math.min(8_000, timeLeft()), { visitor_text: turn.event.text ?? null,
       // A clarification of the current question would only repeat it; ask for a clearer answer instead.
       approved_text: approved, notice_to_rephrase: approved ? null : serviceText && serviceText === question?.text ? 'Ответ не удалось однозначно понять: попросите уточнить его.' : serviceText,
-      question: question ? { text: question.text, options: question.options.map(option => option.text) } : null, history: dialog(evidence),
+      question: question ? { text: question.text, options: question.options.map(option => option.text), ...(question.reask ? { reask: true } : {}) } : null, history: dialog(evidence),
       previous_replies: await context.core.store.recentReplies(session.id) });
     // An empty reworded reply keeps the notice it was meant to convey.
     if (composed) { questionText = composed.question_text; if (!approved) serviceText = composed.reply || serviceText; }

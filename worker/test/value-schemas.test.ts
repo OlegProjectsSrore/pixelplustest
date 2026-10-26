@@ -146,6 +146,11 @@ test('a partial detail fact remains askable until each requested field has been 
   const partial = advanceAudit(initialAuditState(lib.version, 'chat', now), [...base, first], now, lib, preview);
   assert.equal(nextQuestion(partial, now, lib, preview)?.id, q.id);
   const rest = answer('strategy_channels.details', { observation: { state: 'known', value: 'Форма не работает' }, period: { state: 'unknown', value: null } }, 'rest');
-  const complete = advanceAudit(partial, [...base, first, rest], now, lib, preview);
-  assert.equal(nextQuestion(complete, now, lib, preview), null);
+  const unclear = advanceAudit(partial, [...base, first, rest], now, lib, preview);
+  // A key description with a part the visitor does not know is asked again, with the reason; each answer counts towards the limit.
+  assert.deepEqual(nextQuestion(unclear, now, lib, preview)?.reask, { attempt: 2, reason: lib.scenario.required_for_report!.reasons.problem });
+  const period = answer('strategy_channels.details', { period: { state: 'known', value: 'С сентября' } }, 'period');
+  assert.equal(nextQuestion(advanceAudit(unclear, [...base, first, rest, period], now, lib, preview), now, lib, preview), null);
+  const stillUnknown = answer('strategy_channels.details', { period: { state: 'declined', value: null } }, 'declined');
+  assert.equal(nextQuestion(advanceAudit(unclear, [...base, first, rest, stillUnknown], now, lib, preview), now, lib, preview), null);
 });

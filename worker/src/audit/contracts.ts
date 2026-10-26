@@ -137,6 +137,8 @@ export interface QuestionView {
   text: string;
   fact_ids: string[];
   options: { id: string; text: string }[];
+  /** A key question asked again after «don't know», a refusal or an unclear answer: re-ask number and why the answer is needed. */
+  reask?: { attempt: number; reason: string };
 }
 
 export interface MutationRequest {

@@ -28,6 +28,8 @@ export interface Question extends Governed {
   fact_ids: string[]; chat: string; voice: string; phase: string; estimated_seconds: number;
   domain?: string; related_block?: string; fields?: string[]; condition?: Rule; priority?: number;
   transitions?: Record<string, string>; max_clarifications?: number;
+  /** A key question for the report: the reason id the visitor hears when the answer is missing and the question is asked again. */
+  required_for_report?: string;
 }
 export interface Solution extends Governed {
   domain: string; title: string; type: 'data_gap' | 'hypothesis' | 'opportunity' | 'reported_issue';
@@ -55,6 +57,8 @@ export interface Scenario {
   clock: { max_seconds: number; no_new_deep_branch_after: number; closing_from: number };
   phases: { id: string; next?: string; terminal?: boolean }[];
   routing: { max_clarifications_per_fact: number };
+  /** Key questions without a usable answer are asked again with the reason, at most max_reasks times. */
+  required_for_report?: { max_reasks: number; reasons: Record<string, string> };
 }
 export interface PriorAttemptPath { id: PriorAttemptResult; label: string; intro: string; steps: string[] }
 export interface PriorAttemptPaths { version: string; status: string; reviewer: string | null; approved_at: string | null; items: PriorAttemptPath[] }
@@ -211,6 +215,10 @@ export function validateLibrary(lib: AuditLibrary = library, options: { ruleChec
   }
   // Every approved problem must be able to show at least one priced option of its services.
   for (const block of lib.solutions.filter(isApproved)) if (!lib.tariffs.some(tariff => block.services.includes(tariff.service_id) && isApproved(tariff) && tariff.commercial_approval === 'approved' && pricedTariff(tariff))) errors.push(`${block.id}: no approved priced tariff for its services`);
+  // Every key question names an approved reason; re-asks are bounded so the visitor is never held on one question.
+  const required = lib.scenario.required_for_report;
+  if (required && (!Number.isInteger(required.max_reasks) || required.max_reasks < 0 || required.max_reasks > 5 || !isRecord(required.reasons) || Object.values(required.reasons).some(text => typeof text !== 'string' || !text.trim()))) errors.push('Invalid required-for-report rules');
+  for (const question of lib.questions) if (question.required_for_report !== undefined && !(required && Object.hasOwn(required.reasons, question.required_for_report))) errors.push(`${question.id}: unknown required-for-report reason`);
   // One approved path per prior-attempt result, and every history fact offers exactly these results.
   const paths = lib.priorAttemptPaths;
   if (!paths || !Array.isArray(paths.items) || paths.items.map(path => path.id).join() !== PRIOR_ATTEMPT_RESULTS.join() ||

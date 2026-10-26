@@ -510,3 +510,22 @@ test('a ready DeepSeek answer is spoken as it is; startDiagnostic reaches the se
   assert.equal(call.body.tool, 'startDiagnostic'); assert.equal(call.body.call_id, 'call1');
   assert.equal(call.body.answers, undefined); assert.equal(call.body.stray, undefined);
 });
+
+test('too little information: the notice replaces the PDF in the session view', async t => {
+  const message = 'К сожалению, для полноценного анализа было предоставлено недостаточно информации.';
+  const ready = fixture(t, { initial: record(state({ status: 'ready', report: { id: 'r', status: 'ready', outcome: 'insufficient', message } })) });
+  await ready.client.open(); await ready.handlers.onDownload();
+  assert.equal(ready.model.phase, 'ready'); assert.equal(ready.model.notice, message);
+  assert.equal(ready.calls.some(call => call.path.startsWith('/api/report/')), false, 'there is no PDF to download');
+});
+
+test('too little information after management expiry: the report token returns the notice instead of a PDF', async t => {
+  const message = 'К сожалению, для полноценного анализа было предоставлено недостаточно информации.';
+  t.mock.timers.enable({ apis: ['setTimeout', 'setInterval'] });
+  const polled = fixture(t, { initial: record(state({ status: 'preparing', access_expires_at: 1 })), request(path) {
+    if (path.startsWith('/api/report/')) return { status: 'insufficient', message };
+  } });
+  await polled.client.open();
+  t.mock.timers.tick(10000); await new Promise(setImmediate);
+  assert.equal(polled.model.phase, 'ready'); assert.equal(polled.model.notice, message);
+});

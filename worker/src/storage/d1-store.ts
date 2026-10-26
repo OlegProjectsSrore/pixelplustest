@@ -21,7 +21,7 @@ function sessionRow(row: Row): StoredSession {
   return { id: String(row.id), tokenHash: String(row.access_token_hash), createdAt: Number(row.created_at), accessExpiresAt: Number(row.access_expires_at), state: parse<AuditState>(row.state_json), activeCallId: nullableString(row.active_call_id), reportId: String(row.report_id), closedAt: nullableNumber(row.closed_at) };
 }
 function reportRow(row: Row): ReportRecord {
-  return { id: String(row.id), sessionId: String(row.session_id), version: Number(row.version), snapshotId: nullableString(row.snapshot_id), result: row.result_json == null ? null : parse(row.result_json), content: row.content_json == null ? null : parse(row.content_json), libraryVersion: String(row.library_version), rulesVersion: nullableString(row.rules_version), tariffsVersion: nullableString(row.tariffs_version), templateVersion: nullableString(row.template_version), contentHash: nullableString(row.content_hash), pdfHash: nullableString(row.pdf_hash), status: row.status as ReportRecord['status'], kvKey: nullableString(row.kv_key), prepareDeadline: nullableNumber(row.prepare_deadline), reportExpiresAt: nullableNumber(row.report_expires_at), publishedAt: nullableNumber(row.published_at), failedAt: nullableNumber(row.failed_at), errorCode: nullableString(row.error_code), createdAt: Number(row.created_at), updatedAt: Number(row.updated_at) };
+  return { id: String(row.id), sessionId: String(row.session_id), version: Number(row.version), snapshotId: nullableString(row.snapshot_id), result: row.result_json == null ? null : parse(row.result_json), content: row.content_json == null ? null : parse(row.content_json), libraryVersion: String(row.library_version), rulesVersion: nullableString(row.rules_version), tariffsVersion: nullableString(row.tariffs_version), templateVersion: nullableString(row.template_version), contentHash: nullableString(row.content_hash), pdfHash: nullableString(row.pdf_hash), status: row.status as ReportRecord['status'], kvKey: nullableString(row.kv_key), prepareDeadline: nullableNumber(row.prepare_deadline), reportExpiresAt: nullableNumber(row.report_expires_at), publishedAt: nullableNumber(row.published_at), failedAt: nullableNumber(row.failed_at), errorCode: nullableString(row.error_code), createdAt: Number(row.created_at), updatedAt: Number(row.updated_at), outcome: (nullableString(row.outcome) as ReportRecord['outcome']) ?? null, review: row.review_json == null ? null : parse(row.review_json) };
 }
 function jobRow(row: Row): AuditJob {
   return { id: String(row.id), sessionId: String(row.session_id), reportId: String(row.report_id), reportVersion: Number(row.report_version), stage: row.stage as AuditJob['stage'], state: row.state as AuditJob['state'], attempts: parse(row.attempts_json), nextAttemptAt: Number(row.next_attempt_at), leaseToken: nullableString(row.lease_token), leaseExpiresAt: nullableNumber(row.lease_expires_at), errorCode: nullableString(row.error_code), createdAt: Number(row.created_at), updatedAt: Number(row.updated_at) };
@@ -270,17 +270,17 @@ export class D1Store {
     if (p) {
       if ((p.content !== undefined || p.result !== undefined) && report.content !== null) throw new StoreError('content_immutable', 'Saved report content cannot be replaced');
       if (p.content !== undefined && new TextEncoder().encode(stringify(p.content)).byteLength > 512000) throw new StoreError('content_too_large', 'Report content exceeds the storage bound', 413);
-      const columns: Record<string, string> = { snapshotId: 'snapshot_id', result: 'result_json', content: 'content_json', rulesVersion: 'rules_version', tariffsVersion: 'tariffs_version', templateVersion: 'template_version', contentHash: 'content_hash', pdfHash: 'pdf_hash', status: 'status', kvKey: 'kv_key', reportExpiresAt: 'report_expires_at', publishedAt: 'published_at', failedAt: 'failed_at', errorCode: 'error_code' };
+      const columns: Record<string, string> = { snapshotId: 'snapshot_id', result: 'result_json', content: 'content_json', rulesVersion: 'rules_version', tariffsVersion: 'tariffs_version', templateVersion: 'template_version', contentHash: 'content_hash', pdfHash: 'pdf_hash', status: 'status', kvKey: 'kv_key', reportExpiresAt: 'report_expires_at', publishedAt: 'published_at', failedAt: 'failed_at', errorCode: 'error_code', outcome: 'outcome', review: 'review_json' };
       const assignments: string[] = []; const values: unknown[] = [];
       for (const [key, value] of Object.entries(p)) {
         const col = columns[key]; if (!col) throw new StoreError('invalid_patch', 'Invalid report field', 400);
         assignments.push(`${col}=${key === 'reportExpiresAt' || key === 'publishedAt' ? `COALESCE(${col},?)` : '?'}`);
-        values.push(key === 'result' || key === 'content' ? stringify(value) : value);
+        values.push(key === 'result' || key === 'content' || key === 'review' ? stringify(value) : value);
       }
       if (assignments.length) batch.push(this.stmt(`UPDATE reports SET ${assignments.join(',')},updated_at=? WHERE id=? AND ${guard}`, ...values, now, job.reportId, ...args));
     }
     const attempts = { ...job.attempts };
-    if (patch.incrementAttempt) { attempts[patch.incrementAttempt] += 1; if (patch.incrementAttempt === 'render' && attempts.render > 3) throw new StoreError('render_attempts_exhausted', 'Render attempt limit reached'); }
+    if (patch.incrementAttempt) { attempts[patch.incrementAttempt] = (attempts[patch.incrementAttempt] ?? 0) + 1; if (patch.incrementAttempt === 'render' && attempts.render > 3) throw new StoreError('render_attempts_exhausted', 'Render attempt limit reached'); }
     if (p?.status || patch.sessionState) {
       const current = sessionToUpdate!;
       const sessionState = patch.sessionState ?? current.state;

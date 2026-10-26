@@ -83,7 +83,7 @@ for(const c of jokes.categories)assert(c.do_not_use_when&&c.hints.length&&c.sele
 assert(jokes.return_phrases.length&&jokes.neutral_replies.off_topic);
 const scenario=read('scenario.json'),template=read('report-template.json');
 assert.equal(scenario.clock.max_seconds,1500);assert.equal(scenario.clock.no_new_deep_branch_after,1320);assert.equal(scenario.clock.closing_from,1440);
-assert.equal(scenario.closing.accepted_finish_text,'Спасибо за предоставленную информацию, сейчас вам предоставим отчёт предварительного аудита.');
+assert.equal(scenario.closing.accepted_finish_text,'Спасибо за предоставленную информацию, сейчас подготовим результат предварительного аудита.');
 for(const id of scenario.entry_questions)ref('questions',id);
 assert.equal(scenario.phases.at(-1).terminal,true);unique(scenario.phases.map(p=>p.id),'phase');
 for(let i=0;i<scenario.phases.length-1;i++)assert.equal(scenario.phases[i].next,scenario.phases[i+1].id,'Phase cycle');
