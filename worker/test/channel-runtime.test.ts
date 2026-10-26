@@ -212,3 +212,48 @@ test('usage arriving after UTC midnight settles the original day without consumi
   const rows = f.db.sqlite.prepare("SELECT period,used,reserved FROM usage_counters WHERE kind='deepseek_usd_micros'").all();
   assert.equal(rows.length, 1); assert.equal(rows[0].period, '2026-10-22'); assert.equal(rows[0].used, 48); assert.equal(rows[0].reserved, 0);
 });
+
+const worded = { reply: 'Приятно познакомиться, Олег.', question: 'Подскажите, какую должность Вы занимаете в компании?' };
+const composing = (answer: unknown = worded) => (context: ClassifierContext) => 'next_question' in context ? answer : reportFromText(context);
+
+test('with the composer on, DeepSeek words the reaction and the next question after classification', async () => {
+  const seen: Record<string, Json>[] = [];
+  const f = await fixture(context => { if ('next_question' in context) seen.push(context as unknown as Record<string, Json>); return composing()(context); });
+  f.env.CHAT_COMPOSER_ENABLED = 'true';
+  try {
+    const body = f.body(), response = await f.handler(f.request, f.context(body)) as { operation: Record<string, Json> };
+    assert.equal(response.operation.text, worded.reply); assert.equal(response.operation.question_id, 'context_position');
+    assert.equal(response.operation.question_text, worded.question);
+    assert.equal(f.calls(), 2); assert.equal(seen[0].visitor_message, 'Олег');
+    const next = seen[0].next_question as { text: string };
+    assert.equal(next.text, library.questions.find(question => question.id === 'context_position')!.chat);
+    assert.equal((await f.core.store.getUsageReservation('deepseek_calls:chat-session:turn-1:2'))?.actual, 1);
+    const answerEvent = (await f.core.store.listEvents(f.session.id, 0, 100)).find(event => event.text === 'Олег');
+    assert.equal(JSON.stringify(answerEvent?.data ?? null).includes(worded.reply), false, 'the reaction does not rewrite the answer event');
+    const replay = await f.handler(f.request, f.context(body)) as { kind: string; operation: Record<string, Json> };
+    assert.equal(replay.kind, 'duplicate'); assert.equal(replay.operation.question_text, worded.question); assert.equal(f.calls(), 2);
+  } finally { f.db.close(); }
+});
+
+test('wording that fails the code checks falls back to library texts without blocking the answer', async () => {
+  const f = await fixture(composing({ reply: 'Советую тариф «Старт».', question: 'Должность' }));
+  f.env.CHAT_COMPOSER_ENABLED = 'true';
+  try {
+    const response = await f.handler(f.request, f.context(f.body())) as { operation: Record<string, Json> };
+    assert.equal(response.operation.text, null); assert.equal(response.operation.question_text, null);
+    assert.equal(response.operation.question_id, 'context_position'); assert.equal((await f.core.store.listAnswers(f.session.id)).length, 1);
+  } finally { f.db.close(); }
+});
+
+test('a selected option gets a worded next question with exactly one model call', async () => {
+  const f = await fixture(composing({ reply: '', question: 'Какое направление сейчас для Вас главное?' }));
+  f.env.CHAT_COMPOSER_ENABLED = 'true';
+  try {
+    const event: AuditEvent = { id: 'seed-event', source: 'chat', source_key: 'seed', source_revision: 0, local_order: 0, role: 'user', kind: 'utterance', text: 'Сообщённый контекст', occurred_at: now, received_at: now };
+    const seed: AuditAnswer[] = [ ['context.name', 'Олег'], ['context.position', 'Директор'], ['context.responsibilities', 'Продажи'], ['context.company_size', '50 сотрудников'], ['context.business', 'Магазин'], ['context.goal', 'Развитие'], ['context.assets', ['Сайт']] ].map(([id, value], i) => ({ id: `seed-${i}`, question_id: library.questions.find(question => question.fact_ids.includes(id as string))!.id, fact_id: id as string, state: 'known', value: value as Json, event_ids: [event.id], channel: 'chat', method: 'selection', confirmation: 'explicit', library_version: library.version, created_at: now }));
+    await f.core.store.commit({ sessionId: f.session.id, operationId: 'seed', expectedRevision: 0, channelRevision: 0, event, answers: seed, state: advanceAudit(f.session.state, seed, now, library, { allowDraft: true }), now });
+    const response = await f.handler(f.request, f.context(f.body('selection-1', 1, { kind: 'selection', option_ids: ['strategy'] }, 'context_priority'))) as { operation: Record<string, Json> };
+    assert.equal(f.calls(), 1); assert.equal(response.operation.text, null);
+    assert.equal(response.operation.question_text, 'Какое направление сейчас для Вас главное?');
+  } finally { f.db.close(); }
+});

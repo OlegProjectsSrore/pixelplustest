@@ -19,6 +19,8 @@ export interface Env {
   OPENAI_API_KEY?: string;
   OPENAI_REALTIME_MODEL?: string;
   OPENAI_REALTIME_VOICE?: string;
+  /** "true" lets DeepSeek word chat replies and questions; anything else keeps the library texts. */
+  CHAT_COMPOSER_ENABLED?: string;
   OPENAI_TRANSCRIPTION_MODEL?: string;
   VOICE_PROVIDER?: string;
   ULTRAVOX_MODEL?: string;

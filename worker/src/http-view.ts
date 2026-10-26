@@ -128,12 +128,15 @@ export async function presentPayload(core: CoreServices, payload: unknown, readO
       return [{ id: snippet.id as string, title: snippet.title as string, heading: snippet.heading as string, url: snippet.url as string, text: snippet.text as string }];
     });
   }
+  // DeepSeek wording of the first chat question; later questions arrive as operation.question_text.
+  const phrasing = record(original.question_phrasing);
+  if (phrasing && typeof phrasing.question_id === 'string' && typeof phrasing.text === 'string') output.question_phrasing = { question_id: phrasing.question_id, text: phrasing.text };
   const reply = record(original.reply);
   if (reply && typeof reply.id === 'string' && typeof reply.text === 'string') output.reply = { id: reply.id, text: reply.text };
   const operation = record(original.operation);
   if (operation) {
     const publicOperation: Record<string, Json> = {};
-    for (const key of ['text', 'joke_id', 'question_id', 'operation_id', 'revision', 'channel_revision', 'status', 'selection_operation', 'clarification_required']) {
+    for (const key of ['text', 'joke_id', 'question_id', 'question_text', 'operation_id', 'revision', 'channel_revision', 'status', 'selection_operation', 'clarification_required']) {
       const value = operation[key];
       if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' || value === null) publicOperation[key] = value;
     }

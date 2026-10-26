@@ -70,7 +70,9 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
   }
   function render() {
     const session = saved.session;
-    const serverQuestion = session?.question;
+    const phrasing = saved.question_phrasing;
+    // DeepSeek's wording replaces the library text only for the question it was written for.
+    const serverQuestion = session?.question && phrasing?.question_id === session.question.id ? { ...session.question, text: phrasing.text } : session?.question;
     const question = serverQuestion?.id === 'context_priority' && Array.isArray(serverQuestion.fact_ids) && serverQuestion.fact_ids.includes('context.priority')
       ? { ...serverQuestion, answer_mode: 'multiple' } : serverQuestion ?? null;
     const active = session?.status === 'in_progress';
@@ -110,6 +112,9 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
     }
     if (data?.management_token) saved.management_token = data.management_token;
     if (data?.report_token) saved.report_token = data.report_token;
+    const operation = data?.operation;
+    const phrasing = data?.question_phrasing || (typeof operation?.question_text === 'string' ? { question_id: operation.question_id, text: operation.question_text } : null);
+    if (typeof phrasing?.question_id === 'string' && typeof phrasing.text === 'string' && phrasing.text.trim()) saved.question_phrasing = { question_id: phrasing.question_id, text: phrasing.text };
     const reply = data?.reply?.text || data?.operation?.text;
     const replyId = data?.reply?.id || data?.operation?.operation_id || saved.pending?.body?.operation_id;
     if (reply && replyId) addMessage(`reply:${replyId}`, 'assistant', reply);

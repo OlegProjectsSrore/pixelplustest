@@ -10,6 +10,7 @@ import { requestEmail, runOneJob } from './report/pipeline.ts';
 import { SmtpTransport, validateMailbox } from './report/smtp.ts';
 import { presentPayload, sessionView } from './http-view.ts';
 import { normalizeVoiceAnswers } from './channel-voice.ts';
+import { composeFirstQuestion } from './channel-runtime.ts';
 import { parseVoiceAnswerPayload } from './voice/client-tools.ts';
 import type { AuditAnswer } from './audit/contracts.ts';
 
@@ -60,7 +61,10 @@ export function createWorker(adapters: ChannelAdapters = channelAdapters, option
           response = await getReportResponse(core.store, env.REPORTS_KV, path.slice('/api/report/'.length), core.now());
         } else if (method === 'POST' && path === '/api/session') {
           const body = await readJson(request); operationId = typeof body.operation_id === 'string' ? body.operation_id : undefined;
-          response = json(await core.create(request, body), 201);
+          const created = await core.create(request, body) as Record<string, Json>;
+          const sessionId = (created.session as Record<string, Json> | undefined)?.session_id;
+          const phrasing = body.channel === 'chat' && typeof sessionId === 'string' ? await composeFirstQuestion({ core, env, execution }, sessionId) : null;
+          response = json(phrasing ? { ...created, question_phrasing: phrasing } : created, 201);
         } else if (method === 'GET' && /^\/api\/session\/[^/]+$/.test(path)) {
           const id = identifier(path.slice('/api/session/'.length), 'session_id');
           const hash = await hashToken(bearer(request));

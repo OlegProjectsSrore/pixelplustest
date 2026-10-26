@@ -44,16 +44,14 @@ async function readBody(response: Response, signal: AbortSignal): Promise<unknow
   try { return JSON.parse(text); } catch { throw new ReadError('invalid_envelope'); }
 }
 
-/** One metered attempt. The core owns any retry, persistence and user-facing response. */
-export async function classifyTurn(context: ClassifierContext, runtime: ClassifierRuntime): Promise<ClassificationResult> {
-  if (!runtime.api_key?.trim()) return { ok: false, error: { code: 'not_configured', retryable: false }, usage: null, provider_request_id: null };
+/** One metered DeepSeek completion with a JSON object reply; the caller interprets the exchange. */
+export async function requestDeepseek(messages: { role: 'system' | 'user'; content: string }[], runtime: ClassifierRuntime, temperature = 0): Promise<ProviderExchange> {
   if (!Number.isSafeInteger(runtime.max_tokens) || runtime.max_tokens < 1 || runtime.max_tokens > 16384 || !Number.isFinite(runtime.timeout_ms) || runtime.timeout_ms < 1 || runtime.timeout_ms > 60000) throw new Error('Invalid classifier limits');
-  const messages = buildClassifierPrompt(context);
-  const body = JSON.stringify({ model: 'deepseek-flash', thinking: { type: 'disabled' }, response_format: { type: 'json_object' }, stream: false, temperature: 0, max_tokens: runtime.max_tokens, messages });
+  const body = JSON.stringify({ model: 'deepseek-flash', thinking: { type: 'disabled' }, response_format: { type: 'json_object' }, stream: false, temperature, max_tokens: runtime.max_tokens, messages });
   const inputBytes = new TextEncoder().encode(JSON.stringify(messages)).byteLength;
   if (inputBytes > 262144) throw new Error('Classifier context is too large');
   let invoked = false;
-  const exchange = await runtime.runAuthorized({ provider: 'deepseek', model: 'deepseek-flash', max_tokens: runtime.max_tokens, input_utf8_bytes: inputBytes }, async (): Promise<ProviderExchange> => {
+  return runtime.runAuthorized({ provider: 'deepseek', model: 'deepseek-flash', max_tokens: runtime.max_tokens, input_utf8_bytes: inputBytes }, async (): Promise<ProviderExchange> => {
     if (invoked) throw new Error('Classifier attempt already invoked');
     invoked = true;
     const controller = new AbortController();
@@ -82,6 +80,12 @@ export async function classifyTurn(context: ClassifierContext, runtime: Classifi
       return { outcome: 'unknown', status, body: null, usage: null, error: timedOut ? 'timeout' : error instanceof ReadError ? error.code : 'network' };
     } finally { if (timer !== undefined) clearTimeout(timer); }
   });
+}
+
+/** One metered attempt. The core owns any retry, persistence and user-facing response. */
+export async function classifyTurn(context: ClassifierContext, runtime: ClassifierRuntime): Promise<ClassificationResult> {
+  if (!runtime.api_key?.trim()) return { ok: false, error: { code: 'not_configured', retryable: false }, usage: null, provider_request_id: null };
+  const exchange = await requestDeepseek(buildClassifierPrompt(context), runtime);
   const requestId = object(exchange.body) && typeof exchange.body.id === 'string' && exchange.body.id.length <= 200 ? exchange.body.id : null;
   const failure = (code: Extract<ClassificationResult, { ok: false }>['error']['code'], retryable: boolean): ClassificationResult => ({ ok: false, error: { code, retryable }, usage: exchange.usage, provider_request_id: requestId });
   if (exchange.outcome === 'unknown') return failure(exchange.error === 'timeout' ? 'provider_timeout' : 'provider_unavailable', true);

@@ -23,6 +23,7 @@
     "ULTRAVOX_MODEL": "ultravox-v0.7",
     "ULTRAVOX_VOICE": "83b2a94f-8078-4321-935c-a0798b2ac621",
     "ALLOW_DRAFT_LIBRARY": "false",
+    "CHAT_COMPOSER_ENABLED": "true",
     "PUBLIC_SESSIONS_ENABLED": "true",
     "SMTP_HOST": "smtp.gmail.com",
     "SMTP_PORT": "587",

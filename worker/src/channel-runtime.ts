@@ -1,8 +1,9 @@
 import { createChatHandler as createPreparedChatHandler, type PreparedChatTurn } from './chat/handler.ts';
 import type { ClassifierRuntime } from './chat/types.ts';
+import { composeChatMessage, type ComposeInput, type Composed } from './chat/composer.ts';
 import type { AdapterContext, AdapterHandler, ChannelAdapters } from './integration.ts';
 import type { StoredSession, UsageReservation } from './storage/types.ts';
-import { INTERVIEW_BUDGET_MS, type Json } from './audit/contracts.ts';
+import { INTERVIEW_BUDGET_MS, type AuditEvent, type Json } from './audit/contracts.ts';
 import { advanceAudit, elapsedInterviewMs, nextQuestion, validateAnswers } from './audit/engine.ts';
 import { getLibrary, isApproved } from './audit/library.ts';
 import { selectHumorReply, type HumorIntent } from './audit/humor.ts';
@@ -49,6 +50,39 @@ export async function createChatRuntime(context: AdapterContext, session: Stored
       return exchange;
     },
   };
+}
+
+// Classification uses attempts 0 and 1 of an operation; wording takes its own metered attempt.
+const COMPOSE_ATTEMPT = 2;
+// FAQ answers and jokes are approved texts shown verbatim; other notices are reworded by DeepSeek.
+const APPROVED_TEXT_ACTIONS = ['faq', 'off_topic', 'humor_preference', 'role_change'];
+
+/** DeepSeek words the turn; any failure (budget, provider, checks) keeps the library texts. */
+async function composeTurn(context: AdapterContext, session: StoredSession, operationId: string, attempt: number, timeoutMs: number, input: ComposeInput): Promise<Composed | null> {
+  if (context.env.CHAT_COMPOSER_ENABLED !== 'true') return null;
+  try {
+    const runtime = await createChatRuntime(context, session, operationId, attempt);
+    const remaining = INTERVIEW_BUDGET_MS - elapsedInterviewMs(session.state, context.core.now());
+    return remaining > 0 ? await composeChatMessage(input, { ...runtime, max_tokens: 600, timeout_ms: Math.min(timeoutMs, remaining) }) : null;
+  } catch (error) {
+    console.warn(JSON.stringify({ event: 'chat_compose_failed', reason: error instanceof Error ? error.message : 'unknown' }));
+    return null;
+  }
+}
+const dialog = (events: AuditEvent[]) => events.filter(event => (event.role === 'user' || event.role === 'assistant') && typeof event.text === 'string' && event.text.trim())
+  .slice(-8).map(event => ({ role: event.role, text: event.text!.slice(0, 400) }));
+
+/** The first chat question is worded when the session is created; null keeps the library text. */
+export async function composeFirstQuestion(context: AdapterContext, sessionId: string): Promise<{ question_id: string; text: string } | null> {
+  try {
+    const session = await context.core.store.requireSession(sessionId);
+    if (session.state.active_channel !== 'chat') return null;
+    const question = nextQuestion(session.state, context.core.now(), getLibrary(session.state.library_version), context.core.engineOptions);
+    if (!question) return null;
+    const composed = await composeTurn(context, session, 'first-question', 0, 6_000, { visitor_text: null, approved_text: null, notice_to_rephrase: null,
+      question: { text: question.text, options: question.options.map(option => option.text) }, history: [] });
+    return composed?.question_text ? { question_id: question.id, text: composed.question_text } : null;
+  } catch { return null; }
 }
 
 function humorIntent(turn: PreparedChatTurn, now: number): HumorIntent {
@@ -99,10 +133,21 @@ export async function commitChatTurn(request: Request, context: AdapterContext, 
     state.humor.operations[turn.input.operation_id] = { ...reply, status: 'reserved' };
   }
   if (turn.action === 'sensitive') serviceText = 'Я услышал Вас. Можно сделать паузу или завершить разговор.';
+  const libraryText = serviceText;
+  let questionText: string | null = null;
+  if (turn.action !== 'sensitive') {
+    const approved = APPROVED_TEXT_ACTIONS.includes(turn.action) ? serviceText : null;
+    const composed = await composeTurn(context, session, turn.input.operation_id, COMPOSE_ATTEMPT, 8_000, { visitor_text: turn.event.text ?? null,
+      // A clarification of the current question would only repeat it; ask for a clearer answer instead.
+      approved_text: approved, notice_to_rephrase: approved ? null : serviceText && serviceText === question?.text ? 'Ответ не удалось однозначно понять: попросите уточнить его.' : serviceText,
+      question: question ? { text: question.text, options: question.options.map(option => option.text) } : null, history: dialog(evidence) });
+    if (composed) { questionText = composed.question_text; if (!approved) serviceText = composed.reply; }
+  }
+  // A reaction to a plain answer is shown to the visitor but leaves the answer event untouched.
   const event = { ...turn.event, kind: answers.length ? turn.event.kind : 'service' as const,
-    ...(serviceText ? { data: { intent: turn.classification?.intent ?? turn.action, assistant_text: serviceText } } : {}) };
+    ...(libraryText ? { data: { intent: turn.classification?.intent ?? turn.action, assistant_text: serviceText ?? libraryText } } : {}) };
   validateAuditState(state, lib);
-  const result: Json = { text: serviceText, joke_id: jokeId, question_id: turn.action === 'sensitive' ? null : question?.id ?? null,
+  const result: Json = { text: serviceText, joke_id: jokeId, question_id: turn.action === 'sensitive' ? null : question?.id ?? null, question_text: questionText,
     operation_id: turn.input.operation_id, ...(turn.action === 'sensitive' ? { suppress_question: true } : {}) };
   return core.response(await core.store.commit({ ...common, event, answers, state, result }));
 }

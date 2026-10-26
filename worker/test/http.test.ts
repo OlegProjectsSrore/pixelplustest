@@ -8,6 +8,7 @@ import { initialAuditState, type AuditAnswer } from '../src/audit/contracts.ts';
 import { library } from '../src/audit/library.ts';
 import type { Env } from '../src/env.ts';
 import type { ChannelAdapters } from '../src/integration.ts';
+import { createChatAdapter } from '../src/channel-runtime.ts';
 
 const now = Date.UTC(2026, 9, 22, 20);
 const origin = 'https://olegprojectssrore.github.io';
@@ -189,4 +190,39 @@ test('explicitly disabled Turnstile permits session and voice checks without con
     delete app.env.TURNSTILE_ENABLED;
     await assert.rejects(verifyTurnstile(new Request('https://audit.example'), undefined, app.env, 'session'), /turnstile_token/);
   } finally { app.db.close(); }
+});
+
+test('HTTP chat: DeepSeek words the first question at creation and later questions arrive as operation.question_text', async () => {
+  const db = new SqliteD1();
+  const env: Env = { DB: db.binding(), REPORTS_KV: { get: async () => null, put: async () => undefined } as unknown as KVNamespace,
+    ALLOWED_ORIGINS: origin, TURNSTILE_HOSTNAMES: 'olegprojectssrore.github.io', TURNSTILE_SECRET: 'test-secret', IP_HASH_SALT: 'test-salt-'.repeat(5),
+    ALLOW_DRAFT_LIBRARY: 'true', DEEPSEEK_API_KEY: 'test-key', CHAT_COMPOSER_ENABLED: 'true',
+    BUDGETS_JSON: JSON.stringify({ new_sessions: 10, sessions_per_ip: 10, requests_per_ip_per_minute: 120, deepseek_usd_micros: 20_000_000, deepseek_calls: 20, deepseek_tokens: 2_000_000 }) };
+  let failFirst = false;
+  const fetcher = (async (url: string, init?: RequestInit) => {
+    if (!String(url).startsWith('https://api.deepseek.com/')) return Response.json({ success: true, hostname: 'olegprojectssrore.github.io', action: 'session' });
+    const data = JSON.parse(JSON.parse(String(init!.body)).messages[1].content);
+    if ('next_question' in data && !data.visitor_message && failFirst) return new Response(null, { status: 500 });
+    const content = 'next_question' in data
+      ? { reply: data.visitor_message ? 'Приятно познакомиться.' : '', question: data.visitor_message ? 'Какую должность Вы занимаете?' : 'Как к Вам можно обращаться?' }
+      : { intent: 'answer', clarification_question_id: null, faq_id: null, joke_category_id: null, humor_preference: null,
+        answers: [{ question_id: 'context_name', fact_id: 'context.name', state: 'known', value: 'Олег', event_ids: [data.source_events[0].id], evidence: [{ event_id: data.source_events[0].id, text: 'Олег' }] }] };
+    return Response.json({ id: 'provider', usage: { prompt_tokens: 10, completion_tokens: 10, total_tokens: 20 }, choices: [{ finish_reason: 'stop', message: { content: JSON.stringify(content) } }] });
+  }) as typeof fetch;
+  const worker = createWorker({ chat: createChatAdapter() }, { now: () => now, fetcher });
+  const ctx = { waitUntil() {}, passThroughOnException() {} } as unknown as ExecutionContext;
+  const call = (path: string, body: unknown, token?: string) => worker.fetch(new Request(`https://audit.example${path}`, { method: 'POST',
+    headers: { Origin: origin, 'Content-Type': 'application/json', 'CF-Connecting-IP': '192.0.2.3', ...(token ? { Authorization: `Bearer ${token}` } : {}) }, body: JSON.stringify(body) }), env, ctx);
+  try {
+    const created = await (await call('/api/session', { operation_id: randomToken(), channel: 'chat', turnstile_token: 'test-token' })).json() as any;
+    assert.deepEqual(created.data.question_phrasing, { question_id: 'context_name', text: 'Как к Вам можно обращаться?' });
+    const session = created.data.session;
+    const chat = await (await call('/api/chat', { api_version: '1', session_id: session.session_id, operation_id: randomToken(), expected_revision: session.revision,
+      channel_revision: session.channel_revision, library_version: session.library_version, question_id: 'context_name', input: { kind: 'text', text: 'Олег' } }, created.data.session_token)).json() as any;
+    assert.equal(chat.data.operation.text, 'Приятно познакомиться.'); assert.equal(chat.data.operation.question_text, 'Какую должность Вы занимаете?');
+    assert.equal(chat.data.operation.question_id, 'context_position');
+    failFirst = true;
+    const plain = await call('/api/session', { operation_id: randomToken(), channel: 'chat', turnstile_token: 'test-token' });
+    assert.equal(plain.status, 201); assert.equal(((await plain.json()) as any).data.question_phrasing, undefined, 'a provider failure keeps the library question');
+  } finally { db.close(); }
 });

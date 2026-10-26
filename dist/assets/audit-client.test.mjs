@@ -462,3 +462,26 @@ test('Restart during a voice call releases the call first; nothing to restart be
   await empty.client.open();
   assert.equal(empty.model.capabilities.restart, false);
 });
+
+test('DeepSeek wording replaces the library question only for the question it was written for', async t => {
+  const f = fixture(t, { initial: null, request(path, options, context) {
+    if (path === '/api/session') {
+      context.server = state({ question: { id: 'q1', text: 'Как Вас зовут?', options: [] } });
+      return { session: structuredClone(context.server), management_token: 'management', report_token: 'report', question_phrasing: { question_id: 'q1', text: 'Как к Вам можно обращаться?' } };
+    }
+    if (path === '/api/chat') {
+      context.server.revision++;
+      const mismatch = options.body.input.text === 'другой';
+      context.server.question = { id: mismatch ? 'q3' : 'q2', text: mismatch ? 'Третий вопрос?' : 'Какая Ваша должность?', options: [] };
+      return { session: structuredClone(context.server), operation: { text: 'Приятно познакомиться.', question_id: 'q2', question_text: 'Кем Вы работаете в компании?' } };
+    }
+  } });
+  await f.client.open();
+  assert.equal(f.model.question.text, 'Как к Вам можно обращаться?');
+  await f.handlers.onText('Олег');
+  assert.equal(f.model.question.text, 'Кем Вы работаете в компании?');
+  assert(f.model.messages.some(message => message.role === 'assistant' && message.text === 'Приятно познакомиться.'));
+  assert.equal(f.stored.question_phrasing.text, 'Кем Вы работаете в компании?', 'the wording survives a reload');
+  await f.handlers.onText('другой');
+  assert.equal(f.model.question.text, 'Третий вопрос?', 'wording for another question is never shown');
+});
