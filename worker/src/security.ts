@@ -5,8 +5,10 @@ export class HttpError extends Error {
   readonly status: number;
   readonly code: string;
   readonly retryable: boolean;
-  constructor(status: number, code: string, message: string, retryable = false) {
-    super(message); this.status = status; this.code = code; this.retryable = retryable;
+  /** Internal reason for server logs only; never sent to the client. */
+  readonly detail?: string;
+  constructor(status: number, code: string, message: string, retryable = false, detail?: string) {
+    super(message); this.status = status; this.code = code; this.retryable = retryable; this.detail = detail;
   }
 }
 export const fail = (status: number, code: string, message: string, retryable = false): never => { throw new HttpError(status, code, message, retryable); };

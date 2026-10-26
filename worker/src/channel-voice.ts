@@ -157,7 +157,19 @@ async function normalizeTranscripts(core: CoreServices, session: StoredSession, 
   return result;
 }
 
-/** Exact user quotes establish provenance; model-supplied confirmation never becomes explicit approval. */
+/** Case, ё/е, punctuation and quote marks are transcription noise, not different words. */
+export const quoteKey = (text: string): string => text.toLocaleLowerCase('ru').replace(/ё/g, 'е').replace(/[\p{P}\p{S}]+/gu, ' ').replace(/\s+/g, ' ').trim();
+
+/** An exact substring wins; otherwise the same whole words after quoteKey. Ordinals, when given, restrict the replicas. */
+export function quoteMatches(events: AuditEvent[], quote: string, ordinals?: number[]): AuditEvent[] {
+  const eligible = events.filter(event => !ordinals?.length || (event.source === 'voice' && ordinals.includes(event.local_order)));
+  const exact = eligible.filter(event => event.text?.includes(quote));
+  const key = quoteKey(quote);
+  if (exact.length === 1 || !key) return exact;
+  return eligible.filter(event => event.text && ` ${quoteKey(event.text)} `.includes(` ${key} `));
+}
+
+/** User quotes establish provenance; model-supplied confirmation never becomes explicit approval. */
 export async function normalizeVoiceAnswers(core: CoreServices, session: StoredSession, call: VoiceCall, candidates: VoiceAnswerCandidate[]): Promise<AuditAnswer[]> {
   if (candidates.length > 50) fail(413, 'payload_too_large', 'Слишком большой пакет ответов.');
   const conversation = latestEvents(await readEvents(core, session.id)).filter(event => event.call_id === call.id && ['voice', 'webhook'].includes(event.source) && record(event.data).is_final === true);
@@ -168,7 +180,7 @@ export async function normalizeVoiceAnswers(core: CoreServices, session: StoredS
   for (const candidate of candidates) {
     const evidence: AuditEvent[] = [];
     for (const quote of candidate.source_quotes) {
-      const matches = events.filter(event => event.text?.includes(quote) && (!candidate.source_ordinals?.length || (event.source === 'voice' && candidate.source_ordinals.includes(event.local_order))));
+      const matches = quoteMatches(events, quote, candidate.source_ordinals);
       if (matches.length !== 1) fail(409, 'pending_evidence', 'Цитата не найдена однозначно в доставленных репликах посетителя.');
       if (!evidence.some(item => item.id === matches[0].id)) evidence.push(matches[0]);
     }

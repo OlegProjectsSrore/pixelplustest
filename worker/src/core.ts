@@ -4,7 +4,7 @@ import { assertLibraryReady, getLibrary, library } from './audit/library.ts';
 import { selectHumorReply, type HumorIntent } from './audit/humor.ts';
 import { D1Store, elapsedMs, type StoredSession, type MutationResult } from './storage/d1-store.ts';
 import type { Env } from './env.ts';
-import { bearer, budgets, fail, hashIp, hashToken, identifier, mutation, object, randomToken, requestHash, revision, textField, verifyTurnstile } from './security.ts';
+import { bearer, budgets, fail, hashIp, hashToken, HttpError, identifier, mutation, object, randomToken, requestHash, revision, textField, verifyTurnstile } from './security.ts';
 
 export class CoreServices {
   readonly store: D1Store;
@@ -113,7 +113,7 @@ export class CoreServices {
     const evidence = await this.events(session.id);
     const lib = getLibrary(session.state.library_version);
     try { validateAnswers(answers, [...evidence, event], existing, lib, this.engineOptions); }
-    catch { fail(400, 'invalid_answers', 'Ответы не прошли проверку словаря или свидетельств.'); }
+    catch (error) { throw new HttpError(400, 'invalid_answers', 'Ответы не прошли проверку словаря или свидетельств.', false, error instanceof Error ? error.message : undefined); }
     const state = advanceAudit(session.state, [...existing, ...answers], this.now(), lib, this.engineOptions);
     return this.response(await this.store.commit({ sessionId: session.id, expectedRevision: input.expected_revision, channelRevision: input.channel_revision,
       operationId: input.operation_id, requestHash: digest, event, answers, state, now: this.now() }));

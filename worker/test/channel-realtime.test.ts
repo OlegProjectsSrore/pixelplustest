@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { CoreServices } from '../src/core.ts';
 import { createRealtimeAdapters, realtimeTools } from '../src/channel-realtime.ts';
+import { quoteMatches } from '../src/channel-voice.ts';
+import type { AuditEvent } from '../src/audit/contracts.ts';
 import { initialAuditState } from '../src/audit/contracts.ts';
 import { library } from '../src/audit/library.ts';
 import { hashToken, HttpError } from '../src/security.ts';
@@ -102,6 +104,53 @@ test('Transcript from a browser clock an hour ahead or behind is accepted with s
   const stored = (await f.core.store.listEvents('s1', 0, 100)).filter(e => e.source === 'voice');
   assert.deepEqual(stored.map(e => [e.text, e.occurred_at, obj(e.data).client_occurred_at]),
     [['Как Вас зовут?', NOW + 2000, NOW + 3_600_000], ['Меня зовут Александр.', NOW + 2000, NOW - 3_600_000]]);
+});
+
+test('Quote matching prefers an exact substring, then whole words ignoring case, ё and punctuation', () => {
+  const said = (local_order: number, text: string) => ({ source: 'voice', local_order, text }) as unknown as AuditEvent;
+  const events = [said(1, 'Да.'), said(3, 'да, конечно'), said(5, 'Алёна')];
+  const orders = (quote: string, ordinals?: number[]) => quoteMatches(events, quote, ordinals).map(e => e.local_order);
+  assert.deepEqual(orders('да'), [3], 'a single exact substring still wins');
+  assert.deepEqual(orders('ДА'), [1, 3], 'loose words can be ambiguous');
+  assert.deepEqual(orders('ДА', [1]), [1], 'ordinals disambiguate');
+  assert.deepEqual(orders('«алена»'), [5]);
+  assert.deepEqual(orders('алё'), [], 'loose matching needs whole words');
+  assert.deepEqual(orders('...'), [], 'punctuation alone is not a quote');
+});
+
+async function nameCall(f: Awaited<ReturnType<typeof fixture>>, userText: string) {
+  const call = await f.start(); f.tick(2000);
+  const line = (ordinal: number, role: string, text: string) => ({ source: 'voice', source_key: `${call.call_id}:${ordinal}`, source_revision: 0, local_order: ordinal,
+    call_id: call.call_id, role, kind: 'utterance', text, occurred_at: NOW, data: { is_final: true, medium: 'voice' } });
+  const delivered = await f.invoke(f.adapters.voiceTranscript!, await f.body(undefined, { call_id: call.call_id, events: [line(0, 'assistant', 'Как Вас зовут?'), line(1, 'user', userText)] }));
+  return (answer: Record<string, unknown>) => f.body(undefined, { call_id: call.call_id, through_event_id: delivered.through_event_id,
+    answers: [{ question_id: 'context_name', fact_id: 'context.name', state: 'known', value: 'Александр', source_ordinals: [1], ...answer }] });
+}
+
+test('Voice answer is saved when the quote differs from the transcript only in case and punctuation', async t => {
+  for (const quote of ['александр.', '«Александр»', 'АЛЕКСАНДР']) {
+    const f = await fixture(); t.after(() => f.db.close());
+    const save = await nameCall(f, 'Александр,');
+    await f.invoke(f.adapters.voiceAnswers!, await save({ source_quotes: [quote] }));
+    const answers = await f.core.store.listAnswers('s1');
+    assert.deepEqual(answers.map(a => [a.fact_id, a.value]), [['context.name', 'Александр']], quote);
+  }
+});
+
+test('Rejected voice saves are logged by structure only, with the engine reason', async t => {
+  const f = await fixture(); t.after(() => f.db.close());
+  const warn = t.mock.method(console, 'warn', () => {});
+  const save = await nameCall(f, 'Александр,');
+  await assert.rejects(f.invoke(f.adapters.voiceAnswers!, await save({ source_quotes: ['Меня зовут Александр'] })), code('pending_evidence'));
+  await assert.rejects(f.invoke(f.adapters.voiceAnswers!, await save({ fact_id: 'context.position', source_quotes: ['Александр'] })), code('invalid_answers'));
+  const logs = warn.mock.calls.map(c => String(c.arguments[0]));
+  assert.equal(logs.length, 2);
+  for (const text of logs) assert(!/Александр|зовут/iu.test(text), 'visitor words and values never reach logs');
+  const [missing, invalid] = logs.map(text => JSON.parse(text));
+  assert.equal(missing.event, 'voice_answers_rejected'); assert.equal(missing.code, 'pending_evidence'); assert.equal(missing.current_question_id, 'context_name');
+  assert.deepEqual(missing.user_replicas, [{ ordinal: 1, length: 10 }]);
+  assert.deepEqual(missing.answers[0].quotes, [{ length: 20, exact: 0, matched: 0 }]); assert.equal(missing.answers[0].value, 'string');
+  assert.equal(invalid.code, 'invalid_answers'); assert.equal(invalid.detail, 'Unknown or inactive question/fact pair'); assert.equal(invalid.answers[0].fact_id, 'context.position');
 });
 
 test('Heartbeat cannot revive another call; cron terminates stale calls; failed hangup blocks overlap', async t => {

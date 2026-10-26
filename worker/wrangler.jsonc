@@ -6,6 +6,7 @@
   "compatibility_date": "2026-10-22",
   "workers_dev": true,
   "send_metrics": false,
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
   "triggers": { "crons": ["* * * * *"] },
   "d1_databases": [{ "binding": "DB", "database_name": "pixelplus-ai", "database_id": "9a74183c-b271-47df-8d22-1facab33e988", "migrations_dir": "migrations" }],
   "kv_namespaces": [{ "binding": "REPORTS_KV", "id": "c607d12502534f1b9fbe754cc6f39be3" }],
