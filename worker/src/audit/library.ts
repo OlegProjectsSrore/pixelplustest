@@ -104,6 +104,11 @@ export function getLibrary(version = library.version): AuditLibrary {
   if (version !== library.version) throw new Error(`Library version is unavailable: ${version}`);
   return library;
 }
+/** A shown price: a fixed or «from» amount, or a closed range; «individual» is not a price. */
+export function pricedTariff(tariff: Tariff): boolean {
+  const price = tariff.price as unknown as Record<string, unknown>, money = (value: unknown) => typeof value === 'number' && Number.isFinite(value) && value >= 0;
+  return ((price.type === 'fixed' || price.type === 'from') && money(price.amount)) || (price.type === 'range' && money(price.min) && money(price.max) && (price.min as number) <= (price.max as number));
+}
 export function isApproved(item: { status: string; reviewer?: string | null; approved_at?: string | null }): boolean {
   return item.status === 'approved' && typeof item.reviewer === 'string' && item.reviewer.trim().length > 0 && typeof item.approved_at === 'string' && Number.isFinite(Date.parse(item.approved_at));
 }
@@ -196,8 +201,11 @@ export function validateLibrary(lib: AuditLibrary = library, options: { ruleChec
     ref(tariff.service_id, serviceIds, tariff.id); ref(tariff.source.id, sourceIds, tariff.id);
     if (tariff.selection_rule) rule(tariff.selection_rule, tariff.id);
     if (isApproved(tariff) && tariff.commercial_approval === 'approved' && !tariff.selection_rule) errors.push(`${tariff.id}: approved tariff lacks an evidence rule`);
+    if (isApproved(tariff) && tariff.commercial_approval === 'approved' && !pricedTariff(tariff)) errors.push(`${tariff.id}: approved tariff has no price`);
     if (tariff.auto_selectable && (!isApproved(tariff) || tariff.commercial_approval !== 'approved' || !tariff.selection_rule || tariff.conflicts.length)) errors.push(`${tariff.id}: unsafe automatic tariff`);
   }
+  // Every approved problem must be able to show at least one priced option of its services.
+  for (const block of lib.solutions.filter(isApproved)) if (!lib.tariffs.some(tariff => block.services.includes(tariff.service_id) && isApproved(tariff) && tariff.commercial_approval === 'approved' && pricedTariff(tariff))) errors.push(`${block.id}: no approved priced tariff for its services`);
   for (const service of lib.services) { ref(service.source_id, sourceIds, service.id); for (const id of service.tariff_ids) ref(id, tariffIds, service.id); for (const id of service.block_ids) ref(id, solutionIds, service.id); }
   for (const item of lib.cases) { ref(item.source_id, sourceIds, item.id); item.block_ids.forEach(id => ref(id, solutionIds, item.id)); if (item.visitor_forecast !== false) errors.push(`${item.id}: a case must not forecast the visitor's result`); }
   for (const id of lib.scenario.entry_questions) ref(id, questionIds, 'scenario entry');

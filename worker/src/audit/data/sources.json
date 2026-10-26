@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "status": "draft",
   "prepared_at": "2026-10-22T20:13:25.939Z",
   "author": "Codex; automated preparation",
@@ -4724,6 +4724,90 @@
           "scope": "Требования к источникам, хранению и утверждению тарифов для текущих исправлений. Не является полной повторной приёмкой библиотеки или программной реализации."
         }
       }
+    },
+    {
+      "id": "s_bitrix24_site",
+      "url": "https://pixelplus.ru/crm/bitrix24/integration/1c-bitrix/",
+      "title": "Интеграция CRM Битрикс24 с 1С-Bitrix",
+      "local_path": "knowledge-base/kb/services/crm/bitrix24/integration/1c-bitrix.md",
+      "section": "crm",
+      "crawled_at": "2026-10-22T09:08:26+00:00",
+      "sha256": "08551b124276b65257861d25fe210bc120f7a4e965a63dfe6312605a7452e008",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-26",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 18,
+          "section": "## Разовые работы",
+          "text": "| Настройка обмена заказами | 6 500 руб |"
+        },
+        {
+          "line": 19,
+          "section": "## Разовые работы",
+          "text": "| Настройка обмена пользователями | 4 000 руб |"
+        },
+        {
+          "line": 20,
+          "section": "## Разовые работы",
+          "text": "| Настройка обмена товарами | 9 500 руб |"
+        },
+        {
+          "line": 21,
+          "section": "## Разовые работы",
+          "text": "| Интеграция с веб-формами на сайте | 4 000 руб |"
+        },
+        {
+          "line": 22,
+          "section": "## Разовые работы",
+          "text": "| Интеграция онлайн-чатов | 3 000 руб |"
+        }
+      ],
+      "tables": []
+    },
+    {
+      "id": "s_bitrix24_telephony",
+      "url": "https://pixelplus.ru/crm/bitrix24/integration/telephoniya/",
+      "title": "Интеграция телефонии с CRM Битрикс24",
+      "local_path": "knowledge-base/kb/services/crm/bitrix24/integration/telephoniya.md",
+      "section": "crm",
+      "crawled_at": "2026-10-22T09:08:29+00:00",
+      "sha256": "ca3d106c75d5bfa2de2b94b8eca3726f30903c4f8b930c5ae724c7bd2d3f7538",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-26",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 18,
+          "section": "## Разовые работы",
+          "text": "| Подключение облачной телефонии | 3 500 руб |"
+        },
+        {
+          "line": 19,
+          "section": "## Разовые работы",
+          "text": "| Подключение встроенной телефонии (привязка/аренда номера) | 6 500 руб |"
+        },
+        {
+          "line": 20,
+          "section": "## Разовые работы",
+          "text": "| Интеграция CRM со сторонней ip-телефонией | 13 000 руб |"
+        },
+        {
+          "line": 21,
+          "section": "## Разовые работы",
+          "text": "| Интеграция офисной АТС | 26 000 руб |"
+        },
+        {
+          "line": 22,
+          "section": "## Разовые работы",
+          "text": "| Интеграция телефонной станции с СRM по SIP-коннектору | 6 500 руб |"
+        }
+      ],
+      "tables": []
     }
   ],
   "notes": [

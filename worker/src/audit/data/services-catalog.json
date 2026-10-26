@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "status": "approved",
   "author": "Codex — подготовка библиотеки",
   "reviewer": "project_owner_chat_approval",
@@ -28,7 +28,8 @@
         "strategy_individual"
       ],
       "price_observation_source_ids": [
-        "strategy"
+        "strategy",
+        "marketing_audit"
       ],
       "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
@@ -59,11 +60,13 @@
       "prerequisites": [
         "Согласованный объём и разрешённый доступ к необходимым данным"
       ],
-      "tariff_ids": [],
+      "tariff_ids": [
+        "marketing_audit_complex"
+      ],
       "price_observation_source_ids": [
         "marketing_audit"
       ],
-      "pricing_resolution": "scope_and_quote_required",
+      "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
         "strategy_goal",
         "strategy_dependency",
@@ -139,11 +142,16 @@
       "prerequisites": [
         "Согласованный объём и разрешённый доступ к необходимым данным"
       ],
-      "tariff_ids": [],
+      "tariff_ids": [
+        "calltracking_small",
+        "calltracking_medium",
+        "calltracking_large",
+        "calltracking_static"
+      ],
       "price_observation_source_ids": [
         "calltracking"
       ],
-      "pricing_resolution": "scope_and_quote_required",
+      "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
         "analytics_calls",
         "crm_calls"
@@ -205,11 +213,15 @@
       "prerequisites": [
         "Согласованный объём и разрешённый доступ к необходимым данным"
       ],
-      "tariff_ids": [],
+      "tariff_ids": [
+        "seo_technical_standard",
+        "seo_technical_conversion",
+        "seo_technical_leader"
+      ],
       "price_observation_source_ids": [
         "seo_technical"
       ],
-      "pricing_resolution": "scope_and_quote_required",
+      "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
         "seo_index",
         "seo_migration",
@@ -294,11 +306,15 @@
       "prerequisites": [
         "Согласованный объём и разрешённый доступ к необходимым данным"
       ],
-      "tariff_ids": [],
+      "tariff_ids": [
+        "ads_start",
+        "ads_standard",
+        "ads_business"
+      ],
       "price_observation_source_ids": [
         "ads"
       ],
-      "pricing_resolution": "scope_and_quote_required",
+      "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
         "ads_quality",
         "ads_cost",
@@ -330,11 +346,15 @@
       "prerequisites": [
         "Согласованный объём и разрешённый доступ к необходимым данным"
       ],
-      "tariff_ids": [],
+      "tariff_ids": [
+        "retarget_start",
+        "retarget_optimal",
+        "retarget_maximum"
+      ],
       "price_observation_source_ids": [
         "retarget"
       ],
-      "pricing_resolution": "scope_and_quote_required",
+      "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
         "ads_retarget"
       ]
@@ -356,11 +376,16 @@
       "prerequisites": [
         "Согласованный объём и разрешённый доступ к необходимым данным"
       ],
-      "tariff_ids": [],
+      "tariff_ids": [
+        "ux_shop",
+        "ux_services",
+        "ux_info",
+        "ux_subscription"
+      ],
       "price_observation_source_ids": [
         "ux"
       ],
-      "pricing_resolution": "scope_and_quote_required",
+      "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
         "seo_mobile",
         "ads_landing",
@@ -392,11 +417,14 @@
       "prerequisites": [
         "Согласованный объём и разрешённый доступ к необходимым данным"
       ],
-      "tariff_ids": [],
+      "tariff_ids": [
+        "cjm_expert",
+        "cjm_advanced"
+      ],
       "price_observation_source_ids": [
         "cjm"
       ],
-      "pricing_resolution": "scope_and_quote_required",
+      "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
         "ux_navigation",
         "ux_contact",
@@ -423,11 +451,13 @@
       "prerequisites": [
         "Действующий магазин со стабильным потоком посетителей; применимость подтверждается отдельно"
       ],
-      "tariff_ids": [],
+      "tariff_ids": [
+        "cro_leads"
+      ],
       "price_observation_source_ids": [
         "cro"
       ],
-      "pricing_resolution": "scope_and_quote_required",
+      "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
         "ux_checkout",
         "ux_cost",
@@ -454,11 +484,18 @@
       "prerequisites": [
         "Согласованный объём и разрешённый доступ к необходимым данным"
       ],
-      "tariff_ids": [],
+      "tariff_ids": [
+        "web_corporate",
+        "web_shop",
+        "web_landing",
+        "web_promo",
+        "web_image",
+        "web_platform"
+      ],
       "price_observation_source_ids": [
         "web"
       ],
-      "pricing_resolution": "scope_and_quote_required",
+      "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
         "seo_before_build",
         "dev_launch",
@@ -524,11 +561,15 @@
       "prerequisites": [
         "Согласованный объём и разрешённый доступ к необходимым данным"
       ],
-      "tariff_ids": [],
+      "tariff_ids": [
+        "portal_start",
+        "portal_advanced",
+        "portal_corporate"
+      ],
       "price_observation_source_ids": [
         "portal"
       ],
-      "pricing_resolution": "scope_and_quote_required",
+      "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
         "dev_portal",
         "dev_mvp"
@@ -602,11 +643,15 @@
       "prerequisites": [
         "Согласованный объём и разрешённый доступ к необходимым данным"
       ],
-      "tariff_ids": [],
+      "tariff_ids": [
+        "technical_small",
+        "technical_medium",
+        "technical_large"
+      ],
       "price_observation_source_ids": [
         "technical"
       ],
-      "pricing_resolution": "scope_and_quote_required",
+      "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
         "ux_form",
         "ux_accessibility",
@@ -634,11 +679,15 @@
       "prerequisites": [
         "Согласованный объём и разрешённый доступ к необходимым данным"
       ],
-      "tariff_ids": [],
+      "tariff_ids": [
+        "crm_minimal",
+        "crm_standard",
+        "crm_extended"
+      ],
       "price_observation_source_ids": [
         "crm"
       ],
-      "pricing_resolution": "scope_and_quote_required",
+      "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
         "analytics_quality",
         "ads_capacity",
@@ -672,11 +721,14 @@
       "prerequisites": [
         "Согласованный объём и разрешённый доступ к необходимым данным"
       ],
-      "tariff_ids": [],
-      "price_observation_source_ids": [
-        "crm_integration"
+      "tariff_ids": [
+        "crm_integration_bitrix"
       ],
-      "pricing_resolution": "scope_and_quote_required",
+      "price_observation_source_ids": [
+        "crm_integration",
+        "s_bitrix24_site"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
         "analytics_sales",
         "dev_cabinet",
@@ -708,11 +760,14 @@
       "prerequisites": [
         "Согласованный объём и разрешённый доступ к необходимым данным"
       ],
-      "tariff_ids": [],
-      "price_observation_source_ids": [
-        "telephony"
+      "tariff_ids": [
+        "telephony_bitrix"
       ],
-      "pricing_resolution": "scope_and_quote_required",
+      "price_observation_source_ids": [
+        "telephony",
+        "s_bitrix24_telephony"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
         "crm_response",
         "crm_calls"
@@ -793,11 +848,14 @@
       "prerequisites": [
         "Согласованный объём и разрешённый доступ к необходимым данным"
       ],
-      "tariff_ids": [],
+      "tariff_ids": [
+        "marketplace_advanced",
+        "marketplace_expert"
+      ],
       "price_observation_source_ids": [
         "marketplace"
       ],
-      "pricing_resolution": "scope_and_quote_required",
+      "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
         "market_entry",
         "market_order",
@@ -858,11 +916,18 @@
       "prerequisites": [
         "Согласованный объём и разрешённый доступ к необходимым данным"
       ],
-      "tariff_ids": [],
-      "price_observation_source_ids": [
-        "market_integration"
+      "tariff_ids": [
+        "market_integration_postpaid",
+        "market_integration_subscription_10",
+        "market_integration_subscription_30",
+        "market_integration_subscription_100"
       ],
-      "pricing_resolution": "scope_and_quote_required",
+      "price_observation_source_ids": [
+        "market_integration",
+        "t_support_post",
+        "t_support_sub"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
         "ads_feed",
         "market_sync"
@@ -886,11 +951,14 @@
       "prerequisites": [
         "Согласованный объём и разрешённый доступ к необходимым данным"
       ],
-      "tariff_ids": [],
+      "tariff_ids": [
+        "maps_basic",
+        "maps_extended"
+      ],
       "price_observation_source_ids": [
         "maps"
       ],
-      "pricing_resolution": "scope_and_quote_required",
+      "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
         "rep_missing",
         "rep_details",
@@ -914,11 +982,16 @@
       "prerequisites": [
         "Согласованный объём и разрешённый доступ к необходимым данным"
       ],
-      "tariff_ids": [],
-      "price_observation_source_ids": [
-        "reputation"
+      "tariff_ids": [
+        "reputation_basic",
+        "reputation_advanced",
+        "reputation_expert"
       ],
-      "pricing_resolution": "scope_and_quote_required",
+      "price_observation_source_ids": [
+        "reputation",
+        "t_serm"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
         "rep_branches",
         "rep_response",
@@ -944,11 +1017,13 @@
       "prerequisites": [
         "Согласованный объём и разрешённый доступ к необходимым данным"
       ],
-      "tariff_ids": [],
+      "tariff_ids": [
+        "serm_analysis"
+      ],
       "price_observation_source_ids": [
         "serm"
       ],
-      "pricing_resolution": "scope_and_quote_required",
+      "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
         "rep_search",
         "rep_false",
@@ -972,11 +1047,16 @@
       "prerequisites": [
         "Согласованный объём и разрешённый доступ к необходимым данным"
       ],
-      "tariff_ids": [],
+      "tariff_ids": [
+        "social_content",
+        "social_audience",
+        "social_promotion",
+        "social_competitors"
+      ],
       "price_observation_source_ids": [
         "social"
       ],
-      "pricing_resolution": "scope_and_quote_required",
+      "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
         "social_quality",
         "social_moderation",
@@ -1002,12 +1082,16 @@
       "prerequisites": [
         "Согласованный объём и разрешённый доступ к необходимым данным"
       ],
-      "tariff_ids": [],
+      "tariff_ids": [
+        "telegram_start",
+        "telegram_optima",
+        "telegram_maxi"
+      ],
       "price_observation_source_ids": [
         "telegram",
         "t_telegram"
       ],
-      "pricing_resolution": "scope_and_quote_required",
+      "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
         "social_moderation",
         "social_promotion"
@@ -1074,11 +1158,15 @@
       "prerequisites": [
         "Согласованный объём и разрешённый доступ к необходимым данным"
       ],
-      "tariff_ids": [],
+      "tariff_ids": [
+        "brand_new",
+        "brand_growth",
+        "brand_large"
+      ],
       "price_observation_source_ids": [
         "brand"
       ],
-      "pricing_resolution": "scope_and_quote_required",
+      "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
         "brand_position",
         "brand_consistency",
@@ -1260,11 +1348,15 @@
       "prerequisites": [
         "Согласованный объём и разрешённый доступ к необходимым данным"
       ],
-      "tariff_ids": [],
+      "tariff_ids": [
+        "mobile_ios",
+        "mobile_android",
+        "mobile_crossplatform"
+      ],
       "price_observation_source_ids": [
         "mobile"
       ],
-      "pricing_resolution": "scope_and_quote_required",
+      "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
         "mobile_need",
         "mobile_transaction",
@@ -1288,11 +1380,14 @@
       "prerequisites": [
         "Согласованный объём и разрешённый доступ к необходимым данным"
       ],
-      "tariff_ids": [],
+      "tariff_ids": [
+        "mobile_ux_expert",
+        "mobile_ux_advanced"
+      ],
       "price_observation_source_ids": [
         "mobile_ux"
       ],
-      "pricing_resolution": "scope_and_quote_required",
+      "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
         "mobile_need",
         "mobile_onboarding",
@@ -1317,11 +1412,15 @@
       "prerequisites": [
         "Согласованный объём и разрешённый доступ к необходимым данным"
       ],
-      "tariff_ids": [],
+      "tariff_ids": [
+        "aso_app",
+        "aso_standard",
+        "aso_super"
+      ],
       "price_observation_source_ids": [
         "aso"
       ],
-      "pricing_resolution": "scope_and_quote_required",
+      "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
         "mobile_store"
       ]
@@ -1380,11 +1479,15 @@
       "prerequisites": [
         "Согласованный объём и разрешённый доступ к необходимым данным"
       ],
-      "tariff_ids": [],
+      "tariff_ids": [
+        "one_c_support_subscription",
+        "one_c_support_deposit",
+        "one_c_support_postpaid"
+      ],
       "price_observation_source_ids": [
         "one_c_support"
       ],
-      "pricing_resolution": "scope_and_quote_required",
+      "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
         "integration_update"
       ]
@@ -1406,11 +1509,18 @@
       "prerequisites": [
         "Согласованный объём и разрешённый доступ к необходимым данным"
       ],
-      "tariff_ids": [],
-      "price_observation_source_ids": [
-        "one_c_sync"
+      "tariff_ids": [
+        "one_c_sync_postpaid",
+        "one_c_sync_subscription_10",
+        "one_c_sync_subscription_30",
+        "one_c_sync_subscription_100"
       ],
-      "pricing_resolution": "scope_and_quote_required",
+      "price_observation_source_ids": [
+        "one_c_sync",
+        "t_support_post",
+        "t_support_sub"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
         "market_sync",
         "integration_catalog",

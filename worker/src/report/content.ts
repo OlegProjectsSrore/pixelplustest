@@ -40,7 +40,8 @@ function tariffPrice(details: Record<string, Json>): string {
   const value = price.type === "fixed" ? amount : price.type === "from" && amount ? `от ${amount}` : price.type === "range" && minimum && maximum ? `${minimum}–${maximum}` : null;
   if (!value) return "Стоимость уточняется";
   const units: Record<string, string> = { project: "за проект", month: "в месяц", audit: "за аудит", hour: "за час", database: "за базу", slide: "за слайд", prepaid_package: "за пакет" };
-  const periods: Record<string, string> = { one_time: "разово", monthly: "ежемесячно", monthly_in_arrears: "постоплата в конце месяца", not_monthly: "не ежемесячно", not_stated: "порядок оплаты уточняется" };
+  // An unstated period or unit is simply left out: the price itself is always shown.
+  const periods: Record<string, string> = { one_time: "разово", monthly: "ежемесячно", monthly_in_arrears: "постоплата в конце месяца", not_monthly: "не ежемесячно" };
   const unit = units[String(price.unit)] ?? "";
   const period = price.billing_period === "monthly" && price.unit === "month" ? "" : periods[String(price.billing_period)] ?? "";
   return [value, unit, period].filter(Boolean).join(" · ");
@@ -76,7 +77,7 @@ export function buildReportContent(result: AuditResult, snapshot: AuditSnapshot,
       const tax = object(details.tax);
       const checked = typeof details.source_checked_on === "string" ? details.source_checked_on : "не указана";
       const group = (name: string, values: string[]) => values.length ? `<h4>${escapeHtml(name)}</h4>${list(values)}` : "";
-      return `<article class="tariff-option"><h3>${escapeHtml(tariff.title)}</h3><p class="tariff-price">${escapeHtml(tariffPrice(details))}</p><p>${escapeHtml(service?.name ?? String(details.service_id ?? "Услуга"))}. Подходящий объём и пакет уточняются перед предложением.</p>${group("Что входит", strings(details.included))}${group("Условия", strings(details.conditions))}${group("Что не входит", strings(details.excluded))}${group("Что требует уточнения", strings(details.not_stated))}${typeof tax?.source_text === "string" ? `<p>${escapeHtml(tax.source_text)} (по источнику).</p>` : ""}<p>Источник проверен: ${escapeHtml(checked)}. ${tariff.source_urls.map(url => `<a href="${escapeHtml(url)}">${escapeHtml(library.sources.find(source => source.url === url)?.title ?? url)}</a>`).join("; ")}</p></article>`;
+      return `<article class="tariff-option"><h3>${escapeHtml(tariff.title)}</h3><p class="tariff-price">${escapeHtml(tariffPrice(details))}</p><p>${escapeHtml(service?.name ?? String(details.service_id ?? "Услуга"))}. Подходящий объём и пакет уточняются перед предложением.</p>${group("Что входит", strings(details.included))}${group("Условия", strings(details.conditions))}${group("Что не входит", strings(details.excluded))}${group("Что требует уточнения", strings(details.not_stated))}${typeof tax?.source_text === "string" ? `<p>${escapeHtml(tax.source_text)}${tax.status === "source_says_excluded" ? " (по источнику)" : ""}.</p>` : ""}<p>Источник проверен: ${escapeHtml(checked)}. ${tariff.source_urls.map(url => `<a href="${escapeHtml(url)}">${escapeHtml(library.sources.find(source => source.url === url)?.title ?? url)}</a>`).join("; ")}</p></article>`;
     }).join("") : ""),
     section("Недостающие сведения и ограничения", list([...new Set([...result.gaps.map(factLabel), ...result.contradictions.map(item => `${factLabel(item.fact_id)}: ${item.reason}`), ...result.limitations, ...snapshot.limitations])])),
   ].join("");

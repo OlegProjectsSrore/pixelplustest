@@ -230,7 +230,8 @@ test('approved rules separate sufficiency from significance and block repeated w
   result = analyzeAudit(snapshot(answers), lib);
   assert.equal(result.solutions.length, 1);
   assert.deepEqual(result.actions[1].after, [result.actions[0].id]);
-  assert.equal(result.tariffs.length, 0);
+  // Prices everywhere: a strategy problem shows the complex-marketing range that includes the audit and the strategy.
+  assert.deepEqual(result.tariffs.map(tariff => [tariff.id, (tariff.details.price as Record<string, unknown>).min, (tariff.details.price as Record<string, unknown>).max]), [['marketing_audit_complex', 99500, 515610]]);
 });
 
 test('approved tariffs become preliminary options only for a supported service and matching evidence', () => {
@@ -240,7 +241,8 @@ test('approved tariffs become preliminary options only for a supported service a
   assert.deepEqual(missingHistory.tariffs, []);
   const ready = snapshot([...base, answer('analytics.history', { attempts_status: 'not_tried', attempts: [] }, 'answer-4')]);
   const result = analyzeAudit(ready, library);
-  assert.deepEqual(result.tariffs.map(tariff => tariff.id), ['analytics_once', 'analytics_month', 'analytics_advanced']);
+  // The problem's services are analytics and CRM integration: options of both are offered.
+  assert.deepEqual(result.tariffs.map(tariff => tariff.id), ['analytics_once', 'analytics_month', 'analytics_advanced', 'crm_integration_bitrix']);
   assert.ok(result.tariffs.every(tariff => tariff.details.selection_status === 'option_requires_scope_confirmation'));
   assert.ok(result.tariffs.every(tariff => tariff.source_urls.length === 1 && tariff.source_urls[0].startsWith('https://')));
   const altered = structuredClone(result);

@@ -59,6 +59,28 @@ test("PDF content shows evidence-matched tariff alternatives with prices, scope 
   assert.match(html, /Источник проверен: 2026-10-22/);
   assert.match(html, /Что входит/);
   assert.ok(html.indexOf('class="report-cover"') < html.indexOf('Предварительные тарифные варианты'));
+  // A range is shown as a range; an unstated VAT is said plainly, not attributed to the source.
+  assert.match(html, /3[   ]000 ₽–9[   ]500 ₽/);
+  assert.match(html, /НДС на странице не указан.</);
+});
+
+test("every price is shown: no period caveat, no «individual» and no «price is specified later» for any approved tariff", () => {
+  const answer = (id: string, fact: string, value: AuditAnswer['value']): AuditAnswer => ({ id, question_id: library.questions.find(question => question.fact_ids.includes(fact))!.id, fact_id: fact,
+    state: 'known', value, event_ids: ['visitor-1'], channel: 'chat', method: 'selection', confirmation: 'explicit', library_version: library.version, created_at: date });
+  let shown = 0;
+  for (const block of library.solutions) {
+    const details = library.facts.find(fact => fact.id === `${block.id}.details`)!;
+    const value = Object.fromEntries((details.required_fields ?? []).map(field => [field, { state: 'known', value: 'Пример' }]));
+    const snapshot: AuditSnapshot = { id: `snap-${block.id}`, session_id: 'session', library_version: library.version, created_at: date, through_seq: 1,
+      answers: [answer('a1', `${block.domain}.applicable`, true), answer('a2', `${block.id}.signal`, 'target'), answer('a3', `${block.id}.details`, value), answer('a4', `${block.domain}.history`, { attempts_status: 'not_tried', attempts: [] })],
+      state: initialAuditState(library.version, 'chat', date), limitations: [] };
+    const result = analyzeAudit(snapshot, library);
+    assert.ok(result.tariffs.length > 0, `${block.id} has a price`);
+    const html = buildReportContent(result, snapshot, library).html;
+    assert.doesNotMatch(html, /порядок оплаты уточняется|период оплаты уточняется|рассчитывается индивидуально|Стоимость уточняется/, block.id);
+    shown += result.tariffs.length;
+  }
+  assert.ok(shown >= library.solutions.length);
 });
 
 test("KV cache misses only return waiting and never invoke rendering; expired report returns 410", async () => {

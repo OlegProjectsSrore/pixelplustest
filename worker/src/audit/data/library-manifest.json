@@ -136,8 +136,8 @@
     },
     {
       "name": "services-catalog.json",
-      "sha256": "50a230b68b3d2db5de2d9a4625cd6f8bd9caf7a117f7b96f4f3e5a18f8d63875",
-      "bytes": 56974,
+      "sha256": "c5a53bbc03f8555ac6d2982ba52b8197ac01635b09db811125909efb5efc6437",
+      "bytes": 59715,
       "role": "runtime_candidate"
     },
     {
@@ -148,14 +148,14 @@
     },
     {
       "name": "sources.json",
-      "sha256": "71dace593a7113c803f6515979d03ab1fe28a5523d3c9907179eb25bc686a850",
-      "bytes": 186288,
+      "sha256": "31049025ca0015f7092867c8fee523db48f9ab860f70b5a084d8ef1c558f9782",
+      "bytes": 189669,
       "role": "editorial"
     },
     {
       "name": "tariffs.json",
-      "sha256": "84c7d57c71987d08f2c7b5605e0eb71f482231a43886322470a5dfaa9dcdfbe8",
-      "bytes": 237017,
+      "sha256": "f50e961a7ba71ebdd3de884b314de0f541a565007737925b1adfe9b8b9591787",
+      "bytes": 619920,
       "role": "runtime_candidate"
     },
     {
