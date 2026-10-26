@@ -2,6 +2,18 @@
 
 ---
 
+- Date/time: 2026-10-26 18:42
+- Scope: S:\PROJECTS\pixelplustest
+- Summary: ветка `codex/expert-chat-panel` (рабочая копия `.deployment\expert-chat-panel`) перемотана вперёд на `main` до коммита с этой записью.
+  - Ветка была чистой, своих коммитов не имела и отставала на один коммит (e37de8b → 36c6e4a, вынос промпта DeepSeek).
+  - Перемотка с `core.autocrlf=false`, чтобы файлы в этой рабочей копии остались с LF.
+- Files changed:
+  - project_log.md
+  - вне репозитория: рабочая копия `.deployment/expert-chat-panel`
+- Reference: «Да, перемотай ветку Codex (codex/expert-chat-panel) на main.»
+
+---
+
 - Date/time: 2026-10-26 18:35
 - Scope: S:\PROJECTS\pixelplustest
 - Summary: промпт DeepSeek вынесен в отдельный файл с меткой, по образцу голосового.
