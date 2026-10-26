@@ -80,6 +80,10 @@ async function rejectsCode(run: Promise<unknown>, code: string) {
   await assert.rejects(run, error => error instanceof HttpError && error.code === code);
 }
 function enumState(state: AuditState) {
+  for (const id of library.scenario.mandatory_entry_questions ?? []) {
+    const fact = library.questions.find(question => question.id === id)!.fact_ids[0];
+    state.facts[fact] = { fact_id: fact, state: 'known', value: 'recorded', confirmation: 'explicit', answer_ids: [`prior-${fact}`] };
+  }
   state.facts['strategy_goal.signal'] = { fact_id: 'strategy_goal.signal', state: 'known', value: 'target', confirmation: 'unconfirmed', answer_ids: ['prior'] };
 }
 
@@ -291,7 +295,12 @@ test('LLM statements remain unconfirmed, and real engine requests confirmation b
   await harness.execute(); const turn = harness.saved.turn!;
   assert.equal(turn.answers[0].confirmation, 'unconfirmed');
   const derived = deriveFacts(turn.answers);
-  const question = nextQuestion({ ...harness.session.state, ...derived }, NOW, library, { allowDraft: true });
+  const state = { ...harness.session.state, ...derived };
+  for (const id of library.scenario.mandatory_entry_questions ?? []) {
+    const fact = library.questions.find(question => question.id === id)!.fact_ids[0];
+    state.facts[fact] = { fact_id: fact, state: 'known', value: 'recorded', confirmation: 'explicit', answer_ids: [`prior-${fact}`] };
+  }
+  const question = nextQuestion(state, NOW, library, { allowDraft: true });
   assert.equal(question?.id, turn.answers[0].question_id); assert.match(question!.text, /верно ли записаны сведения/);
   // This test does not fabricate a text-confirmation hook: the core must provide it.
 });

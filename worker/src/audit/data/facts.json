@@ -1,11 +1,99 @@
 {
   "schema_version": "1.0.0",
-  "version": "0.1.1",
+  "version": "0.1.4",
   "status": "approved",
   "author": "Codex — подготовка по методике и локальным источникам",
   "reviewer": "project_owner_chat_approval",
-  "approved_at": "2026-10-23T06:01:25.796Z",
+  "approved_at": "2026-10-26T11:14:36.181Z",
   "items": [
+    {
+      "id": "context.name",
+      "label": "Имя посетителя",
+      "value_type": "text",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.1.4",
+      "status": "approved",
+      "author": "Codex — по запросу владельца проекта",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-26T11:14:36.181Z",
+      "purpose": "Обязательное знакомство перед основным опросом"
+    },
+    {
+      "id": "context.position",
+      "label": "Должность посетителя в компании",
+      "value_type": "text",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.1.4",
+      "status": "approved",
+      "author": "Codex — по запросу владельца проекта",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-26T11:14:36.181Z",
+      "purpose": "Обязательное знакомство перед основным опросом"
+    },
+    {
+      "id": "context.responsibilities",
+      "label": "Функционал и зона ответственности посетителя",
+      "value_type": "text",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.1.4",
+      "status": "approved",
+      "author": "Codex — по запросу владельца проекта",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-26T11:14:36.181Z",
+      "purpose": "Обязательное знакомство перед основным опросом"
+    },
+    {
+      "id": "context.company_size",
+      "label": "Размер компании",
+      "value_type": "text",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.1.4",
+      "status": "approved",
+      "author": "Codex — по запросу владельца проекта",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-26T11:14:36.181Z",
+      "purpose": "Обязательное знакомство перед основным опросом"
+    },
     {
       "id": "context.business",
       "label": "Чем занимается компания",

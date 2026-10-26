@@ -50,6 +50,7 @@ export interface Service extends Governed { name: string; source_id: string; sco
 export interface Case { id: string; source_id: string; block_ids: string[]; status: string; visitor_forecast: boolean }
 export interface Scenario {
   entry_questions: string[];
+  mandatory_entry_questions?: string[];
   clock: { max_seconds: number; no_new_deep_branch_after: number; closing_from: number };
   phases: { id: string; next?: string; terminal?: boolean }[];
   routing: { max_clarifications_per_fact: number };
@@ -72,7 +73,7 @@ export interface AuditLibrary {
 
 /** Version is intentionally pinned; a changed content release must receive a new version. */
 export const library: AuditLibrary = {
-  version: '0.1.3', rulesVersion: '1.0.0', tariffVersion: tariffsData.version, templateVersion: '1.2.0',
+  version: '0.1.4', rulesVersion: '1.0.0', tariffVersion: tariffsData.version, templateVersion: '1.2.0',
   status: solutionsData.status,
   facts: (factsData.items as FactDefinition[]).map(fact => ({ ...fact, runtime_schema: runtimeSchemaForFact(fact, solutionsData.items.map(block => block.id)) })), questions: questionsData.items as Question[],
   solutions: solutionsData.items as unknown as Solution[], tariffs: tariffsData.items as unknown as Tariff[],
@@ -82,7 +83,23 @@ export const library: AuditLibrary = {
   schemas: { state: stateSchemaData, result: resultSchemaData },
 };
 
+// 0.1.4 only adds the introductory block. Keep the previous projection available
+// for already-created sessions and report snapshots pinned to 0.1.3.
+const introductionIds = new Set(scenarioData.mandatory_entry_questions);
+const introductionFacts = new Set(questionsData.items.filter(question => introductionIds.has(question.id)).flatMap(question => question.fact_ids));
+const previousLibrary: AuditLibrary = {
+  ...library, version: '0.1.3',
+  facts: library.facts.filter(fact => !introductionFacts.has(fact.id)),
+  questions: library.questions.filter(question => !introductionIds.has(question.id)),
+  scenario: { ...library.scenario, entry_questions: library.scenario.entry_questions.filter(id => !introductionIds.has(id)), mandatory_entry_questions: [] },
+  schemas: {
+    state: { ...stateSchemaData, properties: { ...stateSchemaData.properties, library_version: { const: '0.1.3' } } },
+    result: { ...resultSchemaData, properties: { ...resultSchemaData.properties, library_version: { const: '0.1.3' } } },
+  } as AuditLibrary['schemas'],
+};
+
 export function getLibrary(version = library.version): AuditLibrary {
+  if (version === previousLibrary.version) return previousLibrary;
   if (version !== library.version) throw new Error(`Library version is unavailable: ${version}`);
   return library;
 }
@@ -183,6 +200,12 @@ export function validateLibrary(lib: AuditLibrary = library, options: { ruleChec
   for (const service of lib.services) { ref(service.source_id, sourceIds, service.id); for (const id of service.tariff_ids) ref(id, tariffIds, service.id); for (const id of service.block_ids) ref(id, solutionIds, service.id); }
   for (const item of lib.cases) { ref(item.source_id, sourceIds, item.id); item.block_ids.forEach(id => ref(id, solutionIds, item.id)); if (item.visitor_forecast !== false) errors.push(`${item.id}: a case must not forecast the visitor's result`); }
   for (const id of lib.scenario.entry_questions) ref(id, questionIds, 'scenario entry');
+  const mandatory = lib.scenario.mandatory_entry_questions ?? [];
+  if (new Set(mandatory).size !== mandatory.length) errors.push('Duplicate mandatory entry question');
+  for (const [index, id] of mandatory.entries()) {
+    const question = lib.questions.find(item => item.id === id);
+    if (lib.scenario.entry_questions[index] !== id || !question || question.phase !== 'orientation' || question.condition) errors.push(`Invalid mandatory entry question: ${id}`);
+  }
   if (lib.scenario.clock.max_seconds !== 900 || lib.scenario.clock.no_new_deep_branch_after !== 720 || lib.scenario.clock.closing_from !== 840) errors.push('Scenario clock disagrees with architecture');
   const phases = new Map(lib.scenario.phases.map(phase => [phase.id, phase]));
   for (const phase of phases.values()) {
@@ -216,7 +239,8 @@ export function compileVoiceBlocks(lib: AuditLibrary = library, options: { allow
   const blocks: ReturnType<typeof compileVoiceBlocks> = {};
   for (const question of lib.questions) {
     if (!isApproved(question) && !(options.allowDraft && question.status === 'draft')) continue;
-    const key = question.related_block ?? question.domain ?? question.phase;
+    // Save each mandatory introductory answer before the server chooses the next question.
+    const key = lib.scenario.mandatory_entry_questions?.includes(question.id) ? question.id : question.related_block ?? question.domain ?? question.phase;
     const block = blocks[key] ??= { library_version: lib.version, questions: [] };
     block.questions.push({ id: question.id, text: question.voice, fact_ids: question.fact_ids, options: question.fact_ids.flatMap(id => lib.facts.find(fact => fact.id === id)?.values?.map(value => ({ id: value.id, text: value.label })) ?? []) });
   }

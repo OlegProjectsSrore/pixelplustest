@@ -27,7 +27,7 @@ test('real client/transport/Worker: creation, text, multi-selection, lost ACK re
     if (String(url).includes('turnstile')) return Response.json({ success: true, hostname: 'olegprojectssrore.github.io', action: 'session' });
     providerCalls++;
     const context = JSON.parse(JSON.parse(String(init?.body)).messages[1].content), event = context.source_events[0];
-    const answers = [ ['context_business', 'context.business', 'Магазин'], ['context_goal', 'context.goal', 'Рост продаж'], ['context_assets', 'context.assets', ['Сайт']] ]
+    const answers = [ ['context_name', 'context.name', 'Олег'], ['context_position', 'context.position', 'Директор'], ['context_responsibilities', 'context.responsibilities', 'Продажи'], ['context_company_size', 'context.company_size', '50 сотрудников'], ['context_business', 'context.business', 'Магазин'], ['context_goal', 'context.goal', 'Рост продаж'], ['context_assets', 'context.assets', ['Сайт']] ]
       .map(([question_id, fact_id, value]) => ({ question_id, fact_id, value, state: 'known', event_ids: [event.id], evidence: [{ event_id: event.id, text: event.text }] }));
     return Response.json({ usage: { prompt_tokens: 80, completion_tokens: 20, total_tokens: 100 }, choices: [{ finish_reason: 'stop', message: { content: JSON.stringify({
       intent: 'answer', answers, clarification_question_id: null, faq_id: null, joke_category_id: null, humor_preference: null,
@@ -51,10 +51,10 @@ test('real client/transport/Worker: creation, text, multi-selection, lost ACK re
   });
   try {
     await client.open('chat');
-    assert.equal(model.error, ''); assert.equal(client.session.question.id, 'context_business');
+    assert.equal(model.error, ''); assert.equal(client.session.question.id, 'context_name');
     assert.equal(stored.management_token.length, 43); assert.notEqual(stored.management_token, stored.report_token);
     now += 600000;
-    await handlers.onText('Магазин. Рост продаж. Сайт.');
+    await handlers.onText('Олег. Директор. Отвечаю за продажи. 50 сотрудников. Магазин. Рост продаж. Сайт.');
     assert.equal(model.remaining_seconds, 900, 'Ten minutes in chat do not consume the voice timer');
     assert.equal(model.error, ''); assert.equal(client.session.question.id, 'context_priority');
     assert.equal(model.question.answer_mode, 'multiple');
@@ -67,7 +67,7 @@ test('real client/transport/Worker: creation, text, multi-selection, lost ACK re
     assert.equal(selectionBodies.length, 2); assert.equal(selectionBodies[0], selectionBodies[1]);
     assert.equal(client.session.revision, revision); assert.equal(providerCalls, 1);
     const answers = await core.store.listAnswers(client.session.session_id);
-    assert.equal(answers.length, 4);
+    assert.equal(answers.length, 8);
     assert.deepEqual(answers.find(answer => answer.fact_id === 'context.priority')?.value, ['strategy', 'analytics']);
     await handlers.onPause(); assert.equal(client.session.paused, true);
     await handlers.onResume(); assert.equal(client.session.paused, false);

@@ -18,7 +18,7 @@ const execution = { waitUntil() {}, passThroughOnException() {} } as unknown as 
 const intent = (kind: Classification['intent']): Classification => ({ intent: kind, answers: [], clarification_question_id: null, faq_id: null, joke_category_id: null, humor_preference: null });
 function reportFromText(context: ClassifierContext, kind: 'answer' | 'mixed' = 'answer'): Classification {
   const source = context.source_events[0];
-  return { ...intent(kind), answers: [{ question_id: 'context_business', fact_id: 'context.business', state: 'known', value: source.text!, event_ids: [source.id], evidence: [{ event_id: source.id, text: source.text! }] }] };
+  return { ...intent(kind), answers: [{ question_id: 'context_name', fact_id: 'context.name', state: 'known', value: source.text!, event_ids: [source.id], evidence: [{ event_id: source.id, text: source.text! }] }] };
 }
 async function fixture(respond: (context: ClassifierContext, call: number) => unknown | Promise<unknown> = context => reportFromText(context)) {
   const db = new SqliteD1(); let calls = 0;
@@ -33,7 +33,7 @@ async function fixture(respond: (context: ClassifierContext, call: number) => un
   const session = await core.store.createSession({ id: 'chat-session', tokenHash: await hashToken(bearer), reportId: 'report-1', reportTokenHash: await hashToken('report-token'), state: initialAuditState(library.version, 'chat', now), now });
   const handler = createChatAdapter();
   const request = new Request('https://example.test/api/chat', { method: 'POST', headers: { Authorization: `Bearer ${bearer}` } });
-  const body = (operation = 'turn-1', revision = 0, input: Record<string, unknown> = { kind: 'text', text: 'Продаём товары для дома.' }, question = 'context_business') => ({ api_version: '1', session_id: session.id, operation_id: operation, expected_revision: revision, channel_revision: 0, library_version: library.version, question_id: question, input });
+  const body = (operation = 'turn-1', revision = 0, input: Record<string, unknown> = { kind: 'text', text: 'Олег' }, question = 'context_name') => ({ api_version: '1', session_id: session.id, operation_id: operation, expected_revision: revision, channel_revision: 0, library_version: library.version, question_id: question, input });
   const context = (value: Record<string, unknown>): AdapterContext => ({ core, env, execution, body: value });
   return { db, core, env, session, request, body, context, handler, calls: () => calls };
 }
@@ -46,7 +46,7 @@ test('chat text uses delivered evidence, becomes explicit written evidence and a
     const answers = await f.core.store.listAnswers(f.session.id);
     assert.equal(answers.length, 1); assert.equal(answers[0].confirmation, 'explicit'); assert.equal(answers[0].method, 'classification');
     const session = await f.core.store.requireSession(f.session.id);
-    assert.equal(session.state.current_question_id, 'context_goal');
+    assert.equal(session.state.current_question_id, 'context_position');
     const repeated = await f.handler(f.request, f.context(body));
     assert.equal((repeated as { kind: string }).kind, 'duplicate'); assert.equal(f.calls(), 1);
     const tokens = await f.core.store.getUsageReservation('deepseek_tokens:chat-session:turn-1:0');
@@ -59,7 +59,7 @@ test('standard selection never calls the model and only accepts offered options'
   const f = await fixture();
   try {
     const event: AuditEvent = { id: 'seed-event', source: 'chat', source_key: 'seed', source_revision: 0, local_order: 0, role: 'user', kind: 'utterance', text: 'Сообщённый контекст', occurred_at: now, received_at: now };
-    const seed: AuditAnswer[] = [ ['context.business', 'Магазин'], ['context.goal', 'Развитие'], ['context.assets', ['Сайт']] ].map(([id, value], i) => ({ id: `seed-${i}`, question_id: library.questions.find(question => question.fact_ids.includes(id as string))!.id, fact_id: id as string, state: 'known', value: value as Json, event_ids: [event.id], channel: 'chat', method: 'selection', confirmation: 'explicit', library_version: library.version, created_at: now }));
+    const seed: AuditAnswer[] = [ ['context.name', 'Олег'], ['context.position', 'Директор'], ['context.responsibilities', 'Продажи'], ['context.company_size', '50 сотрудников'], ['context.business', 'Магазин'], ['context.goal', 'Развитие'], ['context.assets', ['Сайт']] ].map(([id, value], i) => ({ id: `seed-${i}`, question_id: library.questions.find(question => question.fact_ids.includes(id as string))!.id, fact_id: id as string, state: 'known', value: value as Json, event_ids: [event.id], channel: 'chat', method: 'selection', confirmation: 'explicit', library_version: library.version, created_at: now }));
     await f.core.store.commit({ sessionId: f.session.id, operationId: 'seed', expectedRevision: 0, channelRevision: 0, event, answers: seed, state: advanceAudit(f.session.state, seed, now, library, { allowDraft: true }), now });
     const selected = f.body('selection-1', 1, { kind: 'selection', option_ids: ['strategy'] }, 'context_priority');
     await f.handler(f.request, f.context(selected));

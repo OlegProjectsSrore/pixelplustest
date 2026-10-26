@@ -210,6 +210,12 @@ export function nextQuestion(state: AuditState, now: number, lib: AuditLibrary =
   if (!options.allowDraft) assertLibraryReady(lib);
   const elapsed = elapsedInterviewMs(state, now);
   if (state.status !== 'in_progress' || state.paused || elapsed >= INTERVIEW_BUDGET_MS) return null;
+  // The introductory block precedes adaptive branches in both channels. Explicit
+  // unknown/declined answers count as collected; they must not trap the visitor.
+  const mandatory = (lib.scenario.mandatory_entry_questions ?? [])
+    .map(id => lib.questions.find(question => question.id === id))
+    .find(question => question && permitted(question, options) && needsQuestion(question, state, lib));
+  if (mandatory) return { id: mandatory.id, text: mandatory[state.active_channel], fact_ids: mandatory.fact_ids, options: [] };
   const activeBlocks = candidates(state, lib, options), domains = new Set(activeBlocks.map(block => block.domain));
   const priority = state.facts['context.priority'];
   const namedTopics = known(priority) && Array.isArray(priority.value) ? priority.value.filter((value): value is string => typeof value === 'string') : [];

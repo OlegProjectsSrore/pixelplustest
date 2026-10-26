@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { initialAuditState, type AuditAnswer, type AuditEvent, type AuditSnapshot } from '../src/audit/contracts.ts';
-import { advanceAudit, analyzeAudit, deriveFacts, elapsedInterviewMs, nextQuestion, validateAnswers } from '../src/audit/engine.ts';
-import { compileVoiceBlocks, library, validateLibrary, validateLibraryManifest, type AuditLibrary } from '../src/audit/library.ts';
+import { advanceAudit, analyzeAudit, deriveFacts, elapsedInterviewMs, interviewSufficiency, nextQuestion, validateAnswers } from '../src/audit/engine.ts';
+import { compileVoiceBlocks, getLibrary, library, validateLibrary, validateLibraryManifest, type AuditLibrary } from '../src/audit/library.ts';
 import { evaluateRule, validateRule } from '../src/audit/rules.ts';
 import { selectHumorReply } from '../src/audit/humor.ts';
 import { validateAuditResult, validateAuditState } from '../src/audit/validation.ts';
@@ -18,6 +18,77 @@ function answer(fact = 'context.business', value: AuditAnswer['value'] = 'Маг
   assert.ok(question);
   return { id, question_id: question.id, fact_id: fact, state: 'known', value, event_ids: ['event-1'], channel: 'chat', method: 'classification', confirmation: 'explicit', library_version: library.version, created_at: now };
 }
+const introduction = () => [
+  answer('context.name', 'Олег', 'intro-name'),
+  answer('context.position', 'Директор', 'intro-position'),
+  answer('context.responsibilities', 'Отвечаю за продажи', 'intro-responsibilities'),
+  answer('context.company_size', '50 сотрудников', 'intro-size'),
+];
+
+test('mandatory introduction has the same order and saved progress across repeated channel switches', () => {
+  const expected = [
+    ['context_name', 'Как Вас зовут?'],
+    ['context_position', 'Какая Ваша должность в компании?'],
+    ['context_responsibilities', 'Какой у Вас функционал в компании, за что Вы отвечаете?'],
+    ['context_company_size', 'Какой размер компании?'],
+  ];
+  for (const start of ['chat', 'voice'] as const) {
+    let state = { ...initialAuditState(library.version, start, now), paused: false };
+    const accepted: AuditAnswer[] = [];
+    for (const [index, [id, text]] of expected.entries()) {
+      assert.equal(interviewSufficiency(state, now).sufficient, false);
+      for (const channel of ['chat', 'voice', 'chat', 'voice'] as const) {
+        state = { ...state, active_channel: channel, channel_revision: state.channel_revision + 1 };
+        const question = nextQuestion(state, now)!;
+        assert.equal(question.id, id); assert.equal(question.text, text);
+      }
+      const reply = { ...introduction()[index], channel: state.active_channel, method: 'voice_batch' as const };
+      validateAnswers([reply], [{ ...event(), source: 'voice' }], accepted);
+      accepted.push(reply);
+      state = advanceAudit(state, accepted, now);
+    }
+    assert.equal(nextQuestion(state, now)?.id, 'context_business');
+    assert.equal(state.facts['context.responsibilities'].value, 'Отвечаю за продажи');
+    assert.equal(state.facts['context.company_size'].value, '50 сотрудников');
+  }
+});
+
+test('mandatory questions precede adaptive clarification and accept explicit refusals without loops', () => {
+  const business = { ...answer(), confirmation: 'unconfirmed' as const };
+  const accepted: AuditAnswer[] = [business];
+  let state = advanceAudit(initialAuditState(library.version, 'chat', now), accepted, now);
+  for (const [index, reply] of introduction().entries()) {
+    assert.equal(nextQuestion(state, now)?.id, reply.question_id);
+    accepted.push({ ...reply, state: index % 2 ? 'unknown' : 'declined', value: null });
+    state = advanceAudit(state, accepted, now);
+  }
+  assert.equal(nextQuestion(state, now)?.id, 'context_business');
+  assert.match(nextQuestion(state, now)!.text, /верно ли записаны сведения/);
+  assert.equal(nextQuestion({ ...state, status: 'closing' }, now), null);
+});
+
+test('each mandatory voice question is a separate save boundary with no optional branch', () => {
+  const blocks = compileVoiceBlocks(library);
+  for (const reply of introduction()) {
+    const block = Object.values(blocks).find(block => block.questions.some(question => question.id === reply.question_id))!;
+    assert.equal(block.questions.length, 1);
+    assert.equal(block.questions[0].id, reply.question_id);
+  }
+});
+
+test('library validation rejects missing or reordered mandatory entry questions', () => {
+  const invalid = structuredClone(library);
+  invalid.scenario.entry_questions.reverse();
+  assert.ok(validateLibrary(invalid).errors.some(error => error.includes('Invalid mandatory entry question')));
+});
+
+test('previously created sessions keep their pinned questions and report library', () => {
+  const previous = getLibrary('0.1.3');
+  assert.equal(nextQuestion(initialAuditState(previous.version, 'chat', now), now, previous)?.id, 'context_business');
+  assert.equal(previous.questions.some(question => question.id === 'context_name'), false);
+  assert.deepEqual(validateLibrary(previous, { ruleChecks: ruleChecksData }).errors, []);
+  assert.equal(getLibrary().version, '0.1.4');
+});
 function snapshot(answers: AuditAnswer[]): AuditSnapshot {
   const state = advanceAudit(initialAuditState(library.version, 'chat', now), answers, now, library, preview);
   return { id: 'snapshot-1', session_id: 'session-1', library_version: library.version, created_at: now, through_seq: 1, answers, state, limitations: [] };
@@ -121,7 +192,7 @@ test('new evidence may fill an earlier unknown without falsely treating unknown 
 });
 
 test('selection skips collected context and does not infer domain applicability', () => {
-  const state = advanceAudit(initialAuditState(library.version, 'chat', now), [answer()], now, library, preview);
+  const state = advanceAudit(initialAuditState(library.version, 'chat', now), [...introduction(), answer()], now, library, preview);
   assert.notEqual(nextQuestion(state, now, library, preview)?.id, 'context_business');
   assert.equal(state.candidate_blocks.length, 0);
   const late = { ...state, elapsed_ms: 14 * 60_000, active_since: null };
@@ -284,7 +355,7 @@ test('manifest validation covers exact bytes and missing/extra inputs', async ()
 });
 
 test('the interview follows named topics and stops screening a domain after selecting a substantive branch', () => {
-  const entries = [answer('context.business'), answer('context.goal', 'Улучшить измеримость', 'goal'), answer('context.assets', ['site'], 'assets'), answer('context.priority', ['strategy'], 'priority')];
+  const entries = [...introduction(), answer('context.business'), answer('context.goal', 'Улучшить измеримость', 'goal'), answer('context.assets', ['site'], 'assets'), answer('context.priority', ['strategy'], 'priority')];
   let state = advanceAudit(initialAuditState(library.version, 'chat', now), entries, now, library, preview);
   assert.equal(nextQuestion(state, now, library, preview)?.id, 'strategy_scope');
   entries.push(answer('strategy.applicable', true, 'applicable'), answer('strategy_goal.signal', 'target', 'signal'));

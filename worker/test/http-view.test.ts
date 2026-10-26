@@ -43,7 +43,7 @@ test('SessionView uses HTTP v1 fields and question options without exposing audi
     assert.equal(typeof question.text, 'string'); assert.ok(['text', 'number', 'single', 'multiple'].includes(String(question.answer_mode)));
     assert.ok(Array.isArray(question.options));
     for (const item of question.options) assert.deepEqual(Object.keys(object(item)).sort(), ['id', 'label', 'text']);
-    assert.deepEqual(question.fact_ids, ['context.business']);
+    assert.deepEqual(question.fact_ids, ['context.name']);
     const serialized = JSON.stringify(view);
     for (const secret of ['tokenHash', 'private-token-hash', 'candidate_blocks', 'contradictions', 'result_json', 'content_json']) assert.equal(serialized.includes(secret), false);
     assert.equal(object(view.capabilities!).finish, true);

@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0.0",
-  "version": "0.1.1",
+  "version": "0.1.4",
   "status": "approved",
   "author": "Codex — подготовка библиотеки",
   "reviewer": "project_owner_chat_approval",
-  "approved_at": "2026-10-23T06:01:25.796Z",
+  "approved_at": "2026-10-26T11:14:36.181Z",
   "channels": [
     "chat",
     "voice"
@@ -21,6 +21,10 @@
     "scope": "Общий бюджет сессии, включая уточнения, юмор и смену канала; время PDF после интервью отдельно."
   },
   "entry_questions": [
+    "context_name",
+    "context_position",
+    "context_responsibilities",
+    "context_company_size",
     "context_business",
     "context_goal",
     "context_assets",
@@ -131,5 +135,11 @@
     "model_cannot_select_tariff_or_diagnosis": true,
     "source_turn_required": true
   },
-  "runtime_status": "Content contract and offline verification; live chat, voice, D1 and PDF delivery are not implemented by these files."
+  "runtime_status": "Content contract and offline verification; live chat, voice, D1 and PDF delivery are not implemented by these files.",
+  "mandatory_entry_questions": [
+    "context_name",
+    "context_position",
+    "context_responsibilities",
+    "context_company_size"
+  ]
 }

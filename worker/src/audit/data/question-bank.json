@@ -1,11 +1,99 @@
 {
   "schema_version": "1.0.0",
-  "version": "0.1.1",
+  "version": "0.1.4",
   "status": "approved",
   "author": "Codex — подготовка по методике и локальным источникам",
   "reviewer": "project_owner_chat_approval",
-  "approved_at": "2026-10-23T06:01:25.796Z",
+  "approved_at": "2026-10-26T11:14:36.181Z",
   "items": [
+    {
+      "id": "context_name",
+      "fact_ids": [
+        "context.name"
+      ],
+      "chat": "Как Вас зовут?",
+      "voice": "Как Вас зовут?",
+      "skip_if": "Ответ уже явно сообщён посетителем; не повторять при смене канала.",
+      "version": "0.1.4",
+      "status": "approved",
+      "author": "Codex — по запросу владельца проекта",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-26T11:14:36.181Z",
+      "phase": "orientation",
+      "estimated_seconds": 25,
+      "related_blocks": [],
+      "time_importance": "context_or_routing",
+      "duration_status": "author_estimate_not_measured",
+      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
+      "max_clarifications": 1,
+      "answer_mode": "structured_fact"
+    },
+    {
+      "id": "context_position",
+      "fact_ids": [
+        "context.position"
+      ],
+      "chat": "Какая Ваша должность в компании?",
+      "voice": "Какая Ваша должность в компании?",
+      "skip_if": "Ответ уже явно сообщён посетителем; не повторять при смене канала.",
+      "version": "0.1.4",
+      "status": "approved",
+      "author": "Codex — по запросу владельца проекта",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-26T11:14:36.181Z",
+      "phase": "orientation",
+      "estimated_seconds": 25,
+      "related_blocks": [],
+      "time_importance": "context_or_routing",
+      "duration_status": "author_estimate_not_measured",
+      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
+      "max_clarifications": 1,
+      "answer_mode": "structured_fact"
+    },
+    {
+      "id": "context_responsibilities",
+      "fact_ids": [
+        "context.responsibilities"
+      ],
+      "chat": "Какой у Вас функционал в компании, за что Вы отвечаете?",
+      "voice": "Какой у Вас функционал в компании, за что Вы отвечаете?",
+      "skip_if": "Ответ уже явно сообщён посетителем; не повторять при смене канала.",
+      "version": "0.1.4",
+      "status": "approved",
+      "author": "Codex — по запросу владельца проекта",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-26T11:14:36.181Z",
+      "phase": "orientation",
+      "estimated_seconds": 25,
+      "related_blocks": [],
+      "time_importance": "context_or_routing",
+      "duration_status": "author_estimate_not_measured",
+      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
+      "max_clarifications": 1,
+      "answer_mode": "structured_fact"
+    },
+    {
+      "id": "context_company_size",
+      "fact_ids": [
+        "context.company_size"
+      ],
+      "chat": "Какой размер компании?",
+      "voice": "Какой размер компании?",
+      "skip_if": "Ответ уже явно сообщён посетителем; не повторять при смене канала.",
+      "version": "0.1.4",
+      "status": "approved",
+      "author": "Codex — по запросу владельца проекта",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-26T11:14:36.181Z",
+      "phase": "orientation",
+      "estimated_seconds": 25,
+      "related_blocks": [],
+      "time_importance": "context_or_routing",
+      "duration_status": "author_estimate_not_measured",
+      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
+      "max_clarifications": 1,
+      "answer_mode": "structured_fact"
+    },
     {
       "id": "context_business",
       "fact_ids": [

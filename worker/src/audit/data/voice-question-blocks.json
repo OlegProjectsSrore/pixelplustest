@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "status": "approved",
   "purpose": "Сервер выбирает один блок; не передавать весь каталог агенту или браузеру.",
   "blocks": [
@@ -3094,6 +3094,34 @@
     }
   ],
   "context": [
+    {
+      "id": "context_name",
+      "text": "Как Вас зовут?",
+      "fact_ids": [
+        "context.name"
+      ]
+    },
+    {
+      "id": "context_position",
+      "text": "Какая Ваша должность в компании?",
+      "fact_ids": [
+        "context.position"
+      ]
+    },
+    {
+      "id": "context_responsibilities",
+      "text": "Какой у Вас функционал в компании, за что Вы отвечаете?",
+      "fact_ids": [
+        "context.responsibilities"
+      ]
+    },
+    {
+      "id": "context_company_size",
+      "text": "Какой размер компании?",
+      "fact_ids": [
+        "context.company_size"
+      ]
+    },
     {
       "id": "context_business",
       "text": "Что вы предлагаете и кто обычно это покупает?",

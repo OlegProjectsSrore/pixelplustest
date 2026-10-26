@@ -2,6 +2,51 @@
 
 ---
 
+- Date/time: 2026-10-26 12:29
+- Scope: S:\PROJECTS\pixelplustest\.deployment\expert-chat-panel
+- Summary: по разрешению владельца опубликован Cloudflare Worker с библиотекой опроса 0.1.4; подготовлена публикация новой подписи страницы /main/ через workflow GitHub Pages при отправке текущего коммита в main.
+- Files changed: project_log.md; публикация подготовленных изменений worker/src и dist/main/index.html.
+- Validation: production-проверка библиотеки успешна. Worker version 5e62fbcd-1981-429b-9b9a-7bfe37715312 опубликован; smoke:deployed подтвердил CORS, авторизацию и доступ к D1 без создания опроса и запросов к AI.
+- Reference: «Опубликуй».
+
+---
+
+- Date/time: 2026-10-26 12:23
+- Scope: S:\PROJECTS\pixelplustest\.deployment\expert-chat-panel
+- Summary: подпись под заголовком в шапке /main/ заменена на «После аудита вы получите PDF-файл с рекомендациями.». Существующая разметка сохранена. Изменение локальное, без публикации.
+- Files changed: dist/main/index.html, project_log.md.
+- Reference: выделенная пользователем строка «Итог аудита в pdf сразу: приоритет и 3 нужных шага.» и новая формулировка «После аудит вы получите pdf файл с рекомендациями».
+
+---
+
+- Date/time: 2026-10-26 12:22
+- Scope: S:\PROJECTS\pixelplustest\.deployment\expert-chat-panel
+- Summary: в библиотеку 0.1.4 добавлен обязательный вступительный блок: имя, должность, функционал и зона ответственности, размер компании. Сервер задаёт его перед адаптивными вопросами; голосовые ответы сохраняются по одному. Отказ и неизвестный ответ не вызывают зацикливания. Сохранённые ответы учитываются при смене канала. Сессии и отчёты версии 0.1.3 сохраняют прежнюю библиотеку.
+- Files changed:
+  - worker/src/audit/data/facts.json
+  - worker/src/audit/data/question-bank.json
+  - worker/src/audit/data/scenario.json
+  - worker/src/audit/data/audit-state.schema.json
+  - worker/src/audit/data/audit-result.schema.json
+  - worker/src/audit/data/library-manifest.json
+  - worker/src/audit/data/voice-question-blocks.json
+  - worker/src/audit/data/report-examples.json
+  - worker/src/audit/data/validation-report.json
+  - worker/src/audit/library.ts
+  - worker/src/audit/engine.ts
+  - worker/src/voice/prompt.ts
+  - worker/src/chat/handler.test.ts
+  - worker/test/audit.test.ts
+  - worker/test/channel-runtime.test.ts
+  - worker/test/channel-voice.test.ts
+  - worker/test/client-worker.test.ts
+  - worker/test/http-view.test.ts
+  - project_log.md
+- Validation: 323 теста успешно; TypeScript, check:library и сборка Worker без публикации успешны. Проверка полного содержимого verify-audit-content.mjs остановилась на существовавших до изменений несовпадениях контрольных сумм источников: CRLF у digital-strategiya.md; у web-analitika.md несовпадение подтверждено также в HEAD после нормализации строк. Материалы и ожидаемые хеши источников не изменялись; статус полной проверки в validation-report.json отмечен как заблокированный. Реальные звонки и платные запросы для проверки не выполнялись. Коммит, push и публикация не выполнялись.
+- Reference: «Нужно чтобы обязательно были заданы следующие вопросы…»; «какой у Вас функционал, за что Вы отвечаете?»; «Вноси изменения в код».
+
+---
+
 - Date/time: 2026-10-22 15:55
 - Scope: S:\PROJECTS\pixelplustest
 - Summary: в базу знаний добавлены четыре презентации PDF из /doc/ (общая, разработка, поддержка, SEO). /doc/ закрыт в robots.txt, файлы взяты явно по указанию пользователя. Новый модуль pdf_markdown.py переводит слайды в Markdown (раздел на слайд, карточки по порядку чтения, склейка переносов); в начале каждого документа указана дата файла на сервере (разработка — 2018-08-03, поддержка и SEO — 2023-12-13, общая — 2024-02-27). База пересобрана (1 705 документов), индекс перестроен (2 954 куска), векторы перезагружены в Vectorize pixelplus-services и проверены. Изменения отправлены на GitHub.

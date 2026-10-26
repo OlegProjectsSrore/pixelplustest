@@ -84,7 +84,9 @@ test('start reserves before provider, attaches before join URL, and encrypted re
     const calls = await f.core.store.listCalls('session-1'); assert.equal(calls[0].status, 'reserved');
     const config = JSON.parse(String(init?.body)); assert.equal(config.maxDuration, '900s');
     assert.equal(config.model, 'approved-model'); assert.equal(config.voice, 'approved-voice');
-    assert.ok(config.systemPrompt.includes('context_model'), 'the prompt contains the full current block');
+    const prompt = JSON.parse(config.systemPrompt.slice(config.systemPrompt.lastIndexOf('\n') + 1));
+    assert.equal(config.firstSpeakerSettings.agent.text, 'Как Вас зовут?');
+    assert.deepEqual(prompt.questions.map((question: { id: string }) => question.id), ['context_name']);
     return Response.json(rawCall(), { status: 201 });
   });
   const input = await f.body('start-1'), result = await f.invoke(f.adapters.voiceStart!, input);
@@ -114,6 +116,34 @@ test('returning to an already spoken voice question waits for the visitor instea
   const second = f.requests.at(-1)!;
   assert.equal(new URL(second.url).searchParams.get('priorCallId'), PROVIDER_ID);
   assert.deepEqual(JSON.parse(String(second.init?.body)).firstSpeakerSettings, { user: {} });
+});
+
+test('saved introductory answers survive voice to chat and back without restarting the questions', async t => {
+  const f = await fixture(); t.after(() => f.db.close());
+  const first = await f.start();
+  await f.transcript(first.call_id, 'intro-name', [
+    { text: 'Как Вас зовут?', role: 'assistant', order: 0 },
+    { text: 'Олег', order: 1 },
+    { text: 'Правильно ли я понял: Олег?', role: 'assistant', order: 2 },
+    { text: 'Да, верно.', order: 3 },
+  ]);
+  const reply = { question_id: 'context_name', fact_id: 'context.name', state: 'known', value: 'Олег', source_quotes: ['Олег'], confirmation_candidate: 'explicit' };
+  await f.invoke(f.adapters.voiceAnswers!, await f.body('save-intro-name', { call_id: first.call_id, answers: [reply] }));
+  const saved = await f.core.store.requireSession('session-1');
+  assert.equal(saved.state.current_question_id, 'context_position');
+  assert.equal(saved.state.facts['context.name'].confirmation, 'explicit');
+  f.tick(5000);
+  await f.core.store.confirmCallStopped(first.call_id, f.core.now());
+  await f.core.channel(f.request(), await f.body('intro-to-chat', { action: 'switch', channel: 'chat' }), f.adapters.pollVoice);
+  const chat = await f.core.store.requireSession('session-1');
+  assert.equal(obj(obj(await f.core.view(chat)).question).id, 'context_position');
+  assert.equal(chat.state.facts['context.name'].value, 'Олег');
+  await f.core.channel(f.request(), await f.body('intro-to-voice', { action: 'switch', channel: 'voice' }), f.adapters.pollVoice);
+  f.respond(() => Response.json({ ...rawCall(), callId: '22222222-2222-4222-8222-222222222222' }, { status: 201 }));
+  await f.start('intro-start-2');
+  const config = JSON.parse(String(f.requests.at(-1)!.init?.body));
+  assert.equal(config.firstSpeakerSettings.agent.text, 'Какая Ваша должность в компании?');
+  assert.equal((await f.core.store.listAnswers('session-1')).length, 1);
 });
 
 test('concurrent start authorizes one external create and retains unknown outcome without retry', async t => {
