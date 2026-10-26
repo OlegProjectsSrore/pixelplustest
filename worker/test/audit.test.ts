@@ -280,6 +280,22 @@ test('humor is deterministic, excludes reservations, does not alter facts or tim
   assert.equal(selectHumorReply(state, intent, question).joke_id, null);
 });
 
+test('return phrases take turns as jokes are used; neutral replies describe the consultant role', () => {
+  const state = initialAuditState(library.version, 'chat', now);
+  const question = nextQuestion(state, now, library, preview)!;
+  const intent = { kind: 'off_topic' as const, certain: true, safe_category_ids: ['weather'], now };
+  const endings: (string | undefined)[] = [];
+  for (let i = 0; i <= library.jokes.return_phrases.length; i++) {
+    const reply = selectHumorReply(state, intent, question);
+    endings.push(library.jokes.return_phrases.find(phrase => reply.text.endsWith(` ${phrase}`)));
+    state.humor.reserved_ids.push(reply.joke_id!);
+  }
+  assert.deepEqual(endings, [...library.jokes.return_phrases, library.jokes.return_phrases[0]]);
+  state.humor.reserved_ids = library.jokes.categories.flatMap(category => category.jokes.map(joke => joke.id));
+  assert.match(selectHumorReply(state, intent, question).text, /вопросы об услугах Pixel Plus и провожу экспресс-диагностику/);
+  assert.match(selectHumorReply(state, { ...intent, kind: 'role_change' }, question).text, /ответить на вопросы об услугах Pixel Plus или продолжить экспресс-диагностику/);
+});
+
 test('mixed, sensitive, uncertain and pause intents do not get a joke', () => {
   const state = initialAuditState(library.version, 'chat', now);
   const question = nextQuestion(state, now, library, preview)!;
