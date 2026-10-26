@@ -78,7 +78,7 @@ test('ambiguous quotes require matching ordinals; correction target comes only f
   await assert.rejects(resolveVoiceAnswers({ ...base, events: [event] }, async () => ({ confirmation: 'explicit', replaces_answer_id: 'not-owned' })), /target/);
 });
 
-test('voice answers route accepts server-owned metadata through core and rejects evidence bypass', async () => {
+test('voice answers route accepts server-owned metadata through core and ignores forged evidence', async () => {
   let accepted: AuditAnswer[] = [];
   const ctx = context({ answers: [candidate] }, { accept: async (_request: Request, _body: unknown, acceptedEvent: AuditEvent, answers: AuditAnswer[]) => {
     // Mirrors the actual storage invariant: service/delivery events may not carry answers.
@@ -88,7 +88,9 @@ test('voice answers route accepts server-owned metadata through core and rejects
   await createVoiceHandlers().voiceAnswers(request(), ctx);
   assert.equal(accepted[0].confirmation, 'unconfirmed');
   assert.deepEqual(accepted[0].event_ids, [event.id]);
-  await assert.rejects(createVoiceHandlers().voiceAnswers(request(), context({ answers: [{ ...candidate, event_ids: ['forged'] }] })), isCode('invalid_voice_payload'));
+  accepted = [];
+  await createVoiceHandlers().voiceAnswers(request(), context({ answers: [{ ...candidate, event_ids: ['forged'] }] }, { accept: async (_request: Request, _body: unknown, _event: AuditEvent, answers: AuditAnswer[]) => { accepted = answers; return { kind: 'accepted' }; } }));
+  assert.deepEqual(accepted[0].event_ids, [event.id], 'forged event_ids are dropped, never used as evidence');
   const unavailableEvidence = context({ answers: [candidate] }); unavailableEvidence.core.store.listEvents = async () => [];
   await assert.rejects(createVoiceHandlers().voiceAnswers(request(), unavailableEvidence), isCode('unresolved_evidence'));
 });

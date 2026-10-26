@@ -54,11 +54,13 @@ function stringList(value: unknown, maxLength: number, required = false): string
   if (!Array.isArray(value) || value.length > 32 || (required && !value.length)) throw new Error('Invalid model evidence');
   return value.map(item => nonempty(item, 'model string', maxLength));
 }
+const answerFields = ['question_id', 'fact_id', 'answer_id', 'state', 'value', 'parameters', 'confirmation_candidate', 'source_quotes', 'source_ordinals', 'is_correction'];
 function parseAnswers(value: unknown): VoiceAnswerCandidate[] {
   if (!Array.isArray(value) || value.length > 64) throw new Error('Invalid model answer batch');
-  return value.map(item => {
-    if (!record(item)) throw new Error('Invalid model answer');
-    exactKeys(item, ['question_id', 'fact_id', 'answer_id', 'state', 'value', 'parameters', 'confirmation_candidate', 'source_quotes', 'source_ordinals', 'is_correction']);
+  return value.map(raw => {
+    if (!record(raw)) throw new Error('Invalid model answer');
+    // Realtime models may add fields beyond the tool schema (e.g. value_type); only listed fields are read, the rest are dropped.
+    const item: Record<string, unknown> = Object.fromEntries(answerFields.filter(key => Object.hasOwn(raw, key)).map(key => [key, raw[key]]));
     nonempty(item.question_id, 'question ID', 128); nonempty(item.fact_id, 'fact ID', 128);
     if (!states.includes(String(item.state)) || !Object.hasOwn(item, 'value')) throw new Error('Invalid model answer state');
     json(item.value);

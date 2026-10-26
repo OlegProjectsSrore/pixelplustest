@@ -158,13 +158,15 @@ test('verified webhook normalizes lifecycle but does not trust provider metadata
   await assert.rejects(parseVerifiedWebhook(bad, new Headers(), { secrets: ['new-secret'], now: () => now }), /signature/);
 });
 
-test('tool candidate boundary rejects fabricated authority and missing source evidence', () => {
+test('tool candidate boundary drops fabricated authority and rejects missing source evidence', () => {
   const value = parseVoiceAnswerPayload({ answers: [candidate] });
   assert.equal(value.answers[0].confirmation_candidate, 'unconfirmed');
   assert.equal('confirmation' in value.answers[0], false);
   assert.notEqual(value.answers[0], candidate);
-  for (const field of ['session_id', 'call_id', 'operation_id', 'expected_revision', 'event_ids', 'confirmation', 'library_version', 'id']) {
-    assert.throws(() => parseVoiceAnswerPayload({ answers: [{ ...candidate, [field]: 'forged' }] }), /Unexpected/);
+  for (const field of ['session_id', 'call_id', 'operation_id', 'expected_revision', 'event_ids', 'confirmation', 'library_version', 'id', 'value_type']) {
+    const parsed = parseVoiceAnswerPayload({ answers: [{ ...candidate, [field]: 'forged' }] }).answers[0];
+    assert.equal(field in parsed, false, `${field} is dropped and never trusted`);
+    assert.deepEqual(parsed, value.answers[0]);
   }
   assert.throws(() => parseVoiceAnswerPayload({ answers: [{ ...candidate, source_quotes: [] }] }), /evidence/);
   assert.throws(() => parseVoiceAnswerPayload({ answers: [{ ...candidate, state: 'not_measured' }] }), /null/);

@@ -5,7 +5,7 @@ import type { HumorIntent } from './audit/humor.ts';
 import { validateRuntimeValue, type RuntimeValueSchema } from './audit/value-schemas.ts';
 import type { CoreServices } from './core.ts';
 import type { AdapterContext, ChannelAdapters } from './integration.ts';
-import { fail, hashToken, identifier, mutation, object, readBytes, requestHash, revision, textField } from './security.ts';
+import { fail, hashToken, HttpError, identifier, mutation, object, readBytes, requestHash, revision, textField } from './security.ts';
 import { elapsedMs, type StoredSession, type UsageReservation, type VoiceCall } from './storage/d1-store.ts';
 import { buildCallConfig, buildInterviewPrompt, createVoiceProvider, parseVerifiedWebhook, parseVoiceAnswerPayload, parseVoiceOffTopicPayload, VoiceProviderError } from './voice/index.ts';
 import type { VoiceAnswerCandidate, VoiceCallConfig, VoiceDependencies } from './voice/types.ts';
@@ -27,6 +27,11 @@ const FETCH_TIMEOUT_MS = 12_000;
 const record = (value: Json | undefined): Record<string, Json> => value && typeof value === 'object' && !Array.isArray(value) ? value : {};
 const json = (value: unknown): Json => JSON.parse(JSON.stringify(value)) as Json;
 
+/** Model tool arguments are deterministic input: a format error is a 400 the model can correct, not a retryable 500. */
+function modelArguments<T>(parse: () => T): T {
+  try { return parse(); }
+  catch (error) { throw error instanceof HttpError ? error : new HttpError(400, 'invalid_answers', 'Ответ модели не прошёл проверку формата.', false, error instanceof Error ? error.message : undefined); }
+}
 function secret(core: CoreServices, name: string): string {
   const value = core.env[name];
   return typeof value === 'string' && value.trim() ? value : fail(503, 'not_configured', 'Голосовой канал ещё не настроен.');
@@ -547,7 +552,7 @@ export function createVoiceAdapters(options: VoiceBridgeOptions = {}): Partial<C
       const call = await member(core, session, body.call_id);
       if (session.state.status !== 'in_progress' || session.state.active_channel !== 'voice' || call.id !== session.activeCallId || call.channelRevision !== input.channel_revision || call.status !== 'active') fail(409, 'channel_conflict', 'Звонок больше не владеет каналом ввода.');
       if (body.tool === 'offTopicReply') {
-        parseVoiceOffTopicPayload(Object.fromEntries(['kind', 'certain', 'safe_category_ids', 'excluded_joke_ids', 'previous_topic_category_ids'].filter(key => body[key] !== undefined).map(key => [key, body[key]])));
+        modelArguments(() => parseVoiceOffTopicPayload(Object.fromEntries(['kind', 'certain', 'safe_category_ids', 'excluded_joke_ids', 'previous_topic_category_ids'].filter(key => body[key] !== undefined).map(key => [key, body[key]]))));
         const evidence = latestEvents(await readEvents(core, session.id)).filter(event => event.call_id === call.id && event.source === 'voice' && event.role === 'user' && record(event.data).is_final === true).sort((a, b) => a.local_order - b.local_order);
         const latest = evidence.at(-1); if (!latest) fail(409, 'pending_evidence', 'Последняя реплика посетителя ещё не доставлена.');
         let intent = literalIntent(latest!.text ?? '', core.now());
@@ -564,7 +569,7 @@ export function createVoiceAdapters(options: VoiceBridgeOptions = {}): Partial<C
           event: core.serviceEvent(input.operation_id, 'finish', { reason: 'visitor_request', event_id: latest!.id }), state: session.state, now: core.now(), reason: 'visitor_request' }));
         return core.humor(request, body, { ...intent, now: core.now() });
       }
-      const parsed = parseVoiceAnswerPayload({ answers: body.answers });
+      const parsed = modelArguments(() => parseVoiceAnswerPayload({ answers: body.answers }));
       if (body.through_event_id !== undefined && !(await readEvents(core, session.id)).some(event => event.id === body.through_event_id && event.call_id === call.id)) fail(409, 'pending_evidence', 'Граница голосовой истории ещё не сохранена.');
       const answers = await normalizeVoiceAnswers(core, session, call, parsed.answers);
       const event: AuditEvent = { ...core.serviceEvent(input.operation_id, 'answer', { type: 'voice_packet' }), source: 'voice', call_id: call.id };

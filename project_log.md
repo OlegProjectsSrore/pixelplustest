@@ -2,6 +2,36 @@
 
 ---
 
+- Date/time: 2026-10-26 17:45
+- Scope: S:\PROJECTS\pixelplustest
+- Summary: журнал отказов (запись `voice_answers_rejected`, сессия 911e38eac32f) показал, почему голосовой ответ «Александр» не сохранялся.
+  - Модель передала верные question_id, fact_id, state и строковое value; цитата совпала дословно. Но она добавила поле `value_type`, которого нет в схеме `saveAnswers`: OpenAI Realtime не запрещает лишние поля.
+  - Разбор `parseAnswers` выбрасывал обычную ошибку «Unexpected model tool field», и сервер отвечал 500. Получив 500, клиент держит отправку неподтверждённой и блокирует следующие («Сначала повторите неподтверждённую отправку.»).
+  - Теперь `parseAnswers` в `voice/client-tools.ts` читает только разрешённые поля ответа, а остальные отбрасывает. Сохраняемый ответ сервер и так собирает только из этих полей, поэтому поддельные `event_ids`, `confirmation`, `id` по-прежнему не используются.
+  - Ошибки формата аргументов модели (`saveAnswers` и `offTopicReply`) в голосовом обработчике возвращаются как 400 `invalid_answers` без повтора. Внутренняя причина передаётся в `HttpError.detail` и попадает в журнал, а клиент снимает блокировку.
+  - Два прежних теста, ожидавших отказа на лишние поля (`voice.test.ts`, `handlers.test.ts`), переделаны: теперь они проверяют, что поддельные поля отброшены и не попадают в доказательства.
+  - Worker опубликован, версия abc19f70-1198-468e-87fa-04cc26dcbc4e. Переменные (15), ключи (10) и Workers Logs не менялись.
+- Files changed:
+  - worker/src/voice/client-tools.ts
+  - worker/src/channel-voice.ts
+  - worker/src/voice/voice.test.ts
+  - worker/src/voice/handlers.test.ts
+  - worker/test/channel-realtime.test.ts
+  - project_log.md
+  - внешнее состояние: Cloudflare Worker pixelplus-ai (версия abc19f70)
+- Validation:
+  - проверка типов без ошибок;
+  - тесты Worker — 343 из 343; два новых теста (лишнее `value_type` отброшено и ответ сохранён; ошибка формата — 400 `invalid_answers` без повтора, с причиной в журнале) на прежнем коде падают;
+  - `check:library` — productionReady;
+  - сборка прошла;
+  - smoke в Miniflare — внешних запросов 0;
+  - после публикации `smoke-deployed-worker.mjs --open` — PASS.
+
+  Реальный звонок после публикации не проводился.
+- Reference: «Да: пусть Worker отбрасывает лишние поля в ответах модели вместо отказа, а ошибки формата возвращает как 400 invalid_answers, а не 500. Добавь тесты, прогони проверки, опубликуй Worker, закоммить и отправь на GitHub.»
+
+---
+
 - Date/time: 2026-10-26 17:29
 - Scope: S:\PROJECTS\pixelplustest
 - Summary: голосовой ответ не сохранялся.

@@ -153,6 +153,29 @@ test('Rejected voice saves are logged by structure only, with the engine reason'
   assert.equal(invalid.code, 'invalid_answers'); assert.equal(invalid.detail, 'Unknown or inactive question/fact pair'); assert.equal(invalid.answers[0].fact_id, 'context.position');
 });
 
+test('Extra model fields such as value_type are dropped and the voice answer is saved', async t => {
+  const f = await fixture(); t.after(() => f.db.close());
+  const save = await nameCall(f, 'Александр,');
+  await f.invoke(f.adapters.voiceAnswers!, await save({ source_quotes: ['Александр,'], value_type: 'text', confirmation_candidate: 'explicit', is_correction: false, event_ids: ['forged'] }));
+  const answers = await f.core.store.listAnswers('s1');
+  assert.deepEqual(answers.map(a => [a.fact_id, a.value]), [['context.name', 'Александр']]);
+  assert.notDeepEqual(answers[0].event_ids, ['forged']);
+});
+
+test('Malformed model arguments are a 400 invalid_answers, not a retryable 500', async t => {
+  const f = await fixture(); t.after(() => f.db.close());
+  const warn = t.mock.method(console, 'warn', () => {});
+  const save = await nameCall(f, 'Александр,');
+  const definite = (e: unknown) => e instanceof HttpError && e.status === 400 && e.code === 'invalid_answers' && !e.retryable;
+  await assert.rejects(f.invoke(f.adapters.voiceAnswers!, await save({ state: 'unknown', source_quotes: ['Александр'] })), definite);
+  const callId = (await f.core.store.requireSession('s1')).activeCallId;
+  await assert.rejects(f.invoke(f.adapters.voiceAnswers!, await f.body(undefined, { call_id: callId, tool: 'offTopicReply', kind: 'invented', certain: true, safe_category_ids: [] })), definite);
+  const [answer, offTopic] = warn.mock.calls.map(c => JSON.parse(String(c.arguments[0])));
+  assert.equal(answer.status, 400); assert.equal(answer.detail, 'Uncertain answers require null');
+  assert.equal(offTopic.tool, 'offTopicReply'); assert.equal(offTopic.detail, 'Invalid off-topic candidate');
+  assert.equal((await f.core.store.listAnswers('s1')).length, 0);
+});
+
 test('Heartbeat cannot revive another call; cron terminates stale calls; failed hangup blocks overlap', async t => {
   const f = await fixture(); t.after(() => f.db.close()); const call = await f.start();
   await assert.rejects(f.invoke(f.adapters.voiceControl!, { session_id: 's1', call_id: 'not-owned', action: 'heartbeat' }), code('call_mismatch'));
