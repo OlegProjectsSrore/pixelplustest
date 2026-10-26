@@ -257,3 +257,18 @@ test('a selected option gets a worded next question with exactly one model call'
     assert.equal(response.operation.question_text, 'Какое направление сейчас для Вас главное?');
   } finally { f.db.close(); }
 });
+
+test('the next wording sees the reactions already shown in this session', async () => {
+  const seen: Record<string, Json>[] = [];
+  const f = await fixture((context, call) => {
+    if ('next_question' in context) { seen.push(context as unknown as Record<string, Json>); return { reply: call === 2 ? 'Рады знакомству, Олег.' : 'Уточните, пожалуйста, ответ.', question: 'Какую должность Вы занимаете в компании?' }; }
+    return call === 1 ? reportFromText(context) : intent('unknown');
+  });
+  f.env.CHAT_COMPOSER_ENABLED = 'true';
+  try {
+    await f.handler(f.request, f.context(f.body()));
+    await f.handler(f.request, f.context(f.body('turn-2', 1, { kind: 'text', text: 'не знаю, что сказать' }, 'context_position')));
+    assert.deepEqual(seen.map(context => context.previous_replies), [[], ['Рады знакомству, Олег.']]);
+    assert.deepEqual(await f.core.store.recentReplies(f.session.id), ['Рады знакомству, Олег.', 'Уточните, пожалуйста, ответ.']);
+  } finally { f.db.close(); }
+});

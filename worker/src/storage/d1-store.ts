@@ -77,6 +77,14 @@ export class D1Store {
     const result = await this.stmt(`SELECT payload_json,seq FROM audit_events WHERE session_id=? AND seq>? ORDER BY seq LIMIT ?`, sessionId, afterSeq, Math.max(1, Math.min(limit, 1000))).all<Row>();
     return result.results.map(row => ({ ...parse<AuditEvent>(row.payload_json), seq: Number(row.seq) }));
   }
+  /** Assistant texts of the latest committed chat turns, oldest first; only used so wording does not repeat itself. */
+  async recentReplies(sessionId: string, limit = 4): Promise<string[]> {
+    const result = await this.stmt(`SELECT result_json FROM audit_events WHERE session_id=? AND source='chat' AND result_json IS NOT NULL ORDER BY seq DESC LIMIT ?`, sessionId, Math.max(1, Math.min(limit, 20))).all<Row>();
+    return result.results.flatMap(row => {
+      const value = parse<Json>(row.result_json);
+      return value && typeof value === 'object' && !Array.isArray(value) && typeof value.text === 'string' && value.text.trim() ? [value.text] : [];
+    }).reverse();
+  }
   async getOperation(sessionId: string, operationId: string): Promise<{ result: Json; event: AuditEvent; requestHash: string | null } | null> {
     const row = await this.stmt(`SELECT payload_json,result_json,seq,request_hash FROM audit_events WHERE session_id=? AND operation_id=?`, sessionId, operationId).first<Row>();
     return row ? { result: row.result_json == null ? null : parse<Json>(row.result_json), event: { ...parse<AuditEvent>(row.payload_json), seq: Number(row.seq) }, requestHash: nullableString(row.request_hash) } : null;

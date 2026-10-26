@@ -80,7 +80,7 @@ export async function composeFirstQuestion(context: AdapterContext, sessionId: s
     const question = nextQuestion(session.state, context.core.now(), getLibrary(session.state.library_version), context.core.engineOptions);
     if (!question) return null;
     const composed = await composeTurn(context, session, 'first-question', 0, 6_000, { visitor_text: null, approved_text: null, notice_to_rephrase: null,
-      question: { text: question.text, options: question.options.map(option => option.text) }, history: [] });
+      question: { text: question.text, options: question.options.map(option => option.text) }, history: [], previous_replies: [] });
     return composed?.question_text ? { question_id: question.id, text: composed.question_text } : null;
   } catch { return null; }
 }
@@ -140,7 +140,8 @@ export async function commitChatTurn(request: Request, context: AdapterContext, 
     const composed = await composeTurn(context, session, turn.input.operation_id, COMPOSE_ATTEMPT, 8_000, { visitor_text: turn.event.text ?? null,
       // A clarification of the current question would only repeat it; ask for a clearer answer instead.
       approved_text: approved, notice_to_rephrase: approved ? null : serviceText && serviceText === question?.text ? 'Ответ не удалось однозначно понять: попросите уточнить его.' : serviceText,
-      question: question ? { text: question.text, options: question.options.map(option => option.text) } : null, history: dialog(evidence) });
+      question: question ? { text: question.text, options: question.options.map(option => option.text) } : null, history: dialog(evidence),
+      previous_replies: await context.core.store.recentReplies(session.id) });
     if (composed) { questionText = composed.question_text; if (!approved) serviceText = composed.reply; }
   }
   // A reaction to a plain answer is shown to the visitor but leaves the answer event untouched.
