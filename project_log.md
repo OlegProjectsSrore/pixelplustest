@@ -2,6 +2,33 @@
 
 ---
 
+- Date/time: 2026-10-26 17:24
+- Scope: S:\PROJECTS\pixelplustest
+- Summary: запись о синхронизации основной папки с GitHub, выполненной 2026-10-26 в 15:40–15:46 без записи в журнале. До синхронизации локальная `main` стояла на f04f592 и отставала от `origin/main` (0a7b88b) на 33 коммита; в ней лежали незакоммиченные правки. Рабочая копия `.deployment\expert-chat-panel` была на 0a7b88b. Коммит 30140f9 «Preserve local knowledge-base fixes and reconcile project history» сделан поверх 0a7b88b, в нём сохранены 65 файлов из основной папки:
+  - правки базы знаний и извлечения таблиц из записи 2026-10-22 21:09 (61 изменённый файл `knowledge-base/` и новый `test_extract.py`);
+  - тексты AI-блока в `dist/assets/ai-lead.html` и `dist/index.html` (на опубликованную `/main/` не влияют);
+  - `dist/assets/audit-integration.md` — историческая запись интеграции Ultravox (в GitHub Pages не публикуется).
+
+  В журнал перенесены 24 записи, которые были только в основной папке (было 10 записей, стало 34). Код Worker, чата и OpenAI Realtime взят из 0a7b88b без изменений. После синхронизации `main`, `origin/main` и `codex/expert-chat-panel` указывали на 30140f9. Состояние основной папки до синхронизации сохранено двумя способами:
+  - резервная копия `.artifacts\reconcile-20261026-154023` — 207 исходных файлов в `files/`, diff-файлы, `manifest.json`, `resolution.json`, `refs.txt`, хеш `.dev.vars` в `local-env.sha256`;
+  - Git stash «Preserve main workspace before reconciliation 2026-10-26» (95630bb579059b2030ff25ad48dd4715c7c045cf). В нём старые версии чата, сделанные до перехода на OpenAI Realtime, поэтому целиком его не применять.
+
+  Файл `worker\.dev.vars` не менялся, `OPENAI_API_KEY` в него не добавлялся.
+- Files changed:
+  - в коммите 30140f9: knowledge-base/** (62 файла), dist/assets/ai-lead.html, dist/index.html, dist/assets/audit-integration.md, project_log.md
+  - вне Git: .artifacts/reconcile-20261026-154023/, stash@{0}
+  - этой записью: project_log.md
+- Validation: после синхронизации проверено:
+  - `main`, `origin/main` и worktree стоят на 30140f9, обе копии чистые;
+  - база знаний в коммите совпадает со stash;
+  - sha256 всех 63 источников из `sources.json` и `index.json` из `source-inventory.json` совпадают с коммитом;
+  - test_extract — 7 из 7, `build-index.mjs --check` — 2 956 кусков, typecheck без ошибок, тесты Worker — 337 из 337;
+  - GitHub Pages для 30140f9 опубликован успешно;
+  - `.dev.vars` совпадает с `local-env.sha256`.
+- Reference: «Да, добавь в project_log.md запись о синхронизации (коммит 30140f9, stash, резервная копия), закоммить и отправь на GitHub.»
+
+---
+
 - Date/time: 2026-10-26 14:22
 - Scope: S:\PROJECTS\pixelplustest\.deployment\expert-chat-panel
 - Summary: голосовой канал переведён с Ultravox на OpenAI Realtime gpt-realtime-2.1-mini; WebRTC, cedar, speed=1.0, русские потоковые субтитры, защищённое повторение SDP и серверная остановка. Сохранены вопросы, PDF, DeepSeek для чата и действующие бюджеты. Добавлены heartbeat/Cron, восстановление недоставленных фактов и проверки повторных переключений.
