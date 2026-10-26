@@ -99,7 +99,7 @@ export async function presentPayload(core: CoreServices, payload: unknown, readO
     output.session = await sessionView(core, session, readOnly);
   }
   if (readOnly) return output;
-  for (const key of ['operation_id', 'status', 'id', 'call_id', 'provider_call_id', 'join_url', 'transition_pending', 'stop_required', 'accepted', 'message', 'through_event_id', 'retry_after_seconds', 'report_token']) {
+  for (const key of ['operation_id', 'status', 'id', 'call_id', 'provider_call_id', 'join_url', 'provider', 'sdp_answer', 'first_message', 'realtime_instructions', 'transition_pending', 'stop_required', 'accepted', 'message', 'through_event_id', 'retry_after_seconds', 'report_token']) {
     const value = original[key];
     if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' || value === null) output[key] = value;
   }

@@ -2,6 +2,15 @@
 
 ---
 
+- Date/time: 2026-10-26 14:22
+- Scope: S:\PROJECTS\pixelplustest\.deployment\expert-chat-panel
+- Summary: голосовой канал переведён с Ultravox на OpenAI Realtime gpt-realtime-2.1-mini; WebRTC, cedar, speed=1.0, русские потоковые субтитры, защищённое повторение SDP и серверная остановка. Сохранены вопросы, PDF, DeepSeek для чата и действующие бюджеты. Добавлены heartbeat/Cron, восстановление недоставленных фактов и проверки повторных переключений.
+- Files changed: worker/src/channel-realtime.ts; worker/src/channel-voice.ts; worker/src/integration.ts; worker/src/index.ts; worker/src/env.ts; worker/src/http-view.ts; worker/src/storage/d1-store.ts; worker/migrations/0006_realtime_calls.sql; worker/wrangler.jsonc; worker/test/channel-realtime.test.ts; worker/test/realtime-runtime.test.mjs; worker/README.md; dist/assets/audit-realtime.js; dist/assets/audit-realtime.test.mjs; dist/assets/audit-client.js; dist/assets/audit-config.js; dist/assets/site.js; dist/main/index.html; scripts/test-realtime-panel.mjs; project_log.md.
+- Validation: 337 тестов пройдено, проверка типов, сборка, production-библиотека 0.1.4, workerd и deployed smoke успешны. Браузерные сценарии проверяют четыре переключения, историю и остановку таймера. На реальном OpenAI подтверждены модель Mini, WebRTC, распознавание русского ответа, сохранение обязательных фактов и переход к следующему вопросу без ошибок Realtime. Миграция 0006 применена; Worker опубликован, версия 4ca759fa-a866-40d7-abb6-44ce83cf9195. В workerd проверен multipart fetch с redirect=manual; для единственного тестового вызова, не отправленного из-за неподдерживаемого redirect=error, освобождён резерв. Ответы планируются последовательно после расшифровки и серверного сохранения, исключая наложение response.create.
+- Reference: «Да, начинай» — подтверждение переноса на OpenAI, проверки и публикации.
+
+---
+
 - Date/time: 2026-10-26 12:42
 - Scope: S:\PROJECTS\pixelplustest\.deployment\expert-chat-panel
 - Summary: подпись о PDF размещена в одну строку с совпадающими краями заголовка. Шрифт подписи уменьшен до 92% прежнего размера; высота строки сохранена, положение текста скорректировано на 1 px вверх. Обновлена версия CSS для сброса кеша.

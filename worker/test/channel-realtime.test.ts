@@ -1,0 +1,115 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { CoreServices } from '../src/core.ts';
+import { createRealtimeAdapters, realtimeTools } from '../src/channel-realtime.ts';
+import { initialAuditState } from '../src/audit/contracts.ts';
+import { library } from '../src/audit/library.ts';
+import { hashToken, HttpError } from '../src/security.ts';
+import { presentPayload } from '../src/http-view.ts';
+import type { AdapterHandler, AdapterContext } from '../src/integration.ts';
+import type { Env } from '../src/env.ts';
+import { SqliteD1 } from './helpers/d1.ts';
+
+const NOW = Date.parse('2026-10-26T12:00:00Z'), TOKEN = 'a'.repeat(43), SDP = 'v=0\r\nm=audio 9 UDP/TLS/RTP/SAVPF 111\r\n';
+const obj = (v: unknown) => v as Record<string, any>;
+const code = (name: string) => (e: unknown) => e instanceof HttpError && e.code === name;
+async function fixture() {
+  const db = new SqliteD1(); let now = NOW, sequence = 0;
+  const requests: { url: string; init?: RequestInit }[] = [];
+  let respond = async (_url: string, _init?: RequestInit): Promise<Response> => new Response(SDP, { status: 201, headers: { Location: `/v1/realtime/calls/rtc_${++sequence}` } });
+  const env: Env = { DB: db.binding(), REPORTS_KV: {} as KVNamespace, ALLOW_DRAFT_LIBRARY: 'true',
+    OPENAI_API_KEY: 'test-private-key', OPENAI_REALTIME_MODEL: 'gpt-realtime-2.1-mini',
+    VOICE_REPLAY_SECRET: Buffer.alloc(32, 3).toString('base64url'), BUDGETS_JSON: JSON.stringify({ voice_starts: 14, voice_seconds: 7200 }) };
+  const core = new CoreServices(env, () => now, (async (url, init) => { requests.push({ url: String(url), init }); return respond(String(url), init); }) as typeof fetch);
+  await core.store.createSession({ id: 's1', tokenHash: await hashToken(TOKEN), reportId: 'r1', reportTokenHash: 'read-only', state: initialAuditState(library.version, 'voice', now), now });
+  const adapters = createRealtimeAdapters();
+  const request = (token = TOKEN) => new Request('https://worker.example/test', { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
+  const context = (body: Record<string, unknown>): AdapterContext => ({ core, env, body, execution: { waitUntil() {} } as unknown as ExecutionContext });
+  const body = async (operation = crypto.randomUUID(), extra = {}) => { const s = await core.store.requireSession('s1'); return { session_id: s.id, operation_id: operation, library_version: library.version, expected_revision: s.state.revision, channel_revision: s.state.channel_revision, ...extra }; };
+  const invoke = async (fn: AdapterHandler, input: Record<string, unknown>) => obj(await fn(request(), context(input)));
+  const start = async () => invoke(adapters.voiceStart!, await body(undefined, { sdp: SDP }));
+  return { db, env, core, adapters, request, context, body, invoke, start, requests, tick: (ms: number) => { now += ms; }, respond: (fn: typeof respond) => { respond = fn; } };
+}
+
+test('Realtime reserves before OpenAI, uses exact model/speed, replays encrypted SDP without another call', async t => {
+  const f = await fixture(); t.after(() => f.db.close());
+  f.respond(async (url, init) => {
+    assert.equal(url, 'https://api.openai.com/v1/realtime/calls');
+    assert.equal(f.db.sqlite.prepare("SELECT COUNT(*) n FROM usage_reservations WHERE state='reserved'").get()!.n, 2);
+    const form = init!.body as FormData, config = JSON.parse(String(form.get('session')));
+    assert.equal(form.get('sdp'), SDP); assert.equal(config.model, 'gpt-realtime-2.1-mini');
+    assert.equal(config.audio.output.speed, 1); assert.equal(config.audio.output.voice, 'cedar');
+    assert.equal(config.audio.input.transcription.language, 'ru');
+    assert.match(config.instructions, /Как Вас зовут/);
+    assert.equal((init!.headers as Record<string, string>).Authorization, 'Bearer test-private-key');
+    return new Response(SDP, { status: 201, headers: { Location: '/v1/realtime/calls/rtc_test' } });
+  });
+  const body = await f.body(undefined, { sdp: SDP }), first = await f.invoke(f.adapters.voiceStart!, body);
+  assert.equal(first.sdp_answer, SDP); assert.equal(first.first_message, 'Как Вас зовут?');
+  const replay = await f.invoke(f.adapters.voiceStart!, body); assert.equal(replay.sdp_answer, SDP); assert.equal(f.requests.length, 1);
+  const persisted = JSON.stringify(await f.core.store.getOperation('s1', body.operation_id));
+  assert(!persisted.includes('m=audio')); assert(!persisted.includes('test-private-key'));
+  const publicResult = obj(await presentPayload(f.core, first)); assert.equal(publicResult.sdp_answer, SDP); assert.equal(publicResult.provider, 'openai');
+});
+
+test('Realtime tools retain strict answer evidence schema and finish/pause semantics', () => {
+  const tools = realtimeTools().map(obj); assert.deepEqual(tools.map(t => t.name), ['saveAnswers', 'finishAudit', 'offTopicReply', 'hangUp']);
+  const answer = tools[0].parameters.properties.answers.items;
+  assert(answer.required.includes('source_quotes')); assert.equal(answer.additionalProperties, false);
+});
+
+test('Missing key, malformed SDP and stale revision never start a paid call', async t => {
+  const f = await fixture(); t.after(() => f.db.close());
+  delete f.env.OPENAI_API_KEY; await assert.rejects(f.start(), code('not_configured'));
+  f.env.OPENAI_API_KEY = 'test-key';
+  await assert.rejects(f.invoke(f.adapters.voiceStart!, await f.body(undefined, { sdp: 'not SDP' })), code('invalid_sdp'));
+  await assert.rejects(f.invoke(f.adapters.voiceStart!, await f.body(undefined, { sdp: SDP, expected_revision: 100 })), code('revision_conflict'));
+  assert.equal(f.requests.length, 0);
+});
+
+test('Rejected OpenAI credentials release reservations, do not create a phantom active call', async t => {
+  const f = await fixture(); t.after(() => f.db.close());
+  f.respond(async () => Response.json({ error: { code: 'invalid_api_key' } }, { status: 401 }));
+  await assert.rejects(f.start(), code('voice_provider_unavailable'));
+  assert.equal((await f.core.store.requireSession('s1')).activeCallId, null);
+  assert.equal((await f.core.store.listCalls('s1'))[0].status, 'failed');
+  assert(f.db.sqlite.prepare('SELECT actual FROM usage_reservations').all().every(row => row.actual === 0));
+});
+
+test('Four voice/chat switches stop OpenAI, retain transcript and freeze elapsed time in chat', async t => {
+  const f = await fixture(); t.after(() => f.db.close());
+  let elapsed = 0;
+  for (let i = 0; i < 4; i++) {
+    const call = await f.start(); f.tick(2000);
+    await f.invoke(f.adapters.voiceTranscript!, await f.body(undefined, { call_id: call.call_id, events: [{ source: 'voice', source_key: `${call.call_id}:0`, source_revision: 0, local_order: 0, call_id: call.call_id, role: 'user', kind: 'utterance', text: 'Олег', occurred_at: NOW + 2000, data: { is_final: true, medium: 'voice' } }] }));
+    await f.core.channel(f.request(), await f.body(undefined, { action: 'switch', channel: 'chat' }), f.adapters.pollVoice);
+    const s = await f.core.store.requireSession('s1'); assert.equal(s.state.active_channel, 'chat'); assert.equal(s.activeCallId, null);
+    elapsed += 2000; assert.equal(s.state.elapsed_ms, elapsed);
+    f.tick(5000); assert.equal((await f.core.view(await f.core.store.requireSession('s1')) as any).remaining_ms, 900000 - elapsed);
+    await f.core.channel(f.request(), await f.body(undefined, { action: 'switch', channel: 'voice' }), f.adapters.pollVoice);
+  }
+  assert.equal(f.requests.filter(r => r.url.endsWith('/hangup')).length, 4);
+  assert.equal((await f.core.store.listEvents('s1', 0, 100)).filter(e => e.text === 'Олег').length, 4);
+});
+
+test('Heartbeat cannot revive another call; cron terminates stale calls; failed hangup blocks overlap', async t => {
+  const f = await fixture(); t.after(() => f.db.close()); const call = await f.start();
+  await assert.rejects(f.invoke(f.adapters.voiceControl!, { session_id: 's1', call_id: 'not-owned', action: 'heartbeat' }), code('call_mismatch'));
+  f.tick(45000); await f.invoke(f.adapters.voiceControl!, { session_id: 's1', call_id: call.call_id, action: 'heartbeat' });
+  f.tick(45000); await f.adapters.recoverVoice!(f.core); assert.equal((await f.core.store.getCall(call.call_id))!.status, 'active');
+  f.respond(async () => new Response(null, { status: 500 }));
+  f.tick(20000); await f.adapters.recoverVoice!(f.core); assert.equal((await f.core.store.getCall(call.call_id))!.status, 'stopping');
+  await assert.rejects(f.start(), code('voice_unavailable'));
+  f.respond(async () => new Response(null, { status: 200 }));
+  await f.adapters.recoverVoice!(f.core); assert.equal((await f.core.store.getCall(call.call_id))!.status, 'stopped');
+  assert.equal((await f.core.store.requireSession('s1')).activeCallId, null);
+});
+
+test('Voice deadline ends the interview and schedules the report even after stop freezes the timer', async t => {
+  const f = await fixture(); t.after(() => f.db.close()); const call = await f.start();
+  f.tick(900000);
+  await f.invoke(f.adapters.voiceControl!, { session_id: 's1', call_id: call.call_id, action: 'stop', delivery_complete: true });
+  const session = await f.core.store.requireSession('s1');
+  assert.equal(session.state.status, 'closing'); assert.equal(session.state.finish_reason, 'time_limit'); assert.equal(session.state.elapsed_ms, 900000);
+  assert.equal(f.db.sqlite.prepare('SELECT COUNT(*) n FROM audit_jobs').get()!.n, 1);
+});

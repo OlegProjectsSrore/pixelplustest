@@ -16,6 +16,11 @@ export interface Env {
   BUDGETS_JSON?: string;
   PUBLIC_WORKER_URL?: string;
   DEEPSEEK_API_KEY?: string;
+  OPENAI_API_KEY?: string;
+  OPENAI_REALTIME_MODEL?: string;
+  OPENAI_REALTIME_VOICE?: string;
+  OPENAI_TRANSCRIPTION_MODEL?: string;
+  VOICE_PROVIDER?: string;
   ULTRAVOX_MODEL?: string;
   ULTRAVOX_KEY_1?: string;
   ULTRAVOX_KEY_2?: string;

@@ -3,7 +3,7 @@ import type { Env } from './env.ts';
 import type { Json } from './audit/contracts.ts';
 import type { StoredSession } from './storage/types.ts';
 import { createChatAdapter } from './channel-runtime.ts';
-import { createVoiceAdapters } from './channel-voice.ts';
+import { createRealtimeAdapters } from './channel-realtime.ts';
 import { createRecoveryClassifier, defaultVoiceIntentClassifier } from './channel-recovery.ts';
 
 export interface AdapterContext { core: CoreServices; env: Env; execution: ExecutionContext; session?: StoredSession; body?: Record<string, unknown> }
@@ -13,6 +13,7 @@ export interface ChannelAdapters {
   voiceStart?: AdapterHandler;
   voiceTranscript?: AdapterHandler;
   voiceAnswers?: AdapterHandler;
+  voiceControl?: AdapterHandler;
   search?: AdapterHandler;
   ultravoxWebhook?: AdapterHandler;
   reconcile?: (session: StoredSession, now: number, core: CoreServices) => Promise<{ complete: boolean; limitations: string[] }>;
@@ -22,5 +23,5 @@ export interface ChannelAdapters {
 /** Wire the separately implemented channel parsers into the shared durable core. */
 export const channelAdapters: ChannelAdapters = {
   chat: createChatAdapter(),
-  ...createVoiceAdapters({ recoverAnswers: createRecoveryClassifier(), assessIntent: defaultVoiceIntentClassifier }),
+  ...createRealtimeAdapters({ recoverAnswers: createRecoveryClassifier(), assessIntent: defaultVoiceIntentClassifier }),
 };

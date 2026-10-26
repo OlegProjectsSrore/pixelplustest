@@ -76,6 +76,11 @@ export function createWorker(adapters: ChannelAdapters = channelAdapters, option
             readOnly = true;
             response = json({ session: await sessionView(core, await core.store.requireSession(id), true) });
           }
+        } else if (method === 'POST' && path === '/api/voice/control') {
+          if (!adapters.voiceControl) fail(503, 'integration_unavailable', 'Голосовой обработчик ещё не подключён.');
+          const body = await readJson(request);
+          const value = await adapters.voiceControl!(request, { core, env, execution, body });
+          response = value instanceof Response ? value : json(value);
         } else if (method === 'POST' && path === '/api/webhooks/ultravox') {
           if (!adapters.ultravoxWebhook) fail(503, 'integration_unavailable', 'Голосовой обработчик ещё не подключён.');
           const value = await adapters.ultravoxWebhook!(request, { core, env, execution }); response = value instanceof Response ? value : json(value);
@@ -155,7 +160,7 @@ export function createWorker(adapters: ChannelAdapters = channelAdapters, option
     },
     async scheduled(_controller: ScheduledController, env: Env, execution: ExecutionContext): Promise<void> {
       const core = new CoreServices(env, options.now, options.fetcher);
-      execution.waitUntil(refreshVoiceAccounts(core));
+      if (env.VOICE_PROVIDER !== 'openai') execution.waitUntil(refreshVoiceAccounts(core));
       execution.waitUntil((async () => { if (adapters.recoverVoice) await adapters.recoverVoice(core);
         await core.store.closeExpiredSessions(core.now(), 10); await core.store.recoverExpiredSending(core.now(), 20);
         await pipeline(core, adapters); await core.store.cleanup(core.now(), 20); })());

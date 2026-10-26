@@ -3,6 +3,8 @@ import { createAuditTransport, createAuditStorage, AuditRequestError } from './a
 import { getTurnstileToken } from './audit-turnstile.js';
 import { checkMicrophone, createVoiceAdapter, loadVoiceSdk } from './audit-voice.js?v=7f69e524a9';
 
+import { createRealtimeVoiceAdapter } from './audit-realtime.js?v=2f81aeef83';
+
 const THANKS = 'Спасибо за предоставленную информацию, сейчас вам предоставим отчёт предварительного аудита.';
 const VOICE_STATUS = { connecting: 'Соединяемся…', listening: 'Слушаю Вас', thinking: 'Обрабатываю ответ…', speaking: 'Помощник говорит', idle: 'Соединение установлено', disconnected: 'Голосовой разговор отключён', disconnecting: 'Завершаем соединение…' };
 const EMAIL_STATUS = { pending: 'Письмо ожидает отправки.', sending: 'Отправляем письмо…', sent: 'Письмо отправлено.', unknown: 'Результат отправки пока не подтверждён. Повторное письмо автоматически не отправляем.', failed: 'Не удалось отправить письмо. PDF можно скачать.' };
@@ -78,7 +80,7 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
       launchPending: !session && config?.publicSessionsEnabled === false,
       messages: saved.messages || [], remaining_seconds: remaining(), busy,
       voice_status: voiceStatus, email_status: emailStatus, error,
-      capabilities: { chat: !!allowed, voice: !!allowed && !!config?.ultravoxSdkUrl,
+      capabilities: { chat: !!allowed, voice: !!allowed && !!(config?.voiceProvider === 'openai' || config?.ultravoxSdkUrl),
         resume: !!allowed && session.paused, pause: !!allowed && !session.paused,
         finish: !!allowed, email: session?.status === 'ready' && canManage && !busy && !saved.pending },
     });
@@ -260,8 +262,18 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
   }
   async function getVoice() {
     if (voice) return voice;
-    const sdk = await sdkLoader(config?.ultravoxSdkUrl);
-    voice = voiceFactory({ sdk, onState(status) {
+    const realtime = config?.voiceProvider === 'openai';
+    const sdk = realtime ? undefined : await sdkLoader(config?.ultravoxSdkUrl);
+    const factory = realtime && voiceFactory === createVoiceAdapter ? createRealtimeVoiceAdapter : voiceFactory;
+    voice = factory({ sdk, onControl(action, callId, complete) {
+      const task = async () => {
+        const data = await ensureApi().request('/api/voice/control', { method: 'POST', token: saved.management_token,
+          body: { session_id: saved.session.session_id, call_id: callId, action, delivery_complete: complete === true } });
+        if (action === 'stop') { accept(data); saved.voice_call = null; persist(); render(); }
+        return data;
+      };
+      return action === 'stop' ? enqueue(task) : task();
+    }, onState(status) {
       voiceStatus = VOICE_STATUS[status] || 'Голосовой опрос';
       if (status === 'disconnected' && !saved.control_intent && saved.session?.status === 'in_progress' && mode === 'voice') error = 'Голосовое соединение прервано. Для продолжения нажмите «Попробовать ещё раз».';
       if (status === 'disconnected' && saved.control_intent?.action === 'pause') void action(performControlIntent);
@@ -300,11 +312,17 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
   }
   async function startVoice() {
     if (saved.voice_call || voice?.active) throw new Error('Остановка предыдущего звонка ещё не подтверждена. Повторите проверку состояния.');
-    await microphone();
+    if (config?.voiceProvider !== 'openai') await microphone();
     const adapter = await getVoice();
     const turnstile_token = config?.turnstileEnabled === false ? undefined : await challenge(view.challengeElement, config?.turnstileSiteKey, 'voice_start');
-    const data = await enqueue(() => mutate('/api/voice/start', { turnstile_token }));
-    await adapter.start({ call_id: data.call_id, join_url: data.join_url });
+    const offer = adapter.prepare ? await adapter.prepare() : {};
+    try {
+      const data = await enqueue(() => mutate('/api/voice/start', { turnstile_token, ...offer }));
+      await adapter.start(data);
+    } catch (problem) {
+      await adapter.stop().catch(() => {});
+      throw problem;
+    }
   }
   async function stopVoice() {
     if (voice) await voice.stop();
@@ -378,10 +396,14 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
     else await refresh();
     for (const callId of new Set(saved.transcript_outbox.map(event => event.call_id))) await postTranscript([], callId);
     if (saved.control_intent && !saved.pending) { await performControlIntent(); return; }
-    if (pendingPath === '/api/voice/start' && result?.join_url) {
-      await microphone();
+    if (pendingPath === '/api/voice/start' && (result?.join_url || result?.sdp_answer)) {
+      if (config?.voiceProvider !== 'openai') await microphone();
       const adapter = await getVoice();
-      await adapter.start({ call_id: result.call_id, join_url: result.join_url });
+      if (result.sdp_answer && !adapter.active) {
+        const stopped = await ensureApi().request('/api/voice/control', { method: 'POST', token: saved.management_token, body: { session_id: saved.session.session_id, call_id: result.call_id, action: 'stop', delivery_complete: true } });
+        accept(stopped); saved.voice_call = null; persist();
+        await startVoice();
+      } else await adapter.start(result);
     } else if (saved.session?.status === 'in_progress' && mode === 'voice' && !voice?.active) {
       await stopVoice();
       if (saved.voice_call) {

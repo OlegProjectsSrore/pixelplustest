@@ -46,22 +46,22 @@ async function replayKey(core: CoreServices): Promise<CryptoKey> {
   catch { return fail(503, 'not_configured', 'Не настроено защищённое повторение голосового подключения.'); }
   return crypto.subtle.importKey('raw', bytes!, 'AES-GCM', false, ['encrypt', 'decrypt']);
 }
-async function encryptJoinUrl(core: CoreServices, sessionId: string, operationId: string, url: string): Promise<Json> {
+export async function encryptJoinUrl(core: CoreServices, sessionId: string, operationId: string, url: string): Promise<Json> {
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const encrypted = await crypto.subtle.encrypt({ name: 'AES-GCM', iv, additionalData: new TextEncoder().encode(`${sessionId}:${operationId}`) }, await replayKey(core), new TextEncoder().encode(url));
   return { iv: base64url(iv), ciphertext: base64url(new Uint8Array(encrypted)) };
 }
-async function decryptJoinUrl(core: CoreServices, sessionId: string, operationId: string, envelope: Json): Promise<string> {
+export async function decryptJoinUrl(core: CoreServices, sessionId: string, operationId: string, envelope: Json, protocol: string | null = 'wss:'): Promise<string> {
   try {
     const value = record(envelope);
     const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unbase64url(String(value.iv)), additionalData: new TextEncoder().encode(`${sessionId}:${operationId}`) }, await replayKey(core), unbase64url(String(value.ciphertext)));
     const url = new TextDecoder().decode(plain);
-    if (new URL(url).protocol !== 'wss:') throw new Error('URL');
+    if (protocol && new URL(url).protocol !== protocol) throw new Error('URL');
     return url;
   } catch { return fail(503, 'voice_replay_unavailable', 'Не удалось восстановить защищённое подключение.'); }
 }
 
-async function prepared(request: Request, context: AdapterContext) {
+export async function prepared(request: Request, context: AdapterContext) {
   const body = object(context.body), input = mutation(body), core = context.core;
   const session = await core.authenticate(request, input.session_id);
   if (input.library_version !== session.state.library_version) fail(409, 'library_mismatch', 'Версия библиотеки не совпадает.');
@@ -76,7 +76,7 @@ async function member(core: CoreServices, session: StoredSession, callId: unknow
   const call = await core.store.getCall(identifier(callId, 'call_id'));
   return call && call.sessionId === session.id ? call : fail(403, 'call_mismatch', 'Звонок не принадлежит сессии.');
 }
-async function readEvents(core: CoreServices, sessionId: string): Promise<AuditEvent[]> {
+export async function readEvents(core: CoreServices, sessionId: string): Promise<AuditEvent[]> {
   const result: AuditEvent[] = [];
   for (let page = 0; page < 10; page++) {
     const next = await core.store.listEvents(sessionId, result.at(-1)?.seq ?? 0, 500);
@@ -84,7 +84,7 @@ async function readEvents(core: CoreServices, sessionId: string): Promise<AuditE
   }
   return fail(413, 'history_too_large', 'История превышает ограничение обработки.');
 }
-function latestEvents(events: AuditEvent[]): AuditEvent[] {
+export function latestEvents(events: AuditEvent[]): AuditEvent[] {
   const map = new Map<string, AuditEvent>();
   for (const event of events) {
     const key = `${event.source}:${event.source_key}`;
@@ -341,7 +341,7 @@ function providerDependencies(core: CoreServices, call: VoiceCall, creating = fa
     } };
 }
 
-async function settleStoppedCall(core: CoreServices, callId: string): Promise<void> {
+export async function settleStoppedCall(core: CoreServices, callId: string): Promise<void> {
   const call = await core.store.getCall(callId); if (call?.status !== 'stopped') return;
   await core.store.settleUsage(`voice_seconds:${call.sessionId}:${call.operationId}`, Math.ceil(call.usedMs / 1000), core.now());
   await core.store.settleUsage(`voice_starts:${call.sessionId}:${call.operationId}`, 1, core.now());
@@ -384,6 +384,7 @@ export function createVoiceAdapters(options: VoiceBridgeOptions = {}): Partial<C
     let complete = true;
     const calls = await core.store.listCalls(original.id);
     for (const call of calls) {
+      if (call.slotId === 'openai') continue;
       if (call.status === 'failed') continue;
       if (!call.providerCallId) { complete = false; limitations.push('Создание одного из звонков пока не согласовано с провайдером.'); continue; }
       try {
@@ -441,7 +442,7 @@ export function createVoiceAdapters(options: VoiceBridgeOptions = {}): Partial<C
     recoverVoice: async core => {
       let stopped = 0;
       const calls = await core.store.listPendingCalls(2);
-      for (const call of calls) { const session = await core.store.requireSession(call.sessionId); if ((await pollVoice(session, core.now(), core)).status === 'stopped') stopped++; }
+      for (const call of calls) { if (call.slotId === 'openai') continue; const session = await core.store.requireSession(call.sessionId); if ((await pollVoice(session, core.now(), core)).status === 'stopped') stopped++; }
       return { checked: calls.length, stopped };
     },
     voiceStart: async (request, context) => {

@@ -5,5 +5,5 @@ window.PIXELPLUS_AUDIT_CONFIG = Object.freeze({
   apiBaseUrl: 'https://pixelplus-ai.rudiskiyoleg.workers.dev',
   turnstileEnabled: false,
   turnstileSiteKey: '0x4AAAAAAFhfOxQMNL2gKzND',
-  ultravoxSdkUrl: new URL('./ultravox-sdk.js', import.meta.url).href,
+  voiceProvider: 'openai',
 });
