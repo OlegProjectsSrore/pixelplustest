@@ -49,7 +49,7 @@ test('First message keeps the whole interview prompt in force: a system item, ne
   const first = sent.findIndex(e => e.type === 'response.create');
   assert(item >= 0 && first > item, 'the question is added before the reply is requested');
   assert.equal(sent[first].response, undefined, 'response-level instructions would replace the session prompt for this reply');
-  assert.equal(sent[item].item.content[0].text, 'Начни разговор с текущего вопроса сервера и жди ответа. Смысл вопроса: "Как Вас зовут?".');
+  assert.equal(sent[item].item.content[0].text, 'Начни разговор этой репликой сервера и жди ответа. Её смысл: "Как Вас зовут?".');
   assert.doesNotMatch(sent[item].item.content[0].text, /своими словами|сохранив смысл|дословно/, 'no phrasing advice that the model could read aloud');
 });
 
@@ -154,4 +154,17 @@ test('A rejected tool call tells the model to stay silent about it, fix it once 
   assert.match(offTopic.message, /^Готовой реплики нет\. Ничего не говори посетителю об ошибке/);
   assert.match(finish.message, /^Реплика посетителя ещё доставляется\. Ничего не говори об этом посетителю; молча повтори вызов один раз/);
   assert.equal(f.errors.length, 0, 'validation and delivery rejections are not shown to the visitor as errors');
+});
+
+test('startDiagnostic goes through the save barrier and its new instructions replace the session prompt', async t => {
+  const calls = [];
+  const f = fixture(t, { onTool: async (name, args) => { calls.push([name, args]); return { accepted: true, realtime_instructions: 'Режим diagnostic' }; } });
+  await f.start();
+  f.emit({ type: 'response.done', response: { status: 'completed', output: [{ type: 'function_call', call_id: 'd1', name: 'startDiagnostic', arguments: '{}' }] } });
+  await turn(); await turn();
+  assert.deepEqual(calls, [['startDiagnostic', {}]]);
+  const sent = f.peers.at(-1).dc.sent;
+  assert(sent.some(event => event.type === 'session.update' && event.session.instructions === 'Режим diagnostic'));
+  assert(sent.some(event => event.type === 'conversation.item.create' && event.item.type === 'function_call_output' && event.item.call_id === 'd1'));
+  assert.equal(f.errors.length, 0);
 });

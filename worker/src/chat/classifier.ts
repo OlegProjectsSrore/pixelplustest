@@ -1,6 +1,6 @@
 import { buildClassifierPrompt } from './prompt.ts';
 import { parseClassification, ClassificationValidationError } from './validation.ts';
-import type { ClassificationResult, ClassifierContext, ClassifierRuntime, ProviderExchange, ProviderUsage } from './types.ts';
+import type { ClassificationResult, ClassifierContext, ClassifierRuntime, DeepseekModel, ProviderExchange, ProviderUsage } from './types.ts';
 
 export { buildClassifierPrompt, parseClassification, ClassificationValidationError };
 export type * from './types.ts';
@@ -45,13 +45,13 @@ async function readBody(response: Response, signal: AbortSignal): Promise<unknow
 }
 
 /** One metered DeepSeek completion with a JSON object reply; the caller interprets the exchange. */
-export async function requestDeepseek(messages: { role: 'system' | 'user'; content: string }[], runtime: ClassifierRuntime, temperature = 0): Promise<ProviderExchange> {
+export async function requestDeepseek(messages: { role: 'system' | 'user'; content: string }[], runtime: ClassifierRuntime, temperature = 0, model: DeepseekModel = 'deepseek-flash'): Promise<ProviderExchange> {
   if (!Number.isSafeInteger(runtime.max_tokens) || runtime.max_tokens < 1 || runtime.max_tokens > 16384 || !Number.isFinite(runtime.timeout_ms) || runtime.timeout_ms < 1 || runtime.timeout_ms > 60000) throw new Error('Invalid classifier limits');
-  const body = JSON.stringify({ model: 'deepseek-flash', thinking: { type: 'disabled' }, response_format: { type: 'json_object' }, stream: false, temperature, max_tokens: runtime.max_tokens, messages });
+  const body = JSON.stringify({ model, thinking: { type: 'disabled' }, response_format: { type: 'json_object' }, stream: false, temperature, max_tokens: runtime.max_tokens, messages });
   const inputBytes = new TextEncoder().encode(JSON.stringify(messages)).byteLength;
   if (inputBytes > 262144) throw new Error('Classifier context is too large');
   let invoked = false;
-  return runtime.runAuthorized({ provider: 'deepseek', model: 'deepseek-flash', max_tokens: runtime.max_tokens, input_utf8_bytes: inputBytes }, async (): Promise<ProviderExchange> => {
+  return runtime.runAuthorized({ provider: 'deepseek', model, max_tokens: runtime.max_tokens, input_utf8_bytes: inputBytes }, async (): Promise<ProviderExchange> => {
     if (invoked) throw new Error('Classifier attempt already invoked');
     invoked = true;
     const controller = new AbortController();

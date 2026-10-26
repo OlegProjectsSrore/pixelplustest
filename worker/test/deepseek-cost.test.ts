@@ -21,3 +21,10 @@ test('reservation bounds input/output independently and rejects an unpriced mode
   for (const input of [{ ...request, input_utf8_bytes: -1 }, { ...request, max_tokens: 0 }, { ...request, input_utf8_bytes: 262145 }]) assert.throws(() => reserveDeepseekMicros(input));
   assert.throws(() => reserveDeepseekMicros({ ...request, model: 'unpriced-model' } as never));
 });
+test('DeepSeek V4 Pro is priced on its own peak rates for both the reservation and the settlement', () => {
+  assert.equal(measuredDeepseekMicros({ prompt_tokens: 1_000_000, completion_tokens: 1_000_000, total_tokens: 2_000_000 }, 'deepseek-v4-pro'), 5_280_000);
+  assert.equal(measuredDeepseekMicros({ prompt_tokens: 1_000_000, completion_tokens: 0, total_tokens: 1_000_000, prompt_cache_hit_tokens: 1_000_000, prompt_cache_miss_tokens: 0 }, 'deepseek-v4-pro'), 44_000);
+  const request = { provider: 'deepseek' as const, model: 'deepseek-v4-pro' as const, input_utf8_bytes: 1000, max_tokens: 900 };
+  // (1000 + 256) × 1.32 + 900 × 3.96 micro-USD, rounded up.
+  assert.equal(reserveDeepseekMicros(request), 5222);
+});

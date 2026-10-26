@@ -57,7 +57,7 @@ export interface Scenario {
 }
 export interface JokeCategory { id: string; selection_source: string; do_not_use_when: string; jokes: { id: string; text: string }[] }
 export interface JokeLibrary {
-  library_version: string; joke_count: number; categories: JokeCategory[]; return_phrases: string[]; neutral_replies: Record<string, string>;
+  library_version: string; joke_count: number; categories: JokeCategory[]; return_phrases: string[]; questions_return_phrases?: string[]; neutral_replies: Record<string, string>;
 }
 export interface AuditLibrary {
   version: string; rulesVersion: string; tariffVersion: string; templateVersion: string;
@@ -226,6 +226,7 @@ export function validateLibrary(lib: AuditLibrary = library, options: { ruleChec
   index(lib.jokes.categories, 'joke categories'); index(jokes, 'jokes');
   if (jokes.length !== lib.jokes.joke_count || new Set(jokes.map(joke => joke.text.trim())).size !== jokes.length) errors.push('Joke count or text uniqueness mismatch');
   if (!lib.jokes.return_phrases.length || !lib.jokes.neutral_replies.off_topic) errors.push('Missing neutral/return replies');
+  if (lib.jokes.questions_return_phrases && (!lib.jokes.questions_return_phrases.length || lib.jokes.questions_return_phrases.some(phrase => !phrase.trim()))) errors.push('Invalid questions-mode return phrases');
   for (const category of lib.jokes.categories) if (!['question_topic', 'previous_audit_topic', 'fallback'].includes(category.selection_source) || !category.do_not_use_when || category.jokes.some(joke => !joke.text)) errors.push(`${category.id}: invalid joke category`);
   const governed = [...lib.facts, ...lib.questions, ...lib.solutions, ...lib.tariffs];
   for (const item of governed) if (item.status === 'approved' && !isApproved(item)) errors.push(`${item.id}: approval lacks reviewer/date`);

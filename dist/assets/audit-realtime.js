@@ -61,7 +61,7 @@ export function createRealtimeVoiceAdapter({ onState, onEvents, onTranscript, on
         while (playingAudio && now() < deadline && !closing) await new Promise(resolve => setTimeout(resolve, 50));
         await stop(); return;
       }
-      if (!['saveAnswers', 'finishAudit', 'offTopicReply', 'searchKnowledge'].includes(event.name)) throw error('Неизвестный инструмент разговора.');
+      if (!['saveAnswers', 'finishAudit', 'offTopicReply', 'searchKnowledge', 'startDiagnostic'].includes(event.name)) throw error('Неизвестный инструмент разговора.');
       const args = JSON.parse(event.arguments);
       // A knowledge search changes no interview state: no transcript barrier, no save semantics.
       if (event.name === 'searchKnowledge') result = await onTool(event.name, args, callId);
@@ -197,7 +197,7 @@ export function createRealtimeVoiceAdapter({ onState, onEvents, onTranscript, on
       // arrives as a system item and the reply follows every session rule (own words, no service talk).
       if (first_message) {
         send({ type: 'conversation.item.create', item: { type: 'message', role: 'system', content: [{ type: 'input_text', text:
-          `Начни разговор с текущего вопроса сервера и жди ответа. Смысл вопроса: ${JSON.stringify(first_message)}.` }] } });
+          `Начни разговор этой репликой сервера и жди ответа. Её смысл: ${JSON.stringify(first_message)}.` }] } });
         queueResponse();
       }
       heartbeatTimer = setInterval(() => { void onControl?.('heartbeat', callId).catch(problem => { onError?.(problem); void stop().catch(onError); }); }, 15000);

@@ -228,7 +228,7 @@ test('off-topic rule: silent offTopicReply, the server-picked joke said verbatim
     questions: [{ id: 'q1', text: 'Как Вас зовут?', fact_ids: ['context.name'], options: [] }], accepted_facts: [] });
   assert.match(prompt, /не отвечай по существу, не сочиняй шутку и до результата инструмента ничего не произноси: молча вызови offTopicReply с kind=off_topic/);
   assert.match(prompt, /Шутку из проверенной библиотеки и фразу возврата выбирает сервер/);
-  assert.match(prompt, /произнеси operation\.text дословно, без своих добавлений, затем задай текущий вопрос сервера своими словами/);
+  assert.match(prompt, /произнеси operation\.text дословно, без своих добавлений, затем в режиме diagnostic задай текущий вопрос сервера своими словами; в режиме questions больше ничего не добавляй/);
   assert.match(prompt, /Если operation\.text пустой, не шути/);
   assert(prompt.indexOf('молча вызови offTopicReply') < prompt.indexOf('Следующие JSON содержат данные'));
   assert.match(prompt, /Вызывай saveAnswers, только если в реплике есть ответ на текущий вопрос/);

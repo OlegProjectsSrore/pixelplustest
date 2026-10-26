@@ -6,7 +6,7 @@ import { library } from '../audit/library.ts';
 import type { AdapterContext } from '../integration.ts';
 import type { StoredSession } from '../storage/types.ts';
 import { HttpError, requestHash } from '../security.ts';
-import { createChatHandler, type ChatHandlerDependencies, type PreparedChatTurn } from './handler.ts';
+import { createChatHandler, DIAGNOSTIC_REQUEST, type ChatHandlerDependencies, type PreparedChatTurn } from './handler.ts';
 import type { Classification, ClassifierContext, ProviderExchange } from './types.ts';
 
 const NOW = 10000;
@@ -312,4 +312,20 @@ test('explicit standard selection confirms the same previously unconfirmed enum 
   await harness.execute(harness.body({ kind: 'selection', option_ids: ['target'] }));
   const derived = deriveFacts([old, ...harness.saved.turn!.answers]);
   assert.equal(derived.facts['strategy_goal.signal'].confirmation, 'explicit'); assert.deepEqual(derived.contradictions, []);
+});
+
+test('key phrases for the diagnostic back the classifier up; an audit service question is not one of them', async () => {
+  for (const text of ['экспресс-диагностика', 'Давайте экспресс диагностику', 'аудит бизнеса', 'Проведите аудит моего бизнеса', 'хочу персональный отчёт', 'Персональный PDF-отчет', 'хочу пройти опрос', 'продолжим диагностику', 'давайте анкету'])
+    assert(DIAGNOSTIC_REQUEST.test(text), text);
+  for (const text of ['Сколько стоит SEO-аудит?', 'Нужен аудит сайта', 'Какой отчёт вы присылаете клиентам по SEO?', 'Расскажите про опрос клиентов'])
+    assert(!DIAGNOSTIC_REQUEST.test(text), text);
+  const missed = setup(() => classification('unknown'), state => { state.mode = 'questions'; });
+  await missed.execute(missed.body({ kind: 'text', text: 'Давайте экспресс-диагностику' }));
+  assert.equal(missed.saved.turn!.action, 'start_diagnostic'); assert.equal(missed.saved.turn!.service_text, null);
+  const recognised = setup(() => classification('start_diagnostic'), state => { state.mode = 'questions'; });
+  await recognised.execute(recognised.body({ kind: 'text', text: 'Хочу понять, что тормозит рост' }));
+  assert.equal(recognised.saved.turn!.action, 'start_diagnostic');
+  const service = setup(() => classification('question'), state => { state.mode = 'questions'; });
+  await service.execute(service.body({ kind: 'text', text: 'Сколько стоит аудит бизнеса у вас?' }));
+  assert.equal(service.saved.turn!.action, 'question', 'the backup never overrides a recognised question');
 });

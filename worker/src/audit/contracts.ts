@@ -75,6 +75,9 @@ export interface AuditState {
   through_seq: number;
   extracted_through_seq: number;
   history_status: 'pending' | 'complete' | 'incomplete';
+  /** questions: the assistant only answers and asks no diagnostic question until the visitor asks for the diagnostic.
+   * Sessions created before this field existed are in the diagnostic. */
+  mode?: 'questions' | 'diagnostic';
 }
 
 export interface AuditSnapshot {
@@ -144,11 +147,15 @@ export const REPORT_PREPARATION_MS = 48 * 60 * 60 * 1000;
 export const HISTORY_WAIT_MS = 90 * 1000;
 export const REPORT_RETENTION_MS = 30 * 24 * 60 * 60 * 1000;
 
-export function initialAuditState(libraryVersion: string, channel: Channel, now: number): AuditState {
+/** Visitor sessions start in questions mode (core.create); the diagnostic default keeps engine fixtures on the survey. */
+export function initialAuditState(libraryVersion: string, channel: Channel, now: number, mode: 'questions' | 'diagnostic' = 'diagnostic'): AuditState {
   return {
     library_version: libraryVersion, revision: 0, channel_revision: 0, active_channel: channel,
     status: 'in_progress', current_question_id: null, facts: {}, contradictions: [], missing_facts: [], candidate_blocks: [],
     elapsed_ms: 0, active_since: null, paused: channel === 'voice', finish_reason: null,
     humor: { enabled: true, reserved_ids: [], used_ids: [], operations: {} }, through_seq: 0, extracted_through_seq: 0, history_status: 'pending',
+    mode,
   };
 }
+/** The diagnostic has begun once the visitor asked for it or gave any answer; until then pause and finish make no sense. */
+export const diagnosticStarted = (state: AuditState): boolean => state.mode !== 'questions' || Object.keys(state.facts).length > 0;

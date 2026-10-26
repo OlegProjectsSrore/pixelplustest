@@ -1,7 +1,7 @@
 import type { AuditAnswer, AuditEvent, AuditFact, FactStatus, Json } from '../audit/contracts.ts';
 import type { FactDefinition, Question } from '../audit/library.ts';
 
-export const INTENTS = ['answer', 'mixed', 'clarify', 'faq', 'question', 'off_topic', 'sensitive', 'role_change', 'humor_preference', 'decline', 'pause', 'resume', 'finish', 'unknown'] as const;
+export const INTENTS = ['answer', 'mixed', 'clarify', 'faq', 'question', 'off_topic', 'sensitive', 'role_change', 'humor_preference', 'decline', 'pause', 'resume', 'finish', 'start_diagnostic', 'unknown'] as const;
 export type Intent = typeof INTENTS[number];
 
 /** A strict, deliberately small schema supplied by the core, never by the visitor/model. */
@@ -76,9 +76,11 @@ export interface ProviderExchange {
   usage: ProviderUsage | null;
   error: 'timeout' | 'network' | 'body_too_large' | 'invalid_envelope' | null;
 }
+export type DeepseekModel = 'deepseek-flash' | 'deepseek-v4-pro';
 export interface ExternalRequest {
   provider: 'deepseek';
-  model: 'deepseek-flash';
+  /** Flash classifies and words replies; V4 Pro answers visitor questions from the knowledge base. */
+  model: DeepseekModel;
   max_tokens: number;
   /** Conservative input size for the core's reservation policy. Not a token count. */
   input_utf8_bytes: number;

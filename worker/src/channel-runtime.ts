@@ -5,7 +5,7 @@ import { answerQuestion, formatAnswer } from './chat/answerer.ts';
 import { searchKnowledge } from './search/service.ts';
 import type { AdapterContext, AdapterHandler, ChannelAdapters } from './integration.ts';
 import type { StoredSession, UsageReservation } from './storage/types.ts';
-import { INTERVIEW_BUDGET_MS, type AuditEvent, type Json } from './audit/contracts.ts';
+import { diagnosticStarted, INTERVIEW_BUDGET_MS, type AuditEvent, type Json } from './audit/contracts.ts';
 import { advanceAudit, elapsedInterviewMs, nextQuestion, validateAnswers } from './audit/engine.ts';
 import { getLibrary, isApproved } from './audit/library.ts';
 import { selectHumorReply, type HumorIntent } from './audit/humor.ts';
@@ -48,7 +48,7 @@ export async function createChatRuntime(context: AdapterContext, session: Stored
       await core.store.settleUsage(calls.id, 1, core.now());
       // Even an HTTP error without usage is not assumed to have cost zero.
       await core.store.settleUsage(tokens.id, exchange.usage?.total_tokens ?? null, core.now());
-      await core.store.settleUsage(money.id, measuredDeepseekMicros(exchange.usage), core.now());
+      await core.store.settleUsage(money.id, measuredDeepseekMicros(exchange.usage, input.model), core.now());
       return exchange;
     },
   };
@@ -60,6 +60,8 @@ const ANSWER_ATTEMPT = 3;
 // The browser waits 30 s for a turn; classification, search, answer and wording share this budget.
 const TURN_BUDGET_MS = 24_000;
 const NOT_FOUND = 'В материалах Pixel Plus точного ответа на этот вопрос нет. Уточнить детали можно у специалистов студии: https://pixelplus.ru/contact/zakaz/';
+// Reworded by DeepSeek; the composer's reply carries no question mark.
+const HELP_NOTICE = 'Подскажите, чем могу помочь.';
 // FAQ answers and jokes are approved texts shown verbatim; other notices are reworded by DeepSeek.
 const APPROVED_TEXT_ACTIONS = ['faq', 'off_topic', 'humor_preference', 'role_change'];
 
@@ -75,18 +77,31 @@ async function composeTurn(context: AdapterContext, session: StoredSession, oper
     return null;
   }
 }
-/** Answers a visitor question from the knowledge base; null when the feature is off or fails, so the turn is never blocked. */
-async function answerFromKnowledge(context: AdapterContext, session: StoredSession, operationId: string, question: string, history: { role: string; text: string }[], timeoutMs: number): Promise<string | null> {
+/** Answers a visitor question from the knowledge base; null when the feature is off or fails, so the turn is never blocked.
+ * answered is false for the honest fallbacks (nothing found, or only the closest page). */
+async function answerFromKnowledge(context: AdapterContext, session: StoredSession, operationId: string, question: string, history: { role: string; text: string }[], timeoutMs: number): Promise<{ text: string; answered: boolean } | null> {
   if (context.env.KNOWLEDGE_ANSWERS_ENABLED !== 'true' || !question.trim() || timeoutMs < 2_000) return null;
   try {
     const { fragments } = await searchKnowledge(context, session, question.slice(0, 500), { limit: 6, maxChars: 1500 });
-    if (!fragments.length) return NOT_FOUND;
+    if (!fragments.length) return { text: NOT_FOUND, answered: false };
     const runtime = await createChatRuntime(context, session, operationId, ANSWER_ATTEMPT);
     const answered = await answerQuestion({ question, fragments, history }, { ...runtime, max_tokens: 900, timeout_ms: timeoutMs });
     // Without a checked answer the closest page is still useful and honest.
-    return answered ? formatAnswer(answered) : 'Подробнее об этом — на странице «' + fragments[0].title + '»: ' + fragments[0].url;
+    return answered ? { text: formatAnswer(answered), answered: true } : { text: 'Подробнее об этом — на странице «' + fragments[0].title + '»: ' + fragments[0].url, answered: false };
   } catch (error) {
     console.warn(JSON.stringify({ event: 'knowledge_answer_failed', reason: error instanceof Error ? error.message : 'unknown' }));
+    return null;
+  }
+}
+/** The voice model's searchKnowledge: DeepSeek V4 Pro writes a short spoken answer from the fragments; null leaves the fragments to the voice model. */
+export async function voiceKnowledgeAnswer(context: AdapterContext, session: StoredSession, question: string, fragments: { title: string; heading: string; url: string; text: string }[]): Promise<string | null> {
+  if (!fragments.length) return null;
+  try {
+    const runtime = await createChatRuntime(context, session, `voice-answer:${crypto.randomUUID()}`, ANSWER_ATTEMPT);
+    const answered = await answerQuestion({ question, fragments, history: [], channel: 'voice' }, { ...runtime, max_tokens: 600, timeout_ms: 15_000 });
+    return answered?.answer ?? null;
+  } catch (error) {
+    console.warn(JSON.stringify({ event: 'voice_knowledge_answer_failed', reason: error instanceof Error ? error.message : 'unknown' }));
     return null;
   }
 }
@@ -146,7 +161,15 @@ export async function commitChatTurn(request: Request, context: AdapterContext, 
   if (turn.classification?.humor_preference === 'allow') state.humor.enabled = true;
   let serviceText = turn.service_text;
   let jokeId: string | null = null;
-  const question = nextQuestion(state, now, lib, core.engineOptions);
+  // The visitor asked for the diagnostic: it starts, or continues from the question where it stopped.
+  if (turn.action === 'start_diagnostic') {
+    serviceText = diagnosticStarted(session.state) ? 'Продолжим экспресс-диагностику.' : 'Начинаем экспресс-диагностику.';
+    state.mode = 'diagnostic';
+  }
+  // A question about services pauses the diagnostic: no survey question until the visitor asks to continue.
+  if (turn.action === 'question') state.mode = 'questions';
+  let question = nextQuestion(state, now, lib, core.engineOptions);
+  state.current_question_id = question?.id ?? null;
   if (['off_topic', 'humor_preference', 'role_change'].includes(turn.action)) {
     const reply = selectHumorReply(state, humorIntent(turn, now), question, lib);
     serviceText = reply.text; jokeId = reply.joke_id;
@@ -155,21 +178,31 @@ export async function commitChatTurn(request: Request, context: AdapterContext, 
   }
   if (turn.action === 'sensitive') serviceText = 'Я услышал Вас. Можно сделать паузу или завершить разговор.';
   const timeLeft = () => turn.started_at + TURN_BUDGET_MS - core.now();
-  // A question about services is answered from the knowledge base; a mixed reply also keeps its facts and advances.
+  // A question about services is answered from the knowledge base; a mixed reply also keeps its facts.
   const asksKnowledge = turn.action === 'question' || (turn.classification?.intent === 'mixed' && !turn.service_text);
-  if (asksKnowledge) serviceText = await answerFromKnowledge(context, session, turn.input.operation_id, turn.event.text ?? '', dialog(evidence), Math.min(12_000, timeLeft()))
-    ?? (turn.action === 'question' ? NOT_FOUND : serviceText);
+  if (asksKnowledge) {
+    const found = await answerFromKnowledge(context, session, turn.input.operation_id, turn.event.text ?? '', dialog(evidence), Math.min(12_000, timeLeft()));
+    // During the survey a mixed reply shows only a real answer; otherwise its facts get the usual reaction and the next question.
+    if (turn.action === 'question' || state.mode === 'questions') serviceText = found?.text ?? NOT_FOUND;
+    else if (found?.answered) serviceText = found.text;
+    if (found?.answered && state.mode !== 'questions') { state.mode = 'questions'; question = null; state.current_question_id = null; }
+  }
+  // In questions mode a message that is not a question and got no library text (a greeting, a name, an unclear remark)
+  // gets an offer to help, never a survey prompt and never an empty reply.
+  const offerHelp = state.mode === 'questions' && !asksKnowledge && turn.action !== 'sensitive' && (['answer', 'clarify'].includes(turn.action) || !serviceText);
+  if (offerHelp) serviceText = HELP_NOTICE;
   const libraryText = serviceText;
   let questionText: string | null = null;
   // The survey question does not change after a pure question, so its earlier wording stays.
   if (turn.action !== 'sensitive' && turn.action !== 'question' && timeLeft() > 1_500) {
-    const approved = APPROVED_TEXT_ACTIONS.includes(turn.action) || asksKnowledge ? serviceText : null;
+    const approved = (APPROVED_TEXT_ACTIONS.includes(turn.action) && !offerHelp) || asksKnowledge ? serviceText : null;
     const composed = await composeTurn(context, session, turn.input.operation_id, COMPOSE_ATTEMPT, Math.min(8_000, timeLeft()), { visitor_text: turn.event.text ?? null,
       // A clarification of the current question would only repeat it; ask for a clearer answer instead.
       approved_text: approved, notice_to_rephrase: approved ? null : serviceText && serviceText === question?.text ? 'Ответ не удалось однозначно понять: попросите уточнить его.' : serviceText,
       question: question ? { text: question.text, options: question.options.map(option => option.text) } : null, history: dialog(evidence),
       previous_replies: await context.core.store.recentReplies(session.id) });
-    if (composed) { questionText = composed.question_text; if (!approved) serviceText = composed.reply; }
+    // An empty reworded reply keeps the notice it was meant to convey.
+    if (composed) { questionText = composed.question_text; if (!approved) serviceText = composed.reply || serviceText; }
   }
   // A reaction to a plain answer is shown to the visitor but leaves the answer event untouched.
   const event = { ...turn.event, kind: answers.length ? turn.event.kind : 'service' as const,

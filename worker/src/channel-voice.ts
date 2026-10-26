@@ -557,6 +557,15 @@ export function createVoiceAdapters(options: VoiceBridgeOptions = {}): Partial<C
       currentRevision(session, input);
       const call = await member(core, session, body.call_id);
       if (session.state.status !== 'in_progress' || session.state.active_channel !== 'voice' || call.id !== session.activeCallId || call.channelRevision !== input.channel_revision || call.status !== 'active') fail(409, 'channel_conflict', 'Звонок больше не владеет каналом ввода.');
+      if (body.tool === 'startDiagnostic') {
+        // The visitor asked for the diagnostic: it starts, or continues from the question where it stopped.
+        const state: AuditState = { ...session.state, mode: 'diagnostic' };
+        const question = nextQuestion(state, core.now(), getLibrary(state.library_version), core.engineOptions);
+        state.current_question_id = question?.id ?? null;
+        return core.response(await core.store.commit({ sessionId: session.id, expectedRevision: input.expected_revision, channelRevision: input.channel_revision, operationId: input.operation_id, requestHash: digest,
+          event: core.serviceEvent(input.operation_id, 'service', { type: 'start_diagnostic' }), state, now: core.now(),
+          result: { status: 'diagnostic', question_id: question?.id ?? null, question_text: question?.text ?? null } }));
+      }
       if (body.tool === 'offTopicReply') {
         modelArguments(() => parseVoiceOffTopicPayload(Object.fromEntries(['kind', 'certain', 'safe_category_ids', 'excluded_joke_ids', 'previous_topic_category_ids'].filter(key => body[key] !== undefined).map(key => [key, body[key]]))));
         const evidence = latestEvents(await readEvents(core, session.id)).filter(event => event.call_id === call.id && event.source === 'voice' && event.role === 'user' && record(event.data).is_final === true).sort((a, b) => a.local_order - b.local_order);

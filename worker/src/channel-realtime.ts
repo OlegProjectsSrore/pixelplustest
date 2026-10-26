@@ -11,6 +11,8 @@ import { createVoiceAdapters, decryptJoinUrl, encryptJoinUrl, latestEvents, prep
 
 const API = 'https://api.openai.com/v1/realtime/calls';
 const HEARTBEAT_TIMEOUT = 60_000;
+// The same greeting the chat window shows; the voice model says it in its own words.
+export const GREETING = 'Здравствуйте! Я могу ответить на вопросы об услугах Pixel Plus, помочь подобрать подходящее решение или провести небольшую экспресс-диагностику вашего бизнеса. По её итогам вы получите персональный PDF-отчёт с основными проблемами, приоритетами и рекомендациями.';
 const record = (v: unknown): Record<string, Json> => v && typeof v === 'object' && !Array.isArray(v) ? v as Record<string, Json> : {};
 function key(core: CoreServices): string { return core.env.OPENAI_API_KEY?.trim() || fail(503, 'not_configured', 'Ключ OpenAI не настроен.'); }
 
@@ -25,9 +27,12 @@ export function realtimeTools(): Json[] {
       required: t.dynamicParameters.filter(p => p.required).map(p => p.name),
     } };
   }).concat([{ type: 'function', name: 'searchKnowledge',
-    description: 'Найти в материалах Pixel Plus ответ на вопрос посетителя об услугах, ценах, сроках, условиях, кейсах или компании. Возвращает фрагменты страниц pixelplus.ru; отвечай только по ним.',
+    description: 'Найти в материалах Pixel Plus ответ на вопрос посетителя об услугах, ценах, сроках, условиях, кейсах, компании или о задаче его бизнеса. Возвращает answer — готовый проверенный ответ DeepSeek, который произносится дословно, — или фрагменты страниц pixelplus.ru, по которым отвечать коротко.',
     parameters: { type: 'object', additionalProperties: false, required: ['query'],
-      properties: { query: { type: 'string', description: 'Короткий поисковый запрос по-русски по смыслу вопроса посетителя.' } } } }]);
+      properties: { query: { type: 'string', description: 'Короткий поисковый запрос по-русски по смыслу вопроса посетителя.' } } } },
+  { type: 'function', name: 'startDiagnostic',
+    description: 'Начать или продолжить экспресс-диагностику бизнеса, когда посетитель об этом просит: «экспресс-диагностика», «аудит бизнеса», «персональный отчёт», «пройти опрос» — в любых словах. Вызывать молча; сервер возвращает вопрос, с которого продолжить.',
+    parameters: { type: 'object', properties: {}, additionalProperties: false } }]);
 }
 
 export async function realtimeInstructions(core: CoreServices, session: StoredSession): Promise<string> {
@@ -37,7 +42,7 @@ export async function realtimeInstructions(core: CoreServices, session: StoredSe
   const history = latestEvents(await readEvents(core, session.id)).filter(e => ['user', 'assistant'].includes(e.role) && e.text && (e.source === 'chat' || record(e.data).is_final === true)).slice(-24).map(e => ({ role: e.role, text: e.text }));
   return buildInterviewPrompt({ library_version: lib.version, questions: question ? [question] : [], current_question_id: question?.id ?? null,
     accepted_facts: Object.values(session.state.facts), remaining_seconds: Math.max(1, Math.ceil((INTERVIEW_BUDGET_MS - elapsedMs(session.state, core.now())) / 1000)),
-    humor_enabled: session.state.humor.enabled, off_topic_categories: lib.jokes.categories, fact_formats: schemas, history });
+    humor_enabled: session.state.humor.enabled, off_topic_categories: lib.jokes.categories, fact_formats: schemas, history, conversation_mode: session.state.mode ?? 'diagnostic' });
 }
 
 /** Rejected voice saves are logged as structure only: IDs, states, lengths and match counts, never visitor words or values. */
@@ -123,8 +128,11 @@ export function createRealtimeAdapters(options: VoiceBridgeOptions = {}): Partia
     // Validate encryption before reserving or making any billable request.
     await encryptJoinUrl(core, session.id, input.operation_id, 'configuration-check');
     const question = nextQuestion({ ...session.state, paused: false }, core.now(), getLibrary(session.state.library_version), core.engineOptions);
-    const last = latestEvents(await readEvents(core, session.id)).filter(e => e.role === 'assistant' && e.text && (e.source === 'chat' || record(e.data).is_final === true)).at(-1);
-    const firstMessage = last?.text?.trim() === question?.text.trim() ? '' : question?.text ?? 'Можно завершить опрос и подготовить предварительный аудит.';
+    const spoken = latestEvents(await readEvents(core, session.id)).filter(e => ['user', 'assistant'].includes(e.role) && e.text && (e.source === 'chat' || record(e.data).is_final === true));
+    const last = spoken.filter(e => e.role === 'assistant').at(-1);
+    // Questions mode opens with the greeting that asks what the visitor needs; after a channel switch it simply offers help.
+    const firstMessage = session.state.mode === 'questions' ? (spoken.length ? 'Чем ещё могу помочь?' : GREETING)
+      : last?.text?.trim() === question?.text.trim() ? '' : question?.text ?? 'Можно завершить опрос и подготовить предварительный аудит.';
     let starts: UsageReservation | null = null, seconds: UsageReservation | null = null, call: VoiceCall | null = null;
     let attempted = false, definiteRejection = false, providerId: string | null = null;
     try {

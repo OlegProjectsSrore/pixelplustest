@@ -83,7 +83,8 @@ export const runtimeStateSchema = {
     paused: { type: 'boolean' }, finish_reason: nullableText,
     humor: ref('Humor'), through_seq: integer, extracted_through_seq: integer,
     history_status: { type: 'string', enum: ['pending', 'complete', 'incomplete'] },
-  }),
+    mode: { type: 'string', enum: ['questions', 'diagnostic'] },
+  }, ['mode']),
   $defs: {
     ...common,
     Humor: closed<HumorState>({

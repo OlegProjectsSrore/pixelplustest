@@ -34,7 +34,7 @@ async function fixture(respond: (context: ClassifierContext, call: number) => un
   const session = await core.store.createSession({ id: 'chat-session', tokenHash: await hashToken(bearer), reportId: 'report-1', reportTokenHash: await hashToken('report-token'), state: initialAuditState(library.version, 'chat', now), now });
   const handler = createChatAdapter();
   const request = new Request('https://example.test/api/chat', { method: 'POST', headers: { Authorization: `Bearer ${bearer}` } });
-  const body = (operation = 'turn-1', revision = 0, input: Record<string, unknown> = { kind: 'text', text: 'Олег' }, question = 'context_name') => ({ api_version: '1', session_id: session.id, operation_id: operation, expected_revision: revision, channel_revision: 0, library_version: library.version, question_id: question, input });
+  const body = (operation = 'turn-1', revision = 0, input: Record<string, unknown> = { kind: 'text', text: 'Олег' }, question: string | null = 'context_name') => ({ api_version: '1', session_id: session.id, operation_id: operation, expected_revision: revision, channel_revision: 0, library_version: library.version, question_id: question, input });
   const context = (value: Record<string, unknown>): AdapterContext => ({ core, env, execution, body: value });
   return { db, core, env, session, request, body, context, handler, calls: () => calls };
 }
@@ -285,7 +285,7 @@ function enableKnowledge(f: Awaited<ReturnType<typeof fixture>>) {
 }
 const asked = (text: string) => ({ kind: 'text', text });
 
-test('a service question is answered from the knowledge base; the survey question stays and nothing is saved', async () => {
+test('a service question is answered from the knowledge base and pauses the diagnostic; nothing is saved', async () => {
   const seen: { question: string; fragments: { url: string }[] }[] = [];
   const f = await fixture(context => {
     if ('fragments' in context) { seen.push(context as never); return { answer: 'Да, мы создаём сайты на Битрикс.', sources: [(context as never as { fragments: { url: string }[] }).fragments[0].url] }; }
@@ -294,7 +294,9 @@ test('a service question is answered from the knowledge base; the survey questio
   enableKnowledge(f); f.env.CHAT_COMPOSER_ENABLED = 'true';
   try {
     const response = await f.handler(f.request, f.context(f.body('q-1', 0, asked('Делаете ли вы сайты на Битриксе?')))) as { operation: Record<string, Json> };
-    assert.equal(response.operation.question_id, 'context_name'); assert.equal(response.operation.question_text, null, 'the unchanged question is not reworded');
+    // No survey question follows the answer until the visitor asks to continue the diagnostic.
+    assert.equal(response.operation.question_id, null); assert.equal(response.operation.question_text, null);
+    assert.equal((await f.core.store.requireSession(f.session.id)).state.mode, 'questions');
     assert.match(String(response.operation.text), /^Да, мы создаём сайты на Битрикс\.\nПодробнее: https:\/\/pixelplus\.ru\//);
     assert.equal(seen[0].question, 'Делаете ли вы сайты на Битриксе?');
     assert(seen[0].fragments.length > 0 && seen[0].fragments.length <= 6); assert(seen[0].fragments.some(fragment => fragment.url.includes('bitrix')));
@@ -309,20 +311,61 @@ test('an unchecked answer falls back to the closest page; nothing found or the f
   try {
     const page = await f.handler(f.request, f.context(f.body('q-1', 0, asked('Сколько стоит продвижение сайта?')))) as { operation: Record<string, Json> };
     assert.match(String(page.operation.text), /^Подробнее об этом — на странице «.+»: https:\/\/pixelplus\.ru\//);
-    const none = await f.handler(f.request, f.context(f.body('q-2', 1, asked('zzqx')))) as { operation: Record<string, Json> };
+    const none = await f.handler(f.request, f.context(f.body('q-2', 1, asked('zzqx'), null))) as { operation: Record<string, Json> };
     assert.match(String(none.operation.text), /точного ответа на этот вопрос нет/);
     f.env.KNOWLEDGE_ANSWERS_ENABLED = 'false';
-    const off = await f.handler(f.request, f.context(f.body('q-3', 2, asked('Делаете ли вы сайты на Битриксе?')))) as { operation: Record<string, Json> };
+    const off = await f.handler(f.request, f.context(f.body('q-3', 2, asked('Делаете ли вы сайты на Битриксе?'), null))) as { operation: Record<string, Json> };
     assert.match(String(off.operation.text), /точного ответа на этот вопрос нет/);
   } finally { f.db.close(); }
 });
 
-test('a mixed reply saves its facts, answers the question and moves on to the next survey question', async () => {
+test('a mixed reply saves its facts, answers the question and pauses the diagnostic', async () => {
   const f = await fixture(context => 'fragments' in context ? { answer: 'Да, мы создаём сайты на Битрикс.', sources: [(context as never as { fragments: { url: string }[] }).fragments[0].url] } : reportFromText(context, 'mixed'));
   enableKnowledge(f);
   try {
     const response = await f.handler(f.request, f.context(f.body('m-1', 0, asked('Олег, а сайты на Битриксе делаете?')))) as { operation: Record<string, Json> };
-    assert.equal(response.operation.question_id, 'context_position'); assert.match(String(response.operation.text), /^Да, мы создаём сайты на Битрикс\./);
+    assert.equal(response.operation.question_id, null); assert.match(String(response.operation.text), /^Да, мы создаём сайты на Битрикс\./);
     assert.equal((await f.core.store.listAnswers(f.session.id)).length, 1);
+  } finally { f.db.close(); }
+});
+
+test('questions mode: help offer, joke without the survey, key phrase starts, a service question pauses, asking again resumes where it stopped', async () => {
+  const f = await fixture(context => {
+    if ('fragments' in context) return { answer: 'Да, мы создаём сайты на Битрикс.', sources: [(context as never as { fragments: { url: string }[] }).fragments[0].url] };
+    const text = context.source_events[0].text!;
+    if (/диагностик/.test(text)) return intent('start_diagnostic');
+    if (/Битрикс/.test(text)) return intent('question');
+    if (/погода/.test(text)) return { ...intent('off_topic'), joke_category_id: 'weather' };
+    return text === 'Привет' ? intent('unknown') : reportFromText(context);
+  });
+  enableKnowledge(f);
+  f.db.sqlite.prepare(`UPDATE audit_sessions SET state_json=json_set(state_json,'$.mode','questions') WHERE id=?`).run(f.session.id);
+  const turn = async (operation: string, revision: number, text: string, question: string | null) =>
+    (await f.handler(f.request, f.context(f.body(operation, revision, asked(text), question))) as { operation: Record<string, Json> }).operation;
+  const mode = async () => (await f.core.store.requireSession(f.session.id)).state.mode;
+  try {
+    const hello = await turn('t-1', 0, 'Привет', null);
+    assert.equal(hello.text, 'Подскажите, чем могу помочь.'); assert.equal(hello.question_id, null);
+    const joke = await turn('t-2', 1, 'Какая сегодня погода?', null);
+    assert.equal(joke.joke_id, 'weather_01'); assert.equal(joke.question_id, null);
+    assert(library.jokes.questions_return_phrases!.some(phrase => String(joke.text).endsWith(` ${phrase}`)), String(joke.text));
+    const start = await turn('t-3', 2, 'Давайте экспресс-диагностику', null);
+    assert.equal(start.text, 'Начинаем экспресс-диагностику.'); assert.equal(start.question_id, 'context_name'); assert.equal(await mode(), 'diagnostic');
+    const name = await turn('t-4', 3, 'Олег', 'context_name');
+    assert.equal(name.question_id, 'context_position');
+    const service = await turn('t-5', 4, 'Делаете сайты на Битриксе?', 'context_position');
+    assert.match(String(service.text), /^Да, мы создаём сайты на Битрикс\./); assert.equal(service.question_id, null); assert.equal(await mode(), 'questions');
+    const resume = await turn('t-6', 5, 'Продолжим диагностику', null);
+    assert.equal(resume.text, 'Продолжим экспресс-диагностику.'); assert.equal(resume.question_id, 'context_position', 'the survey continues where it stopped');
+    assert.deepEqual((await f.core.store.listAnswers(f.session.id)).map(answer => answer.value), ['Олег']);
+  } finally { f.db.close(); }
+});
+
+test('questions mode never sends an empty reply: an off-topic greeting without a joke gets the offer to help', async () => {
+  const f = await fixture(() => intent('off_topic'));
+  f.db.sqlite.prepare(`UPDATE audit_sessions SET state_json=json_set(state_json,'$.mode','questions') WHERE id=?`).run(f.session.id);
+  try {
+    const greeting = await f.handler(f.request, f.context(f.body('g-1', 0, asked('Здравствуйте'), null))) as { operation: Record<string, Json> };
+    assert.equal(greeting.operation.text, 'Подскажите, чем могу помочь.'); assert.equal(greeting.operation.joke_id, null); assert.equal(greeting.operation.question_id, null);
   } finally { f.db.close(); }
 });

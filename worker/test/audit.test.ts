@@ -379,3 +379,22 @@ test('the interview follows named topics and stops screening a domain after sele
   assert.equal(nextQuestion(state, now, library, preview)?.id, 'strategy_goal_detail');
   assert.deepEqual(state.candidate_blocks, ['strategy_goal']);
 });
+
+test('questions mode asks no survey question, keeps sufficiency honest and still jokes with its own return phrases', () => {
+  const state = initialAuditState(library.version, 'chat', now, 'questions');
+  assert.equal(nextQuestion(state, now, library, preview), null, 'the survey waits for the visitor to ask for the diagnostic');
+  assert.equal(interviewSufficiency(state, now, library, preview).sufficient, false);
+  validateAuditState(state);
+  const intent = { kind: 'off_topic' as const, certain: true, safe_category_ids: ['weather'], now };
+  const first = selectHumorReply(state, intent, null);
+  assert.equal(first.joke_id, 'weather_01'); assert.equal(first.question_id, null);
+  assert(first.text.endsWith(` ${library.jokes.questions_return_phrases![0]}`), first.text);
+  assert(!library.jokes.return_phrases.some(phrase => first.text.endsWith(phrase)), 'no «back to the survey» while no survey runs');
+  state.humor.reserved_ids.push(first.joke_id!);
+  assert(selectHumorReply(state, intent, null).text.endsWith(` ${library.jokes.questions_return_phrases![1]}`));
+  const diagnostic = { ...state, mode: 'diagnostic' as const };
+  assert.equal(nextQuestion(diagnostic, now, library, preview)?.id, 'context_name', 'the diagnostic starts with the first question');
+  assert.throws(() => validateAuditState({ ...state, mode: 'other' }), /state\.mode/);
+  const old = structuredClone(diagnostic) as Partial<typeof diagnostic>; delete old.mode;
+  assert.equal(nextQuestion(old as typeof diagnostic, now, library, preview)?.id, 'context_name', 'sessions saved before the mode existed stay in the diagnostic');
+});

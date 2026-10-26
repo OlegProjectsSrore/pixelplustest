@@ -88,8 +88,8 @@
     },
     {
       "name": "off-topic-jokes.json",
-      "sha256": "cb934acc0ba0237dece81dd735d5ec4f32c4d09fa08f2314bafa94d226efca85",
-      "bytes": 59546,
+      "sha256": "f0ddeb6bd701b2156452906ad072200f88399896610f4bb29fd7614a3b335a62",
+      "bytes": 59888,
       "role": "runtime_candidate"
     },
     {

@@ -1,9 +1,9 @@
-import { createAuditView } from './audit-ui.js?v=852604f24f';
+import { createAuditView } from './audit-ui.js?v=79170ad9a8';
 import { createAuditTransport, createAuditStorage, AuditRequestError } from './audit-http.js';
 import { getTurnstileToken } from './audit-turnstile.js';
 import { checkMicrophone, createVoiceAdapter, loadVoiceSdk } from './audit-voice.js?v=7f69e524a9';
 
-import { createRealtimeVoiceAdapter } from './audit-realtime.js?v=486735d8b1';
+import { createRealtimeVoiceAdapter } from './audit-realtime.js?v=832b0b4a01';
 
 const THANKS = 'Спасибо за предоставленную информацию, сейчас вам предоставим отчёт предварительного аудита.';
 const VOICE_STATUS = { connecting: 'Соединяемся…', listening: 'Слушаю Вас', thinking: 'Обрабатываю ответ…', speaking: 'Помощник говорит', idle: 'Соединение установлено', disconnected: 'Голосовой разговор отключён', disconnecting: 'Завершаем соединение…' };
@@ -78,7 +78,7 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
     const active = session?.status === 'in_progress';
     const canManage = !!saved.management_token && session?.access_expires_at > now();
     const allowed = active && canManage && !busy && !saved.pending;
-    view?.render({ mode, phase: phase(), question,
+    view?.render({ mode, phase: phase(), question, diagnostic: session?.diagnostic_started !== false,
       launchPending: !session && config?.publicSessionsEnabled === false,
       messages: saved.messages || [], remaining_seconds: remaining(), busy,
       voice_status: voiceStatus, email_status: emailStatus, error,
@@ -292,11 +292,11 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
         // A knowledge search reads only; it bypasses the mutation queue so it never waits behind a save.
         if (name === 'searchKnowledge') return searchKnowledge(args?.query);
         return enqueue(async () => {
-          if (!['saveAnswers', 'finishAudit', 'offTopicReply'].includes(name)) throw new Error('Неизвестный инструмент разговора.');
+          if (!['saveAnswers', 'finishAudit', 'offTopicReply', 'startDiagnostic'].includes(name)) throw new Error('Неизвестный инструмент разговора.');
           const boundary = saved.transcript_boundaries[callId];
           const payload = name === 'offTopicReply'
             ? Object.fromEntries(['kind', 'certain', 'safe_category_ids', 'excluded_joke_ids', 'previous_topic_category_ids'].filter(key => args[key] !== undefined).map(key => [key, args[key]]))
-            : { answers: args.answers };
+            : name === 'startDiagnostic' ? {} : { answers: args.answers };
           const extra = { ...payload, call_id: callId, ...(boundary ? { through_event_id: boundary } : {}) };
           let result;
           if (name === 'finishAudit') {
@@ -304,7 +304,7 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
             result = await mutate('/api/voice/answers', { answers: args.answers, call_id: callId, ...(boundary ? { through_event_id: boundary } : {}) }, {
               followup: { path: '/api/audit/finish', extra: { reason: args.reason, call_id: callId, ...(boundary ? { through_event_id: boundary } : {}) } },
             });
-          } else result = await mutate('/api/voice/answers', { ...extra, ...(name === 'offTopicReply' ? { tool: name } : {}) });
+          } else result = await mutate('/api/voice/answers', { ...extra, ...(['offTopicReply', 'startDiagnostic'].includes(name) ? { tool: name } : {}) });
           if (name === 'offTopicReply' && args.kind === 'pause' && (result?.stop_required === true || result?.status === 'stopping')) {
             saved.control_intent = { action: 'pause' }; persist();
           }
@@ -336,6 +336,8 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
     if (typeof query !== 'string' || !query.trim() || !saved.session || !saved.management_token) throw new Error('Поиск недоступен.');
     const path = '/api/tools/search?session_id=' + encodeURIComponent(saved.session.session_id) + '&q=' + encodeURIComponent(query.trim().slice(0, 300));
     const data = await ensureApi().request(path, { token: saved.management_token });
+    // A checked answer from DeepSeek V4 Pro is spoken as it is; otherwise the voice model answers from the fragments.
+    if (typeof data?.answer === 'string' && data.answer.trim()) return { found: true, answer: data.answer };
     const fragments = Array.isArray(data?.snippets) ? data.snippets.map(({ title, url, text }) => ({ title, url, text })) : [];
     return { found: fragments.length > 0, fragments };
   }

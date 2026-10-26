@@ -2,7 +2,7 @@ import type { CoreServices } from './core.ts';
 import type { Env } from './env.ts';
 import type { Json } from './audit/contracts.ts';
 import type { StoredSession } from './storage/types.ts';
-import { createChatAdapter } from './channel-runtime.ts';
+import { createChatAdapter, voiceKnowledgeAnswer } from './channel-runtime.ts';
 import { createRealtimeAdapters } from './channel-realtime.ts';
 import { createRecoveryClassifier, defaultVoiceIntentClassifier } from './channel-recovery.ts';
 import { createKnowledgeSearchHandler } from './search/service.ts';
@@ -24,6 +24,6 @@ export interface ChannelAdapters {
 /** Wire the separately implemented channel parsers into the shared durable core. */
 export const channelAdapters: ChannelAdapters = {
   chat: createChatAdapter(),
-  search: createKnowledgeSearchHandler(),
+  search: createKnowledgeSearchHandler(voiceKnowledgeAnswer),
   ...createRealtimeAdapters({ recoverAnswers: createRecoveryClassifier(), assessIntent: defaultVoiceIntentClassifier }),
 };

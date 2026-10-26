@@ -56,8 +56,8 @@ function safeText(value) {
  * @returns {Object} View methods and an unmodified challengeElement mount point.
  *
  * question.answer_mode === 'multiple' enables checkboxes; otherwise radio.
- * question.can_skip === true enables onSkip(). Status text is already localized
- * by the controller. Text drafts are cleared only by clearDraft()/setDraft().
+ * diagnostic === false (questions only, survey not begun) hides pause and finish.
+ * Status text is already localized by the controller. Text drafts are cleared only by clearDraft()/setDraft().
  */
 export function createAuditView(handlers = {}) {
   const prefix = `audit-${++viewCount}`;
@@ -130,8 +130,7 @@ export function createAuditView(handlers = {}) {
   const selectionActions = element('div', 'audit-selection-actions');
   const selectionSubmit = button('Ответить', 'primary');
   selectionSubmit.type = 'submit';
-  const skipButton = button('Пропустить вопрос', 'quiet');
-  selectionActions.append(selectionSubmit, skipButton);
+  selectionActions.append(selectionSubmit);
   selectionForm.append(optionFieldset, selectionActions);
   questionSection.append(questionTitle, selectionForm);
 
@@ -300,9 +299,6 @@ export function createAuditView(handlers = {}) {
   });
   downloadButton.addEventListener('click', () => call('onDownload'));
   retryButton.addEventListener('click', () => call('onRetry'));
-  skipButton.addEventListener('click', () => {
-    if (canAnswer() && model.question?.can_skip === true) call('onSkip');
-  });
   selectionForm.addEventListener('submit', event => {
     event.preventDefault();
     if (canAnswer() && selectedIds.size) call('onSelection', [...selectedIds]);
@@ -408,12 +404,10 @@ export function createAuditView(handlers = {}) {
       questionKey = nextQuestionKey;
     }
     questionSection.hidden = !question || !interviewing;
-    selectionForm.hidden = model.mode !== 'chat' || (!options.length && question?.can_skip !== true);
+    selectionForm.hidden = model.mode !== 'chat' || !options.length;
     optionFieldset.hidden = !options.length;
     optionFieldset.disabled = !canAnswer();
     selectionSubmit.hidden = !options.length;
-    skipButton.hidden = question?.can_skip !== true;
-    skipButton.disabled = !canAnswer();
     textForm.hidden = model.mode !== 'chat' || !interviewing;
     draft.disabled = !canAnswer();
     updateAnswerButtons();
@@ -430,11 +424,13 @@ export function createAuditView(handlers = {}) {
 
     recovery.hidden = model.launchPending || (phase !== 'failed' && phase !== 'unavailable' && !error.textContent);
     retryButton.disabled = Boolean(busy);
-    pauseButton.hidden = !interviewing;
+    // Before the visitor asks for the diagnostic there is nothing to pause or finish.
+    const surveyBegun = model.diagnostic !== false;
+    pauseButton.hidden = !interviewing || !surveyBegun;
     pauseButton.disabled = busy || !capabilities.pause;
     resumeButton.hidden = !paused;
     resumeButton.disabled = busy || !capabilities.resume;
-    finishButton.hidden = !interviewing && !paused;
+    finishButton.hidden = (!interviewing && !paused) || !surveyBegun;
     finishButton.disabled = busy || !capabilities.finish;
     restartButton.hidden = !capabilities.restart;
     restartButton.disabled = Boolean(busy);

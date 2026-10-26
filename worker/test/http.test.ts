@@ -194,7 +194,7 @@ test('explicitly disabled Turnstile permits session and voice checks without con
   } finally { app.db.close(); }
 });
 
-test('HTTP chat: DeepSeek words the first question at creation and later questions arrive as operation.question_text', async () => {
+test('HTTP chat: a new session opens with the greeting only; the key phrase starts the diagnostic and its questions arrive as operation.question_text', async () => {
   const db = new SqliteD1();
   const env: Env = { DB: db.binding(), REPORTS_KV: { get: async () => null, put: async () => undefined } as unknown as KVNamespace,
     ALLOWED_ORIGINS: origin, TURNSTILE_HOSTNAMES: 'olegprojectssrore.github.io', TURNSTILE_SECRET: 'test-secret', IP_HASH_SALT: 'test-salt-'.repeat(5),
@@ -205,8 +205,10 @@ test('HTTP chat: DeepSeek words the first question at creation and later questio
     if (!String(url).startsWith('https://api.deepseek.com/')) return Response.json({ success: true, hostname: 'olegprojectssrore.github.io', action: 'session' });
     const data = JSON.parse(JSON.parse(String(init!.body)).messages[1].content);
     if ('next_question' in data && !data.visitor_message && failFirst) return new Response(null, { status: 500 });
+    const starting = (data.source_events?.[0]?.text ?? data.visitor_message ?? '').includes('диагностик');
     const content = 'next_question' in data
-      ? { reply: data.visitor_message ? 'Приятно познакомиться.' : '', question: data.visitor_message ? 'Какую должность Вы занимаете?' : 'Как к Вам можно обращаться?' }
+      ? starting ? { reply: 'Начнём экспресс-диагностику.', question: 'Как к Вам можно обращаться?' } : { reply: 'Приятно познакомиться.', question: 'Какую должность Вы занимаете?' }
+      : starting ? { intent: 'start_diagnostic', answers: [], clarification_question_id: null, faq_id: null, joke_category_id: null, humor_preference: null }
       : { intent: 'answer', clarification_question_id: null, faq_id: null, joke_category_id: null, humor_preference: null,
         answers: [{ question_id: 'context_name', fact_id: 'context.name', state: 'known', value: 'Олег', event_ids: [data.source_events[0].id], evidence: [{ event_id: data.source_events[0].id, text: 'Олег' }] }] };
     return Response.json({ id: 'provider', usage: { prompt_tokens: 10, completion_tokens: 10, total_tokens: 20 }, choices: [{ finish_reason: 'stop', message: { content: JSON.stringify(content) } }] });
@@ -217,20 +219,29 @@ test('HTTP chat: DeepSeek words the first question at creation and later questio
     headers: { Origin: origin, 'Content-Type': 'application/json', 'CF-Connecting-IP': '192.0.2.3', ...(token ? { Authorization: `Bearer ${token}` } : {}) }, body: JSON.stringify(body) }), env, ctx);
   try {
     const created = await (await call('/api/session', { operation_id: randomToken(), channel: 'chat', turnstile_token: 'test-token' })).json() as any;
-    assert.deepEqual(created.data.question_phrasing, { question_id: 'context_name', text: 'Как к Вам можно обращаться?' });
-    const session = created.data.session;
-    const chat = await (await call('/api/chat', { api_version: '1', session_id: session.session_id, operation_id: randomToken(), expected_revision: session.revision,
-      channel_revision: session.channel_revision, library_version: session.library_version, question_id: 'context_name', input: { kind: 'text', text: 'Олег' } }, created.data.session_token)).json() as any;
+    // The greeting asks what the visitor needs: no survey question yet, nothing to pause or finish.
+    assert.equal(created.data.question_phrasing, undefined); assert.equal(created.data.session.question, null);
+    assert.equal(created.data.session.conversation_mode, 'questions'); assert.equal(created.data.session.diagnostic_started, false);
+    let session = created.data.session;
+    const send = async (text: string, questionId: string | null) => (await call('/api/chat', { api_version: '1', session_id: session.session_id, operation_id: randomToken(), expected_revision: session.revision,
+      channel_revision: session.channel_revision, library_version: session.library_version, question_id: questionId, input: { kind: 'text', text } }, created.data.session_token)).json() as any;
+    const start = await send('Давайте экспресс-диагностику', null);
+    assert.equal(start.data.operation.text, 'Начнём экспресс-диагностику.'); assert.equal(start.data.operation.question_text, 'Как к Вам можно обращаться?');
+    assert.equal(start.data.operation.question_id, 'context_name'); assert.equal(start.data.session.question.id, 'context_name');
+    assert.equal(start.data.session.conversation_mode, 'diagnostic'); assert.equal(start.data.session.diagnostic_started, true);
+    session = start.data.session;
+    const chat = await send('Олег', 'context_name');
     assert.equal(chat.data.operation.text, 'Приятно познакомиться.'); assert.equal(chat.data.operation.question_text, 'Какую должность Вы занимаете?');
     assert.equal(chat.data.operation.question_id, 'context_position');
     failFirst = true;
     const plain = await call('/api/session', { operation_id: randomToken(), channel: 'chat', turnstile_token: 'test-token' });
-    assert.equal(plain.status, 201); assert.equal(((await plain.json()) as any).data.question_phrasing, undefined, 'a provider failure keeps the library question');
+    assert.equal(plain.status, 201); assert.equal(((await plain.json()) as any).data.question_phrasing, undefined, 'no survey question to word at creation');
   } finally { db.close(); }
 });
 
-test('HTTP knowledge search for the voice tool needs the session token and returns pixelplus.ru fragments', async () => {
-  const app = setup({ search: createKnowledgeSearchHandler() });
+test('HTTP knowledge search for the voice tool needs the session token and returns pixelplus.ru fragments with a ready answer', async () => {
+  const asked: { question: string; urls: string[] }[] = [];
+  const app = setup({ search: createKnowledgeSearchHandler(async (_context, _session, question, fragments) => { asked.push({ question, urls: fragments.map(fragment => fragment.url) }); return 'Да, мы создаём сайты на Битрикс.'; }) });
   app.env.KNOWLEDGE_ANSWERS_ENABLED = 'true';
   app.env.BUDGETS_JSON = JSON.stringify({ ...JSON.parse(app.env.BUDGETS_JSON!), knowledge_searches: 10 });
   const insert = app.db.sqlite.prepare('INSERT INTO kb_chunks VALUES (?,?,?,?,?,?)');
@@ -247,5 +258,8 @@ test('HTTP knowledge search for the voice tool needs the session token and retur
     assert(body.data.snippets.length > 0 && body.data.snippets.length <= 4);
     assert(body.data.snippets.every((snippet: { url: string }) => snippet.url.startsWith('https://pixelplus.ru/')));
     assert(body.data.snippets.some((snippet: { url: string }) => snippet.url.includes('bitrix')));
+    // The spoken answer (DeepSeek V4 Pro in production) is written from the same fragments.
+    assert.equal(body.data.answer, 'Да, мы создаём сайты на Битрикс.');
+    assert.deepEqual(asked, [{ question: 'сайты на Битрикс', urls: body.data.snippets.map((snippet: { url: string }) => snippet.url) }]);
   } finally { app.db.close(); }
 });

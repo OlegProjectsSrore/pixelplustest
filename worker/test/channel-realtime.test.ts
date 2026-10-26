@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { CoreServices } from '../src/core.ts';
-import { createRealtimeAdapters, realtimeTools } from '../src/channel-realtime.ts';
+import { createRealtimeAdapters, GREETING, realtimeTools } from '../src/channel-realtime.ts';
 import { quoteMatches } from '../src/channel-voice.ts';
 import type { AuditEvent } from '../src/audit/contracts.ts';
 import { initialAuditState } from '../src/audit/contracts.ts';
@@ -58,7 +58,7 @@ test('Realtime reserves before OpenAI, uses exact model/speed, replays encrypted
 });
 
 test('Realtime tools retain strict answer evidence schema and finish/pause semantics', () => {
-  const tools = realtimeTools().map(obj); assert.deepEqual(tools.map(t => t.name), ['saveAnswers', 'finishAudit', 'offTopicReply', 'hangUp', 'searchKnowledge']);
+  const tools = realtimeTools().map(obj); assert.deepEqual(tools.map(t => t.name), ['saveAnswers', 'finishAudit', 'offTopicReply', 'hangUp', 'searchKnowledge', 'startDiagnostic']);
   const answer = tools[0].parameters.properties.answers.items;
   assert(answer.required.includes('source_quotes')); assert.equal(answer.additionalProperties, false);
 });
@@ -245,4 +245,23 @@ test('Voice deadline ends the interview and schedules the report even after stop
   const session = await f.core.store.requireSession('s1');
   assert.equal(session.state.status, 'closing'); assert.equal(session.state.finish_reason, 'time_limit'); assert.equal(session.state.elapsed_ms, 900000);
   assert.equal(f.db.sqlite.prepare('SELECT COUNT(*) n FROM audit_jobs').get()!.n, 1);
+});
+
+test('Voice questions mode: the greeting opens the call; startDiagnostic switches to the survey and returns its first question', async t => {
+  const f = await fixture(); t.after(() => f.db.close());
+  f.db.sqlite.prepare(`UPDATE audit_sessions SET state_json=json_set(state_json,'$.mode','questions') WHERE id='s1'`).run();
+  let instructions = '';
+  f.respond(async (_url, init) => { instructions = JSON.parse(String((init!.body as FormData).get('session'))).instructions; return new Response(SDP, { status: 201, headers: { Location: '/v1/realtime/calls/rtc_questions' } }); });
+  const call = await f.start();
+  assert.equal(call.first_message, GREETING, 'the greeting asks what the visitor needs');
+  assert.match(instructions, /"conversation_mode":"questions"/); assert.match(instructions, /"current_question_id":null/);
+  f.tick(2000);
+  const line = (ordinal: number, role: string, text: string) => ({ source: 'voice', source_key: `${call.call_id}:${ordinal}`, source_revision: 0, local_order: ordinal,
+    call_id: call.call_id, role, kind: 'utterance', text, occurred_at: NOW, data: { is_final: true, medium: 'voice' } });
+  await f.invoke(f.adapters.voiceTranscript!, await f.body(undefined, { call_id: call.call_id, events: [line(0, 'assistant', 'Здравствуйте! Чем могу помочь?'), line(1, 'user', 'Давайте экспресс-диагностику')] }));
+  const started = await f.invoke(f.adapters.voiceAnswers!, await f.body(undefined, { call_id: call.call_id, tool: 'startDiagnostic' }));
+  assert.deepEqual(obj(started.operation), { status: 'diagnostic', question_id: 'context_name', question_text: 'Как Вас зовут?' });
+  assert.match(started.realtime_instructions, /"conversation_mode":"diagnostic"/); assert.match(started.realtime_instructions, /Как Вас зовут/);
+  const state = (await f.core.store.requireSession('s1')).state;
+  assert.equal(state.mode, 'diagnostic'); assert.equal(state.current_question_id, 'context_name');
 });

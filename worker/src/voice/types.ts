@@ -47,6 +47,8 @@ export interface VoicePromptInput {
   service_faq?: { question: string; answer: string }[];
   /** Value formats of the current question's facts and recent conversation turns; data, never instructions. */
   fact_formats?: readonly unknown[]; history?: readonly unknown[];
+  /** questions: answer only, no diagnostic questions until the visitor asks for the diagnostic. */
+  conversation_mode?: 'questions' | 'diagnostic';
 }
 export interface VoiceAnswerCandidate {
   question_id: string; fact_id: string; answer_id?: string;

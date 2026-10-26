@@ -15,7 +15,7 @@ export interface PreparedChatTurn {
   event: AuditEvent;
   answers: AuditAnswer[];
   classification: Classification | null;
-  action: 'answer' | 'clarify' | 'faq' | 'question' | 'off_topic' | 'sensitive' | 'role_change' | 'humor_preference' | 'pause' | 'resume' | 'finish';
+  action: 'answer' | 'clarify' | 'faq' | 'question' | 'off_topic' | 'sensitive' | 'role_change' | 'humor_preference' | 'pause' | 'resume' | 'finish' | 'start_diagnostic';
   /** Only an approved service entry or a deterministic clarification; never a recommendation. */
   service_text: string | null;
   /** When the request started; the core keeps the whole turn within the browser's wait. */
@@ -36,6 +36,9 @@ export interface ChatHandlerDependencies {
   }>;
 }
 const empty = (): Classification => ({ intent: 'unknown', answers: [], clarification_question_id: null, faq_id: null, joke_category_id: null, humor_preference: null });
+/** Key phrases that ask for the diagnostic in any form: «экспресс-диагностика», «аудит бизнеса», «персональный отчёт», «пройти опрос».
+ * A question about an SEO or site audit service does not match: it names no business and no survey. */
+export const DIAGNOSTIC_REQUEST = /экспресс[\s-]*диагностик|(?:диагностик|аудит)\p{L}*\s+(?:\p{L}+\s+)?бизнес|персональн\p{L}*\s+(?:pdf[\s-]*)?отч[её]т|(?:пройти|начать|продолжить|провести|пройд[её]м|начн[её]м|продолжим|давайте|хочу)\s+(?:\p{L}+\s+)?(?:диагностик|опрос|анкет)/iu;
 const clarifyText = 'Не удалось однозначно записать ответ. Пожалуйста, уточните его или выберите подходящий вариант.';
 
 /** Deterministic selection only from the engine's current question. No model is involved. */
@@ -140,6 +143,10 @@ export function createChatHandler(dependencies: ChatHandlerDependencies): Adapte
       if (currentClassification.faq_id) serviceText = catalog.faqs?.find(item => item.id === currentClassification.faq_id)?.answer ?? null;
       if (currentClassification.clarification_question_id) serviceText = catalog.clarificationQuestions?.find(item => item.id === currentClassification.clarification_question_id)?.text ?? null;
       if (action === 'clarify' && serviceText === null) serviceText = clarifyText;
+      // Key phrases back the classifier up when it did not recognise the request for the diagnostic.
+      if (!answers.length && (['clarify', 'off_topic'].includes(action) || (action === 'resume' && !session.state.paused)) && DIAGNOSTIC_REQUEST.test(event.text ?? '')) {
+        action = 'start_diagnostic'; serviceText = null;
+      }
       if (session.state.paused && !['resume', 'finish'].includes(action)) fail(409, 'session_paused', 'Сначала возобновите опрос.');
     } else fail(400, 'invalid_input', 'Неизвестный вид ответа.');
     return dependencies.commitTurn(request, context, session, { input, request_hash: hash, event, answers, classification, action, service_text: serviceText, started_at: startedAt });

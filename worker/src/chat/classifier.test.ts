@@ -151,7 +151,9 @@ test('prompt file has only the intents mark; every intent is listed and visitor 
   assert.doesNotMatch(system.content, /\{\{\w+\}\}/);
   assert(system.content.includes(`intent только из списка: ${INTENTS.join(', ')}.`));
   assert.match(system.content, /Схема JSON: \{"intent":"unknown","answers":\[\],"clarification_question_id":null,"faq_id":null,"joke_category_id":null,"humor_preference":null\}/);
-  assert.equal(system.content.split('\n').length, 16);
+  assert.equal(system.content.split('\n').length, 17);
+  assert.match(system.content, /start_diagnostic — посетитель хочет начать или продолжить экспресс-диагностику бизнеса: «экспресс-диагностика», «аудит бизнеса», «персональный отчёт»/);
+  assert.match(system.content, /Вопрос о цене или составе услуги аудита Pixel Plus \(например, SEO-аудита сайта\) — question, а не start_diagnostic\./);
   assert.match(system.content, /mixed без хотя бы одного кандидата в answers не бывает\. Начатая, но не законченная фраза \(«Меня зовут…», «Я…»\) — не факт и не ambiguous: не создавай для неё кандидата, в том числе ради mixed\./);
   assert.match(system.content, /Если реплика не сообщает ни одного факта, а уходит в посторонний вопрос или болтовню, это off_topic, а если вопрос об услугах Pixel Plus — question\./);
   assert.match(system.content, /Шуточные вопросы о самом помощнике \(как настроение, как дела, сколько лет\) — тоже off_topic/);

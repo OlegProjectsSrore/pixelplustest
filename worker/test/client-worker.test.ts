@@ -13,7 +13,7 @@ const { createAuditClient } = await import('../../dist/assets/audit-client.js');
 // @ts-expect-error Static frontend transport has no TypeScript declaration file.
 const { createAuditTransport } = await import('../../dist/assets/audit-http.js');
 
-test('real client/transport/Worker: creation, text, multi-selection, lost ACK retry, pause and finish', async () => {
+test('real client/transport/Worker: creation, key phrase, text, multi-selection, lost ACK retry, pause and finish', async () => {
   const db = new SqliteD1(); let now = Date.parse('2026-10-22T20:00:00Z');
   const jobs: Promise<unknown>[] = [];
   let providerCalls = 0, stored: any = null, handlers: any, model: any, dropSelectionAck = true;
@@ -29,8 +29,9 @@ test('real client/transport/Worker: creation, text, multi-selection, lost ACK re
     const context = JSON.parse(JSON.parse(String(init?.body)).messages[1].content), event = context.source_events[0];
     const answers = [ ['context_name', 'context.name', 'Олег'], ['context_position', 'context.position', 'Директор'], ['context_responsibilities', 'context.responsibilities', 'Продажи'], ['context_company_size', 'context.company_size', '50 сотрудников'], ['context_business', 'context.business', 'Магазин'], ['context_goal', 'context.goal', 'Рост продаж'], ['context_assets', 'context.assets', ['Сайт']] ]
       .map(([question_id, fact_id, value]) => ({ question_id, fact_id, value, state: 'known', event_ids: [event.id], evidence: [{ event_id: event.id, text: event.text }] }));
+    const start = event.text.includes('диагностик');
     return Response.json({ usage: { prompt_tokens: 80, completion_tokens: 20, total_tokens: 100 }, choices: [{ finish_reason: 'stop', message: { content: JSON.stringify({
-      intent: 'answer', answers, clarification_question_id: null, faq_id: null, joke_category_id: null, humor_preference: null,
+      intent: start ? 'start_diagnostic' : 'answer', answers: start ? [] : answers, clarification_question_id: null, faq_id: null, joke_category_id: null, humor_preference: null,
     }) } }] });
   };
   const worker = createWorker(undefined, { now: () => now, fetcher: provider });
@@ -51,7 +52,10 @@ test('real client/transport/Worker: creation, text, multi-selection, lost ACK re
   });
   try {
     await client.open('chat');
-    assert.equal(model.error, ''); assert.equal(client.session.question.id, 'context_name');
+    // The greeting asks what the visitor needs; the survey starts on the key phrase.
+    assert.equal(model.error, ''); assert.equal(client.session.question, null); assert.equal(model.diagnostic, false);
+    await handlers.onText('Давайте экспресс-диагностику');
+    assert.equal(model.error, ''); assert.equal(client.session.question.id, 'context_name'); assert.equal(model.diagnostic, true);
     assert.equal(stored.management_token.length, 43); assert.notEqual(stored.management_token, stored.report_token);
     now += 600000;
     await handlers.onText('Олег. Директор. Отвечаю за продажи. 50 сотрудников. Магазин. Рост продаж. Сайт.');
@@ -59,13 +63,13 @@ test('real client/transport/Worker: creation, text, multi-selection, lost ACK re
     assert.equal(model.error, ''); assert.equal(client.session.question.id, 'context_priority');
     assert.equal(model.question.answer_mode, 'multiple');
     await handlers.onSelection(['strategy', 'analytics']);
-    assert.ok(stored.pending); assert.equal(providerCalls, 1);
+    assert.ok(stored.pending); assert.equal(providerCalls, 2);
     const core = new CoreServices(env, () => now);
     const revision = (await core.store.requireSession(client.session.session_id)).state.revision;
     await handlers.onRetry();
     assert.equal(model.error, ''); assert.equal(stored.pending, null);
     assert.equal(selectionBodies.length, 2); assert.equal(selectionBodies[0], selectionBodies[1]);
-    assert.equal(client.session.revision, revision); assert.equal(providerCalls, 1);
+    assert.equal(client.session.revision, revision); assert.equal(providerCalls, 2);
     const answers = await core.store.listAnswers(client.session.session_id);
     assert.equal(answers.length, 8);
     assert.deepEqual(answers.find(answer => answer.fact_id === 'context.priority')?.value, ['strategy', 'analytics']);

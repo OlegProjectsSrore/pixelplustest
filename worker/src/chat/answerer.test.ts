@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { ANSWER_TEMPERATURE, answerQuestion, buildAnswerPrompt, checkAnswer, formatAnswer, type AnswerInput } from './answerer.ts';
+import { ANSWER_MODEL, ANSWER_TEMPERATURE, answerQuestion, buildAnswerPrompt, checkAnswer, formatAnswer, type AnswerInput } from './answerer.ts';
 import { ANSWER_STYLE } from './answer-style.ts';
 import type { ClassifierRuntime, ProviderExchange } from './types.ts';
 
@@ -43,4 +43,16 @@ test('one DeepSeek call at a low temperature; failures and empty fragments retur
   assert.equal(await answerQuestion(input, runtime({ outcome: 'unknown', status: null, body: null, usage: null, error: 'timeout' })), null);
   assert.equal(await answerQuestion({ ...input, fragments: [] }, runtime(completed('{}'))), null);
   assert.equal(bodies.length, 2, 'no call without fragments');
+});
+
+test('visitor answers are written by DeepSeek V4 Pro; the spoken variant asks for short sentences', async () => {
+  const bodies: Record<string, unknown>[] = [];
+  const runtime: ClassifierRuntime = { api_key: 'key', max_tokens: 900, timeout_ms: 5000,
+    fetch: (async (_url: string, init: RequestInit) => { bodies.push(JSON.parse(String(init.body))); return new Response(null); }) as unknown as typeof fetch,
+    async runAuthorized(request, call) { assert.equal(request.model, 'deepseek-v4-pro'); await call(); return { outcome: 'unknown', status: null, body: null, usage: null, error: 'timeout' }; } };
+  await answerQuestion(input, runtime);
+  assert.equal(ANSWER_MODEL, 'deepseek-v4-pro'); assert.equal(bodies[0].model, 'deepseek-v4-pro'); assert.deepEqual(bodies[0].thinking, { type: 'disabled' });
+  const [chat] = buildAnswerPrompt(input), [voice] = buildAnswerPrompt({ ...input, channel: 'voice' });
+  assert.doesNotMatch(chat.content, /прозвучит голосом/); assert.match(voice.content, /Ответ прозвучит голосом: 1–3 коротких предложения/);
+  assert.match(ANSWER_STYLE, /не предлагай пройти опрос или экспресс-диагностику и не возвращай к ним/);
 });

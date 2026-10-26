@@ -498,3 +498,15 @@ test('the voice searchKnowledge tool reads /api/tools/search with the session to
   assert.equal(call.token, 'management'); assert.equal(call.method, undefined);
   await assert.rejects(f.voice.onTool('searchKnowledge', { query: ' ' }, 'call1'), /Поиск недоступен/);
 });
+
+test('a ready DeepSeek answer is spoken as it is; startDiagnostic reaches the server as a tool without arguments', async t => {
+  const f = fixture(t, { request(path) {
+    if (path.startsWith('/api/tools/search')) return { ok: true, corpus: 'c', answer: 'Да, мы создаём сайты на Битрикс.', snippets: [{ id: 'd#0', title: 'Битрикс', heading: 'Сайты', url: 'https://pixelplus.ru/razrabotka-sajtov/cms/bitrix/', text: 'Создаём сайты на Битрикс.' }] };
+  } });
+  await f.client.open(); await f.handlers.onChannel('voice');
+  assert.deepEqual(await f.voice.onTool('searchKnowledge', { query: 'сайты на Битрикс' }, 'call1'), { found: true, answer: 'Да, мы создаём сайты на Битрикс.' });
+  await f.voice.onTool('startDiagnostic', { stray: 1 }, 'call1');
+  const call = f.calls.find(item => item.path === '/api/voice/answers');
+  assert.equal(call.body.tool, 'startDiagnostic'); assert.equal(call.body.call_id, 'call1');
+  assert.equal(call.body.answers, undefined); assert.equal(call.body.stray, undefined);
+});

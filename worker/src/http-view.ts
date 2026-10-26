@@ -1,6 +1,6 @@
 import type { CoreServices } from './core.ts';
 import type { AuditEvent, Json } from './audit/contracts.ts';
-import { INTERVIEW_BUDGET_MS } from './audit/contracts.ts';
+import { diagnosticStarted, INTERVIEW_BUDGET_MS } from './audit/contracts.ts';
 import { getLibrary } from './audit/library.ts';
 import { elapsedMs } from './storage/d1-store.ts';
 import type { ReportRecord, StoredSession } from './storage/types.ts';
@@ -69,7 +69,7 @@ export async function sessionView(core: CoreServices, session: StoredSession, re
     remaining_ms: readOnly ? 0 : remainingMs, elapsed_ms: readOnly ? 0 : elapsed,
     expires_at: readOnly ? reportAccessExpiry : session.accessExpiresAt,
     access_expires_at: readOnly ? 0 : session.accessExpiresAt,
-    ...(!readOnly ? { humor_enabled: state.humor.enabled } : {}),
+    ...(!readOnly ? { humor_enabled: state.humor.enabled, conversation_mode: state.mode ?? 'diagnostic', diagnostic_started: diagnosticStarted(state) } : {}),
     question: canInterview && !state.paused ? publicQuestion(publicBase?.question, session) : null,
     messages, voice: call ? { call_id: call.id, provider_call_id: call.providerCallId, status: call.status } : null,
     report: { id: session.reportId, status: report?.status ?? state.status, expires_at: report?.reportExpiresAt ?? null },
@@ -122,6 +122,7 @@ export async function presentPayload(core: CoreServices, payload: unknown, readO
   }
   if (typeof original.corpus === 'string' && Array.isArray(original.snippets)) {
     output.corpus = original.corpus;
+    if (typeof original.answer === 'string') output.answer = original.answer;
     output.snippets = original.snippets.flatMap(value => {
       const snippet = record(value);
       if (!snippet || !['id', 'title', 'heading', 'url', 'text'].every(key => typeof snippet[key] === 'string')) return [];

@@ -209,7 +209,8 @@ export function nextQuestion(state: AuditState, now: number, lib: AuditLibrary =
   if (state.library_version !== lib.version) throw new Error('Pinned library mismatch');
   if (!options.allowDraft) assertLibraryReady(lib);
   const elapsed = elapsedInterviewMs(state, now);
-  if (state.status !== 'in_progress' || state.paused || elapsed >= INTERVIEW_BUDGET_MS) return null;
+  // In questions mode the assistant only answers; the survey waits until the visitor asks for the diagnostic.
+  if (state.status !== 'in_progress' || state.paused || elapsed >= INTERVIEW_BUDGET_MS || state.mode === 'questions') return null;
   // The introductory block precedes adaptive branches in both channels. Explicit
   // unknown/declined answers count as collected; they must not trap the visitor.
   const mandatory = (lib.scenario.mandatory_entry_questions ?? [])
@@ -268,7 +269,9 @@ export function interviewSufficiency(state: AuditState, now: number, lib: AuditL
   const orientation = lib.questions.filter(question => lib.scenario.entry_questions.includes(question.id) && permitted(question, options)).flatMap(question => question.fact_ids);
   const missing = orientation.filter(id => !usableFact(state.facts[id]));
   if (missing.length) return { sufficient: false, reason: 'missing_context', missing };
-  return { sufficient: nextQuestion(state, now, lib, options) === null, reason: nextQuestion(state, now, lib, options) === null ? 'sufficient' : 'questions_remaining', missing: [] };
+  // Sufficiency is about the survey itself, whichever mode the conversation is in.
+  const remaining = nextQuestion({ ...state, mode: 'diagnostic' }, now, lib, options);
+  return { sufficient: remaining === null, reason: remaining === null ? 'sufficient' : 'questions_remaining', missing: [] };
 }
 
 function previousWorkAllows(block: Solution, facts: Record<string, AuditFact>): boolean {

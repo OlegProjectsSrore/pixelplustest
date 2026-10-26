@@ -18,14 +18,18 @@ export async function searchKnowledge(context: AdapterContext, session: StoredSe
   finally { await core.store.settleUsage(reservation.id, 1, core.now()); }
 }
 
-/** GET /api/tools/search for the voice model's searchKnowledge tool: source fragments only, the model words the answer. */
-export function createKnowledgeSearchHandler(): AdapterHandler {
+/** Writes the spoken answer from the fragments (DeepSeek V4 Pro); null leaves the fragments to the voice model. */
+export type VoiceAnswerer = (context: AdapterContext, session: StoredSession, question: string, fragments: HybridResult['fragments']) => Promise<string | null>;
+
+/** GET /api/tools/search for the voice model's searchKnowledge tool: the fragments and, when it passes the checks, a ready answer. */
+export function createKnowledgeSearchHandler(answer?: VoiceAnswerer): AdapterHandler {
   return async (request, context) => {
     const url = new URL(request.url);
     const session = await context.core.authenticate(request, identifier(url.searchParams.get('session_id'), 'session_id'));
     const query = textField(url.searchParams.get('q'), 'q', 300);
     if (session.state.status !== 'in_progress') fail(409, 'interview_closed', 'Сбор сведений уже завершён.');
     const result = await searchKnowledge(context, session, query, { limit: 4, maxChars: 1200 });
-    return { corpus: index.corpus, snippets: result.fragments.map(fragment => ({ ...fragment })) };
+    const spoken = answer ? await answer(context, session, query, result.fragments) : null;
+    return { corpus: index.corpus, snippets: result.fragments.map(fragment => ({ ...fragment })), ...(spoken ? { answer: spoken } : {}) };
   };
 }

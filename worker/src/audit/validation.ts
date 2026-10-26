@@ -41,7 +41,8 @@ const stateFields = ['library_version', 'revision', 'channel_revision', 'active_
 
 /** The Worker contract is separate from the content team's offline audit-state schema. */
 export function validateAuditState(value: unknown, lib: AuditLibrary = library): asserts value is AuditState {
-  record(value, 'state'); fields(value, stateFields);
+  record(value, 'state'); fields(value, stateFields, ['mode']);
+  if (value.mode !== undefined && !['questions', 'diagnostic'].includes(String(value.mode))) fail('state.mode');
   if (value.library_version !== lib.version) fail('state.library_version');
   for (const key of ['revision', 'channel_revision', 'elapsed_ms', 'through_seq', 'extracted_through_seq']) integer(value[key], `state.${key}`);
   if ((value.elapsed_ms as number) > 900_000 || (value.extracted_through_seq as number) > (value.through_seq as number)) fail('state timing/event boundary');

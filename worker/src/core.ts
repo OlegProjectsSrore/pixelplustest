@@ -86,7 +86,8 @@ export class CoreServices {
       now, expiresAt: Date.parse(`${period}T00:00:00Z`) + 2 * 86400000 });
     if (!ipReservation) { await this.store.settleUsage(globalReservation.id, 0, now); fail(429, 'session_limit', 'Предел создания сессий исчерпан.', true); }
     const token = randomToken(); const reportToken = randomToken();
-    const state = initialAuditState(library.version, channel as 'chat' | 'voice', now);
+    // The greeting asks what the visitor needs; the diagnostic starts only when the visitor asks for it.
+    const state = initialAuditState(library.version, channel as 'chat' | 'voice', now, 'questions');
     state.current_question_id = nextQuestion(state, now, library, this.engineOptions)?.id ?? null;
     const session = await this.store.createSession({ id, reportId: crypto.randomUUID(), tokenHash: await hashToken(token), reportTokenHash: await hashToken(reportToken), state, now });
     await this.store.settleUsage(globalReservation.id, 1, now);
@@ -163,7 +164,8 @@ export class CoreServices {
       data.last_event_seq = boundary!.seq ?? 0;
     }
     if (reason === 'sufficient' && elapsedMs(state, this.now()) < INTERVIEW_BUDGET_MS) {
-      const question = nextQuestion(state, this.now(), getLibrary(session.state.library_version), this.engineOptions);
+      // A pause for questions does not make the survey sufficient.
+      const question = nextQuestion({ ...state, mode: 'diagnostic' }, this.now(), getLibrary(session.state.library_version), this.engineOptions);
       if (question) {
         const saved = await this.store.commit({ sessionId: session.id, expectedRevision: input.expected_revision, channelRevision: input.channel_revision,
           operationId: input.operation_id, requestHash: digest, event: this.serviceEvent(input.operation_id, 'answer', { ...data, clarification_required: true }),
