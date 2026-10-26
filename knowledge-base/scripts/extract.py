@@ -66,6 +66,7 @@ def page_title(soup, kind):
 
 def content_roots(soup):
     """Части страницы с содержанием: шапка с заголовком и основной блок; для старых шаблонов — всё тело."""
+    preserve_table_markers(soup)
     for selector in CHROME:
         for element in soup.select(selector):
             element.decompose()
@@ -76,6 +77,54 @@ def content_roots(soup):
         heading = soup.select_one(".page__heading")
         return [r for r in (heading, main) if r]
     return [soup.body] if soup.body else []
+
+
+def preserve_table_markers(soup):
+    """Сохраняет проверенные CSS/SVG-отметки до удаления графики и сравнения блоков.
+
+    Названия классов и SVG взяты из исходного HTML pixelplus.ru; пустая ячейка
+    без такой отметки не означает «Нет». Числа, условия и сноски сохраняются.
+    """
+    labels = {
+        "table-compare__available": "Да", "table__available": "Да",
+        "table-compare__not-available": "Нет", "table__not-available": "Нет",
+    }
+    icons = {"#check-circle": "Да", "#close-circle": "Нет"}
+    for table in soup.find_all("table"):
+        comparison = "table-compare" in table.get("class", [])
+        for cell in table.find_all(["td", "th"]):
+            for element in [cell, *cell.find_all(True)]:
+                if element.attrs is None:
+                    continue
+                values = {labels[c] for c in element.get("class", []) if c in labels}
+                if len(values) > 1:
+                    raise ValueError("Противоречивые отметки в ячейке таблицы")
+                if values:
+                    comparison = True
+                    # Класс на td/th дополняет текст; span обычно пустой.
+                    element.append(" " + values.pop())
+                    element["class"] = [c for c in element.get("class", []) if c not in labels]
+            for svg in cell.find_all("svg"):
+                values = {icons[href] for use in svg.find_all("use")
+                          if (href := use.get("href") or use.get("xlink:href")) in icons}
+                if len(values) > 1:
+                    raise ValueError("Противоречивые SVG-отметки в ячейке таблицы")
+                if values:
+                    comparison = True
+                    svg.replace_with(" " + values.pop())
+        if not comparison:
+            continue
+        for row in table.find_all("tr"):
+            if row.find_parent(["thead", "tfoot"]) or row.select("button, input"):
+                continue
+            if set(row.get("class", [])) & {"table-compare__description", "table-compare__heading-row"}:
+                continue
+            cells = row.find_all(["td", "th"], recursive=False)
+            if len(cells) < 2 or not cells[0].get_text(strip=True):
+                continue
+            for cell in cells[1:]:
+                if not cell.get_text(strip=True) and not cell.has_attr("colspan"):
+                    cell.append("Не указано")
 
 
 def blocks(roots):
