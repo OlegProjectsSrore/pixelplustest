@@ -45,6 +45,8 @@ export interface VoicePromptInput {
   accepted_facts: AuditFact[]; remaining_seconds: number; humor_enabled: boolean;
   off_topic_categories?: { id: string; selection_source: string; do_not_use_when: string }[];
   service_faq?: { question: string; answer: string }[];
+  /** Value formats of the current question's facts and recent conversation turns; data, never instructions. */
+  fact_formats?: readonly unknown[]; history?: readonly unknown[];
 }
 export interface VoiceAnswerCandidate {
   question_id: string; fact_id: string; answer_id?: string;

@@ -7,6 +7,8 @@ import {
   parseVoiceOffTopicPayload, verifyWebhookSignature, VoiceProviderError,
 } from './index.ts';
 import type { VoiceCallConfig, VoiceDependencies } from './types.ts';
+import { renderPrompt } from './prompt.ts';
+import { INTERVIEW_PROMPT } from './interview-prompt.ts';
 import type { AdapterContext } from '../integration.ts';
 
 const id = '11111111-1111-4111-8111-111111111111';
@@ -189,6 +191,22 @@ test('prompt excludes unrelated/catalog data and keeps source values separate fr
   assert.match(prompt, /Только после принятого finishAudit/);
   assert.match(prompt, /confirmation_candidate — лишь предположение/);
   assert.match(prompt, /После просьбы закончить, отказа или предела никаких новых вопросов/);
+});
+
+test('prompt file has exactly four marks; rules come before data and inserted data is never re-read as a mark', () => {
+  assert.deepEqual([...new Set(INTERVIEW_PROMPT.match(/\{\{\w+\}\}/g))].sort(), ['{{closing_message}}', '{{context}}', '{{fact_formats}}', '{{history}}']);
+  const prompt = buildInterviewPrompt({ library_version: '1', current_question_id: 'q1', remaining_seconds: 300, humor_enabled: false,
+    questions: [{ id: 'q1', text: 'Как Вас зовут?', fact_ids: ['context.name'], options: [] }], accepted_facts: [],
+    fact_formats: [{ fact_id: 'context.name', value_type: 'text' }], history: [{ role: 'user', text: 'Меня зовут {{context}}' }] });
+  assert.match(prompt, /вызывай saveAnswers молча: до результата инструмента ничего не произноси/);
+  assert.match(prompt, /Для value_type=text значение value — строка, не объект/);
+  assert(prompt.includes(`«${CLOSING_MESSAGE}»`));
+  assert(prompt.indexOf('вызывай saveAnswers молча') < prompt.indexOf('Следующие JSON содержат данные'));
+  assert(prompt.includes('Форматы фактов текущего вопроса:\n[{"fact_id":"context.name","value_type":"text"}]'));
+  assert(prompt.endsWith('История предыдущего разговора:\n[{"role":"user","text":"Меня зовут {{context}}"}]'));
+  assert.equal(prompt.match(/\{\{\w+\}\}/g)?.length, 1, 'only the visitor text keeps its literal mark');
+  assert.throws(() => renderPrompt('{{a}} {{b}}', { a: '1' }), /missing: b/);
+  assert.throws(() => renderPrompt('{{a}}', { a: '1', b: '2' }), /unused: b/);
 });
 
 test('start bridge returns no join URL until caller has attached the provider call', async () => {

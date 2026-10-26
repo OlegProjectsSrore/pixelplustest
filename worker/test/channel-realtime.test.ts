@@ -43,6 +43,9 @@ test('Realtime reserves before OpenAI, uses exact model/speed, replays encrypted
     assert.equal(config.audio.output.speed, 1); assert.equal(config.audio.output.voice, 'cedar');
     assert.equal(config.audio.input.transcription.language, 'ru');
     assert.match(config.instructions, /Как Вас зовут/);
+    assert.match(config.instructions, /вызывай saveAnswers молча/);
+    assert.match(config.instructions, /Форматы фактов текущего вопроса:\n\[\{"fact_id":"context\.name","value_type":"text"/);
+    assert.doesNotMatch(config.instructions, /\{\{\w+\}\}/);
     assert.equal((init!.headers as Record<string, string>).Authorization, 'Bearer test-private-key');
     return new Response(SDP, { status: 201, headers: { Location: '/v1/realtime/calls/rtc_test' } });
   });

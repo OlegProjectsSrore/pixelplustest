@@ -84,7 +84,7 @@ test('start reserves before provider, attaches before join URL, and encrypted re
     const calls = await f.core.store.listCalls('session-1'); assert.equal(calls[0].status, 'reserved');
     const config = JSON.parse(String(init?.body)); assert.equal(config.maxDuration, '900s');
     assert.equal(config.model, 'approved-model'); assert.equal(config.voice, 'approved-voice');
-    const prompt = JSON.parse(config.systemPrompt.slice(config.systemPrompt.lastIndexOf('\n') + 1));
+    const lines = config.systemPrompt.split('\n'), prompt = JSON.parse(lines[lines.indexOf('Состояние опроса:') + 1]);
     assert.equal(config.firstSpeakerSettings.agent.text, 'Как Вас зовут?');
     assert.deepEqual(prompt.questions.map((question: { id: string }) => question.id), ['context_name']);
     return Response.json(rawCall(), { status: 201 });
