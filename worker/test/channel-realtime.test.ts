@@ -92,6 +92,18 @@ test('Four voice/chat switches stop OpenAI, retain transcript and freeze elapsed
   assert.equal((await f.core.store.listEvents('s1', 0, 100)).filter(e => e.text === 'Олег').length, 4);
 });
 
+test('Transcript from a browser clock an hour ahead or behind is accepted with server time', async t => {
+  const f = await fixture(); t.after(() => f.db.close()); const call = await f.start(); f.tick(2000);
+  const line = (ordinal: number, role: string, text: string, occurred_at: number) => ({ source: 'voice', source_key: `${call.call_id}:${ordinal}`, source_revision: 0, local_order: ordinal,
+    call_id: call.call_id, role, kind: 'utterance', text, occurred_at, data: { is_final: true, medium: 'voice' } });
+  const events = [line(0, 'assistant', 'Как Вас зовут?', NOW + 3_600_000), line(1, 'user', 'Меня зовут Александр.', NOW - 3_600_000)];
+  const result = await f.invoke(f.adapters.voiceTranscript!, await f.body(undefined, { call_id: call.call_id, events }));
+  assert.equal(result.accepted_events.length, 2);
+  const stored = (await f.core.store.listEvents('s1', 0, 100)).filter(e => e.source === 'voice');
+  assert.deepEqual(stored.map(e => [e.text, e.occurred_at, obj(e.data).client_occurred_at]),
+    [['Как Вас зовут?', NOW + 2000, NOW + 3_600_000], ['Меня зовут Александр.', NOW + 2000, NOW - 3_600_000]]);
+});
+
 test('Heartbeat cannot revive another call; cron terminates stale calls; failed hangup blocks overlap', async t => {
   const f = await fixture(); t.after(() => f.db.close()); const call = await f.start();
   await assert.rejects(f.invoke(f.adapters.voiceControl!, { session_id: 's1', call_id: 'not-owned', action: 'heartbeat' }), code('call_mismatch'));

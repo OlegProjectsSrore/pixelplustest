@@ -148,11 +148,11 @@ async function normalizeTranscripts(core: CoreServices, session: StoredSession, 
     if (item.source !== 'voice' || item.call_id !== call.id || !['user', 'assistant'].includes(String(item.role)) || item.kind !== 'utterance' || item.source_key !== `${call.id}:${ordinal}`) fail(400, 'invalid_transcript', 'Неверное происхождение реплики.');
     const text = textField(item.text, 'text', 12000), data = object(item.data);
     if (typeof data.is_final !== 'boolean' || !['voice', 'text'].includes(String(data.medium))) fail(400, 'invalid_transcript', 'Некорректное состояние реплики.');
-    const occurredAt = revision(item.occurred_at, 'occurred_at');
-    if (occurredAt < session.createdAt || occurredAt > core.now() + 5000) fail(400, 'invalid_transcript', 'Неверное время реплики.');
+    // Visitor clocks are often minutes off: order comes from local_order, time from the server; the browser time is kept for reference only.
+    const receivedAt = core.now(), clientOccurredAt = Number.isSafeInteger(item.occurred_at) && (item.occurred_at as number) >= 0 ? item.occurred_at as number : null;
     result.push({ id: `ve:${await hashToken(`${session.id}:${call.id}:${ordinal}:${sourceRevision}`)}`, source: 'voice', source_key: `${call.id}:${ordinal}`, source_revision: sourceRevision,
       local_order: ordinal, call_id: call.id, role: item.role as 'user' | 'assistant', kind: item.role === 'user' && /^Исправляю:\s+\S/iu.test(text) ? 'correction' : 'utterance', text,
-      data: { is_final: data.is_final as boolean, medium: String(data.medium) }, occurred_at: occurredAt, received_at: core.now() });
+      data: { is_final: data.is_final as boolean, medium: String(data.medium), client_occurred_at: clientOccurredAt }, occurred_at: receivedAt, received_at: receivedAt });
   }
   return result;
 }
