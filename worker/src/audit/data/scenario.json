@@ -12,12 +12,12 @@
   "visitor_result": "PDF only",
   "clock": {
     "target_seconds": [
-      480,
-      600
+      900,
+      1200
     ],
-    "max_seconds": 900,
-    "no_new_deep_branch_after": 720,
-    "closing_from": 840,
+    "max_seconds": 1500,
+    "no_new_deep_branch_after": 1320,
+    "closing_from": 1440,
     "scope": "Общий бюджет сессии, включая уточнения, юмор и смену канала; время PDF после интервью отдельно."
   },
   "entry_questions": [
@@ -58,7 +58,7 @@
     {
       "id": "selected_branches",
       "next": "confirmation",
-      "may_continue_while_seconds_below": 840
+      "may_continue_while_seconds_below": 1440
     },
     {
       "id": "confirmation",
@@ -75,7 +75,7 @@
   ],
   "closing": {
     "accepted_finish_text": "Спасибо за предоставленную информацию, сейчас вам предоставим отчёт предварительного аудита.",
-    "no_more_questions_after": 900,
+    "no_more_questions_after": 1500,
     "stop_requested": "Принять завершение и сохранить уже полученные сведения.",
     "partial_report_allowed": true
   },

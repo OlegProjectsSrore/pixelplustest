@@ -29,7 +29,7 @@
     "elapsed_seconds": {
       "type": "number",
       "minimum": 0,
-      "maximum": 900
+      "maximum": 1500
     },
     "status": {
       "enum": [

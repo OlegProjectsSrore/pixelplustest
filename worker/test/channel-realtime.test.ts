@@ -126,7 +126,7 @@ test('Four voice/chat switches stop OpenAI, retain transcript and freeze elapsed
     await f.core.channel(f.request(), await f.body(undefined, { action: 'switch', channel: 'chat' }), f.adapters.pollVoice);
     const s = await f.core.store.requireSession('s1'); assert.equal(s.state.active_channel, 'chat'); assert.equal(s.activeCallId, null);
     elapsed += 2000; assert.equal(s.state.elapsed_ms, elapsed);
-    f.tick(5000); assert.equal((await f.core.view(await f.core.store.requireSession('s1')) as any).remaining_ms, 900000 - elapsed);
+    f.tick(5000); assert.equal((await f.core.view(await f.core.store.requireSession('s1')) as any).remaining_ms, 1_500_000 - elapsed);
     await f.core.channel(f.request(), await f.body(undefined, { action: 'switch', channel: 'voice' }), f.adapters.pollVoice);
   }
   assert.equal(f.requests.filter(r => r.url.endsWith('/hangup')).length, 4);
@@ -240,10 +240,10 @@ test('Heartbeat cannot revive another call; cron terminates stale calls; failed 
 
 test('Voice deadline ends the interview and schedules the report even after stop freezes the timer', async t => {
   const f = await fixture(); t.after(() => f.db.close()); const call = await f.start();
-  f.tick(900000);
+  f.tick(1_500_000);
   await f.invoke(f.adapters.voiceControl!, { session_id: 's1', call_id: call.call_id, action: 'stop', delivery_complete: true });
   const session = await f.core.store.requireSession('s1');
-  assert.equal(session.state.status, 'closing'); assert.equal(session.state.finish_reason, 'time_limit'); assert.equal(session.state.elapsed_ms, 900000);
+  assert.equal(session.state.status, 'closing'); assert.equal(session.state.finish_reason, 'time_limit'); assert.equal(session.state.elapsed_ms, 1_500_000);
   assert.equal(f.db.sqlite.prepare('SELECT COUNT(*) n FROM audit_jobs').get()!.n, 1);
 });
 

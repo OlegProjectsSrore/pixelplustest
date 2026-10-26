@@ -195,9 +195,9 @@ test('selection skips collected context and does not infer domain applicability'
   const state = advanceAudit(initialAuditState(library.version, 'chat', now), [...introduction(), answer()], now, library, preview);
   assert.notEqual(nextQuestion(state, now, library, preview)?.id, 'context_business');
   assert.equal(state.candidate_blocks.length, 0);
-  const late = { ...state, elapsed_ms: 14 * 60_000, active_since: null };
+  const late = { ...state, elapsed_ms: 24 * 60_000, active_since: null };
   assert.equal(nextQuestion(late, now, library, preview)?.id, 'context_confirmation');
-  assert.equal(nextQuestion({ ...state, elapsed_ms: 900_000, active_since: null }, now, library, preview), null);
+  assert.equal(nextQuestion({ ...state, elapsed_ms: 1_500_000, active_since: null }, now, library, preview), null);
   assert.equal(nextQuestion({ ...state, paused: true }, now, library, preview), null);
 });
 
@@ -397,4 +397,19 @@ test('questions mode asks no survey question, keeps sufficiency honest and still
   assert.throws(() => validateAuditState({ ...state, mode: 'other' }), /state\.mode/);
   const old = structuredClone(diagnostic) as Partial<typeof diagnostic>; delete old.mode;
   assert.equal(nextQuestion(old as typeof diagnostic, now, library, preview)?.id, 'context_name', 'sessions saved before the mode existed stay in the diagnostic');
+});
+
+test('a voice interview asks at most 50 distinct questions, the last being the confirmation; chat has no such cap', () => {
+  const voice = { ...initialAuditState(library.version, 'voice', now), paused: false };
+  const answers: AuditAnswer[] = ['context_name', 'context_position', 'context_responsibilities', 'context_company_size'].map((questionId, index) => ({
+    id: `a${index}`, question_id: questionId, fact_id: questionId.replace('context_', 'context.'), state: 'known', value: 'Тест', event_ids: ['e'],
+    channel: 'voice', method: 'voice_batch', confirmation: 'explicit', library_version: library.version, created_at: now }));
+  const advanced = advanceAudit(voice, answers, now, library, preview);
+  assert.equal(advanced.questions_answered, 4, 'distinct questions answered are counted');
+  assert.notEqual(nextQuestion(advanced, now, library, preview)?.id, 'context_confirmation');
+  assert.equal(nextQuestion({ ...advanced, questions_answered: 49 }, now, library, preview)?.id, 'context_confirmation', 'the 50th place is kept for the confirmation');
+  assert.equal(nextQuestion({ ...advanced, questions_answered: 50 }, now, library, preview), null);
+  const chat = { ...advanced, active_channel: 'chat' as const, questions_answered: 60 };
+  assert.notEqual(nextQuestion(chat, now, library, preview), null, 'chat is not capped');
+  assert.equal(library.scenario.clock.max_seconds, 1500); assert.equal(library.scenario.clock.no_new_deep_branch_after, 1320); assert.equal(library.scenario.clock.closing_from, 1440);
 });

@@ -1,4 +1,4 @@
-import type { AuditState, QuestionView } from './contracts.ts';
+import { INTERVIEW_BUDGET_MS, type AuditState, type QuestionView } from './contracts.ts';
 import { elapsedInterviewMs } from './engine.ts';
 import { library, type AuditLibrary } from './library.ts';
 
@@ -22,7 +22,7 @@ const returnPhrase = (state: AuditState, lib: AuditLibrary) => {
 export function selectHumorReply(state: AuditState, intent: HumorIntent, question: QuestionView | null, lib: AuditLibrary = library): HumorReply {
   if (state.library_version !== lib.version) throw new Error('Pinned library mismatch');
   const neutral = lib.jokes.neutral_replies;
-  if (intent.kind === 'pause' || intent.kind === 'finish' || state.status !== 'in_progress' || state.paused || elapsedInterviewMs(state, intent.now) >= 900_000) return { joke_id: null, text: neutral.pause_or_stop, question_id: null };
+  if (intent.kind === 'pause' || intent.kind === 'finish' || state.status !== 'in_progress' || state.paused || elapsedInterviewMs(state, intent.now) >= INTERVIEW_BUDGET_MS) return { joke_id: null, text: neutral.pause_or_stop, question_id: null };
   if (intent.kind === 'humor_enabled') return { joke_id: null, text: returnPhrase(state, lib), question_id: question?.id ?? null };
   if (intent.kind === 'humor_declined' || !state.humor.enabled) return { joke_id: null, text: neutral.humor_declined, question_id: question?.id ?? null };
   if (intent.kind === 'role_change') return { joke_id: null, text: neutral.role_change, question_id: question?.id ?? null };

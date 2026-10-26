@@ -14,6 +14,7 @@ import resultSchemaData from './data/audit-result.schema.json' with { type: 'jso
 import { evaluateRule, isRecord, validateRule, type Rule, type RuleFact, type Truth } from './rules.ts';
 import { runtimeSchemaForFact, type RuntimeValueSchema } from './value-schemas.ts';
 import { runtimeStateSchema, runtimeResultSchema } from './runtime-schemas.ts';
+import { INTERVIEW_BUDGET_MS } from './contracts.ts';
 
 export interface Governed { id: string; version: string; status: string; reviewer: string | null; approved_at: string | null }
 export interface FactDefinition extends Governed {
@@ -206,7 +207,9 @@ export function validateLibrary(lib: AuditLibrary = library, options: { ruleChec
     const question = lib.questions.find(item => item.id === id);
     if (lib.scenario.entry_questions[index] !== id || !question || question.phase !== 'orientation' || question.condition) errors.push(`Invalid mandatory entry question: ${id}`);
   }
-  if (lib.scenario.clock.max_seconds !== 900 || lib.scenario.clock.no_new_deep_branch_after !== 720 || lib.scenario.clock.closing_from !== 840) errors.push('Scenario clock disagrees with architecture');
+  // The scenario clock follows the interview budget: no new branches in the last 3 minutes, only closing in the last minute.
+  const budgetSeconds = INTERVIEW_BUDGET_MS / 1000;
+  if (lib.scenario.clock.max_seconds !== budgetSeconds || lib.scenario.clock.no_new_deep_branch_after !== budgetSeconds - 180 || lib.scenario.clock.closing_from !== budgetSeconds - 60) errors.push('Scenario clock disagrees with architecture');
   const phases = new Map(lib.scenario.phases.map(phase => [phase.id, phase]));
   for (const phase of phases.values()) {
     const seen = new Set<string>(); let current: typeof phase | undefined = phase;

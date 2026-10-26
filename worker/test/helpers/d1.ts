@@ -1,17 +1,19 @@
 import { DatabaseSync } from 'node:sqlite';
 import { readFileSync, readdirSync } from 'node:fs';
 
+const MIGRATIONS = new URL('../../migrations/', import.meta.url);
+export const migrationFiles = (): string[] => readdirSync(MIGRATIONS).filter(name => name.endsWith('.sql')).sort();
+
 /** Executes the actual application SQL on SQLite. Only the transport-shaped D1 wrapper is adapted. */
 export class SqliteD1 {
   sqlite: DatabaseSync;
   beforeBatch: (() => void) | null = null;
-  constructor() {
+  /** before: apply only migrations whose file names sort before it, so a test can add data and then run migrate(). */
+  constructor(options: { before?: string } = {}) {
     this.sqlite = new DatabaseSync(':memory:');
-    const migrations = new URL('../../migrations/', import.meta.url);
-    for (const filename of readdirSync(migrations).filter(name => name.endsWith('.sql')).sort()) {
-      this.sqlite.exec(readFileSync(new URL(filename, migrations), 'utf8'));
-    }
+    for (const filename of migrationFiles()) if (!options.before || filename < options.before) this.migrate(filename);
   }
+  migrate(filename: string): void { this.sqlite.exec(readFileSync(new URL(filename, MIGRATIONS), 'utf8')); }
   prepare(query: string): SqliteStatement { return new SqliteStatement(this, query, []); }
   async batch(statements: SqliteStatement[]): Promise<D1Result[]> {
     this.beforeBatch?.();

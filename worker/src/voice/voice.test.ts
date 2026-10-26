@@ -36,7 +36,7 @@ test('call configuration pins WebRTC evidence, signing and remaining budget on c
   const nikolai = buildCallConfig({ ...config, voice: '83b2a94f-8078-4321-935c-a0798b2ac621' });
   assert.deepEqual(nikolai.body.voiceOverrides, { inworld: { speakingRate: 1 } });
   assert.throws(() => buildCallConfig({ ...config, prior_call_id: id, initial_messages: [] }), /mutually exclusive/);
-  assert.throws(() => buildCallConfig({ ...config, remaining_seconds: 901 }), /Remaining/);
+  assert.throws(() => buildCallConfig({ ...config, remaining_seconds: 1501 }), /Remaining/);
   assert.throws(() => buildCallConfig({ ...config, remaining_seconds: 0 }), /Remaining/);
   assert.throws(() => buildCallConfig({ ...config, webhook_secrets: [] }), /signing/);
   assert.throws(() => buildCallConfig({ ...config, callback_url: 'http://pixel.example/webhook' }), /HTTPS/);

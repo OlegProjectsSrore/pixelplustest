@@ -1,4 +1,4 @@
-import { INTERVIEW_BUDGET_MS, type AuditAnswer, type AuditEvent, type AuditFact, type AuditResult, type AuditSnapshot, type AuditState, type Contradiction, type Json, type QuestionView } from './contracts.ts';
+import { INTERVIEW_BUDGET_MS, MAX_VOICE_QUESTIONS, type AuditAnswer, type AuditEvent, type AuditFact, type AuditResult, type AuditSnapshot, type AuditState, type Contradiction, type Json, type QuestionView } from './contracts.ts';
 import { assertLibraryReady, isApproved, library, type AuditLibrary, type FactDefinition, type Question, type Solution } from './library.ts';
 import { evaluateRule, isRecord } from './rules.ts';
 import { validateAuditResult, validateAuditState } from './validation.ts';
@@ -211,6 +211,9 @@ export function nextQuestion(state: AuditState, now: number, lib: AuditLibrary =
   const elapsed = elapsedInterviewMs(state, now);
   // In questions mode the assistant only answers; the survey waits until the visitor asks for the diagnostic.
   if (state.status !== 'in_progress' || state.paused || elapsed >= INTERVIEW_BUDGET_MS || state.mode === 'questions') return null;
+  // A voice interview asks at most MAX_VOICE_QUESTIONS distinct questions; the last place is kept for the confirmation.
+  const answeredCount = state.questions_answered ?? 0, voiceCap = state.active_channel === 'voice';
+  if (voiceCap && answeredCount >= MAX_VOICE_QUESTIONS) return null;
   // The introductory block precedes adaptive branches in both channels. Explicit
   // unknown/declined answers count as collected; they must not trap the visitor.
   const mandatory = (lib.scenario.mandatory_entry_questions ?? [])
@@ -228,6 +231,7 @@ export function nextQuestion(state: AuditState, now: number, lib: AuditLibrary =
   if (!selected) {
     const weighted = lib.questions.flatMap((question, order) => {
       if (!permitted(question, options) || !needsQuestion(question, state, lib) || (question.condition && evaluateRule(question.condition, state.facts) !== true)) return [];
+      if (voiceCap && answeredCount >= MAX_VOICE_QUESTIONS - 1 && question.phase !== 'confirmation') return [];
       const domain = questionDomain(question);
       const applicable = domain ? state.facts[`${domain}.applicable`] : undefined;
       if (question.phase === 'routing' && (!domain || !requestedDomains.includes(domain))) return [];
@@ -254,7 +258,8 @@ export function nextQuestion(state: AuditState, now: number, lib: AuditLibrary =
 
 export function advanceAudit(state: AuditState, answers: AuditAnswer[], now: number, lib: AuditLibrary = library, options: EngineOptions = {}): AuditState {
   const derived = deriveFacts(answers, lib);
-  const updated: AuditState = { ...state, facts: derived.facts, contradictions: derived.contradictions };
+  const updated: AuditState = { ...state, facts: derived.facts, contradictions: derived.contradictions,
+    questions_answered: new Set(answers.filter(answer => answer.library_version === lib.version).map(answer => answer.question_id)).size };
   const active = candidates(updated, lib, options);
   updated.candidate_blocks = active.map(block => block.id);
   updated.missing_facts = [...new Set(active.flatMap(block => [...block.matrix.required, block.previous_attempts.fact]).filter(id => !usableFact(updated.facts[id])))];

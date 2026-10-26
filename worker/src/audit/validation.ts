@@ -1,4 +1,4 @@
-import type { AuditFact, AuditResult, AuditSnapshot, AuditState } from './contracts.ts';
+import { INTERVIEW_BUDGET_MS, type AuditFact, type AuditResult, type AuditSnapshot, type AuditState } from './contracts.ts';
 import { library, isApproved, type AuditLibrary } from './library.ts';
 import { evaluateRule, isRecord } from './rules.ts';
 
@@ -41,11 +41,12 @@ const stateFields = ['library_version', 'revision', 'channel_revision', 'active_
 
 /** The Worker contract is separate from the content team's offline audit-state schema. */
 export function validateAuditState(value: unknown, lib: AuditLibrary = library): asserts value is AuditState {
-  record(value, 'state'); fields(value, stateFields, ['mode']);
+  record(value, 'state'); fields(value, stateFields, ['mode', 'questions_answered']);
+  if (value.questions_answered !== undefined) integer(value.questions_answered, 'state.questions_answered');
   if (value.mode !== undefined && !['questions', 'diagnostic'].includes(String(value.mode))) fail('state.mode');
   if (value.library_version !== lib.version) fail('state.library_version');
   for (const key of ['revision', 'channel_revision', 'elapsed_ms', 'through_seq', 'extracted_through_seq']) integer(value[key], `state.${key}`);
-  if ((value.elapsed_ms as number) > 900_000 || (value.extracted_through_seq as number) > (value.through_seq as number)) fail('state timing/event boundary');
+  if ((value.elapsed_ms as number) > INTERVIEW_BUDGET_MS || (value.extracted_through_seq as number) > (value.through_seq as number)) fail('state timing/event boundary');
   if (!['chat', 'voice'].includes(String(value.active_channel)) || !['in_progress', 'closing', 'preparing', 'ready', 'failed'].includes(String(value.status)) || !['pending', 'complete', 'incomplete'].includes(String(value.history_status))) fail('state enum');
   if (typeof value.paused !== 'boolean') fail('state.paused');
   if (value.active_since !== null) integer(value.active_since, 'state.active_since');

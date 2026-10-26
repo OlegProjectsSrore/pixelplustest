@@ -1,3 +1,4 @@
+import { INTERVIEW_BUDGET_MS } from '../audit/contracts.ts';
 export const ULTRAVOX_API_ORIGIN = 'https://api.ultravox.ai';
 export function record(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -25,7 +26,7 @@ export function nullableString(value: unknown, name: string): string | null {
   return value;
 }
 export function remainingSeconds(value: number): number {
-  if (!Number.isFinite(value) || value <= 0 || value > 900) throw new Error('Remaining interview time must be in (0, 900] seconds');
+  if (!Number.isFinite(value) || value <= 0 || value > INTERVIEW_BUDGET_MS / 1000) throw new Error(`Remaining interview time must be in (0, ${INTERVIEW_BUDGET_MS / 1000}] seconds`);
   // Never round upwards beyond the caller's remaining budget.
   const result = Math.floor(value * 1000) / 1000;
   if (result <= 0) throw new Error('No remaining interview time');

@@ -30,7 +30,7 @@ async function fixture(options: VoiceBridgeOptions = {}) {
   const core = new CoreServices(env, () => now, (async (url, init) => { requests.push({ url: String(url), init }); return respond(String(url), init); }) as typeof fetch);
   const state = initialAuditState(library.version, 'voice', now); state.current_question_id = 'context_business';
   await core.store.createSession({ id: 'session-1', tokenHash: await hashToken(TOKEN), reportId: 'report-1', reportTokenHash: 'read-hash', state, now });
-  await core.store.updateVoiceSlot({ id: '1', availableMs: 900_000, maxConcurrency: 1, now });
+  await core.store.updateVoiceSlot({ id: '1', availableMs: 1_500_000, maxConcurrency: 1, now });
   await db.prepare('UPDATE ultravox_slots SET config_hash=? WHERE id=?').bind(await voiceConfigHash(core, '1'), '1').run();
   const adapters = createVoiceAdapters({ refreshAccounts: async () => {}, ...options });
   const request = () => new Request('https://worker.example/api/voice/test', { method: 'POST', headers: { Authorization: `Bearer ${TOKEN}` } });
@@ -82,7 +82,7 @@ test('start reserves before provider, attaches before join URL, and encrypted re
   f.respond(async (_url, init) => {
     assert.equal(f.db.sqlite.prepare("SELECT COUNT(*) n FROM usage_reservations WHERE state='reserved'").get()!.n, 2);
     const calls = await f.core.store.listCalls('session-1'); assert.equal(calls[0].status, 'reserved');
-    const config = JSON.parse(String(init?.body)); assert.equal(config.maxDuration, '900s');
+    const config = JSON.parse(String(init?.body)); assert.equal(config.maxDuration, '1500s');
     assert.equal(config.model, 'approved-model'); assert.equal(config.voice, 'approved-voice');
     const lines = config.systemPrompt.split('\n'), prompt = JSON.parse(lines[lines.indexOf('Состояние опроса:') + 1]);
     assert.equal(config.firstSpeakerSettings.agent.text, 'Как Вас зовут?');

@@ -126,7 +126,7 @@ test('email operation deduplication, session cap, and expired SMTP sending becom
 
 test('voice slots and channel ownership prevent overlapping calls and preserve elapsed time', async t => {
   const { db, store } = await setup('voice'); t.after(() => db.close());
-  await store.updateVoiceSlot({ id: 'slot1', availableMs: 1000000, maxConcurrency: 1, now: NOW });
+  await store.updateVoiceSlot({ id: 'slot1', availableMs: 2_000_000, maxConcurrency: 1, now: NOW });
   const base = { sessionId: 's1', slotId: 'slot1', expectedRevision: 0, channelRevision: 0, now: NOW, slotMaxAgeMs: 60000 };
   const calls = await Promise.all([store.reserveVoiceCall({ ...base, id: 'c1', operationId: 'v1' }), store.reserveVoiceCall({ ...base, id: 'c2', operationId: 'v2' })]);
   assert.equal(calls.filter(Boolean).length, 1); const call = calls.find(Boolean)!;
@@ -197,7 +197,7 @@ test('late evidence after a snapshot changes only the event log and keeps the sn
 
 test('voice keeps counting through accepted finish until provider confirms its stop', async t => {
   const { db, store } = await setup('voice'); t.after(() => db.close());
-  await store.updateVoiceSlot({ id: 'slot1', availableMs: 1000000, maxConcurrency: 1, now: NOW });
+  await store.updateVoiceSlot({ id: 'slot1', availableMs: 2_000_000, maxConcurrency: 1, now: NOW });
   await store.reserveVoiceCall({ id: 'c1', sessionId: 's1', slotId: 'slot1', operationId: 'v1', expectedRevision: 0, channelRevision: 0, now: NOW, slotMaxAgeMs: 60000 });
   await store.attachCall('c1', 'provider1', NOW + 10);
   const current = await store.requireSession('s1');
@@ -278,7 +278,7 @@ test('exactly one concurrent usage reservation caller owns permission to start a
 
 test('stop revision and slot release share one CAS; an intervening revision cannot release another owner', async t => {
   const { db, store } = await setup('voice'); t.after(() => db.close());
-  await store.updateVoiceSlot({ id: '1', availableMs: 900000, maxConcurrency: 1, now: NOW });
+  await store.updateVoiceSlot({ id: '1', availableMs: 1500000, maxConcurrency: 1, now: NOW });
   await store.reserveVoiceCall({ id: 'c1', sessionId: 's1', slotId: '1', operationId: 'voice', expectedRevision: 0, channelRevision: 0, now: NOW, slotMaxAgeMs: 10000 });
   await store.attachCall('c1', 'provider1', NOW);
   const before = await store.requireSession('s1');
@@ -295,7 +295,7 @@ test('stop revision and slot release share one CAS; an intervening revision cann
 
 test('recovery cache requires a paid owner reservation, rejects another call and never overwrites', async t => {
   const { db, store } = await setup('voice'); t.after(() => db.close());
-  await store.updateVoiceSlot({ id: '1', availableMs: 900000, maxConcurrency: 1, now: NOW });
+  await store.updateVoiceSlot({ id: '1', availableMs: 1500000, maxConcurrency: 1, now: NOW });
   await store.reserveVoiceCall({ id: 'c1', sessionId: 's1', slotId: '1', operationId: 'voice', expectedRevision: 0, channelRevision: 0, now: NOW, slotMaxAgeMs: 10000 });
   const input = { sessionId: 's1', callId: 'c1', boundaryHash: 'boundary1', reservationId: 'owner', result: { ok: true }, now: NOW };
   assert.equal(await store.putRecoveryResult(input), false);

@@ -40,8 +40,8 @@
     },
     {
       "name": "audit-state.schema.json",
-      "sha256": "29ae2e79128b9c3f2a2277bae6212cda42c3eae0065812c8d03049dfb2f30ef9",
-      "bytes": 55509,
+      "sha256": "fc4ab9d2638b2136c34f7c37772bae9c39a8269fe6372aa905efcfd863d94c43",
+      "bytes": 55510,
       "role": "runtime_candidate"
     },
     {
@@ -130,8 +130,8 @@
     },
     {
       "name": "scenario.json",
-      "sha256": "2cd6567858df14138ddeb99eee7fffc084d3505e3096f7e7dfb83557cc1f86c1",
-      "bytes": 6253,
+      "sha256": "1a57fe6913710f10b872f7820c3111ee1162bfeea685e90c1ad806de429ed652",
+      "bytes": 6259,
       "role": "runtime_candidate"
     },
     {

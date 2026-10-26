@@ -82,7 +82,7 @@ test('refresh retains unknown-call holds and reservation atomically rejects obso
   assert.equal(await f.core.store.reserveVoiceCall({ ...request, configHash: 'stale' }), null);
   assert.ok(await f.core.store.reserveVoiceCall({ ...request, configHash: await voiceConfigHash(f.core, '1') }));
   await f.core.store.markCallUnknown('call'); f.tick(60001); await refreshVoiceAccounts(f.core);
-  assert.equal(f.slot().reserved_ms, 900000); assert.equal(f.slot().active_calls, 1); assert.equal((await f.core.store.getCall('call'))!.status, 'unknown');
+  assert.equal(f.slot().reserved_ms, 1500000); assert.equal(f.slot().active_calls, 1); assert.equal((await f.core.store.getCall('call'))!.status, 'unknown');
 });
 test('model pagination cannot send the API key to a different origin', async () => {
   const requests: string[] = [];

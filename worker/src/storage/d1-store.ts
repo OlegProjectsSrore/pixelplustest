@@ -443,7 +443,7 @@ export class D1Store {
   }
 
   async closeExpiredSessions(now: number, limit = 10): Promise<number> {
-    const rows = await this.stmt(`SELECT id FROM audit_sessions WHERE status='in_progress' AND MIN(access_expires_at, CASE WHEN active_channel='voice' AND active_started_at IS NOT NULL THEN active_started_at + 900000 - used_ms ELSE access_expires_at END)<=? ORDER BY MIN(access_expires_at, CASE WHEN active_channel='voice' AND active_started_at IS NOT NULL THEN active_started_at + 900000 - used_ms ELSE access_expires_at END) LIMIT ?`, now, Math.min(limit, 50)).all<Row>();
+    const rows = await this.stmt(`SELECT id FROM audit_sessions WHERE status='in_progress' AND MIN(access_expires_at, CASE WHEN active_channel='voice' AND active_started_at IS NOT NULL THEN active_started_at + ${INTERVIEW_BUDGET_MS} - used_ms ELSE access_expires_at END)<=? ORDER BY MIN(access_expires_at, CASE WHEN active_channel='voice' AND active_started_at IS NOT NULL THEN active_started_at + ${INTERVIEW_BUDGET_MS} - used_ms ELSE access_expires_at END) LIMIT ?`, now, Math.min(limit, 50)).all<Row>();
     let closed = 0;
     for (const row of rows.results) {
       const session = await this.requireSession(String(row.id));

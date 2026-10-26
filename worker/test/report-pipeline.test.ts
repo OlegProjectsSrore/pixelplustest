@@ -63,7 +63,7 @@ test("voice without reconciler waits 90 seconds then preserves incomplete-histor
 });
 
 async function seedActiveCall(f: Awaited<ReturnType<typeof fixture>>) {
-  await f.store.updateVoiceSlot({ id: "1", availableMs: 900_000, maxConcurrency: 1, now: start });
+  await f.store.updateVoiceSlot({ id: "1", availableMs: 1_500_000, maxConcurrency: 1, now: start });
   f.db.sqlite.prepare("INSERT INTO ultravox_calls(id,session_id,slot_id,provider_call_id,channel_revision,status,reserved_ms,started_at,operation_id,created_at) VALUES('call','session','1','provider-call',0,'active',900000,?,'start-call',?)").run(start, start);
   f.db.sqlite.prepare("UPDATE audit_sessions SET active_call_id='call' WHERE id='session'").run();
 }

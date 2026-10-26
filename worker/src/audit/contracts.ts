@@ -78,6 +78,8 @@ export interface AuditState {
   /** questions: the assistant only answers and asks no diagnostic question until the visitor asks for the diagnostic.
    * Sessions created before this field existed are in the diagnostic. */
   mode?: 'questions' | 'diagnostic';
+  /** Distinct questions answered so far (current library); the voice interview stops at MAX_VOICE_QUESTIONS. */
+  questions_answered?: number;
 }
 
 export interface AuditSnapshot {
@@ -141,7 +143,9 @@ export interface ApiErrorBody {
   error: { code: string; message: string; retryable: boolean };
   request_id: string;
 }
-export const INTERVIEW_BUDGET_MS = 15 * 60 * 1000;
+export const INTERVIEW_BUDGET_MS = 25 * 60 * 1000;
+/** A voice interview asks at most this many distinct questions; the last one is kept for the confirmation. */
+export const MAX_VOICE_QUESTIONS = 50;
 export const SESSION_LIFETIME_MS = 24 * 60 * 60 * 1000;
 export const REPORT_PREPARATION_MS = 48 * 60 * 60 * 1000;
 export const HISTORY_WAIT_MS = 90 * 1000;
@@ -154,7 +158,7 @@ export function initialAuditState(libraryVersion: string, channel: Channel, now:
     status: 'in_progress', current_question_id: null, facts: {}, contradictions: [], missing_facts: [], candidate_blocks: [],
     elapsed_ms: 0, active_since: null, paused: channel === 'voice', finish_reason: null,
     humor: { enabled: true, reserved_ids: [], used_ids: [], operations: {} }, through_seq: 0, extracted_through_seq: 0, history_status: 'pending',
-    mode,
+    mode, questions_answered: 0,
   };
 }
 /** The diagnostic has begun once the visitor asked for it or gave any answer; until then pause and finish make no sense. */

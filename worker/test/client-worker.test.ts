@@ -59,7 +59,7 @@ test('real client/transport/Worker: creation, key phrase, text, multi-selection,
     assert.equal(stored.management_token.length, 43); assert.notEqual(stored.management_token, stored.report_token);
     now += 600000;
     await handlers.onText('Олег. Директор. Отвечаю за продажи. 50 сотрудников. Магазин. Рост продаж. Сайт.');
-    assert.equal(model.remaining_seconds, 900, 'Ten minutes in chat do not consume the voice timer');
+    assert.equal(model.remaining_seconds, 1500, 'Ten minutes in chat do not consume the voice timer');
     assert.equal(model.error, ''); assert.equal(client.session.question.id, 'context_priority');
     assert.equal(model.question.answer_mode, 'multiple');
     await handlers.onSelection(['strategy', 'analytics']);

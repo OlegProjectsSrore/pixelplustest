@@ -69,7 +69,7 @@ test('state schema rejects wrong primitive types, enums, fractional revisions an
   const cases = [
     { revision: '0' }, { revision: 0.5 }, { revision: -1 }, { revision: Number.MAX_SAFE_INTEGER + 1 },
     { active_channel: 'email' }, { status: 'completed' }, { history_status: 'done' }, { paused: 'false' },
-    { active_since: false }, { finish_reason: 3 }, { elapsed_ms: 900_001 }, { through_seq: Number.NaN },
+    { active_since: false }, { finish_reason: 3 }, { elapsed_ms: 1_500_001 }, { through_seq: Number.NaN },
     { missing_facts: [4] }, { candidate_blocks: {} }, { current_question_id: [] },
   ];
   for (const change of cases) assert.ok(validateSchema({ ...fresh(), ...change }, runtimeStateSchema).length > 0, JSON.stringify(change));

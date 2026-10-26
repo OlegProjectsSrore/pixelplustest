@@ -32,7 +32,7 @@ async function fixture(respond: (context: ClassifierContext) => unknown | Promis
   const state = initialAuditState(library.version, 'voice', now); state.current_question_id = 'context_business';
   state.paused = false; state.active_since = now;
   await core.store.createSession({ id: 'session-1', tokenHash: 'token-hash', reportId: 'report-1', reportTokenHash: 'read-hash', state, now });
-  await core.store.updateVoiceSlot({ id: '1', availableMs: 900_000, maxConcurrency: 1, now });
+  await core.store.updateVoiceSlot({ id: '1', availableMs: 1_500_000, maxConcurrency: 1, now });
   db.sqlite.prepare(`INSERT INTO ultravox_calls(id,session_id,slot_id,provider_call_id,channel_revision,status,reserved_ms,started_at,ended_at,operation_id,created_at) VALUES('call-1','session-1','1','provider-1',0,?,900000,?,?, 'start-1',?)`).run(live ? 'active' : 'stopped', now, live ? null : now, now);
   if (live) db.sqlite.prepare(`UPDATE audit_sessions SET active_call_id='call-1' WHERE id='session-1'`).run();
   const event = (id: string, role: AuditEvent['role'], text: string, order: number): AuditEvent => ({ id, source: 'webhook', source_key: `history:call-1:${id}`,
