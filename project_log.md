@@ -2,6 +2,19 @@
 
 ---
 
+- Date/time: 2026-10-26 18:26
+- Scope: S:\PROJECTS\pixelplustest
+- Summary: ветки синхронизированы.
+  - Ветка `codex/expert-chat-panel` в рабочей копии `.deployment\expert-chat-panel` была чистой, своих коммитов не имела и отставала от `main` на 7 коммитов (30140f9 → 99b4435). Она перемотана вперёд (fast-forward) до коммита с этой записью, так что `main`, `origin/main` и `codex/expert-chat-panel` указывают на один коммит.
+  - Перемотка выполнена с `core.autocrlf=false`, чтобы обновлённые файлы в этой рабочей копии остались с LF, как остальные. Иначе `check:library` выдаёт несовпадение хешей.
+  - Других веток на GitHub нет. Stash «Preserve main workspace before reconciliation 2026-10-26» оставлен без изменений.
+- Files changed:
+  - project_log.md
+  - вне репозитория: рабочая копия `.deployment/expert-chat-panel` (23 файла из 7 коммитов плюс этот журнал)
+- Reference: «Да, синхронизируй ветки»
+
+---
+
 - Date/time: 2026-10-26 18:22
 - Scope: S:\PROJECTS\pixelplustest
 - Summary: голос OpenAI Realtime сменён с cedar на ash по просьбе владельца. Изменены переменная `OPENAI_REALTIME_VOICE` в `wrangler.jsonc`, запасное значение в `channel-realtime.ts`, ожидание в тесте и описание в `worker/README.md`. Модель `gpt-realtime-2.1-mini` и скорость 1.0 не менялись.
