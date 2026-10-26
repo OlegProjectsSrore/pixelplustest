@@ -5,9 +5,9 @@ import { answerQuestion, formatAnswer } from './chat/answerer.ts';
 import { searchKnowledge } from './search/service.ts';
 import type { AdapterContext, AdapterHandler, ChannelAdapters } from './integration.ts';
 import type { StoredSession, UsageReservation } from './storage/types.ts';
-import { diagnosticStarted, INTERVIEW_BUDGET_MS, type AuditEvent, type Json } from './audit/contracts.ts';
+import { diagnosticStarted, INTERVIEW_BUDGET_MS, type AuditEvent, type AuditState, type Json, type QuestionView } from './audit/contracts.ts';
 import { advanceAudit, elapsedInterviewMs, nextQuestion, validateAnswers } from './audit/engine.ts';
-import { getLibrary, isApproved } from './audit/library.ts';
+import { getLibrary, isApproved, type AuditLibrary } from './audit/library.ts';
 import { selectHumorReply, type HumorIntent } from './audit/humor.ts';
 import { validateAuditState } from './audit/validation.ts';
 import { fail, object } from './security.ts';
@@ -213,6 +213,20 @@ export async function commitChatTurn(request: Request, context: AdapterContext, 
   return core.response(await core.store.commit({ ...common, event, answers, state, result }));
 }
 
+/** Attempt IDs the classifier may use: the saved attempts of each history, plus one new ID only for the first attempt or when the
+ * current question asks what was done; otherwise the model would restate the saved attempt under a new ID. */
+export function chatAttemptIds(lib: AuditLibrary, state: AuditState, current: QuestionView | null, operationId: string): Record<string, string[]> {
+  const asksWork = current !== null && lib.questions.find(question => question.id === current.id)?.fields?.includes('work') === true;
+  const ids: Record<string, string[]> = {};
+  for (const fact of lib.facts.filter(fact => fact.id.endsWith('.history'))) {
+    const existing = state.facts[fact.id]?.value;
+    const attempts = existing && typeof existing === 'object' && !Array.isArray(existing) && Array.isArray(existing.attempts) ? existing.attempts : [];
+    const saved = attempts.flatMap(attempt => attempt && typeof attempt === 'object' && !Array.isArray(attempt) && typeof attempt.attempt_id === 'string' ? [attempt.attempt_id] : []);
+    ids[fact.id] = [...saved, ...(saved.length && !(asksWork && current.fact_ids.includes(fact.id)) ? [] : [`${operationId}:${fact.id}:1`])];
+  }
+  return ids;
+}
+
 /** Wires the channel agent's parser/classifier into the shared authorization and state transaction. */
 export function createChatAdapter(): AdapterHandler {
   return createPreparedChatHandler({
@@ -225,13 +239,7 @@ export function createChatAdapter(): AdapterHandler {
       }) : [];
       const current = nextQuestion(session.state, context.core.now(), lib, context.core.engineOptions);
       const body = object(context.body), operationId = String(body.operation_id);
-      const allowedAttemptIds: Record<string, string[]> = {};
-      for (const fact of lib.facts.filter(fact => fact.id.endsWith('.history'))) {
-        const existing = session.state.facts[fact.id]?.value;
-        const attempts = existing && typeof existing === 'object' && !Array.isArray(existing) && Array.isArray(existing.attempts) ? existing.attempts : [];
-        allowedAttemptIds[fact.id] = [...attempts.flatMap(attempt => attempt && typeof attempt === 'object' && !Array.isArray(attempt) && typeof attempt.attempt_id === 'string' ? [attempt.attempt_id] : []), `${operationId}:${fact.id}:1`];
-      }
-      return { faqs, allowedAttemptIds, clarificationQuestions: current ? [{ id: current.id, text: current.text }] : [] };
+      return { faqs, allowedAttemptIds: chatAttemptIds(lib, session.state, current, operationId), clarificationQuestions: current ? [{ id: current.id, text: current.text }] : [] };
     },
   });
 }

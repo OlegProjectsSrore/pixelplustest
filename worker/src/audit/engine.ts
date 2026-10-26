@@ -2,7 +2,7 @@ import { INTERVIEW_BUDGET_MS, MAX_VOICE_QUESTIONS, type AuditAnswer, type AuditE
 import { assertLibraryReady, isApproved, library, type AuditLibrary, type FactDefinition, type PriorAttemptPath, type Question, type Solution } from './library.ts';
 import { evaluateRule, isRecord } from './rules.ts';
 import { validateAuditResult, validateAuditState } from './validation.ts';
-import { mergeStructuredValues, validateRuntimeValue } from './value-schemas.ts';
+import { mergeHistoryValue, mergeStructuredValues, validateRuntimeValue } from './value-schemas.ts';
 
 export interface EngineOptions { allowDraft?: boolean }
 const allowedStates = ['known', 'unknown', 'not_measured', 'not_applicable', 'declined', 'ambiguous', 'other'];
@@ -156,7 +156,11 @@ export function deriveFacts(answers: AuditAnswer[], lib: AuditLibrary = library)
     const definition = lib.facts.find(fact => fact.id === factId);
     if (variants.size > 1 && definition?.runtime_schema && group.every(answer => answer.state === 'known' && answer.confirmation !== 'disputed' && isRecord(answer.value) && canonical(answer.parameters ?? null) === canonical(first.parameters ?? null))) {
       try {
-        merged = group.slice(1).reduce((value, answer) => mergeStructuredValues(value, answer.value), first.value);
+        // A history takes from each later answer the fields its question asks and details not saved yet; repeats are dropped.
+        const asked = (answer: AuditAnswer) => lib.questions.find(question => question.id === answer.question_id)?.fields ?? [];
+        merged = factId.endsWith('.history')
+          ? group.slice(1).reduce((value, answer) => mergeHistoryValue(value, answer.value, asked(answer)), first.value)
+          : group.slice(1).reduce((value, answer) => mergeStructuredValues(value, answer.value), first.value);
         validateRuntimeValue(merged, definition.runtime_schema);
         validateSuppliedQuantities(merged);
         if (factId.endsWith('.history') && isRecord(merged)) validateHistory(merged);

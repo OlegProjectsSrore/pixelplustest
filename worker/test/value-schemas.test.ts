@@ -102,6 +102,31 @@ test('a history result is classified within the pinned values and the newer summ
   assert.throws(() => mergeStructuredValues({ attempts_status: 'tried' }, { attempts_status: 'not_tried' }));
 });
 
+test('a history answer gives its question\'s fields and new details; repeats of saved details in other words are dropped', () => {
+  const known = (value: string) => ({ state: 'known', value });
+  const reply = (question: number, value: Json, id: string): AuditAnswer => ({ ...answer('strategy.history', value, id), question_id: `strategy_history_${question}` });
+  // The live DeepSeek case: the executor said in passing, then asked directly; the work restated in other words with every answer.
+  const answers = [
+    reply(1, { attempts_status: 'tried', result: 'unknown', attempts: [{ attempt_id: 'a', work: known('Работали с агентством по аналитике'), period_and_duration: known('Полгода'), executor_and_resources: known('Агентство по аналитике') }] }, 'one'),
+    reply(2, { attempts_status: 'tried', result: 'unknown', attempts: [{ attempt_id: 'a', work: known('Работа с агентством'), period_and_duration: known('Полгода'), executor_and_resources: known('Агентство'), goal: known('Ждали отчёт по каналам') }] }, 'two'),
+    reply(3, { result: 'partial_or_stopped', attempts: [{ attempt_id: 'a', work: known('Аналитика с агентством'), outcome: known('Часть отчётов настроили') }] }, 'three'),
+    reply(4, { attempts: [{ attempt_id: 'a', current_status: { state: 'unknown', value: null }, stop_reason: known('Закончился бюджет') }] }, 'four'),
+  ];
+  validateAnswers(answers, [event], [], library, preview);
+  const derived = deriveFacts(answers), fact = derived.facts['strategy.history'];
+  assert.deepEqual(derived.contradictions, []);
+  assert.equal(fact.state, 'known');
+  assert.deepEqual(fact.value, { attempts_status: 'tried', result: 'partial_or_stopped', attempts: [{ attempt_id: 'a', work: known('Работали с агентством по аналитике'), period_and_duration: known('Полгода'),
+    executor_and_resources: known('Агентство'), goal: known('Ждали отчёт по каналам'), outcome: known('Часть отчётов настроили'), current_status: { state: 'unknown', value: null }, stop_reason: known('Закончился бюджет') }] });
+  // A direct answer replaces a passing mention, but «unknown» never erases a known detail.
+  const later = reply(4, { attempts: [{ attempt_id: 'a', stop_reason: { state: 'unknown', value: null }, current_status: known('Остановили') }] }, 'five');
+  const updated = deriveFacts([...answers, later]).facts['strategy.history'].value as any;
+  assert.deepEqual([updated.attempts[0].stop_reason, updated.attempts[0].current_status], [known('Закончился бюджет'), known('Остановили')]);
+  // A new attempt ID is another piece of work; tried against not tried is still a contradiction.
+  assert.equal((deriveFacts([...answers, reply(1, { attempts: [{ attempt_id: 'b', work: known('Меняли сайт') }] }, 'six')]).facts['strategy.history'].value as any).attempts.length, 2);
+  assert.equal(deriveFacts([answers[0], reply(1, { attempts_status: 'not_tried', attempts: [] }, 'seven')]).facts['strategy.history'].state, 'conflicting');
+});
+
 test('overlapping structured facts and histories conflict when their reported values disagree', () => {
   const one = answer('strategy_channels.details', { object: { state: 'known', value: 'Сайт A' } });
   const two = answer('strategy_channels.details', { object: { state: 'known', value: 'Сайт B' } }, 'other');

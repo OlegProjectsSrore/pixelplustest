@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { SqliteD1 } from './helpers/d1.ts';
 import { CoreServices } from '../src/core.ts';
-import { createChatAdapter, createChatRuntime } from '../src/channel-runtime.ts';
+import { chatAttemptIds, createChatAdapter, createChatRuntime } from '../src/channel-runtime.ts';
 import { initialAuditState, type AuditAnswer, type AuditEvent, type Json } from '../src/audit/contracts.ts';
 import { advanceAudit } from '../src/audit/engine.ts';
 import { library } from '../src/audit/library.ts';
@@ -368,4 +368,17 @@ test('questions mode never sends an empty reply: an off-topic greeting without a
     const greeting = await f.handler(f.request, f.context(f.body('g-1', 0, asked('Здравствуйте'), null))) as { operation: Record<string, Json> };
     assert.equal(greeting.operation.text, 'Подскажите, чем могу помочь.'); assert.equal(greeting.operation.joke_id, null); assert.equal(greeting.operation.question_id, null);
   } finally { f.db.close(); }
+});
+
+test('a new attempt ID is offered only for the first attempt or when the question asks what was done', () => {
+  const state = initialAuditState(library.version, 'chat', now);
+  state.facts['strategy.history'] = { fact_id: 'strategy.history', state: 'known', answer_ids: ['saved'], confirmation: 'explicit',
+    value: { attempts_status: 'tried', attempts: [{ attempt_id: 'saved-1', work: { state: 'known', value: 'Настраивали аналитику' } }] } };
+  const question = (id: string) => ({ id, text: id, fact_ids: library.questions.find(item => item.id === id)!.fact_ids, options: [] });
+  const ids = (id: string | null) => chatAttemptIds(library, state, id ? question(id) : null, 'op');
+  assert.deepEqual(ids('strategy_history_2')['strategy.history'], ['saved-1']);
+  assert.deepEqual(ids('strategy_history_4')['strategy.history'], ['saved-1']);
+  assert.deepEqual(ids('strategy_history_1')['strategy.history'], ['saved-1', 'op:strategy.history:1']);
+  assert.deepEqual(ids(null)['strategy.history'], ['saved-1']);
+  assert.deepEqual(ids('strategy_history_2')['seo.history'], ['op:seo.history:1']);
 });

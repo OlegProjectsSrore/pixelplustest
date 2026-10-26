@@ -214,6 +214,8 @@ test('prompt file has exactly four marks; rules come before data and inserted da
   assert.match(prompt, /Никогда не зачитывай вопрос дословно: формулируй его своими словами/);
   assert(prompt.indexOf('Никогда не зачитывай вопрос дословно') < prompt.indexOf('Следующие JSON содержат данные'));
   assert.match(prompt, /Для value_type=text значение value — строка, не объект/);
+  assert.match(prompt, /Для попытки, уже сохранённой в facts, бери её attempt_id и передавай только новое: ответ на текущий вопрос и сведения, которых ещё нет; уже сохранённое не повторяй, в том числе другими словами\. Новый attempt_id — только для другой работы\./);
+  assert.match(prompt, /передавай в value поле result — итог прошлых работ по теме по всем ответам посетителя\. Выбирай первое подходящее по порядку/);
   assert(prompt.includes(`«${CLOSING_MESSAGE}»`));
   assert(prompt.indexOf('вызывай saveAnswers молча') < prompt.indexOf('Следующие JSON содержат данные'));
   assert(prompt.includes('Форматы фактов текущего вопроса:\n[{"fact_id":"context.name","value_type":"text"}]'));

@@ -89,6 +89,33 @@ export function validateRuntimeValue(value: unknown, schema: RuntimeValueSchema,
   if (!valid) throw new Error('Value does not match the declared runtime schema');
 }
 
+const uncertain = (value: unknown): boolean => record(value) && ['unknown', 'ambiguous', 'declined'].includes(String(value.state));
+/** Adds one history answer to the saved history. Of an attempt already saved, the answer gives the fields its question asks
+ * (a direct answer replaces an earlier passing mention, «unknown» never erases a known detail) and fields not saved yet;
+ * a repeat of a saved detail in other words is dropped, not a contradiction. Attempt identity stays explicit, never positional. */
+export function mergeHistoryValue(saved: Json, next: Json, asked: readonly string[]): Json {
+  if (!record(saved) || !record(next)) throw new Error('History must be structured');
+  const merged = structuredClone(saved) as Record<string, Json>;
+  for (const [key, value] of Object.entries(next)) {
+    if (key !== 'attempts') merged[key] = Object.hasOwn(merged, key) ? mergeStructuredValues(merged[key]!, value as Json, key) : structuredClone(value) as Json;
+  }
+  if (next.attempts === undefined) return merged;
+  if (!Array.isArray(next.attempts) || (merged.attempts !== undefined && !Array.isArray(merged.attempts))) throw new Error('History attempts must be a list');
+  const attempts = new Map<string, Record<string, Json>>();
+  for (const item of [...(merged.attempts as Json[] | undefined ?? []), ...next.attempts]) {
+    if (!record(item) || typeof item.attempt_id !== 'string') throw new Error('History attempt has no stable ID');
+    const current = attempts.get(item.attempt_id);
+    if (!current) { attempts.set(item.attempt_id, structuredClone(item) as Record<string, Json>); continue; }
+    for (const [field, part] of Object.entries(item)) {
+      if (field === 'attempt_id') continue;
+      if (!HISTORY_FIELDS.includes(field as typeof HISTORY_FIELDS[number])) current[field] = Object.hasOwn(current, field) ? mergeStructuredValues(current[field]!, part as Json, field) : structuredClone(part) as Json;
+      else if (!Object.hasOwn(current, field) || uncertain(current[field]) || (asked.includes(field) && !uncertain(part))) current[field] = structuredClone(part) as Json;
+    }
+  }
+  merged.attempts = [...attempts.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([, value]) => value);
+  return merged;
+}
+
 /** Merge only compatible observations. History array identity is explicit, never positional. */
 export function mergeStructuredValues(first: Json, second: Json, path = ''): Json {
   if (JSON.stringify(first) === JSON.stringify(second)) return structuredClone(first);

@@ -154,6 +154,7 @@ test('prompt file has only the intents mark; every intent is listed and visitor 
   assert.equal(system.content.split('\n').length, 18);
   assert.match(system.content, /передавай result — итог прошлых работ по теме по всем сведениям: accepted_facts, history и текущей реплике\. Выбирай первое подходящее по порядку: ongoing — работа идёт сейчас; no_result — результата не было или его не измеряли, даже если работу потом бросили или остановили из-за денег; partial_or_stopped — результат частичный/);
   assert.match(system.content, /При каждом новом ответе о прошлых работах передавай result заново по всем сведениям\./);
+  assert.match(system.content, /Для попытки, уже сохранённой в accepted_facts, бери её attempt_id и передавай только новое: ответ на текущий вопрос и сведения, которых ещё нет; уже сохранённое не повторяй, в том числе другими словами\./);
   assert.match(system.content, /start_diagnostic — посетитель хочет начать или продолжить экспресс-диагностику бизнеса: «экспресс-диагностика», «аудит бизнеса», «персональный отчёт»/);
   assert.match(system.content, /Вопрос о цене или составе услуги аудита Pixel Plus \(например, SEO-аудита сайта\) — question, а не start_diagnostic\./);
   assert.match(system.content, /mixed без хотя бы одного кандидата в answers не бывает\. Начатая, но не законченная фраза \(«Меня зовут…», «Я…»\) — не факт и не ambiguous: не создавай для неё кандидата, в том числе ради mixed\./);
