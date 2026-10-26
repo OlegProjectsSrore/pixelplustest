@@ -2,6 +2,18 @@
 
 ---
 
+- Date/time: 2026-10-26 20:32
+- Scope: S:\PROJECTS\pixelplustest
+- Summary: ветка `codex/expert-chat-panel` (рабочая копия `.deployment\expert-chat-panel`) перемотана вперёд на `main` до коммита с этой записью.
+  - Ветка была чистой, своих коммитов не имела и отставала на один коммит (d49a0f7 → 1f7ff1a: ответы на вопросы через гибридный поиск в чате и голосе).
+  - Перемотка с `core.autocrlf=false`, чтобы файлы в этой рабочей копии остались с LF.
+- Files changed:
+  - project_log.md
+  - вне репозитория: рабочая копия `.deployment/expert-chat-panel`
+- Reference: «Да, перемотай ветку Codex (codex/expert-chat-panel) на main.»
+
+---
+
 - Date/time: 2026-10-26 20:30
 - Scope: S:\PROJECTS\pixelplustest
 - Summary: помощник отвечает на произвольные вопросы об услугах Pixel Plus через гибридный поиск по базе знаний, как на портфолио; экспресс-диагностика с PDF сохранена. Решения владельца:
