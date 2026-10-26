@@ -2,6 +2,18 @@
 
 ---
 
+- Date/time: 2026-10-26 23:49
+- Scope: S:\PROJECTS\pixelplustest
+- Summary: ветка `codex/expert-chat-panel` (рабочая копия `.deployment\expert-chat-panel`) перемотана вперёд на `main` до коммита с этой записью.
+  - Ветка была чистой, своих коммитов не имела и отставала на один коммит (f84e0fd → 0ccda8c: шаги и пути для прошлых попыток в отчёте аудита).
+  - Перемотка с `core.autocrlf=false`, чтобы файлы в этой рабочей копии остались с LF.
+- Files changed:
+  - project_log.md
+  - вне репозитория: рабочая копия `.deployment/expert-chat-panel`
+- Reference: «Да, перемотай ветку Codex (codex/expert-chat-panel) на main.»
+
+---
+
 - Date/time: 2026-10-26 23:47
 - Scope: S:\PROJECTS\pixelplustest
 - Summary: утверждённые владельцем шаги и пути для прошлых попыток (`outputs/steps-approval/steps-and-prior-attempts-for-approval.md`) внесены в библиотеку аудита и реализованы. Worker опубликован.
