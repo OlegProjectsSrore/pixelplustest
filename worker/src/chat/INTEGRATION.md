@@ -61,7 +61,7 @@ ID `target` и `alternative` повторяются между фактами. �
 
 `ClassifierRuntime` требует `api_key`, `max_tokens`, `timeout_ms`, `runAuthorized(request, call)`; `fetch` можно передать из `core.fetcher`. Прямого чтения `Env` в адаптере нет.
 
-`request` содержит `provider: "deepseek"`, `model: "deepseek-flash"`, `max_tokens`, `input_utf8_bytes`. Последнее поле — размер входа в UTF-8, а не измеренный расход токенов; ядро задаёт консервативный резерв с учётом выбранной единицы бюджета и накладных расходов. API-ключ в метаданных резервирования отсутствует.
+`request` содержит `provider: "deepseek"`, `model: "deepseek-v4-pro"`, `max_tokens`, `input_utf8_bytes`. Последнее поле — размер входа в UTF-8, а не измеренный расход токенов; ядро задаёт консервативный резерв с учётом выбранной единицы бюджета и накладных расходов. API-ключ в метаданных резервирования отсутствует.
 
 Обязательный контракт `runAuthorized`:
 
@@ -85,7 +85,7 @@ ID `target` и `alternative` повторяются между фактами. �
 | `BUDGETS_JSON` | `createChatRuntime` требует положительные `deepseek_calls`, `deepseek_tokens`, `deepseek_usd_micros`. До запроса резервирует 1 вызов, `input_utf8_bytes + max_tokens + 256` токенов и верхнюю стоимость по пиковым ставкам из `src/deepseek-cost.ts`. После ответа учитывает usage и стоимость ввода/вывода с проверенным кешем; отсутствие usage сохраняет оба неопределённых резерва. |
 | `ALLOW_DRAFT_LIBRARY` | Существующий флаг ядра. Обёртка передаёт `core.engineOptions.allowDraft`; адаптер самостоятельно не разрешает черновики. |
 
-Провайдерские поля фиксированы: `deepseek-flash`, `thinking: {type:"disabled"}`, `response_format: {type:"json_object"}`, `stream:false`, `temperature:0`. JSON Schema провайдеру не отправляется. Требование JSON и пример включены в инструкции. Принимается только `finish_reason:"stop"` и прошедший локальную проверку результат. Официальные источники: [Chat Completions](https://api-docs.deepseek.com/api/create-chat-completion/), [JSON Output](https://api-docs.deepseek.com/guides/json_mode/), [ошибки](https://api-docs.deepseek.com/quick_start/error_codes/), [ожидание ответа](https://api-docs.deepseek.com/quick_start/rate_limit/).
+Провайдерские поля фиксированы: `deepseek-v4-pro`, `thinking: {type:"disabled"}`, `response_format: {type:"json_object"}`, `stream:false`, `temperature:0`. JSON Schema провайдеру не отправляется. Требование JSON и пример включены в инструкции. Принимается только `finish_reason:"stop"` и прошедший локальную проверку результат. Официальные источники: [Chat Completions](https://api-docs.deepseek.com/api/create-chat-completion/), [JSON Output](https://api-docs.deepseek.com/guides/json_mode/), [ошибки](https://api-docs.deepseek.com/quick_start/error_codes/), [ожидание ответа](https://api-docs.deepseek.com/quick_start/rate_limit/).
 
 ## Подтверждённые границы интеграции на момент проверки
 

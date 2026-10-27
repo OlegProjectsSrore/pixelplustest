@@ -24,7 +24,7 @@ test('DeepSeek classifier works in real workerd and refuses redirects without fo
       requests++; assert.equal(request.url, 'https://api.deepseek.com/chat/completions');
       assert.equal(request.headers.get('Authorization'), 'Bearer test-secret');
       if (redirect) return new Response(null, { status: 302, headers: { Location: 'https://attacker.example/' } });
-      const body = await request.json(); assert.equal(body.model, 'deepseek-flash'); assert.deepEqual(body.thinking, { type: 'disabled' });
+      const body = await request.json(); assert.equal(body.model, 'deepseek-v4-pro'); assert.deepEqual(body.thinking, { type: 'disabled' });
       return Response.json({ usage: { prompt_tokens: 80, completion_tokens: 20, total_tokens: 100 }, choices: [{ finish_reason: 'stop', message: { content: JSON.stringify({
         intent: 'unknown', answers: [], clarification_question_id: null, faq_id: null, joke_category_id: null, humor_preference: null,
       }) } }] });

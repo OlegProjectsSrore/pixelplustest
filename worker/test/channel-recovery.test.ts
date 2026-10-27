@@ -23,7 +23,7 @@ async function fixture(respond: (context: ClassifierContext) => unknown | Promis
   const core = new CoreServices(env, () => now, (async (_url, init) => {
     calls++;
     const body = JSON.parse(String(init?.body));
-    assert.equal(body.model, 'deepseek-flash'); assert.deepEqual(body.thinking, { type: 'disabled' });
+    assert.equal(body.model, 'deepseek-v4-pro'); assert.deepEqual(body.thinking, { type: 'disabled' });
     const context = JSON.parse(body.messages[1].content) as ClassifierContext; contexts.push(context);
     const content = await respond(context);
     return Response.json({ id: `mock-${calls}`, usage: { prompt_tokens: 80, completion_tokens: 20, total_tokens: 100 },
@@ -69,7 +69,7 @@ test('recovery uses saved uncovered evidence, pinned questions and bounded adjac
     assert.deepEqual(await classify(await f.input()), answers); assert.equal(f.calls(), 1);
     assert.deepEqual(await f.core.store.listAnswers('session-1'), [], 'the bridge alone commits answers');
     const rows = f.db.sqlite.prepare(`SELECT kind,state,actual FROM usage_reservations ORDER BY kind`).all();
-    assert.deepEqual(rows.map(row => [row.kind, row.state, row.actual]), [['deepseek_calls', 'settled', 1], ['deepseek_tokens', 'settled', 100], ['deepseek_usd_micros', 'settled', 48]]);
+    assert.deepEqual(rows.map(row => [row.kind, row.state, row.actual]), [['deepseek_calls', 'settled', 1], ['deepseek_tokens', 'settled', 100], ['deepseek_usd_micros', 'settled', 185]]);
   } finally { f.db.close(); }
 });
 

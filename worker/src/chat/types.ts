@@ -81,7 +81,7 @@ export interface ProviderExchange {
 export type DeepseekModel = 'deepseek-flash' | 'deepseek-v4-pro';
 export interface ExternalRequest {
   provider: 'deepseek';
-  /** Flash classifies and words replies; V4 Pro answers visitor questions from the knowledge base. */
+  /** V4 Pro for every chat call (CHAT_MODEL); Flash remains priced for older reservations. */
   model: DeepseekModel;
   max_tokens: number;
   /** Conservative input size for the core's reservation policy. Not a token count. */

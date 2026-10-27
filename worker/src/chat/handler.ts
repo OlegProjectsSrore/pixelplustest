@@ -6,7 +6,7 @@ import type { AdapterContext, AdapterHandler } from '../integration.ts';
 import type { StoredSession } from '../storage/types.ts';
 import { fail, mutation, object, requestHash, textField } from '../security.ts';
 import { buildChatContext, type ChatContextInput } from './build-context.ts';
-import { classifyTurn } from './classifier.ts';
+import { CLASSIFIER_REASONING, classifyTurn } from './classifier.ts';
 import type { Classification, ClassifierRuntime } from './types.ts';
 
 export interface PreparedChatTurn {
@@ -105,7 +105,7 @@ export function createChatHandler(dependencies: ChatHandlerDependencies): Adapte
         const runtime = await dependencies.runtime(context, current, input.operation_id, attempt);
         const timeLeft = remaining();
         if (timeLeft <= 0) fail(409, 'time_limit', 'Время опроса закончилось. Завершите сбор сведений.');
-        return classifyTurn(modelContext, { ...runtime, timeout_ms: Math.min(runtime.timeout_ms, timeLeft) });
+        return classifyTurn(modelContext, { ...runtime, timeout_ms: Math.min(runtime.timeout_ms, timeLeft) }, CLASSIFIER_REASONING);
       };
       let result = await runAttempt(session, 0);
       // Only an invalid, completed response permits a second metered attempt here.

@@ -51,7 +51,7 @@ const SERVICE = /формат\S*\s+ответ|фиксированн\S*\s+фор
 // Higher than the classifier's 0 so repeated questions get different wording; checkComposed still gates every output.
 export const COMPOSE_TEMPERATURE = 1.3;
 const clean = (text: string) => text.replace(/\s+/g, ' ').trim();
-// At a high temperature Flash now and then slips in Chinese or Korean characters; such wording goes back to the library texts.
+// At a high temperature the model now and then slips in Chinese or Korean characters; such wording goes back to the library texts.
 const FOREIGN_SCRIPT = /[぀-ヿ㐀-鿿가-힯豈-﫿]/u;
 
 /** Code checks on the model output; null means the library texts are shown instead. */

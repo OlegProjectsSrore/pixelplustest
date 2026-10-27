@@ -84,7 +84,7 @@ const completed = (content: string, finish = 'stop'): ProviderExchange => ({ out
 test('one DeepSeek call per turn at the wording temperature; provider failures and cut-off output return null', async () => {
   const ok = runtime(() => completed(out('Рады знакомству.', 'Кем Вы работаете в компании?')));
   assert.deepEqual(await composeChatMessage(input(), ok), { reply: 'Рады знакомству.', question_text: 'Кем Вы работаете в компании?' });
-  assert.equal(ok.bodies.length, 1); assert.equal(ok.bodies[0].temperature, COMPOSE_TEMPERATURE); assert.equal(COMPOSE_TEMPERATURE, 1.3); assert.equal(ok.bodies[0].model, 'deepseek-flash');
+  assert.equal(ok.bodies.length, 1); assert.equal(ok.bodies[0].temperature, COMPOSE_TEMPERATURE); assert.equal(COMPOSE_TEMPERATURE, 1.3); assert.equal(ok.bodies[0].model, 'deepseek-v4-pro');
   assert.equal(await composeChatMessage(input(), runtime(() => completed(out('Понял.', 'Кем Вы работаете?'), 'length'))), null);
   assert.equal(await composeChatMessage(input(), runtime(() => ({ outcome: 'http_error', status: 500, body: null, usage: null, error: null }))), null);
   assert.equal(await composeChatMessage(input(), { ...runtime(() => completed('{}')), api_key: '' }), null, 'no key, no call');

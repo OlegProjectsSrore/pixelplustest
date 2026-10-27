@@ -23,11 +23,11 @@ function reportFromText(context: ClassifierContext, kind: 'answer' | 'mixed' = '
   return { ...intent(kind), answers: [{ question_id: 'context_name', fact_id: 'context.name', state: 'known', value: source.text!, event_ids: [source.id], evidence: [{ event_id: source.id, text: source.text! }] }] };
 }
 async function fixture(respond: (context: ClassifierContext, call: number) => unknown | Promise<unknown> = context => reportFromText(context)) {
-  const db = new SqliteD1(); let calls = 0; const nameChecks: string[] = [];
+  const db = new SqliteD1(); let calls = 0; const nameChecks: string[] = []; const bodies: Record<string, unknown>[] = [];
   const env: Env = { DB: db.binding(), REPORTS_KV: {} as KVNamespace, ALLOW_DRAFT_LIBRARY: 'true', DEEPSEEK_API_KEY: 'test-key', BUDGETS_JSON: JSON.stringify({ deepseek_usd_micros: 20_000_000, deepseek_calls: 20, deepseek_tokens: 2_000_000 }) };
   const core = new CoreServices(env, () => now, (async (url, init) => {
     if (String(url).startsWith('https://cloudflare-dns.com/')) return Response.json(new URL(String(url)).searchParams.get('name')!.startsWith('nosuch') ? { Status: 3 } : { Status: 0, Answer: [{ type: 1 }] });
-    const request = JSON.parse(String(init?.body));
+    const request = JSON.parse(String(init?.body)); bodies.push(request);
     if (request.messages[0].content === NAME_CHECK_PROMPT) {
       const name = String(JSON.parse(request.messages[1].content).answer); nameChecks.push(name);
       return Response.json({ id: `name-check-${nameChecks.length}`, usage: { prompt_tokens: 60, completion_tokens: 5, total_tokens: 65 }, choices: [{ finish_reason: 'stop', message: { content: JSON.stringify({ is_name: name !== 'Собака' }) } }] });
@@ -42,7 +42,7 @@ async function fixture(respond: (context: ClassifierContext, call: number) => un
   const request = new Request('https://example.test/api/chat', { method: 'POST', headers: { Authorization: `Bearer ${bearer}` } });
   const body = (operation = 'turn-1', revision = 0, input: Record<string, unknown> = { kind: 'text', text: 'Олег' }, question: string | null = 'context_name') => ({ api_version: '1', session_id: session.id, operation_id: operation, expected_revision: revision, channel_revision: 0, library_version: library.version, question_id: question, input });
   const context = (value: Record<string, unknown>): AdapterContext => ({ core, env, execution, body: value });
-  return { db, core, env, session, request, body, context, handler, calls: () => calls, nameChecks: () => nameChecks };
+  return { db, core, env, session, request, body, context, handler, calls: () => calls, nameChecks: () => nameChecks, bodies: () => bodies };
 }
 
 test('chat text uses delivered evidence, becomes explicit written evidence and advances once', async () => {
@@ -58,7 +58,7 @@ test('chat text uses delivered evidence, becomes explicit written evidence and a
     assert.equal((repeated as { kind: string }).kind, 'duplicate'); assert.equal(f.calls(), 1);
     const tokens = await f.core.store.getUsageReservation('deepseek_tokens:chat-session:turn-1:0');
     assert.equal(tokens?.state, 'settled'); assert.equal(tokens?.actual, 100);
-    assert.equal((await f.core.store.getUsageReservation('deepseek_usd_micros:chat-session:turn-1:0'))?.actual, 48);
+    assert.equal((await f.core.store.getUsageReservation('deepseek_usd_micros:chat-session:turn-1:0'))?.actual, 185);
   } finally { f.db.close(); }
 });
 
@@ -382,6 +382,32 @@ test('during the survey a question the materials cannot answer is explained as a
     assert.equal(seen.at(-1)!.explain_question, true);
     assert.deepEqual([response.operation.text, response.operation.question_id], [explained.reply, 'context_position']);
     assert.equal((await f.core.store.requireSession(f.session.id)).state.mode, 'diagnostic');
+  } finally { f.db.close(); }
+});
+
+test('the chat classifier thinks before it answers (reasoning low); the composer and the name check do not', async () => {
+  const f = await fixture(composing());
+  f.env.CHAT_COMPOSER_ENABLED = 'true';
+  try {
+    await f.handler(f.request, f.context(f.body()));
+    const kind = (request: Record<string, unknown>) => {
+      const system = String((request.messages as { content: string }[])[0].content);
+      return system === NAME_CHECK_PROMPT ? 'name' : system.includes('Схема JSON: {"intent"') ? 'classifier' : 'composer';
+    };
+    assert.deepEqual(f.bodies().map(request => [kind(request), (request.thinking as { type: string }).type, request.reasoning_effort ?? null, request.model]),
+      [['classifier', 'enabled', 'low', 'deepseek-v4-pro'], ['name', 'disabled', null, 'deepseek-v4-pro'], ['composer', 'disabled', null, 'deepseek-v4-pro']]);
+  } finally { f.db.close(); }
+});
+
+test('a question about the chat itself before the survey («Ты меня спрашиваешь?») gets what the assistant can do, not a joke', async () => {
+  const f = await fixture((_context, call) => call === 1 ? intent('question') : intent('clarify'));
+  try {
+    await f.handler(f.request, f.context(f.body('turn-1', 0, { kind: 'text', text: 'Что вы умеете?' })));
+    let session = await f.core.store.requireSession(f.session.id);
+    assert.equal(session.state.mode, 'questions');
+    const response = await f.handler(f.request, f.context(f.body('turn-2', session.state.revision, { kind: 'text', text: 'Ты меня спрашиваешь ?' }, null))) as { operation: Record<string, Json> };
+    assert.equal(response.operation.text, 'Я помощник Pixel Plus: отвечу на вопросы об услугах студии или проведу экспресс-диагностику Вашего бизнеса, по итогам которой Вы получите PDF-отчёт. Напишите, что Вам интереснее.');
+    assert.equal(response.operation.joke_id, null);
   } finally { f.db.close(); }
 });
 

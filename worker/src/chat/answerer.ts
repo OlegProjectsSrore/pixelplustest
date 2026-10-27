@@ -18,7 +18,7 @@ sources — один или два адреса из поля url фрагмен
 const VOICE = 'Ответ прозвучит голосом: 1–3 коротких предложения, которые легко произнести, без списков и сокращений.';
 // Low but non-zero: answers must stay close to the fragments, wording may vary.
 export const ANSWER_TEMPERATURE = 0.3;
-// The stronger model writes visitor-facing answers; classification and wording stay on Flash.
+// V4 Pro writes visitor-facing answers, as it does every other chat call (CHAT_MODEL).
 export const ANSWER_MODEL: DeepseekModel = 'deepseek-v4-pro';
 
 export function buildAnswerPrompt(input: AnswerInput): { role: 'system' | 'user'; content: string }[] {

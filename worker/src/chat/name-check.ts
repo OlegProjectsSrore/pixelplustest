@@ -4,7 +4,7 @@ import type { ClassifierRuntime } from './types.ts';
 
 export const NAME_FACT = 'context.name';
 
-// Instructions for the name check (DeepSeek Flash, system message). The JSON reply is a contract with parseNameCheck.
+// Instructions for the name check (DeepSeek V4 Pro, system message). The JSON reply is a contract with parseNameCheck.
 export const NAME_CHECK_PROMPT = `Ты проверяешь ответ посетителя сайта на вопрос «Как Вас зовут?». Определи, назвал ли он настоящее личное имя человека.
 Имя — это имя человека любого народа и языка, полное или уменьшительное: Алексей, Лёша, Анна, Аня, Тимур, Айгуль, Джон, Ахмед. Можно вместе с фамилией или отчеством.
 Не имя: животные, предметы, профессии и должности, роли, названия компаний и мест, оскорбления, шутки и выдуманные прозвища — например «Собака», «Цирк», «Цирковой артист», «Стол», «Директор», «Бэтмен», «Никто».
@@ -22,7 +22,7 @@ export function parseNameCheck(content: string): boolean | null {
   } catch { return null; }
 }
 
-/** One metered DeepSeek Flash call. Null on any provider or reply failure: the name is then accepted as said. */
+/** One metered DeepSeek V4 Pro call. Null on any provider or reply failure: the name is then accepted as said. */
 export async function checkPersonalName(text: string, runtime: ClassifierRuntime): Promise<boolean | null> {
   try {
     const exchange = await requestDeepseek([{ role: 'system', content: NAME_CHECK_PROMPT }, { role: 'user', content: JSON.stringify({ answer: text.slice(0, 200) }) }], runtime);

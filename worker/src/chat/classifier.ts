@@ -44,9 +44,17 @@ async function readBody(response: Response, signal: AbortSignal): Promise<unknow
   try { return JSON.parse(text); } catch { throw new ReadError('invalid_envelope'); }
 }
 
+/** The model of every chat call: classification, wording, the name check, voice recovery and intent. Flash misread visitors too often
+ * («Давай про фирму» was not taken for the diagnostic). */
+export const CHAT_MODEL: DeepseekModel = 'deepseek-v4-pro';
+/** The chat classifier thinks before it answers: understanding the visitor's message decides everything after it. It then takes 5–20 s,
+ * so its limit is 25 s and a turn's 40 s. The composer, the name check and the voice paths stay without thinking: about 2 s each
+ * (the composer with thinking took 15–28 s), and a live voice call cannot wait. */
+export const CLASSIFIER_REASONING = 'low' as const;
+
 /** One metered DeepSeek completion with a JSON object reply; the caller interprets the exchange.
  * reasoning switches thinking on at that effort (temperature is then ignored by the provider) and allows a longer wait and reply (the report writer's ten sections). */
-export async function requestDeepseek(messages: { role: 'system' | 'user'; content: string }[], runtime: ClassifierRuntime, temperature = 0, model: DeepseekModel = 'deepseek-flash', reasoning?: 'low' | 'high' | 'max'): Promise<ProviderExchange> {
+export async function requestDeepseek(messages: { role: 'system' | 'user'; content: string }[], runtime: ClassifierRuntime, temperature = 0, model: DeepseekModel = CHAT_MODEL, reasoning?: 'low' | 'high' | 'max'): Promise<ProviderExchange> {
   if (!Number.isSafeInteger(runtime.max_tokens) || runtime.max_tokens < 1 || runtime.max_tokens > (reasoning ? 32768 : 16384) || !Number.isFinite(runtime.timeout_ms) || runtime.timeout_ms < 1 || runtime.timeout_ms > (reasoning ? 420000 : 60000)) throw new Error('Invalid classifier limits');
   const body = JSON.stringify(reasoning
     ? { model, thinking: { type: 'enabled' }, reasoning_effort: reasoning, response_format: { type: 'json_object' }, stream: false, max_tokens: runtime.max_tokens, messages }
@@ -86,9 +94,9 @@ export async function requestDeepseek(messages: { role: 'system' | 'user'; conte
 }
 
 /** One metered attempt. The core owns any retry, persistence and user-facing response. */
-export async function classifyTurn(context: ClassifierContext, runtime: ClassifierRuntime): Promise<ClassificationResult> {
+export async function classifyTurn(context: ClassifierContext, runtime: ClassifierRuntime, reasoning?: 'low' | 'high'): Promise<ClassificationResult> {
   if (!runtime.api_key?.trim()) return { ok: false, error: { code: 'not_configured', retryable: false }, usage: null, provider_request_id: null };
-  const exchange = await requestDeepseek(buildClassifierPrompt(context), runtime);
+  const exchange = await requestDeepseek(buildClassifierPrompt(context), runtime, 0, CHAT_MODEL, reasoning);
   const requestId = object(exchange.body) && typeof exchange.body.id === 'string' && exchange.body.id.length <= 200 ? exchange.body.id : null;
   const failure = (code: Extract<ClassificationResult, { ok: false }>['error']['code'], retryable: boolean): ClassificationResult => ({ ok: false, error: { code, retryable }, usage: exchange.usage, provider_request_id: requestId });
   if (exchange.outcome === 'unknown') return failure(exchange.error === 'timeout' ? 'provider_timeout' : 'provider_unavailable', true);

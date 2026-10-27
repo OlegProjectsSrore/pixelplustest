@@ -159,6 +159,7 @@ test('prompt file has only the intents mark; every intent is listed and visitor 
   // A question about the question on screen is a clarification, not a question about Pixel Plus services.
   assert.match(system.content, /clarify — посетитель не отвечает на текущий вопрос, а спрашивает о нём самом: .*«Какой именно результат\?»/);
   assert.match(system.content, /Вопрос о смысле текущего вопроса опроса — clarify, а не question\./);
+  assert.match(system.content, /Вопрос о самом разговоре — кто кого спрашивает, что сейчас происходит, чего ждут от посетителя \(«Ты меня спрашиваешь\?»/);
   assert.match(system.content, /history — разговор по порядку, как его видит посетитель: его сообщения \(user\), реплики и вопросы помощника \(assistant\)/);
   assert.match(system.content, /Если посетитель называет причиной трудностей качество продукта, производство, закупки, финансы, логистику или кадры, сохрани это как отдельную причину вне цифровых услуг его словами; не создавай из неё проблему опроса\./);
   assert.match(system.content, /передавай result — итог прошлых работ по теме по всем сведениям: accepted_facts, history и текущей реплике\. Выбирай первое подходящее по порядку: ongoing — работа идёт сейчас; no_result — результата не было или его не измеряли, даже если работу потом бросили или остановили из-за денег; partial_or_stopped — результат частичный/);
@@ -179,7 +180,7 @@ test('one request is authorized before fetch; actual raw API fields and usage ar
     assert.equal(authorized, true); calls++;
     assert.equal(url, 'https://api.deepseek.com/chat/completions');
     const request = JSON.parse(options?.body as string);
-    assert.equal(request.model, 'deepseek-flash'); assert.deepEqual(request.thinking, { type: 'disabled' });
+    assert.equal(request.model, 'deepseek-v4-pro'); assert.deepEqual(request.thinking, { type: 'disabled' });
     assert.deepEqual(request.response_format, { type: 'json_object' }); assert.equal(request.stream, false);
     assert.equal(request.max_tokens, 2048); assert.equal(options?.redirect, 'manual');
     return new Response('\n\n' + JSON.stringify(envelope()));
@@ -191,6 +192,14 @@ test('one request is authorized before fetch; actual raw API fields and usage ar
   };
   const result = await classifyTurn(context(), rt);
   assert.equal(result.ok, true); assert.equal(calls, 1); assert.equal(result.provider_request_id, 'provider-1'); assert.equal(result.usage?.prompt_cache_hit_tokens, 10);
+});
+
+test('with reasoning the classifier thinks at that effort and sends no temperature; without it thinking is off', async () => {
+  const bodies: Record<string, unknown>[] = [];
+  const rt = runtime(async (_url, options) => { bodies.push(JSON.parse(options?.body as string)); return new Response(JSON.stringify(envelope())); });
+  await classifyTurn(context(), rt, 'low'); await classifyTurn(context(), rt);
+  assert.deepEqual([bodies[0].thinking, bodies[0].reasoning_effort, bodies[0].temperature], [{ type: 'enabled' }, 'low', undefined]);
+  assert.deepEqual([bodies[1].thinking, bodies[1].reasoning_effort, bodies[1].temperature], [{ type: 'disabled' }, undefined, 0]);
 });
 
 test('authorization denial prevents fetch and missing credentials prevent authorization', async () => {

@@ -22,7 +22,8 @@ export async function createChatRuntime(context: AdapterContext, session: Stored
   const { core, env } = context;
   const key = typeof env.DEEPSEEK_API_KEY === 'string' ? env.DEEPSEEK_API_KEY : '';
   return {
-    api_key: key, max_tokens: 4096, timeout_ms: 12_000, fetch: core.fetcher,
+    // 25 s fits the classifier's thinking (5–20 s); the composer, the answerer and the name check set shorter limits of their own.
+    api_key: key, max_tokens: 4096, timeout_ms: 25_000, fetch: core.fetcher,
     async runAuthorized(input, execute) {
       const maximumCost = reserveDeepseekMicros(input);
       const reservationKey = `${session.id}:${operationId}:${attempt}`;
@@ -59,11 +60,13 @@ export async function createChatRuntime(context: AdapterContext, session: Stored
 // Classification uses attempts 0 and 1 of an operation; wording takes its own metered attempt.
 const COMPOSE_ATTEMPT = 2;
 const ANSWER_ATTEMPT = 3;
-// The browser waits 30 s for a turn; classification, search, answer and wording share this budget.
-const TURN_BUDGET_MS = 24_000;
+// The browser waits 45 s for a turn; classification, search, answer and wording share this budget.
+const TURN_BUDGET_MS = 40_000;
 const NOT_FOUND = 'В материалах Pixel Plus точного ответа на этот вопрос нет. Уточнить детали можно у специалистов студии: https://pixelplus.ru/contact/zakaz/';
 // Reworded by DeepSeek; the composer's reply carries no question mark.
 const HELP_NOTICE = 'Подскажите, чем могу помочь.';
+// The visitor asks what is going on before the survey («Ты меня спрашиваешь?»): what the assistant can do.
+const HELP_EXPLAINED = 'Я помощник Pixel Plus: отвечу на вопросы об услугах студии или проведу экспресс-диагностику Вашего бизнеса, по итогам которой Вы получите PDF-отчёт. Напишите, что Вам интереснее.';
 // Shown when the composer cannot word an explanation of the current question; the question itself stays below.
 const EXPLAIN_FALLBACK = 'Ответьте, как понимаете вопрос: подойдёт любой ответ своими словами.';
 // FAQ answers and jokes are approved texts shown verbatim; other notices are reworded by DeepSeek.
@@ -248,7 +251,7 @@ export async function commitChatTurn(request: Request, context: AdapterContext, 
   // In questions mode a message that is not a question and got no library text (a greeting, a name, an unclear remark)
   // gets an offer to help, never a survey prompt and never an empty reply.
   const offerHelp = state.mode === 'questions' && !asksKnowledge && turn.action !== 'sensitive' && (['answer', 'clarify'].includes(turn.action) || !serviceText);
-  if (offerHelp) serviceText = HELP_NOTICE;
+  if (offerHelp) serviceText = turn.classification?.intent === 'clarify' ? HELP_EXPLAINED : HELP_NOTICE;
   // A key question asked again: the visitor first hears why the answer is needed for the report.
   if (question?.reask && !serviceText && ['answer', 'clarify'].includes(turn.action)) serviceText = question.reask.reason;
   const libraryText = serviceText;

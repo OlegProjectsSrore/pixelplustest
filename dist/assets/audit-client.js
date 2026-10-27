@@ -62,7 +62,8 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
   function ensureApi() {
     if (!api) {
       if (!hasConfig()) throw new Error('Предварительный аудит пока недоступен. Пожалуйста, зайдите позже.');
-      api = createAuditTransport(config.apiBaseUrl);
+      // 45 s: a chat turn may take up to 40 s on the server while the classifier thinks before it answers.
+      api = createAuditTransport(config.apiBaseUrl, { timeoutMs: 45000 });
     }
     return api;
   }
