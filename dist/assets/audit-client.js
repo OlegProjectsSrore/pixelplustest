@@ -7,6 +7,8 @@ import { createRealtimeVoiceAdapter } from './audit-realtime.js?v=54504d9f6e';
 
 const THANKS = 'Спасибо за предоставленную информацию, сейчас подготовим результат предварительного аудита.';
 const VOICE_FALLBACK = 'Пожалуйста, лучше напишите здесь';
+const TYPE_WEBSITE = 'Пожалуйста, напечатайте адрес сайта здесь.';
+const VOICE_AGAIN = 'Дальше можно отвечать здесь или вернуться к голосу — кнопка «Голос» вверху окна.';
 const VOICE_STATUS = { connecting: 'Соединяемся…', listening: 'Слушаю Вас', thinking: 'Обрабатываю ответ…', speaking: 'Помощник говорит', idle: 'Соединение установлено', disconnected: 'Голосовой разговор отключён', disconnecting: 'Завершаем соединение…' };
 const EMAIL_STATUS = { pending: 'Письмо ожидает отправки.', sending: 'Отправляем письмо…', sent: 'Письмо отправлено.', unknown: 'Результат отправки пока не подтверждён. Повторное письмо автоматически не отправляем.', failed: 'Не удалось отправить письмо. PDF можно скачать.' };
 
@@ -121,6 +123,8 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
     const reply = data?.reply?.text || data?.operation?.text;
     const replyId = data?.reply?.id || data?.operation?.operation_id || saved.pending?.body?.operation_id;
     if (reply && replyId) addMessage(`reply:${replyId}`, 'assistant', reply);
+    // The address asked for after a voice call is in: the interview can go back to voice.
+    if (saved.voice_hint && saved.session?.active_channel === 'chat' && saved.session.question?.id !== 'context_website') { saved.voice_hint = false; addMessage(`voice-again:${now()}`, 'assistant', VOICE_AGAIN); }
     if (saved.session && ['closing', 'preparing', 'ready'].includes(saved.session.status)) addMessage('closing-message', 'assistant', THANKS);
   }
   function enqueue(task) {
@@ -295,13 +299,7 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
       onTranscript: showVoiceTranscript,
       onError(problem) { error = problem.message; render(); },
       // Voice could not answer twice in a row: stop the call, continue in the chat and say so there.
-      onFallback() {
-        const run = () => busy ? setTimeout(run, 300) : void action(async () => {
-          await switchChannel('chat');
-          addMessage(`voice-fallback:${Date.now()}`, 'assistant', VOICE_FALLBACK); persist();
-        });
-        run();
-      },
+      onFallback() { continueInChat(VOICE_FALLBACK); },
       onTool(name, args, callId) {
         // A knowledge search reads only; it bypasses the mutation queue so it never waits behind a save.
         if (name === 'searchKnowledge') return searchKnowledge(args?.query);
@@ -319,6 +317,8 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
               followup: { path: '/api/audit/finish', extra: { reason: args.reason, call_id: callId, ...(boundary ? { through_event_id: boundary } : {}) } },
             });
           } else result = await mutate('/api/voice/answers', { ...extra, ...(['offTopicReply', 'startDiagnostic'].includes(name) ? { tool: name } : {}) });
+          // The company has a site: its address is typed in the chat, not dictated.
+          if (result?.type_in_chat === 'website') { saved.voice_hint = true; persist(); continueInChat(TYPE_WEBSITE); }
           if (name === 'offTopicReply' && args.kind === 'pause' && (result?.stop_required === true || result?.status === 'stopping')) {
             saved.control_intent = { action: 'pause' }; persist();
           }
@@ -331,6 +331,14 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
       },
     });
     return voice;
+  }
+  // Stops the call and continues the interview in the chat with a message there; waits for a running action to finish first.
+  function continueInChat(message) {
+    const run = () => busy ? setTimeout(run, 300) : void action(async () => {
+      await switchChannel('chat');
+      addMessage(`voice-to-chat:${Date.now()}`, 'assistant', message); persist();
+    });
+    run();
   }
   async function startVoice() {
     if (saved.voice_call || voice?.active) throw new Error('Остановка предыдущего звонка ещё не подтверждена. Повторите проверку состояния.');

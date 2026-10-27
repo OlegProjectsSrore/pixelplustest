@@ -26,6 +26,7 @@ test('real client/transport/Worker: creation, key phrase, text, multi-selection,
     BUDGETS_JSON: JSON.stringify({ new_sessions: 10, sessions_per_ip: 10, deepseek_usd_micros: 20_000_000, deepseek_calls: 10, deepseek_tokens: 1_000_000 }) };
   const provider: typeof fetch = async (url, init) => {
     if (String(url).includes('turnstile')) return Response.json({ success: true, hostname: 'olegprojectssrore.github.io', action: 'session' });
+    if (String(url).startsWith('https://cloudflare-dns.com/')) return Response.json({ Status: 0, Answer: [{ type: 1 }] });
     // The name check answers apart from the classifier.
     if (JSON.parse(String(init?.body)).messages[0].content === NAME_CHECK_PROMPT) return Response.json({ usage: { prompt_tokens: 60, completion_tokens: 5, total_tokens: 65 }, choices: [{ finish_reason: 'stop', message: { content: '{"is_name":true}' } }] });
     providerCalls++;

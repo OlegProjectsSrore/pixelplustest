@@ -3,6 +3,7 @@ import type { ClassifierRuntime } from './chat/types.ts';
 import { composeChatMessage, type ComposeInput, type Composed } from './chat/composer.ts';
 import { answerQuestion, formatAnswer } from './chat/answerer.ts';
 import { checkPersonalName, screenNameAnswers } from './chat/name-check.ts';
+import { screenWebsiteAnswers, websiteExists } from './chat/website-check.ts';
 import { searchKnowledge } from './search/service.ts';
 import type { AdapterContext, AdapterHandler, ChannelAdapters } from './integration.ts';
 import type { StoredSession, UsageReservation } from './storage/types.ts';
@@ -165,8 +166,10 @@ export async function commitChatTurn(request: Request, context: AdapterContext, 
   // Voice packets and history recovery keep their separate confirmation requirements.
   const given = turn.answers.map(answer => ({ ...answer, confirmation: 'explicit' as const }));
   if (given.some(answer => answer.channel !== 'chat' || !['selection', 'classification'].includes(answer.method))) fail(400, 'invalid_answers', 'Недопустимое происхождение ответа чата.');
-  // A word that is not a person's name («Собака») is not taken as the visitor's name: the key question is asked again.
-  const answers = await screenNameAnswers(given, text => checkNameWith(context, session, `name-check:${turn.input.operation_id}`, text));
+  // A word that is not a person's name («Собака») is not taken as the visitor's name, and a typed site address with no site behind it
+  // is not taken as the site: the key question is asked again.
+  const named = await screenNameAnswers(given, text => checkNameWith(context, session, `name-check:${turn.input.operation_id}`, text));
+  const answers = await screenWebsiteAnswers(named, host => websiteExists(host, core.fetcher));
   try { validateAnswers(answers, [...evidence, turn.event], existing, lib, core.engineOptions); }
   catch { fail(400, 'invalid_answers', 'Ответ не прошёл проверку словаря или исходного сообщения.'); }
   const state = advanceAudit(session.state, [...existing, ...answers], now, lib, core.engineOptions);

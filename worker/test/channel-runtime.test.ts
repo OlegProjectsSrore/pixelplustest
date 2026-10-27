@@ -25,7 +25,8 @@ function reportFromText(context: ClassifierContext, kind: 'answer' | 'mixed' = '
 async function fixture(respond: (context: ClassifierContext, call: number) => unknown | Promise<unknown> = context => reportFromText(context)) {
   const db = new SqliteD1(); let calls = 0; const nameChecks: string[] = [];
   const env: Env = { DB: db.binding(), REPORTS_KV: {} as KVNamespace, ALLOW_DRAFT_LIBRARY: 'true', DEEPSEEK_API_KEY: 'test-key', BUDGETS_JSON: JSON.stringify({ deepseek_usd_micros: 20_000_000, deepseek_calls: 20, deepseek_tokens: 2_000_000 }) };
-  const core = new CoreServices(env, () => now, (async (_url, init) => {
+  const core = new CoreServices(env, () => now, (async (url, init) => {
+    if (String(url).startsWith('https://cloudflare-dns.com/')) return Response.json(new URL(String(url)).searchParams.get('name')!.startsWith('nosuch') ? { Status: 3 } : { Status: 0, Answer: [{ type: 1 }] });
     const request = JSON.parse(String(init?.body));
     if (request.messages[0].content === NAME_CHECK_PROMPT) {
       const name = String(JSON.parse(request.messages[1].content).answer); nameChecks.push(name);
@@ -79,6 +80,30 @@ test('a word that is not a person\'s name is not taken as the name: the name is 
     assert.equal(session.state.facts['context.name']!.value, 'Олег');
     assert.equal(session.state.current_question_id, 'context_position');
     assert.deepEqual(f.nameChecks(), ['Собака', 'Олег']);
+  } finally { f.db.close(); }
+});
+
+test('a typed site address with no site behind it is asked again with its own reason; a real site is accepted', async () => {
+  const site = (context: ClassifierContext): Classification => {
+    const source = context.source_events[0]!;
+    return { ...intent('answer'), answers: [{ question_id: 'context_website', fact_id: 'context.website', state: 'known', value: source.text!, event_ids: [source.id], evidence: [{ event_id: source.id, text: source.text! }] }] };
+  };
+  const f = await fixture(site);
+  try {
+    // The name, position and company are answered: the site is the current question.
+    const event: AuditEvent = { id: 'seed-event', source: 'chat', source_key: 'seed', source_revision: 0, local_order: 0, role: 'user', kind: 'utterance', text: 'Сообщённый контекст', occurred_at: now, received_at: now };
+    const seed: AuditAnswer[] = [['context.name', 'Олег'], ['context.position', 'Директор'], ['context.company_name', 'Магазин «Дом»']].map(([id, value], i) => ({ id: `seed-${i}`, question_id: library.questions.find(question => question.fact_ids.includes(id))!.id, fact_id: id, state: 'known', value, event_ids: [event.id], channel: 'chat', method: 'selection', confirmation: 'explicit', library_version: library.version, created_at: now }));
+    const state = advanceAudit(f.session.state, seed, now, library, { allowDraft: true });
+    assert.equal(state.current_question_id, 'context_website');
+    await f.core.store.commit({ sessionId: f.session.id, operationId: 'seed', expectedRevision: 0, channelRevision: 0, event, answers: seed, state, now });
+    await f.handler(f.request, f.context(f.body('site-1', 1, { kind: 'text', text: 'nosuch-site.ru' }, 'context_website')));
+    let session = await f.core.store.requireSession(f.session.id);
+    assert.equal(session.state.facts['context.website']!.state, 'ambiguous');
+    const view = await f.core.view(session) as { question: { id: string; reask?: { attempt: number; reason: string } } };
+    assert.deepEqual([view.question.id, view.question.reask], ['context_website', { attempt: 1, reason: library.scenario.required_for_report!.reasons.website_ambiguous }]);
+    await f.handler(f.request, f.context(f.body('site-2', session.state.revision, { kind: 'text', text: 'https://pixelplus.ru/' }, 'context_website')));
+    session = await f.core.store.requireSession(f.session.id);
+    assert.deepEqual([session.state.facts['context.website']!.state, session.state.facts['context.website']!.value], ['known', 'https://pixelplus.ru/']);
   } finally { f.db.close(); }
 });
 

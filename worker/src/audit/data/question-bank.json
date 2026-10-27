@@ -80,7 +80,7 @@
         "context.website"
       ],
       "chat": "Какой адрес сайта Вашей компании? Если сайта пока нет, так и напишите.",
-      "voice": "Какой адрес сайта Вашей компании? Если сайта пока нет, так и скажите.",
+      "voice": "Есть ли у Вашей компании сайт?",
       "skip_if": "Ответ уже явно сообщён посетителем; не повторять при смене канала.",
       "version": "0.1.5",
       "status": "approved",
@@ -95,7 +95,10 @@
       "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
       "max_clarifications": 1,
       "answer_mode": "structured_fact",
-      "required_for_report": "website"
+      "required_for_report": "website",
+      "v0_1_4": {
+        "voice": "Какой адрес сайта Вашей компании? Если сайта пока нет, так и скажите."
+      }
     },
     {
       "id": "context_responsibilities",

@@ -4,6 +4,7 @@ import type { HumorIntent } from './audit/humor.ts';
 import { getLibrary } from './audit/library.ts';
 import { buildChatContext } from './chat/build-context.ts';
 import { classifyTurn, parseClassification, type ClassificationResult } from './chat/classifier.ts';
+import { spokenWebsite } from './chat/website-check.ts';
 import { createChatRuntime } from './channel-runtime.ts';
 import type { CoreServices } from './core.ts';
 import type { StoredSession, VoiceCall } from './storage/types.ts';
@@ -145,7 +146,8 @@ export function createRecoveryClassifier(): RecoveryClassifier {
     const result = await classifySaved(input, 'recovery');
     if (!result) return [];
     const { classification, boundaryHash, sources, all, existing, lib } = result;
-    const answers: AuditAnswer[] = classification.answers.map((candidate, index) => {
+    // The site address is typed in the chat, never recovered from speech: the dictated address stays unsaved and the question stays open.
+    const answers: AuditAnswer[] = classification.answers.filter(candidate => !spokenWebsite(candidate)).map((candidate, index) => {
       const { evidence: _evidence, replaces_answer_id: _replacement, ...answer } = candidate;
       // A model-proposed correction alone cannot erase a previously accepted answer or confirm ASR accuracy.
       return { ...answer, id: `recovery:${boundaryHash}:${index}`, channel: 'voice', method: 'recovery',

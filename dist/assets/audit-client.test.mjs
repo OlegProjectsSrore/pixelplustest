@@ -544,3 +544,24 @@ test('two failed voice replies in a row move the interview to the chat with a re
   assert.equal(f.model.messages.at(-1).role, 'assistant');
   assert.equal(f.model.messages.at(-1).text, 'Пожалуйста, лучше напишите здесь');
 });
+
+test('a voice answer that the company has a site moves the interview to the chat to type the address, then offers voice again', async t => {
+  const f = fixture(t, { initial: null, request: async (path, options, context) => {
+    if (path === '/api/voice/answers') { context.server.revision++; context.server.question = { id: 'context_website', text: 'Какой адрес сайта?', options: [] }; return { session: structuredClone(context.server), type_in_chat: 'website' }; }
+    if (path === '/api/chat') { context.server.revision++; context.server.question = { id: 'context_responsibilities', text: 'За что Вы отвечаете?', options: [] }; return { session: structuredClone(context.server), operation: { operation_id: options.body.operation_id, text: 'Спасибо.' } }; }
+    return undefined;
+  } });
+  await f.client.open('voice');
+  await f.voice.onTool('saveAnswers', { answers: [{ question_id: 'context_website', fact_id: 'context.website', state: 'known', value: 'есть сайт', source_quotes: ['есть'] }] }, 'call1');
+  for (let i = 0; i < 40 && f.model.mode !== 'chat'; i++) await new Promise(resolve => setTimeout(resolve, 25));
+  await new Promise(resolve => setTimeout(resolve, 25));
+  assert.equal(f.client.session.active_channel, 'chat');
+  assert.equal(f.voiceActive, false, 'the voice call is stopped');
+  assert.equal(f.model.messages.at(-1).text, 'Пожалуйста, напечатайте адрес сайта здесь.');
+  await f.handlers.onText('pixelplus.ru');
+  // The hint follows the reply to the address.
+  const texts = f.model.messages.map(message => message.text), reply = texts.indexOf('Спасибо.');
+  assert.ok(reply >= 0);
+  assert.equal(texts[reply + 1], 'Дальше можно отвечать здесь или вернуться к голосу — кнопка «Голос» вверху окна.');
+  assert.equal(texts.filter(text => text.startsWith('Дальше можно')).length, 1, 'the hint is given once');
+});

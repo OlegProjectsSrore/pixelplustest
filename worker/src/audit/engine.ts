@@ -260,7 +260,8 @@ function selectQuestion(state: AuditState, now: number, lib: AuditLibrary, optio
   const rules = lib.scenario.required_for_report, previous = lib.questions.find(question => question.id === state.current_question_id);
   if (rules && previous?.required_for_report && permitted(previous, options) && elapsed < lib.scenario.clock.closing_from * 1000 && elapsed + previous.estimated_seconds * 1000 <= INTERVIEW_BUDGET_MS) {
     const attempt = keyAnswerMissing(previous, state, lib);
-    if (attempt > 0 && attempt <= rules.max_reasks) return { view: { ...questionView(previous, state, lib), reask: { attempt, reason: rules.reasons[previous.required_for_report]! } } };
+    const unclear = previous.fact_ids.some(id => state.facts[id]?.state === 'ambiguous') ? rules.reasons[`${previous.required_for_report}_ambiguous`] : undefined;
+    if (attempt > 0 && attempt <= rules.max_reasks) return { view: { ...questionView(previous, state, lib), reask: { attempt, reason: unclear ?? rules.reasons[previous.required_for_report]! } } };
   }
   // The introductory block precedes adaptive branches in both channels. Explicit
   // unknown/declined answers count as collected; they must not trap the visitor.

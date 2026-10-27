@@ -106,8 +106,8 @@
     },
     {
       "name": "question-bank.json",
-      "sha256": "e27109563b2b08327c6f1e67cc4d6d4f3f14c294bd4cd6bcbe4399cb0cbf853e",
-      "bytes": 959582,
+      "sha256": "2b2c0ba47b86f0e2be91df82f682496dd7e980a1912036b63b0e0c32b3a9c641",
+      "bytes": 959683,
       "role": "runtime_candidate"
     },
     {
@@ -130,8 +130,8 @@
     },
     {
       "name": "scenario.json",
-      "sha256": "d703ff7564f7eb08ddb820405c319cd0613c4a293fcefabfa32c3e118f19cc8e",
-      "bytes": 8520,
+      "sha256": "e7a7e395a8901f3d42dcc0181d3ebbd77001c08a308d2d5ca46c1edc8d929cf0",
+      "bytes": 8724,
       "role": "runtime_candidate"
     },
     {
@@ -160,8 +160,8 @@
     },
     {
       "name": "voice-question-blocks.json",
-      "sha256": "deac93a1a236a857c5ab5de163c3dbf9431c68ba08cee007ef8a630f6673ef04",
-      "bytes": 143142,
+      "sha256": "71133adf2bc5464ed3c922f0b64e1def4d343cb11daab67fbe71c9e836d1ab9a",
+      "bytes": 143072,
       "role": "runtime_candidate"
     }
   ],

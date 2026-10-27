@@ -166,6 +166,19 @@ async function nameCall(f: Awaited<ReturnType<typeof fixture>>, userText: string
     answers: [{ question_id: 'context_name', fact_id: 'context.name', state: 'known', value: 'Александр', source_ordinals: [1], ...answer }] });
 }
 
+test('A dictated site address is not saved: the browser is asked to move to the chat; «no site» is saved', async t => {
+  const dictated = await fixture(); t.after(() => dictated.db.close());
+  const save = await nameCall(dictated, 'Да, есть, пиксельплюс точка ру');
+  const result = await dictated.invoke(dictated.adapters.voiceAnswers!, await save({ question_id: 'context_website', fact_id: 'context.website', value: 'pixelplus.ru', source_quotes: ['Да, есть, пиксельплюс точка ру'] }));
+  assert.equal((result as Record<string, unknown>).type_in_chat, 'website');
+  assert.deepEqual(await dictated.core.store.listAnswers('s1'), []);
+  const none = await fixture(); t.after(() => none.db.close());
+  const noSite = await nameCall(none, 'Сайта пока нет');
+  const saved = await none.invoke(none.adapters.voiceAnswers!, await noSite({ question_id: 'context_website', fact_id: 'context.website', state: 'not_applicable', value: null, source_quotes: ['Сайта пока нет'] }));
+  assert.equal((saved as Record<string, unknown>).type_in_chat, undefined);
+  assert.deepEqual((await none.core.store.listAnswers('s1')).map(a => [a.fact_id, a.state]), [['context.website', 'not_applicable']]);
+});
+
 test('Voice answer is saved when the quote differs from the transcript only in case and punctuation', async t => {
   for (const quote of ['александр.', '«Александр»', 'АЛЕКСАНДР']) {
     const f = await fixture(); t.after(() => f.db.close());

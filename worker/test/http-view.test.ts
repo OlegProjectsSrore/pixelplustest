@@ -174,3 +174,8 @@ test('management expiry disables interview; accepted report remains readable wit
     assert.equal(object(readOnly.report!).status, 'preparing');
   } finally { f.db.close(); }
 });
+
+test('the public payload keeps the server request to type the site address in the chat', async () => {
+  const payload = await presentPayload({} as CoreServices, { accepted: true, type_in_chat: 'website', internal_detail: 'hidden' });
+  assert.deepEqual(payload, { accepted: true, type_in_chat: 'website' });
+});

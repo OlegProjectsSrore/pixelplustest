@@ -10,6 +10,7 @@ import { elapsedMs, type StoredSession, type UsageReservation, type VoiceCall } 
 import { buildCallConfig, buildInterviewPrompt, createVoiceProvider, parseVerifiedWebhook, parseVoiceAnswerPayload, parseVoiceOffTopicPayload, VoiceProviderError } from './voice/index.ts';
 import type { VoiceAnswerCandidate, VoiceCallConfig, VoiceDependencies } from './voice/types.ts';
 import { refreshVoiceAccounts, voiceConfigHash } from './voice-accounts.ts';
+import { spokenWebsite } from './chat/website-check.ts';
 
 type Provider = ReturnType<typeof createVoiceProvider>;
 export interface VoiceBridgeOptions {
@@ -590,9 +591,14 @@ export function createVoiceAdapters(options: VoiceBridgeOptions = {}): Partial<C
       const parsed = modelArguments(() => parseVoiceAnswerPayload({ answers: body.answers }));
       if (body.through_event_id !== undefined && !(await readEvents(core, session.id)).some(event => event.id === body.through_event_id && event.call_id === call.id)) fail(409, 'pending_evidence', 'Граница голосовой истории ещё не сохранена.');
       const normalized = await normalizeVoiceAnswers(core, session, call, parsed.answers);
-      const answers = options.screenAnswers ? await options.screenAnswers({ core, session, answers: normalized }) : normalized;
+      // The site address is typed in the chat, never taken from speech: a voice answer that the company has a site is not saved,
+      // and the browser moves the visitor to the chat to type it. «No site» is saved as usual.
+      const spokenSite = normalized.filter(spokenWebsite);
+      const kept = normalized.filter(answer => !spokenSite.includes(answer));
+      const answers = options.screenAnswers ? await options.screenAnswers({ core, session, answers: kept }) : kept;
       const event: AuditEvent = { ...core.serviceEvent(input.operation_id, 'answer', { type: 'voice_packet' }), source: 'voice', call_id: call.id };
-      return core.accept(request, body, event, answers);
+      const accepted = await core.accept(request, body, event, answers);
+      return spokenSite.length ? { ...record(accepted), type_in_chat: 'website' } : accepted;
     },
     ultravoxWebhook: async (request, context) => {
       const core = context.core, webhookSecret = secret(core, 'ULTRAVOX_WEBHOOK_SECRET'), raw = await readBytes(request, 128 * 1024);

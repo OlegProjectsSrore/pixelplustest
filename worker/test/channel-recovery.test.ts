@@ -73,6 +73,19 @@ test('recovery uses saved uncovered evidence, pinned questions and bounded adjac
   } finally { f.db.close(); }
 });
 
+test('a site address dictated in the call is not recovered from the transcript; other facts of the same reply are', async () => {
+  const f = await fixture(context => {
+    const result = answer(context), source = context.source_events[0];
+    result.answers.push({ question_id: 'context_website', fact_id: 'context.website', state: 'known', value: 'пиксельплюс точка ру',
+      event_ids: [source.id], evidence: [{ event_id: source.id, text: source.text! }] });
+    return result;
+  });
+  try {
+    const answers = await createRecoveryClassifier()(await f.input());
+    assert.deepEqual(answers.map(item => item.fact_id), ['context.business']);
+  } finally { f.db.close(); }
+});
+
 test('unknown provider outcome remains charged and never authorizes another extraction', async () => {
   const f = await fixture(() => { throw new Error('mock network disconnect'); });
   try {
