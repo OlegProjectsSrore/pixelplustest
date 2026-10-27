@@ -138,6 +138,32 @@ test('the marketplace topic asks where the visitor sells, then only that platfor
   assert.equal(before.questions.find(question => question.id === 'market_entry_screen')!.condition, null);
 });
 
+test('the AI topic asks whether AI is already in use, then only that branch\'s questions', () => {
+  const base = [...intro(['ai']), answer('ai.applicable', true)];
+  const view = nextQuestion(advance(base), now, library);
+  assert.equal(view?.id, 'ai_stage');
+  assert.equal(view!.text, 'Вы уже используете AI в работе или только хотите его применить?');
+  assert.deepEqual(view!.options.map(option => option.text), ['Уже используем', 'Только хотим применить', 'И то и другое']);
+  const screens = (stage: AuditAnswer[]) => {
+    const answers = [...base, ...stage], asked: string[] = [];
+    for (let i = 0; i < 20; i++) {
+      const next = nextQuestion(advance(answers), now, library);
+      if (!next || !next.id.endsWith('_screen')) break;
+      asked.push(next.id.replace('_screen', '')); answers.push(answer(next.fact_ids[0]!, 'alternative'));
+    }
+    return asked;
+  };
+  const planning = ['ai_process', 'ai_routine', 'ai_repeat_questions', 'ai_doc_search', 'ai_speech', 'ai_prediction'], using = ['ai_knowledge', 'ai_handoff', 'ai_actions', 'ai_eval', 'ai_access'];
+  assert.deepEqual(screens([answer('ai.stage', 'planning')]), planning, 'the automation questions come right after the first one');
+  assert.deepEqual(screens([answer('ai.stage', 'using')]), using);
+  const all = ['ai_process', 'ai_routine', 'ai_repeat_questions', 'ai_doc_search', 'ai_knowledge', 'ai_handoff', 'ai_actions', 'ai_eval', 'ai_speech', 'ai_prediction', 'ai_access'];
+  assert.deepEqual(screens([answer('ai.stage', 'both')]), all);
+  assert.deepEqual(screens([answer('ai.stage', null, 'unknown')]), all, 'not said: every question');
+  const before = getLibrary('0.1.4');
+  assert.equal(before.questions.some(question => question.id === 'ai_stage'), false);
+  assert.equal(before.questions.find(question => question.id === 'ai_handoff_screen')!.condition, null);
+});
+
 test('every new service has priced tariffs and a problem; every new problem asks its own questions', () => {
   const added = library.services.filter(service => service.introduced_in === '0.2.0');
   assert.equal(added.length, 32);

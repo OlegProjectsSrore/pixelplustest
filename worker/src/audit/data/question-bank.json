@@ -7747,6 +7747,48 @@
       }
     },
     {
+      "id": "ai_stage",
+      "fact_ids": [
+        "ai.stage"
+      ],
+      "chat": "Вы уже используете AI в работе или только хотите его применить?",
+      "voice": "Вы уже используете AI в работе или только хотите его применить?",
+      "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждено владельцем 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T05:18:27Z",
+      "introduced_in": "0.2.0",
+      "phase": "routing",
+      "domain": "ai",
+      "priority": 15,
+      "condition": {
+        "fact": "ai.applicable",
+        "op": "eq",
+        "value": true
+      },
+      "estimated_seconds": 15,
+      "related_blocks": [
+        "ai_process",
+        "ai_routine",
+        "ai_repeat_questions",
+        "ai_doc_search",
+        "ai_speech",
+        "ai_prediction",
+        "ai_knowledge",
+        "ai_handoff",
+        "ai_actions",
+        "ai_eval",
+        "ai_access"
+      ],
+      "time_importance": "context_or_routing",
+      "duration_status": "author_estimate_not_measured",
+      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
+      "max_clarifications": 1,
+      "answer_mode": "semantic_enum"
+    },
+    {
       "id": "ai_impact",
       "fact_ids": [
         "ai.impact"
@@ -17724,7 +17766,29 @@
       "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
       "max_clarifications": 1,
       "answer_mode": "semantic_enum",
-      "required_for_report": "problem"
+      "required_for_report": "problem",
+      "v0_1_4": {
+        "condition": null
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "ai.stage",
+            "op": "in",
+            "value": [
+              "planning",
+              "both"
+            ]
+          },
+          {
+            "not": {
+              "fact": "ai.stage",
+              "op": "state",
+              "value": "known"
+            }
+          }
+        ]
+      }
     },
     {
       "id": "ai_process_detail",
@@ -17747,468 +17811,6 @@
       "neutral_clarification": "Правильно ли я понял описанную ситуацию? Уточните только недостающую часть: {{missing_field_label}}.",
       "related_blocks": [
         "ai_process"
-      ],
-      "time_importance": "resolves_evidence_gap",
-      "duration_status": "author_estimate_not_measured",
-      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
-      "max_clarifications": 1,
-      "answer_mode": "structured_fact",
-      "required_for_report": "problem"
-    },
-    {
-      "id": "ai_knowledge_screen",
-      "fact_ids": [
-        "ai_knowledge.signal"
-      ],
-      "chat": "Откуда помощник должен брать ответы и кто отвечает за актуальность этих материалов?",
-      "voice": "Откуда помощник должен брать ответы и кто отвечает за актуальность этих материалов?",
-      "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
-      "version": "0.1.1",
-      "status": "approved",
-      "author": "Codex — подготовка по методике и локальным источникам",
-      "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
-      "phase": "screen",
-      "domain": "ai",
-      "estimated_seconds": 30,
-      "answer_set": "ai_knowledge",
-      "transitions": {
-        "target": "ai_knowledge_detail",
-        "alternative": "next_relevant_question",
-        "unknown": "record_unknown_and_continue",
-        "not_measured": "record_not_measured_and_continue",
-        "not_applicable": "exclude_block",
-        "declined": "skip_without_reask",
-        "ambiguous": "one_neutral_clarification",
-        "conflicting": "clarify_before_replacing"
-      },
-      "related_blocks": [
-        "ai_knowledge"
-      ],
-      "time_importance": "context_or_routing",
-      "duration_status": "author_estimate_not_measured",
-      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
-      "max_clarifications": 1,
-      "answer_mode": "semantic_enum",
-      "required_for_report": "problem"
-    },
-    {
-      "id": "ai_knowledge_detail",
-      "fact_ids": [
-        "ai_knowledge.details"
-      ],
-      "chat": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
-      "voice": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
-      "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
-      "version": "0.1.1",
-      "status": "approved",
-      "author": "Codex — подготовка по методике и локальным источникам",
-      "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
-      "phase": "detail",
-      "domain": "ai",
-      "related_block": "ai_knowledge",
-      "estimated_seconds": 40,
-      "ask_only_if": "Сигнал target получен, необходимых оснований ещё нет",
-      "neutral_clarification": "Правильно ли я понял описанную ситуацию? Уточните только недостающую часть: {{missing_field_label}}.",
-      "related_blocks": [
-        "ai_knowledge"
-      ],
-      "time_importance": "resolves_evidence_gap",
-      "duration_status": "author_estimate_not_measured",
-      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
-      "max_clarifications": 1,
-      "answer_mode": "structured_fact",
-      "required_for_report": "problem"
-    },
-    {
-      "id": "ai_handoff_screen",
-      "fact_ids": [
-        "ai_handoff.signal"
-      ],
-      "chat": "Что происходит, когда AI не может ответить, клиент возражает или нужен сотрудник?",
-      "voice": "Что происходит, когда AI не может ответить, клиент возражает или нужен сотрудник?",
-      "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
-      "version": "0.1.1",
-      "status": "approved",
-      "author": "Codex — подготовка по методике и локальным источникам",
-      "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
-      "phase": "screen",
-      "domain": "ai",
-      "estimated_seconds": 30,
-      "answer_set": "ai_handoff",
-      "transitions": {
-        "target": "ai_handoff_detail",
-        "alternative": "next_relevant_question",
-        "unknown": "record_unknown_and_continue",
-        "not_measured": "record_not_measured_and_continue",
-        "not_applicable": "exclude_block",
-        "declined": "skip_without_reask",
-        "ambiguous": "one_neutral_clarification",
-        "conflicting": "clarify_before_replacing"
-      },
-      "related_blocks": [
-        "ai_handoff"
-      ],
-      "time_importance": "context_or_routing",
-      "duration_status": "author_estimate_not_measured",
-      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
-      "max_clarifications": 1,
-      "answer_mode": "semantic_enum",
-      "required_for_report": "problem"
-    },
-    {
-      "id": "ai_handoff_detail",
-      "fact_ids": [
-        "ai_handoff.details"
-      ],
-      "chat": "Уточните конкретный пример: где и что произошло, в какой период?",
-      "voice": "Уточните конкретный пример: где и что произошло, в какой период?",
-      "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
-      "version": "0.1.1",
-      "status": "approved",
-      "author": "Codex — подготовка по методике и локальным источникам",
-      "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
-      "phase": "detail",
-      "domain": "ai",
-      "related_block": "ai_handoff",
-      "estimated_seconds": 40,
-      "ask_only_if": "Сигнал target получен, необходимых оснований ещё нет",
-      "neutral_clarification": "Правильно ли я понял описанную ситуацию? Уточните только недостающую часть: {{missing_field_label}}.",
-      "related_blocks": [
-        "ai_handoff"
-      ],
-      "time_importance": "resolves_evidence_gap",
-      "duration_status": "author_estimate_not_measured",
-      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
-      "max_clarifications": 1,
-      "answer_mode": "structured_fact",
-      "required_for_report": "problem"
-    },
-    {
-      "id": "ai_actions_screen",
-      "fact_ids": [
-        "ai_actions.signal"
-      ],
-      "chat": "Какие изменения AI может делать в системах и какие из них требуют проверки человеком?",
-      "voice": "Какие изменения AI может делать в системах и какие из них требуют проверки человеком?",
-      "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
-      "version": "0.1.1",
-      "status": "approved",
-      "author": "Codex — подготовка по методике и локальным источникам",
-      "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
-      "phase": "screen",
-      "domain": "ai",
-      "estimated_seconds": 30,
-      "answer_set": "ai_actions",
-      "transitions": {
-        "target": "ai_actions_detail",
-        "alternative": "next_relevant_question",
-        "unknown": "record_unknown_and_continue",
-        "not_measured": "record_not_measured_and_continue",
-        "not_applicable": "exclude_block",
-        "declined": "skip_without_reask",
-        "ambiguous": "one_neutral_clarification",
-        "conflicting": "clarify_before_replacing"
-      },
-      "related_blocks": [
-        "ai_actions"
-      ],
-      "time_importance": "context_or_routing",
-      "duration_status": "author_estimate_not_measured",
-      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
-      "max_clarifications": 1,
-      "answer_mode": "semantic_enum",
-      "required_for_report": "problem"
-    },
-    {
-      "id": "ai_actions_detail",
-      "fact_ids": [
-        "ai_actions.details"
-      ],
-      "chat": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
-      "voice": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
-      "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
-      "version": "0.1.1",
-      "status": "approved",
-      "author": "Codex — подготовка по методике и локальным источникам",
-      "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
-      "phase": "detail",
-      "domain": "ai",
-      "related_block": "ai_actions",
-      "estimated_seconds": 40,
-      "ask_only_if": "Сигнал target получен, необходимых оснований ещё нет",
-      "neutral_clarification": "Правильно ли я понял описанную ситуацию? Уточните только недостающую часть: {{missing_field_label}}.",
-      "related_blocks": [
-        "ai_actions"
-      ],
-      "time_importance": "resolves_evidence_gap",
-      "duration_status": "author_estimate_not_measured",
-      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
-      "max_clarifications": 1,
-      "answer_mode": "structured_fact",
-      "required_for_report": "problem"
-    },
-    {
-      "id": "ai_eval_screen",
-      "fact_ids": [
-        "ai_eval.signal"
-      ],
-      "chat": "Как проверяется качество AI на типовых, сложных и неизвестных ему запросах?",
-      "voice": "Как проверяется качество AI на типовых, сложных и неизвестных ему запросах?",
-      "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
-      "version": "0.1.1",
-      "status": "approved",
-      "author": "Codex — подготовка по методике и локальным источникам",
-      "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
-      "phase": "screen",
-      "domain": "ai",
-      "estimated_seconds": 30,
-      "answer_set": "ai_eval",
-      "transitions": {
-        "target": "ai_eval_detail",
-        "alternative": "next_relevant_question",
-        "unknown": "record_unknown_and_continue",
-        "not_measured": "record_not_measured_and_continue",
-        "not_applicable": "exclude_block",
-        "declined": "skip_without_reask",
-        "ambiguous": "one_neutral_clarification",
-        "conflicting": "clarify_before_replacing"
-      },
-      "related_blocks": [
-        "ai_eval"
-      ],
-      "time_importance": "context_or_routing",
-      "duration_status": "author_estimate_not_measured",
-      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
-      "max_clarifications": 1,
-      "answer_mode": "semantic_enum",
-      "required_for_report": "problem"
-    },
-    {
-      "id": "ai_eval_detail",
-      "fact_ids": [
-        "ai_eval.details"
-      ],
-      "chat": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
-      "voice": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
-      "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
-      "version": "0.1.1",
-      "status": "approved",
-      "author": "Codex — подготовка по методике и локальным источникам",
-      "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
-      "phase": "detail",
-      "domain": "ai",
-      "related_block": "ai_eval",
-      "estimated_seconds": 40,
-      "ask_only_if": "Сигнал target получен, необходимых оснований ещё нет",
-      "neutral_clarification": "Правильно ли я понял описанную ситуацию? Уточните только недостающую часть: {{missing_field_label}}.",
-      "related_blocks": [
-        "ai_eval"
-      ],
-      "time_importance": "resolves_evidence_gap",
-      "duration_status": "author_estimate_not_measured",
-      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
-      "max_clarifications": 1,
-      "answer_mode": "structured_fact",
-      "required_for_report": "problem"
-    },
-    {
-      "id": "ai_speech_screen",
-      "fact_ids": [
-        "ai_speech.signal"
-      ],
-      "chat": "Какие вопросы о разговорах хотите проверять и как сейчас оценивается выборка?",
-      "voice": "Какие вопросы о разговорах хотите проверять и как сейчас оценивается выборка?",
-      "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
-      "version": "0.1.1",
-      "status": "approved",
-      "author": "Codex — подготовка по методике и локальным источникам",
-      "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
-      "phase": "screen",
-      "domain": "ai",
-      "estimated_seconds": 30,
-      "answer_set": "ai_speech",
-      "transitions": {
-        "target": "ai_speech_detail",
-        "alternative": "next_relevant_question",
-        "unknown": "record_unknown_and_continue",
-        "not_measured": "record_not_measured_and_continue",
-        "not_applicable": "exclude_block",
-        "declined": "skip_without_reask",
-        "ambiguous": "one_neutral_clarification",
-        "conflicting": "clarify_before_replacing"
-      },
-      "related_blocks": [
-        "ai_speech"
-      ],
-      "time_importance": "context_or_routing",
-      "duration_status": "author_estimate_not_measured",
-      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
-      "max_clarifications": 1,
-      "answer_mode": "semantic_enum",
-      "required_for_report": "problem"
-    },
-    {
-      "id": "ai_speech_detail",
-      "fact_ids": [
-        "ai_speech.details"
-      ],
-      "chat": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
-      "voice": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
-      "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
-      "version": "0.1.1",
-      "status": "approved",
-      "author": "Codex — подготовка по методике и локальным источникам",
-      "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
-      "phase": "detail",
-      "domain": "ai",
-      "related_block": "ai_speech",
-      "estimated_seconds": 40,
-      "ask_only_if": "Сигнал target получен, необходимых оснований ещё нет",
-      "neutral_clarification": "Правильно ли я понял описанную ситуацию? Уточните только недостающую часть: {{missing_field_label}}.",
-      "related_blocks": [
-        "ai_speech"
-      ],
-      "time_importance": "resolves_evidence_gap",
-      "duration_status": "author_estimate_not_measured",
-      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
-      "max_clarifications": 1,
-      "answer_mode": "structured_fact",
-      "required_for_report": "problem"
-    },
-    {
-      "id": "ai_prediction_screen",
-      "fact_ids": [
-        "ai_prediction.signal"
-      ],
-      "chat": "Какие данные и история доступны для предполагаемого прогноза и с чем будете сравнивать результат?",
-      "voice": "Какие данные и история доступны для предполагаемого прогноза и с чем будете сравнивать результат?",
-      "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
-      "version": "0.1.1",
-      "status": "approved",
-      "author": "Codex — подготовка по методике и локальным источникам",
-      "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
-      "phase": "screen",
-      "domain": "ai",
-      "estimated_seconds": 30,
-      "answer_set": "ai_prediction",
-      "transitions": {
-        "target": "ai_prediction_detail",
-        "alternative": "next_relevant_question",
-        "unknown": "record_unknown_and_continue",
-        "not_measured": "record_not_measured_and_continue",
-        "not_applicable": "exclude_block",
-        "declined": "skip_without_reask",
-        "ambiguous": "one_neutral_clarification",
-        "conflicting": "clarify_before_replacing"
-      },
-      "related_blocks": [
-        "ai_prediction"
-      ],
-      "time_importance": "context_or_routing",
-      "duration_status": "author_estimate_not_measured",
-      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
-      "max_clarifications": 1,
-      "answer_mode": "semantic_enum",
-      "required_for_report": "problem"
-    },
-    {
-      "id": "ai_prediction_detail",
-      "fact_ids": [
-        "ai_prediction.details"
-      ],
-      "chat": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
-      "voice": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
-      "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
-      "version": "0.1.1",
-      "status": "approved",
-      "author": "Codex — подготовка по методике и локальным источникам",
-      "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
-      "phase": "detail",
-      "domain": "ai",
-      "related_block": "ai_prediction",
-      "estimated_seconds": 40,
-      "ask_only_if": "Сигнал target получен, необходимых оснований ещё нет",
-      "neutral_clarification": "Правильно ли я понял описанную ситуацию? Уточните только недостающую часть: {{missing_field_label}}.",
-      "related_blocks": [
-        "ai_prediction"
-      ],
-      "time_importance": "resolves_evidence_gap",
-      "duration_status": "author_estimate_not_measured",
-      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
-      "max_clarifications": 1,
-      "answer_mode": "structured_fact",
-      "required_for_report": "problem"
-    },
-    {
-      "id": "ai_access_screen",
-      "fact_ids": [
-        "ai_access.signal"
-      ],
-      "chat": "К каким данным должен обращаться AI и как различаются права его пользователей?",
-      "voice": "К каким данным должен обращаться AI и как различаются права его пользователей?",
-      "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
-      "version": "0.1.1",
-      "status": "approved",
-      "author": "Codex — подготовка по методике и локальным источникам",
-      "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
-      "phase": "screen",
-      "domain": "ai",
-      "estimated_seconds": 30,
-      "answer_set": "ai_access",
-      "transitions": {
-        "target": "ai_access_detail",
-        "alternative": "next_relevant_question",
-        "unknown": "record_unknown_and_continue",
-        "not_measured": "record_not_measured_and_continue",
-        "not_applicable": "exclude_block",
-        "declined": "skip_without_reask",
-        "ambiguous": "one_neutral_clarification",
-        "conflicting": "clarify_before_replacing"
-      },
-      "related_blocks": [
-        "ai_access"
-      ],
-      "time_importance": "context_or_routing",
-      "duration_status": "author_estimate_not_measured",
-      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
-      "max_clarifications": 1,
-      "answer_mode": "semantic_enum",
-      "required_for_report": "problem"
-    },
-    {
-      "id": "ai_access_detail",
-      "fact_ids": [
-        "ai_access.details"
-      ],
-      "chat": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
-      "voice": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
-      "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
-      "version": "0.1.1",
-      "status": "approved",
-      "author": "Codex — подготовка по методике и локальным источникам",
-      "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z",
-      "phase": "detail",
-      "domain": "ai",
-      "related_block": "ai_access",
-      "estimated_seconds": 40,
-      "ask_only_if": "Сигнал target получен, необходимых оснований ещё нет",
-      "neutral_clarification": "Правильно ли я понял описанную ситуацию? Уточните только недостающую часть: {{missing_field_label}}.",
-      "related_blocks": [
-        "ai_access"
       ],
       "time_importance": "resolves_evidence_gap",
       "duration_status": "author_estimate_not_measured",
@@ -18253,7 +17855,26 @@
       "max_clarifications": 1,
       "answer_mode": "semantic_enum",
       "required_for_report": "problem",
-      "introduced_in": "0.2.0"
+      "introduced_in": "0.2.0",
+      "condition": {
+        "any": [
+          {
+            "fact": "ai.stage",
+            "op": "in",
+            "value": [
+              "planning",
+              "both"
+            ]
+          },
+          {
+            "not": {
+              "fact": "ai.stage",
+              "op": "state",
+              "value": "known"
+            }
+          }
+        ]
+      }
     },
     {
       "id": "ai_routine_detail",
@@ -18321,7 +17942,26 @@
       "max_clarifications": 1,
       "answer_mode": "semantic_enum",
       "required_for_report": "problem",
-      "introduced_in": "0.2.0"
+      "introduced_in": "0.2.0",
+      "condition": {
+        "any": [
+          {
+            "fact": "ai.stage",
+            "op": "in",
+            "value": [
+              "planning",
+              "both"
+            ]
+          },
+          {
+            "not": {
+              "fact": "ai.stage",
+              "op": "state",
+              "value": "known"
+            }
+          }
+        ]
+      }
     },
     {
       "id": "ai_repeat_questions_detail",
@@ -18389,7 +18029,26 @@
       "max_clarifications": 1,
       "answer_mode": "semantic_enum",
       "required_for_report": "problem",
-      "introduced_in": "0.2.0"
+      "introduced_in": "0.2.0",
+      "condition": {
+        "any": [
+          {
+            "fact": "ai.stage",
+            "op": "in",
+            "value": [
+              "planning",
+              "both"
+            ]
+          },
+          {
+            "not": {
+              "fact": "ai.stage",
+              "op": "state",
+              "value": "known"
+            }
+          }
+        ]
+      }
     },
     {
       "id": "ai_doc_search_detail",
@@ -18420,6 +18079,622 @@
       "answer_mode": "structured_fact",
       "required_for_report": "problem",
       "introduced_in": "0.2.0"
+    },
+    {
+      "id": "ai_knowledge_screen",
+      "fact_ids": [
+        "ai_knowledge.signal"
+      ],
+      "chat": "Откуда помощник должен брать ответы и кто отвечает за актуальность этих материалов?",
+      "voice": "Откуда помощник должен брать ответы и кто отвечает за актуальность этих материалов?",
+      "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка по методике и локальным источникам",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "phase": "screen",
+      "domain": "ai",
+      "estimated_seconds": 30,
+      "answer_set": "ai_knowledge",
+      "transitions": {
+        "target": "ai_knowledge_detail",
+        "alternative": "next_relevant_question",
+        "unknown": "record_unknown_and_continue",
+        "not_measured": "record_not_measured_and_continue",
+        "not_applicable": "exclude_block",
+        "declined": "skip_without_reask",
+        "ambiguous": "one_neutral_clarification",
+        "conflicting": "clarify_before_replacing"
+      },
+      "related_blocks": [
+        "ai_knowledge"
+      ],
+      "time_importance": "context_or_routing",
+      "duration_status": "author_estimate_not_measured",
+      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
+      "max_clarifications": 1,
+      "answer_mode": "semantic_enum",
+      "required_for_report": "problem",
+      "v0_1_4": {
+        "condition": null
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "ai.stage",
+            "op": "in",
+            "value": [
+              "using",
+              "both"
+            ]
+          },
+          {
+            "not": {
+              "fact": "ai.stage",
+              "op": "state",
+              "value": "known"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ai_knowledge_detail",
+      "fact_ids": [
+        "ai_knowledge.details"
+      ],
+      "chat": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+      "voice": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+      "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка по методике и локальным источникам",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "phase": "detail",
+      "domain": "ai",
+      "related_block": "ai_knowledge",
+      "estimated_seconds": 40,
+      "ask_only_if": "Сигнал target получен, необходимых оснований ещё нет",
+      "neutral_clarification": "Правильно ли я понял описанную ситуацию? Уточните только недостающую часть: {{missing_field_label}}.",
+      "related_blocks": [
+        "ai_knowledge"
+      ],
+      "time_importance": "resolves_evidence_gap",
+      "duration_status": "author_estimate_not_measured",
+      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
+      "max_clarifications": 1,
+      "answer_mode": "structured_fact",
+      "required_for_report": "problem"
+    },
+    {
+      "id": "ai_handoff_screen",
+      "fact_ids": [
+        "ai_handoff.signal"
+      ],
+      "chat": "Что происходит, когда AI не может ответить, клиент возражает или нужен сотрудник?",
+      "voice": "Что происходит, когда AI не может ответить, клиент возражает или нужен сотрудник?",
+      "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка по методике и локальным источникам",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "phase": "screen",
+      "domain": "ai",
+      "estimated_seconds": 30,
+      "answer_set": "ai_handoff",
+      "transitions": {
+        "target": "ai_handoff_detail",
+        "alternative": "next_relevant_question",
+        "unknown": "record_unknown_and_continue",
+        "not_measured": "record_not_measured_and_continue",
+        "not_applicable": "exclude_block",
+        "declined": "skip_without_reask",
+        "ambiguous": "one_neutral_clarification",
+        "conflicting": "clarify_before_replacing"
+      },
+      "related_blocks": [
+        "ai_handoff"
+      ],
+      "time_importance": "context_or_routing",
+      "duration_status": "author_estimate_not_measured",
+      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
+      "max_clarifications": 1,
+      "answer_mode": "semantic_enum",
+      "required_for_report": "problem",
+      "v0_1_4": {
+        "condition": null
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "ai.stage",
+            "op": "in",
+            "value": [
+              "using",
+              "both"
+            ]
+          },
+          {
+            "not": {
+              "fact": "ai.stage",
+              "op": "state",
+              "value": "known"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ai_handoff_detail",
+      "fact_ids": [
+        "ai_handoff.details"
+      ],
+      "chat": "Уточните конкретный пример: где и что произошло, в какой период?",
+      "voice": "Уточните конкретный пример: где и что произошло, в какой период?",
+      "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка по методике и локальным источникам",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "phase": "detail",
+      "domain": "ai",
+      "related_block": "ai_handoff",
+      "estimated_seconds": 40,
+      "ask_only_if": "Сигнал target получен, необходимых оснований ещё нет",
+      "neutral_clarification": "Правильно ли я понял описанную ситуацию? Уточните только недостающую часть: {{missing_field_label}}.",
+      "related_blocks": [
+        "ai_handoff"
+      ],
+      "time_importance": "resolves_evidence_gap",
+      "duration_status": "author_estimate_not_measured",
+      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
+      "max_clarifications": 1,
+      "answer_mode": "structured_fact",
+      "required_for_report": "problem"
+    },
+    {
+      "id": "ai_actions_screen",
+      "fact_ids": [
+        "ai_actions.signal"
+      ],
+      "chat": "Какие изменения AI может делать в системах и какие из них требуют проверки человеком?",
+      "voice": "Какие изменения AI может делать в системах и какие из них требуют проверки человеком?",
+      "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка по методике и локальным источникам",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "phase": "screen",
+      "domain": "ai",
+      "estimated_seconds": 30,
+      "answer_set": "ai_actions",
+      "transitions": {
+        "target": "ai_actions_detail",
+        "alternative": "next_relevant_question",
+        "unknown": "record_unknown_and_continue",
+        "not_measured": "record_not_measured_and_continue",
+        "not_applicable": "exclude_block",
+        "declined": "skip_without_reask",
+        "ambiguous": "one_neutral_clarification",
+        "conflicting": "clarify_before_replacing"
+      },
+      "related_blocks": [
+        "ai_actions"
+      ],
+      "time_importance": "context_or_routing",
+      "duration_status": "author_estimate_not_measured",
+      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
+      "max_clarifications": 1,
+      "answer_mode": "semantic_enum",
+      "required_for_report": "problem",
+      "v0_1_4": {
+        "condition": null
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "ai.stage",
+            "op": "in",
+            "value": [
+              "using",
+              "both"
+            ]
+          },
+          {
+            "not": {
+              "fact": "ai.stage",
+              "op": "state",
+              "value": "known"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ai_actions_detail",
+      "fact_ids": [
+        "ai_actions.details"
+      ],
+      "chat": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+      "voice": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+      "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка по методике и локальным источникам",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "phase": "detail",
+      "domain": "ai",
+      "related_block": "ai_actions",
+      "estimated_seconds": 40,
+      "ask_only_if": "Сигнал target получен, необходимых оснований ещё нет",
+      "neutral_clarification": "Правильно ли я понял описанную ситуацию? Уточните только недостающую часть: {{missing_field_label}}.",
+      "related_blocks": [
+        "ai_actions"
+      ],
+      "time_importance": "resolves_evidence_gap",
+      "duration_status": "author_estimate_not_measured",
+      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
+      "max_clarifications": 1,
+      "answer_mode": "structured_fact",
+      "required_for_report": "problem"
+    },
+    {
+      "id": "ai_eval_screen",
+      "fact_ids": [
+        "ai_eval.signal"
+      ],
+      "chat": "Как проверяется качество AI на типовых, сложных и неизвестных ему запросах?",
+      "voice": "Как проверяется качество AI на типовых, сложных и неизвестных ему запросах?",
+      "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка по методике и локальным источникам",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "phase": "screen",
+      "domain": "ai",
+      "estimated_seconds": 30,
+      "answer_set": "ai_eval",
+      "transitions": {
+        "target": "ai_eval_detail",
+        "alternative": "next_relevant_question",
+        "unknown": "record_unknown_and_continue",
+        "not_measured": "record_not_measured_and_continue",
+        "not_applicable": "exclude_block",
+        "declined": "skip_without_reask",
+        "ambiguous": "one_neutral_clarification",
+        "conflicting": "clarify_before_replacing"
+      },
+      "related_blocks": [
+        "ai_eval"
+      ],
+      "time_importance": "context_or_routing",
+      "duration_status": "author_estimate_not_measured",
+      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
+      "max_clarifications": 1,
+      "answer_mode": "semantic_enum",
+      "required_for_report": "problem",
+      "v0_1_4": {
+        "condition": null
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "ai.stage",
+            "op": "in",
+            "value": [
+              "using",
+              "both"
+            ]
+          },
+          {
+            "not": {
+              "fact": "ai.stage",
+              "op": "state",
+              "value": "known"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ai_eval_detail",
+      "fact_ids": [
+        "ai_eval.details"
+      ],
+      "chat": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+      "voice": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+      "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка по методике и локальным источникам",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "phase": "detail",
+      "domain": "ai",
+      "related_block": "ai_eval",
+      "estimated_seconds": 40,
+      "ask_only_if": "Сигнал target получен, необходимых оснований ещё нет",
+      "neutral_clarification": "Правильно ли я понял описанную ситуацию? Уточните только недостающую часть: {{missing_field_label}}.",
+      "related_blocks": [
+        "ai_eval"
+      ],
+      "time_importance": "resolves_evidence_gap",
+      "duration_status": "author_estimate_not_measured",
+      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
+      "max_clarifications": 1,
+      "answer_mode": "structured_fact",
+      "required_for_report": "problem"
+    },
+    {
+      "id": "ai_speech_screen",
+      "fact_ids": [
+        "ai_speech.signal"
+      ],
+      "chat": "Какие вопросы о разговорах хотите проверять и как сейчас оценивается выборка?",
+      "voice": "Какие вопросы о разговорах хотите проверять и как сейчас оценивается выборка?",
+      "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка по методике и локальным источникам",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "phase": "screen",
+      "domain": "ai",
+      "estimated_seconds": 30,
+      "answer_set": "ai_speech",
+      "transitions": {
+        "target": "ai_speech_detail",
+        "alternative": "next_relevant_question",
+        "unknown": "record_unknown_and_continue",
+        "not_measured": "record_not_measured_and_continue",
+        "not_applicable": "exclude_block",
+        "declined": "skip_without_reask",
+        "ambiguous": "one_neutral_clarification",
+        "conflicting": "clarify_before_replacing"
+      },
+      "related_blocks": [
+        "ai_speech"
+      ],
+      "time_importance": "context_or_routing",
+      "duration_status": "author_estimate_not_measured",
+      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
+      "max_clarifications": 1,
+      "answer_mode": "semantic_enum",
+      "required_for_report": "problem",
+      "v0_1_4": {
+        "condition": null
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "ai.stage",
+            "op": "in",
+            "value": [
+              "planning",
+              "both"
+            ]
+          },
+          {
+            "not": {
+              "fact": "ai.stage",
+              "op": "state",
+              "value": "known"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ai_speech_detail",
+      "fact_ids": [
+        "ai_speech.details"
+      ],
+      "chat": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
+      "voice": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
+      "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка по методике и локальным источникам",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "phase": "detail",
+      "domain": "ai",
+      "related_block": "ai_speech",
+      "estimated_seconds": 40,
+      "ask_only_if": "Сигнал target получен, необходимых оснований ещё нет",
+      "neutral_clarification": "Правильно ли я понял описанную ситуацию? Уточните только недостающую часть: {{missing_field_label}}.",
+      "related_blocks": [
+        "ai_speech"
+      ],
+      "time_importance": "resolves_evidence_gap",
+      "duration_status": "author_estimate_not_measured",
+      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
+      "max_clarifications": 1,
+      "answer_mode": "structured_fact",
+      "required_for_report": "problem"
+    },
+    {
+      "id": "ai_prediction_screen",
+      "fact_ids": [
+        "ai_prediction.signal"
+      ],
+      "chat": "Какие данные и история доступны для предполагаемого прогноза и с чем будете сравнивать результат?",
+      "voice": "Какие данные и история доступны для предполагаемого прогноза и с чем будете сравнивать результат?",
+      "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка по методике и локальным источникам",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "phase": "screen",
+      "domain": "ai",
+      "estimated_seconds": 30,
+      "answer_set": "ai_prediction",
+      "transitions": {
+        "target": "ai_prediction_detail",
+        "alternative": "next_relevant_question",
+        "unknown": "record_unknown_and_continue",
+        "not_measured": "record_not_measured_and_continue",
+        "not_applicable": "exclude_block",
+        "declined": "skip_without_reask",
+        "ambiguous": "one_neutral_clarification",
+        "conflicting": "clarify_before_replacing"
+      },
+      "related_blocks": [
+        "ai_prediction"
+      ],
+      "time_importance": "context_or_routing",
+      "duration_status": "author_estimate_not_measured",
+      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
+      "max_clarifications": 1,
+      "answer_mode": "semantic_enum",
+      "required_for_report": "problem",
+      "v0_1_4": {
+        "condition": null
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "ai.stage",
+            "op": "in",
+            "value": [
+              "planning",
+              "both"
+            ]
+          },
+          {
+            "not": {
+              "fact": "ai.stage",
+              "op": "state",
+              "value": "known"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ai_prediction_detail",
+      "fact_ids": [
+        "ai_prediction.details"
+      ],
+      "chat": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+      "voice": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+      "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка по методике и локальным источникам",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "phase": "detail",
+      "domain": "ai",
+      "related_block": "ai_prediction",
+      "estimated_seconds": 40,
+      "ask_only_if": "Сигнал target получен, необходимых оснований ещё нет",
+      "neutral_clarification": "Правильно ли я понял описанную ситуацию? Уточните только недостающую часть: {{missing_field_label}}.",
+      "related_blocks": [
+        "ai_prediction"
+      ],
+      "time_importance": "resolves_evidence_gap",
+      "duration_status": "author_estimate_not_measured",
+      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
+      "max_clarifications": 1,
+      "answer_mode": "structured_fact",
+      "required_for_report": "problem"
+    },
+    {
+      "id": "ai_access_screen",
+      "fact_ids": [
+        "ai_access.signal"
+      ],
+      "chat": "К каким данным должен обращаться AI и как различаются права его пользователей?",
+      "voice": "К каким данным должен обращаться AI и как различаются права его пользователей?",
+      "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка по методике и локальным источникам",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "phase": "screen",
+      "domain": "ai",
+      "estimated_seconds": 30,
+      "answer_set": "ai_access",
+      "transitions": {
+        "target": "ai_access_detail",
+        "alternative": "next_relevant_question",
+        "unknown": "record_unknown_and_continue",
+        "not_measured": "record_not_measured_and_continue",
+        "not_applicable": "exclude_block",
+        "declined": "skip_without_reask",
+        "ambiguous": "one_neutral_clarification",
+        "conflicting": "clarify_before_replacing"
+      },
+      "related_blocks": [
+        "ai_access"
+      ],
+      "time_importance": "context_or_routing",
+      "duration_status": "author_estimate_not_measured",
+      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
+      "max_clarifications": 1,
+      "answer_mode": "semantic_enum",
+      "required_for_report": "problem",
+      "v0_1_4": {
+        "condition": null
+      },
+      "condition": {
+        "any": [
+          {
+            "fact": "ai.stage",
+            "op": "in",
+            "value": [
+              "using",
+              "both"
+            ]
+          },
+          {
+            "not": {
+              "fact": "ai.stage",
+              "op": "state",
+              "value": "known"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ai_access_detail",
+      "fact_ids": [
+        "ai_access.details"
+      ],
+      "chat": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+      "voice": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+      "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
+      "version": "0.1.1",
+      "status": "approved",
+      "author": "Codex — подготовка по методике и локальным источникам",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "phase": "detail",
+      "domain": "ai",
+      "related_block": "ai_access",
+      "estimated_seconds": 40,
+      "ask_only_if": "Сигнал target получен, необходимых оснований ещё нет",
+      "neutral_clarification": "Правильно ли я понял описанную ситуацию? Уточните только недостающую часть: {{missing_field_label}}.",
+      "related_blocks": [
+        "ai_access"
+      ],
+      "time_importance": "resolves_evidence_gap",
+      "duration_status": "author_estimate_not_measured",
+      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
+      "max_clarifications": 1,
+      "answer_mode": "structured_fact",
+      "required_for_report": "problem"
     },
     {
       "id": "mobile_need_screen",

@@ -2942,6 +2942,14 @@
           "answer_set": null
         },
         {
+          "id": "ai_stage",
+          "text": "Вы уже используете AI в работе или только хотите его применить?",
+          "fact_ids": [
+            "ai.stage"
+          ],
+          "answer_set": null
+        },
+        {
           "id": "ai_impact",
           "text": "Что меняется для бизнеса из-за этой ситуации?",
           "fact_ids": [
@@ -2994,6 +3002,54 @@
           "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
           "fact_ids": [
             "ai_process.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ai_routine_screen",
+          "text": "Какую операцию сотрудники чаще всего повторяют вручную и сколько времени она занимает?",
+          "fact_ids": [
+            "ai_routine.signal"
+          ],
+          "answer_set": "ai_routine"
+        },
+        {
+          "id": "ai_routine_detail",
+          "text": "Как часто выполняется эта операция, сколько сотрудников ей заняты, где лежат нужные данные и нужно ли в ней решение человека?",
+          "fact_ids": [
+            "ai_routine.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ai_repeat_questions_screen",
+          "text": "Какие вопросы клиенты задают чаще всего и сколько времени сотрудники тратят на ответы, в том числе вне рабочего времени?",
+          "fact_ids": [
+            "ai_repeat_questions.signal"
+          ],
+          "answer_set": "ai_repeat_questions"
+        },
+        {
+          "id": "ai_repeat_questions_detail",
+          "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
+          "fact_ids": [
+            "ai_repeat_questions.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ai_doc_search_screen",
+          "text": "Сколько времени сотрудники тратят на поиск нужных сведений в документах и инструкциях?",
+          "fact_ids": [
+            "ai_doc_search.signal"
+          ],
+          "answer_set": "ai_doc_search"
+        },
+        {
+          "id": "ai_doc_search_detail",
+          "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
+          "fact_ids": [
+            "ai_doc_search.details"
           ],
           "answer_set": null
         },
@@ -3106,54 +3162,6 @@
           "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
           "fact_ids": [
             "ai_access.details"
-          ],
-          "answer_set": null
-        },
-        {
-          "id": "ai_routine_screen",
-          "text": "Какую операцию сотрудники чаще всего повторяют вручную и сколько времени она занимает?",
-          "fact_ids": [
-            "ai_routine.signal"
-          ],
-          "answer_set": "ai_routine"
-        },
-        {
-          "id": "ai_routine_detail",
-          "text": "Как часто выполняется эта операция, сколько сотрудников ей заняты, где лежат нужные данные и нужно ли в ней решение человека?",
-          "fact_ids": [
-            "ai_routine.details"
-          ],
-          "answer_set": null
-        },
-        {
-          "id": "ai_repeat_questions_screen",
-          "text": "Какие вопросы клиенты задают чаще всего и сколько времени сотрудники тратят на ответы, в том числе вне рабочего времени?",
-          "fact_ids": [
-            "ai_repeat_questions.signal"
-          ],
-          "answer_set": "ai_repeat_questions"
-        },
-        {
-          "id": "ai_repeat_questions_detail",
-          "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
-          "fact_ids": [
-            "ai_repeat_questions.details"
-          ],
-          "answer_set": null
-        },
-        {
-          "id": "ai_doc_search_screen",
-          "text": "Сколько времени сотрудники тратят на поиск нужных сведений в документах и инструкциях?",
-          "fact_ids": [
-            "ai_doc_search.signal"
-          ],
-          "answer_set": "ai_doc_search"
-        },
-        {
-          "id": "ai_doc_search_detail",
-          "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
-          "fact_ids": [
-            "ai_doc_search.details"
           ],
           "answer_set": null
         }

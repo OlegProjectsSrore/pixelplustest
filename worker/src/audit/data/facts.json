@@ -2197,6 +2197,43 @@
       "scope": "повторяемые операции, знания и контроль AI"
     },
     {
+      "id": "ai.stage",
+      "label": "Стадия AI: AI и автоматизация",
+      "value_type": "enum",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждено владельцем 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T05:18:27Z",
+      "introduced_in": "0.2.0",
+      "values": [
+        {
+          "id": "using",
+          "label": "Уже используем"
+        },
+        {
+          "id": "planning",
+          "label": "Только хотим применить"
+        },
+        {
+          "id": "both",
+          "label": "И то и другое"
+        }
+      ],
+      "purpose": "Задавать только вопросы своей ветки: о работающем AI или о задачах, которые стоит автоматизировать"
+    },
+    {
       "id": "ai.impact",
       "label": "Последствия для бизнеса: AI и автоматизация",
       "value_type": "object",

@@ -76,8 +76,8 @@
     },
     {
       "name": "facts.json",
-      "sha256": "8d243787bf501d63e939b9b8d373db9b53ad9130b40071f4a672e7da5ae6dfd6",
-      "bytes": 562309,
+      "sha256": "986f671d018b2837447d96b14f6ef7d8b456c8afb804a3bb7890b05b780b3c47",
+      "bytes": 563442,
       "role": "runtime_candidate"
     },
     {
@@ -106,8 +106,8 @@
     },
     {
       "name": "question-bank.json",
-      "sha256": "0dc36c7fdd6cd2c37d2b5ac45cd90a5201249c2a9fec169780f40d9ae9917bd4",
-      "bytes": 945475,
+      "sha256": "75857eb06d8d2dae3e6522bc385874b73b4a1e86d595c71efa7605a4f4c709af",
+      "bytes": 951646,
       "role": "runtime_candidate"
     },
     {
@@ -160,16 +160,16 @@
     },
     {
       "name": "voice-question-blocks.json",
-      "sha256": "29a129ac729380644d2c20f48cc6f54819fb70d17a92eb0fc0151c19f31995ba",
-      "bytes": 141360,
+      "sha256": "370d4c2e78b721ce7ef1f0089f45f0da4e78afe76ad8a922e6638b5fb6ae8db7",
+      "bytes": 141633,
       "role": "runtime_candidate"
     }
   ],
   "counts": {
     "situations": 159,
     "domains": 17,
-    "facts": 395,
-    "questions": 446,
+    "facts": 396,
+    "questions": 447,
     "answer_sets": 159,
     "services": 76,
     "normalized_tariffs": 184,
