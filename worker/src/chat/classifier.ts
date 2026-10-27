@@ -45,9 +45,9 @@ async function readBody(response: Response, signal: AbortSignal): Promise<unknow
 }
 
 /** One metered DeepSeek completion with a JSON object reply; the caller interprets the exchange.
- * reasoning switches thinking on at that effort (temperature is then ignored by the provider) and allows a longer wait. */
+ * reasoning switches thinking on at that effort (temperature is then ignored by the provider) and allows a longer wait and reply (the report writer's ten sections). */
 export async function requestDeepseek(messages: { role: 'system' | 'user'; content: string }[], runtime: ClassifierRuntime, temperature = 0, model: DeepseekModel = 'deepseek-flash', reasoning?: 'low' | 'high' | 'max'): Promise<ProviderExchange> {
-  if (!Number.isSafeInteger(runtime.max_tokens) || runtime.max_tokens < 1 || runtime.max_tokens > 16384 || !Number.isFinite(runtime.timeout_ms) || runtime.timeout_ms < 1 || runtime.timeout_ms > (reasoning ? 300000 : 60000)) throw new Error('Invalid classifier limits');
+  if (!Number.isSafeInteger(runtime.max_tokens) || runtime.max_tokens < 1 || runtime.max_tokens > (reasoning ? 32768 : 16384) || !Number.isFinite(runtime.timeout_ms) || runtime.timeout_ms < 1 || runtime.timeout_ms > (reasoning ? 420000 : 60000)) throw new Error('Invalid classifier limits');
   const body = JSON.stringify(reasoning
     ? { model, thinking: { type: 'enabled' }, reasoning_effort: reasoning, response_format: { type: 'json_object' }, stream: false, max_tokens: runtime.max_tokens, messages }
     : { model, thinking: { type: 'disabled' }, response_format: { type: 'json_object' }, stream: false, temperature, max_tokens: runtime.max_tokens, messages });

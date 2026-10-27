@@ -90,7 +90,7 @@ export function validateAuditResult(value: unknown, lib: AuditLibrary = library,
     if (!['problem', 'hypothesis', 'verification', 'opportunity'].includes(String(item.kind)) || !['supported', 'hypothesis', 'insufficient'].includes(String(item.evidence_status))) fail('situation enum');
     strings(item.evidence_answer_ids, 'situation evidence'); if (evidenceIds && item.evidence_answer_ids.some(id => !evidenceIds.has(id))) fail('situation evidence is not in snapshot');
     strings(item.limitations, 'situation limitations'); record(item.significance, 'significance'); fields(item.significance, ['level', 'reason']);
-    if (!['high', 'medium', 'low', 'unknown'].includes(String(item.significance.level))) fail('significance level'); text(item.significance.reason, 'significance reason');
+    if (!['critical', 'high', 'medium', 'low', 'unknown'].includes(String(item.significance.level))) fail('significance level'); text(item.significance.reason, 'significance reason');
   }
   list(value.actions, 'result.actions');
   const actionIds = new Set<string>(), edges = new Map<string, string[]>();

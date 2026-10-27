@@ -60,6 +60,11 @@ test('a confirmed other cause opens its topic, enters the report and is solved f
   assert.deepEqual(orderPairs(['ads_cost', 'crm_response'], library), [['crm_response', 'ads_cost']]);
   const html = buildReportContent(result, snapshot, library).html;
   assert.match(html, /Эту ситуацию нашли, проверяя другую возможную причину проблемы «Стоимость подходящего обращения превышает согласованный ориентир»; её стоит решить раньше\./);
+  // With the same level, the other cause comes before the complaint: in the cards and in the prioritisation.
+  const crm = library.solutions.find(block => block.id === 'crm_response')!.pdf.heading as string;
+  assert.match(html, new RegExp(`Проблема №1\\. ${crm}`));
+  const scores = html.slice(html.indexOf('<h1>Приоритизация</h1>'));
+  assert.ok(scores.indexOf(crm) < scores.indexOf('Стоимость подходящего обращения'));
   // The visitor said request handling is not their topic: that cause is skipped and the next one is checked.
   const closed = advance([...adsCost(), answer('crm.applicable', false)]);
   assert.equal(nextQuestion(closed, now, library)?.id, 'ux_contact_screen');
@@ -109,7 +114,7 @@ test('a cause outside digital services is named once in the goal section; a free
   assert.deepEqual(result.solutions.map(solution => solution.id), ['seo_inhouse']);
   const html = buildReportContent(result, snapshot, library).html;
   assert.match(html, /Вы также назвали причину, которая лежит вне маркетинга и цифровых систем: не хватает производственных мощностей\. Её решение не входит в этот аудит/);
-  assert.match(html, /<p class="tariff-price">бесплатно<\/p>/);
+  assert.match(html, /<td><strong>бесплатно<\/strong>/);
   assert.equal(result.solutions.some(solution => solution.id.includes('external')), false);
 });
 

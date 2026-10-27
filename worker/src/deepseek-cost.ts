@@ -21,7 +21,7 @@ function cost(model: DeepseekModel, miss: number, hit: number, output: number): 
 }
 export function reserveDeepseekMicros(input: ExternalRequest): number {
   if (input.provider !== 'deepseek' || !priced(input.model) || !integer(input.input_utf8_bytes) || input.input_utf8_bytes > 262144 ||
-    !integer(input.max_tokens) || input.max_tokens < 1 || input.max_tokens > 16384) throw new Error('Unsupported DeepSeek billing request');
+    !integer(input.max_tokens) || input.max_tokens < 1 || input.max_tokens > 32768) throw new Error('Unsupported DeepSeek billing request');
   // Text bytes upper-bound tokens; 256 covers framing of the two fixed text messages.
   return cost(input.model, input.input_utf8_bytes + 256, 0, input.max_tokens);
 }

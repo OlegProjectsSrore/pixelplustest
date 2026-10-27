@@ -285,7 +285,7 @@ test('approved rules separate sufficiency from significance and open repeated wo
   let result = analyzeAudit(snapshot(answers), lib);
   assert.equal(result.situations[0].evidence_status, 'supported');
   // The approved code priority: no consequences and no named topic — the usual level with the confirmed-problem reason.
-  assert.deepEqual(result.situations[0].significance, { level: 'low', reason: 'Обычный: проблема подтверждена Вашими ответами.' });
+  assert.deepEqual(result.situations[0].significance, { level: 'low', reason: 'Низкий: проблема подтверждена Вашими ответами.' });
   // No history yet: the «unknown» path restores it first; the history stays among the gaps.
   assert.deepEqual(result.solutions[0].prior_attempts, { result: 'unknown', intro: 'Перед новыми работами восстановим, что уже делалось по этой теме.' });
   assert.deepEqual(result.actions.slice(0, 2).map(action => [action.text, action.after]), [

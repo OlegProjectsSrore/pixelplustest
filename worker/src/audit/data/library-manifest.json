@@ -118,8 +118,8 @@
     },
     {
       "name": "report-template.json",
-      "sha256": "9b82572afa5d043a241a26119cc81a2ec8eab25b98f6321d648c7b310c551dcc",
-      "bytes": 8552,
+      "sha256": "4418c93ff331d4d125bcf5c8146e899384da4d9170cbabe1e7e6c132712a1bbb",
+      "bytes": 11545,
       "role": "runtime_candidate"
     },
     {

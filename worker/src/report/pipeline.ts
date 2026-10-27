@@ -33,8 +33,8 @@ export interface PipelineDependencies {
 // A failed information check is retried for about half an hour; then the code minimum decides.
 const REVIEW_ATTEMPTS = 10;
 const REVIEW_RETRY_MS = 3 * 60_000;
-// The writer thinks for up to a few minutes: its step holds a longer lease and is retried twice before the template texts.
-const WRITER_LEASE_MS = 5 * 60_000;
+// The writer thinks for up to seven minutes over the report kit's ten sections: its step holds a longer lease and is retried twice before the template texts.
+const WRITER_LEASE_MS = 8 * 60_000;
 const WRITER_ATTEMPTS = 3;
 const WRITER_RETRY_MS = 2 * 60_000;
 const LEASE_MS = 60_000;

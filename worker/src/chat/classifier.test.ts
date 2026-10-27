@@ -265,4 +265,8 @@ test('reasoning switches thinking on at the given effort, drops the temperature 
   await requestDeepseek([{ role: 'user', content: 'x' }], runtime(fetcher), 0.3);
   assert.deepEqual([bodies[1]!.thinking, 'reasoning_effort' in bodies[1]!, bodies[1]!.temperature], [{ type: 'disabled' }, false, 0.3]);
   await assert.rejects(() => requestDeepseek([{ role: 'user', content: 'x' }], { ...runtime(fetcher), timeout_ms: 180_000 }), /Invalid classifier limits/);
+  // The report writer's longer reply and wait are allowed only with reasoning, and only up to their caps.
+  await requestDeepseek([{ role: 'user', content: 'x' }], { ...runtime(fetcher), max_tokens: 32_000, timeout_ms: 420_000 }, 0, 'deepseek-v4-pro', 'high');
+  await assert.rejects(() => requestDeepseek([{ role: 'user', content: 'x' }], { ...runtime(fetcher), max_tokens: 32_000 }), /Invalid classifier limits/);
+  await assert.rejects(() => requestDeepseek([{ role: 'user', content: 'x' }], { ...runtime(fetcher), max_tokens: 32_000, timeout_ms: 420_001 }, 0, 'deepseek-v4-pro', 'high'), /Invalid classifier limits/);
 });

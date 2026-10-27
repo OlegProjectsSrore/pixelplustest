@@ -2,11 +2,11 @@ import type { AuditFact } from './contracts.ts';
 import type { AuditLibrary } from './library.ts';
 import { isRecord } from './rules.ts';
 
-/** The owner-approved priority (MoSCoW form): high, medium or low, from the visitor's answers only. */
-export type PriorityLevel = 'high' | 'medium' | 'low';
+/** The owner-approved priority of the report kit: critical, high, medium or low, from the visitor's answers only. */
+export type PriorityLevel = 'critical' | 'high' | 'medium' | 'low';
 export type Consequence = 'stops_operation' | 'loss_or_delay' | 'limited' | 'no_effect';
-export const PRIORITY_RANK: Record<PriorityLevel, number> = { high: 3, medium: 2, low: 1 };
-const LEVELS: PriorityLevel[] = ['low', 'medium', 'high'];
+export const PRIORITY_RANK: Record<PriorityLevel, number> = { critical: 4, high: 3, medium: 2, low: 1 };
+const LEVELS: PriorityLevel[] = ['low', 'medium', 'high', 'critical'];
 /** Relations where the first problem has to be solved before the second: the first is the bottleneck. */
 export const ORDER_RELATIONS = ['measurement_before_optimization', 'configure_then_validate', 'permissions_before_contact', 'access_before_actions', 'validation_before_rollout', 'restore_before_change', 'validate_task_before_build', 'goal_before_production'];
 
@@ -18,6 +18,7 @@ export interface ProblemFacts {
   named: number;
   /** The library marks the problem as already happening rather than a gap, hypothesis or opportunity. */
   reported: boolean;
+  type: 'data_gap' | 'hypothesis' | 'opportunity' | 'reported_issue';
   libraryIndex: number;
 }
 const known = (fact: AuditFact | undefined) => fact?.state === 'known' && fact.confirmation === 'explicit';
@@ -32,7 +33,7 @@ export function problemFacts(ids: readonly string[], facts: Record<string, Audit
     const level = known(impact) && isRecord(impact.value) ? impact.value.level : undefined;
     return { id, title: String(block.pdf.heading || block.title), domain: block.domain, domainTitle: domain?.title ?? block.domain,
       consequence: ['stops_operation', 'loss_or_delay', 'limited', 'no_effect'].includes(String(level)) ? level as Consequence : null,
-      named: named.findIndex(value => value === block.domain || value === domain?.title), reported: block.type === 'reported_issue', libraryIndex: index };
+      named: named.findIndex(value => value === block.domain || value === domain?.title), reported: block.type === 'reported_issue', type: block.type, libraryIndex: index };
   });
 }
 
@@ -48,9 +49,9 @@ export function orderPairs(ids: readonly string[], lib: AuditLibrary): [string, 
   return pairs.filter(([before, after], index) => pairs.findIndex(([a, b]) => a === before && b === after) === index);
 }
 
-/** High needs named consequences that stop work or bring losses or delays; the library forbids high when they are unknown. */
+/** Critical and high need named consequences that stop work or bring losses or delays; the library forbids them when the consequences are unknown. */
 export function levelCap(problem: ProblemFacts): PriorityLevel {
-  return problem.consequence === 'stops_operation' || problem.consequence === 'loss_or_delay' ? 'high' : 'medium';
+  return problem.consequence === 'stops_operation' || problem.consequence === 'loss_or_delay' ? 'critical' : 'medium';
 }
 
 /** The approved code rule; its reasons are the approved phrases. Used on its own when the report writer fails. */
@@ -58,7 +59,7 @@ export function codePriorities(problems: readonly ProblemFacts[], pairs: readonl
   const reasons = lib.report.priority.reasons, result = new Map<string, { level: PriorityLevel; reasons: string[] }>();
   for (const problem of problems) {
     const named = problem.named >= 0;
-    const level: PriorityLevel = problem.consequence === 'stops_operation' || (problem.consequence === 'loss_or_delay' && named) ? 'high'
+    const level: PriorityLevel = problem.consequence === 'stops_operation' ? 'critical' : problem.consequence === 'loss_or_delay' && named ? 'high'
       : problem.consequence === 'loss_or_delay' || (named && problem.consequence !== 'no_effect') ? 'medium' : 'low';
     result.set(problem.id, { level, reasons: [...(problem.consequence ? [reasons[problem.consequence]] : []), ...(named ? [reasons.named] : [])] });
   }
@@ -83,9 +84,12 @@ export function formatPriority(level: PriorityLevel, reasons: readonly string[],
   return `${lib.report.priority.levels[level]}: ${reasons.join('; ')}.`;
 }
 
-/** Levels from the report writer must keep the approved limits: high only with severe named consequences, a bottleneck not below its dependent. */
+/** Levels from the report writer must keep the approved limits: critical and high only with severe named consequences, critical only when work stops
+ * or for the bottleneck of a critical problem, a bottleneck not below its dependent. */
 export function levelsAllowed(problems: readonly ProblemFacts[], pairs: readonly [string, string][], levels: ReadonlyMap<string, PriorityLevel>): boolean {
   if (problems.some(problem => !levels.has(problem.id) || PRIORITY_RANK[levels.get(problem.id)!] > PRIORITY_RANK[levelCap(problem)])) return false;
+  if (problems.some(problem => levels.get(problem.id) === 'critical' && problem.consequence !== 'stops_operation' &&
+    !pairs.some(([before, after]) => before === problem.id && levels.get(after) === 'critical'))) return false;
   return pairs.every(([before, after]) => PRIORITY_RANK[levels.get(before)!] >= Math.min(PRIORITY_RANK[levels.get(after)!], PRIORITY_RANK[levelCap(problems.find(item => item.id === before)!)]));
 }
 
@@ -107,3 +111,27 @@ export function executionOrder(order: readonly string[], pairs: readonly [string
   }
   return result;
 }
+
+/** The report kit's scores, all from the visitor's answers (see the comments of the approved LLM sample). */
+export function influenceScore(problem: ProblemFacts): number {
+  return ({ stops_operation: 10, loss_or_delay: 8, limited: 5, no_effect: 2 } as const)[problem.consequence ?? 'limited'];
+}
+export function urgencyScore(problem: ProblemFacts, pairs: readonly [string, string][]): number {
+  const scores = [problem.consequence === 'no_effect' ? 3 : 5];
+  if (problem.consequence === 'stops_operation') scores.push(10);
+  if (problem.named === 0) scores.push(9); else if (problem.named > 0) scores.push(8);
+  if (pairs.some(([before]) => before === problem.id)) scores.push(8);
+  if (problem.consequence === 'loss_or_delay') scores.push(7);
+  return Math.max(...scores);
+}
+export function complexityScore(steps: number): number { return Math.min(10, 2 + steps); }
+export const CONFIDENCE: Record<ProblemFacts['type'], { percent: number; status: string }> = {
+  reported_issue: { percent: 90, status: 'проблема подтверждена Вашими ответами; причина — гипотеза' },
+  data_gap: { percent: 85, status: 'подтверждено Вашими ответами' },
+  hypothesis: { percent: 70, status: 'сильный сигнал; причина — гипотеза' },
+  opportunity: { percent: 60, status: 'возможность роста' },
+};
+/** The business map: a direction's score and potential follow its highest problem level; a direction without problems the visitor discussed scores 8. */
+export const MAP_SCORE: Record<PriorityLevel | 'none', { score: number; potential: string }> = {
+  critical: { score: 2, potential: 'очень высокий' }, high: { score: 3, potential: 'высокий' }, medium: { score: 5, potential: 'средний' }, low: { score: 7, potential: 'низкий' }, none: { score: 8, potential: 'низкий' },
+};

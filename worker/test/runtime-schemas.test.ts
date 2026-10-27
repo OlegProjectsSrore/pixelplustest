@@ -109,7 +109,7 @@ test('result enum and collection element types are validated below the root', ()
   const changes: ((value: AuditResult) => void)[] = [
     value => { Object.assign(value.situations[0], { kind: 'diagnosis' }); },
     value => { Object.assign(value.situations[0], { evidence_status: 'proven' }); },
-    value => { Object.assign(value.situations[0].significance, { level: 'critical' }); },
+    value => { Object.assign(value.situations[0].significance, { level: 'severe' }); },
     value => { Object.assign(value.actions[0], { after: [3] }); },
     value => { Object.assign(value.tariffs[0], { source_urls: [false] }); },
     value => { Object.assign(value.tariffs[0], { details: [] }); },

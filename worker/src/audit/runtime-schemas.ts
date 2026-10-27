@@ -118,7 +118,7 @@ export const runtimeResultSchema = {
       significance: ref('Significance'), limitations: strings(),
     }),
     Significance: closed<AuditSituation['significance']>({
-      level: { type: 'string', enum: ['high', 'medium', 'low', 'unknown'] }, reason: text,
+      level: { type: 'string', enum: ['critical', 'high', 'medium', 'low', 'unknown'] }, reason: text,
     }),
     Solution: closed<AuditSolution>({
       id: text, title: text, text, service_ids: strings(), action_ids: strings(), limitations: strings(),

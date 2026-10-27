@@ -334,8 +334,13 @@ test("the report writer runs only in a scheduled run, under a longer lease; its 
   try {
     const inputs: unknown[] = []; let calls = 0;
     const leases: number[] = [];
-    f.dependencies.writer = async (_session, input) => { calls++; inputs.push(input); leases.push((f.db.sqlite.prepare("SELECT lease_expires_at FROM audit_jobs").get() as { lease_expires_at: number }).lease_expires_at); return { summary: "Главное — связать оплаты с источниками заявок, начать стоит с этого.", plan_intro: "Сначала связываем источники и оплаты.",
-      problems: input.problems.map(problem => ({ id: problem.id, situation: "Продажи из CRM не связаны с рекламными источниками, поэтому отдачу каналов не видно.", priority: "low" as const, why: "Проблема подтверждена Вашими ответами." })) }; };
+    f.dependencies.writer = async (_session, input) => { calls++; inputs.push(input); leases.push((f.db.sqlite.prepare("SELECT lease_expires_at FROM audit_jobs").get() as { lease_expires_at: number }).lease_expires_at); const text = "Продажи из CRM не связаны с рекламными источниками, поэтому отдачу каналов не видно.";
+      return { intro: "Главное — связать оплаты с источниками заявок, начать стоит с этого.", map_conclusion: text, principle: text,
+        problems: input.problems.map(problem => ({ id: problem.id, priority: "low" as const, why: "Проблема подтверждена Вашими ответами.", impact: text, action: text, found: text, why_problem: text, cause: text, consequence: text, expected: text, measure: text })),
+        map: input.map_directions.map(row => ({ id: row.id, conclusion: text })), not_problems: input.not_problems.map(row => ({ id: row.id, conclusion: text })),
+        top_tasks: [{ title: "Связать оплаты", text }], stages: input.plan_stages.map(stage => ({ stage: stage.stage, title: "сначала измерение" })),
+        effect: { rows: [], measure: ["доля оплат с источником"] }, solutions: input.solutions.map(row => ({ id: row.id, task: "Понять отдачу каналов", why: text })),
+        final: { constraint: text, first: text, why: text, next: text } }; };
     await runOneJob(f.dependencies); await runOneJob(f.dependencies);
     // Enough information: the result is kept and the writer's step waits for a scheduled run.
     const analysed = (await f.store.getReport("report"))!;
@@ -346,7 +351,7 @@ test("the report writer runs only in a scheduled run, under a longer lease; its 
     await runOneJob(f.dependencies);
     const lease = f.db.sqlite.prepare("SELECT stage FROM audit_jobs").get() as { stage: string };
     assert.equal(lease.stage, "render"); assert.equal(calls, 1);
-    assert.deepEqual(leases, [start + 5 * 60_000], "the writer holds a five-minute lease");
+    assert.deepEqual(leases, [start + 8 * 60_000], "the writer holds an eight-minute lease");
     const composed = (await f.store.getReport("report"))!;
     assert.ok(JSON.stringify(composed.content).includes("Главное — связать оплаты с источниками заявок"));
     assert.equal((composed.review as Record<string, unknown>).writer, "deepseek-v4-pro");

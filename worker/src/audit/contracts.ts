@@ -101,7 +101,7 @@ export interface AuditSituation {
   kind: 'problem' | 'hypothesis' | 'verification' | 'opportunity';
   evidence_status: 'supported' | 'hypothesis' | 'insufficient';
   evidence_answer_ids: string[];
-  significance: { level: 'high' | 'medium' | 'low' | 'unknown'; reason: string };
+  significance: { level: 'critical' | 'high' | 'medium' | 'low' | 'unknown'; reason: string };
   limitations: string[];
 }
 /** What the visitor's earlier work on a topic came to; each value has its own approved opening of the recommendation. */

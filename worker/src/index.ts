@@ -38,7 +38,7 @@ async function pipeline(core: CoreServices, adapters: ChannelAdapters, longTasks
     // DeepSeek V4 Pro checks the information before the PDF; each try is metered like a chat call.
     review: env.DEEPSEEK_API_KEY ? async (session, input, attempt) => reviewReport(input, { ...await createChatRuntime({ core, env } as AdapterContext, session, `report-review:${session.reportId}`, attempt), max_tokens: 800, timeout_ms: 35_000 }) : undefined,
     // DeepSeek V4 Pro with reasoning high writes the report texts; it thinks for up to a few minutes, so only scheduled runs call it.
-    writer: env.DEEPSEEK_API_KEY ? async (session, input, attempt) => writeReport(input, { ...await createChatRuntime({ core, env } as AdapterContext, session, `report-writer:${session.reportId}`, attempt), max_tokens: 12_000, timeout_ms: 180_000 }) : undefined,
+    writer: env.DEEPSEEK_API_KEY ? async (session, input, attempt) => writeReport(input, { ...await createChatRuntime({ core, env } as AdapterContext, session, `report-writer:${session.reportId}`, attempt), max_tokens: 32_000, timeout_ms: 420_000 }) : undefined,
     longTasks });
 }
 export function createWorker(adapters: ChannelAdapters = channelAdapters, options: { now?: () => number; fetcher?: typeof fetch } = {}) {

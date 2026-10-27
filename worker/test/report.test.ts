@@ -4,6 +4,7 @@ import { renderPdf, sha256, randomReadToken, ReportFailure } from "../src/report
 import { buildMime, SmtpTransport } from "../src/report/smtp.ts";
 import type { SmtpSocket } from "../src/report/smtp.ts";
 import { buildReportContent } from "../src/report/content.ts";
+import { buildWriterInput } from "../src/report/report-writer.ts";
 import { getReportResponse } from "../src/report/download.ts";
 import type { ReportRecord } from "../src/storage/types.ts";
 import { initialAuditState } from "../src/audit/contracts.ts";
@@ -54,15 +55,16 @@ test("PDF content shows evidence-matched tariff alternatives with prices, scope 
       answer('a4', 'analytics.history', { attempts_status: 'not_tried', attempts: [] })],
     state: initialAuditState(library.version, 'chat', date), limitations: [] };
   const html = buildReportContent(analyzeAudit(snapshot, library), snapshot, library).html;
-  assert.ok(html.includes('<h2>Стоимость</h2>'));
-  assert.match(html, /Для проблемы «/);
-  assert.match(html, /Это не индивидуальная смета: пакет, объём и итоговая стоимость определяются при подготовке коммерческого предложения/);
+  assert.ok(html.includes('<h1>Рекомендуемые решения Pixel Plus</h1>'));
+  assert.match(html, /<th>Задача бизнеса<\/th><th>Рекомендуемое решение<\/th><th>Ориентировочная стоимость<\/th><th>Почему<\/th>/);
+  assert.match(html, /Ориентиры основаны на опубликованных тарифах Pixel Plus; фактическая стоимость зависит от состава работ/);
   assert.match(html, /Арифметика — разовая настройка/);
   assert.match(html, /14[\u00a0\u202f ]000 ₽/);
   assert.match(html, /от 60[\u00a0\u202f ]000 ₽/);
-  assert.match(html, /Источник проверен: 2026-10-22/);
-  assert.match(html, /Что входит/);
-  assert.ok(html.indexOf('class="report-cover"') < html.indexOf('<h2>Стоимость</h2>'));
+  assert.match(html, /\(проверено 22\.10\.2026\)/);
+  // The conditions of each tariff stay under its price.
+  assert.match(html, /<span class="muted">Согласовать системы и список целей<\/span>/);
+  assert.ok(html.indexOf('class="report-cover"') < html.indexOf('<h1>Рекомендуемые решения Pixel Plus</h1>'));
   // A range is shown as a range.
   assert.match(html, /3[   ]000 ₽–9[   ]500 ₽/);
   // VAT is mentioned only where the page states it; an unstated VAT is not a line in the report.
@@ -78,11 +80,12 @@ test("PDF opens repeated work with the approved path and tells the earlier work 
     answers: [answer('a1', 'analytics.applicable', true), answer('a2', 'analytics_sales.signal', 'target'),
       answer('a3', 'analytics_sales.details', { description: { state: 'known', value: 'Продажи не связаны с источниками' } }), answer('a4', 'analytics.history', history)],
     state: initialAuditState(library.version, 'chat', date), limitations: [] };
-  const html = buildReportContent(analyzeAudit(snapshot, library), snapshot, library).html;
+  const result = analyzeAudit(snapshot, library), html = buildReportContent(result, snapshot, library).html;
   const path = library.priorAttemptPaths.items.find(item => item.id === 'no_result')!;
   assert.ok(html.includes(`<p>${path.intro}</p>`));
   assert.ok(html.indexOf(path.steps[0]) < html.indexOf(library.solutions.find(block => block.id === 'analytics_sales')!.solution.steps[0].text));
-  assert.match(html, /что делали — Подключали сквозную аналитику; когда и как долго — Весной, три месяца</);
+  // The earlier work in the visitor's words reaches the report writer.
+  assert.equal(buildWriterInput(snapshot, result, library).problems[0]!.earlier_work, 'что делали — Подключали сквозную аналитику; когда и как долго — Весной, три месяца');
   assert.doesNotMatch(html, /не измерялось/);
   assert.doesNotMatch(html, /attempt_id|attempts_status|attempt-1/);
 });

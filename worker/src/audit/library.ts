@@ -78,8 +78,10 @@ export interface ReportTemplate {
   sections: { id: string; title: string; content: string }[];
   texts: { next_step: string; contact_url: string; no_website: string; summary_fallback: string; plan_fallback: string;
     /** {{external_cause}}: a cause outside digital services the visitor named; {{complaint}}: the problem whose other possible cause was checked. */
-    external_cause?: string; cross_found?: string };
-  priority: { levels: Record<'high' | 'medium' | 'low', string>; reasons: Record<'stops_operation' | 'loss_or_delay' | 'limited' | 'no_effect' | 'named' | 'bottleneck' | 'confirmed', string> };
+    external_cause?: string; cross_found?: string;
+    /** The report kit's fixed texts; {{count}}: the number of directions, with its noun. */
+    checked_intro: string; map_intro: string; priorities_intro: string; effect_intro: string; effect_measure_intro: string; solutions_note: string; report_logic: string };
+  priority: { levels: Record<'critical' | 'high' | 'medium' | 'low', string>; reasons: Record<'stops_operation' | 'loss_or_delay' | 'limited' | 'no_effect' | 'named' | 'bottleneck' | 'confirmed', string> };
 }
 export interface JokeCategory { id: string; selection_source: string; do_not_use_when: string; jokes: { id: string; text: string }[] }
 export interface JokeLibrary {
@@ -103,7 +105,7 @@ export interface AuditLibrary {
 
 /** Version is intentionally pinned; a changed content release must receive a new version. */
 export const library: AuditLibrary = {
-  version: '0.2.0', rulesVersion: '1.0.0', tariffVersion: tariffsData.version, templateVersion: '1.3.0',
+  version: '0.2.0', rulesVersion: '1.0.0', tariffVersion: tariffsData.version, templateVersion: '2.0.0',
   status: solutionsData.status,
   facts: (factsData.items as FactDefinition[]).map(fact => ({ ...fact, runtime_schema: runtimeSchemaForFact(fact, solutionsData.items.map(block => block.id)) })), questions: questionsData.items as Question[],
   solutions: solutionsData.items as unknown as Solution[], tariffs: tariffsData.items as unknown as Tariff[],
@@ -270,15 +272,16 @@ export function validateLibrary(lib: AuditLibrary = library, options: { ruleChec
   const required = lib.scenario.required_for_report;
   if (required && (!Number.isInteger(required.max_reasks) || required.max_reasks < 0 || required.max_reasks > 5 || !isRecord(required.reasons) || Object.values(required.reasons).some(text => typeof text !== 'string' || !text.trim()))) errors.push('Invalid required-for-report rules');
   for (const question of lib.questions) if (question.required_for_report !== undefined && !(required && Object.hasOwn(required.reasons, question.required_for_report))) errors.push(`${question.id}: unknown required-for-report reason`);
-  // The approved PDF: eleven sections in order and every fixed text the renderer and the code priority rule use.
+  // The approved report kit: the cover and ten sections in order and every fixed text the renderer and the code priority rule use.
   const report = lib.report;
-  const sectionIds = ['cover', 'summary', 'company', 'goal', 'problems', 'priorities', 'history', 'recommendations', 'plan', 'cost', 'next_step'];
+  const sectionIds = ['cover', 'growth', 'company', 'checked', 'map', 'problems', 'priorities', 'plan', 'effect', 'solutions', 'final'];
+  const textKeys = ['next_step', 'contact_url', 'no_website', 'summary_fallback', 'plan_fallback', 'checked_intro', 'map_intro', 'priorities_intro', 'effect_intro', 'effect_measure_intro', 'solutions_note', 'report_logic'];
   if (!report || !isApproved(report) || report.sections?.map(section => section.id).join() !== sectionIds.join() || report.sections.some(section => !section.title?.trim()) ||
       Object.values(report.texts ?? {}).some(text => typeof text !== 'string' || !text.trim()) ||
-      !['next_step', 'contact_url', 'no_website', 'summary_fallback', 'plan_fallback'].every(key => Object.hasOwn(report.texts ?? {}, key)) ||
-      Object.keys(report.texts ?? {}).some(key => !['next_step', 'contact_url', 'no_website', 'summary_fallback', 'plan_fallback', 'external_cause', 'cross_found'].includes(key)) ||
+      !textKeys.every(key => Object.hasOwn(report.texts ?? {}, key)) || !report.texts.checked_intro.includes('{{count}}') ||
+      Object.keys(report.texts ?? {}).some(key => ![...textKeys, 'external_cause', 'cross_found'].includes(key)) ||
       (report.texts?.external_cause !== undefined && !report.texts.external_cause.includes('{{external_cause}}')) || (report.texts?.cross_found !== undefined && !report.texts.cross_found.includes('{{complaint}}')) ||
-      ['high', 'medium', 'low'].some(level => !report.priority?.levels?.[level as 'high']?.trim()) ||
+      ['critical', 'high', 'medium', 'low'].some(level => !report.priority?.levels?.[level as 'high']?.trim()) ||
       ['stops_operation', 'loss_or_delay', 'limited', 'no_effect', 'named', 'bottleneck', 'confirmed'].some(key => !report.priority?.reasons?.[key as 'named']?.trim()) ||
       !report.priority.reasons.bottleneck.includes('{title}')) errors.push('Invalid report template');
   // One approved path per prior-attempt result, and every history fact offers exactly these results.
