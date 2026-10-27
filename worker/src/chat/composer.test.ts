@@ -62,6 +62,17 @@ test('the reaction is to the answer just given: the question being answered is s
     { reply: 'Рады знакомству, Василий.', question_text: 'Какая у Вас должность?' });
 });
 
+test('a question about the current question is explained: the flag is sent, an explanation is required and never dropped as monotonous', () => {
+  const period = { id: 'context_goal_period', text: 'К какой дате Вам нужен результат, например к концу месяца?' };
+  const asked = input({ visitor_text: 'Какой именно результат ?', answered_question: period, explain: true, question: { text: 'К какому сроку нужен этот результат?', options: [] },
+    previous_replies: ['Речь о сроке.'] });
+  assert.equal(JSON.parse(buildComposerPrompt(asked)[1].content).explain_question, true);
+  assert.equal(JSON.parse(buildComposerPrompt(input())[1].content).explain_question, undefined);
+  assert.equal(checkComposed(out('', 'К какому сроку нужны сухие дрова?'), asked), null, 'an explanation is required');
+  assert.deepEqual(checkComposed(out('Речь о результате, который Вы назвали главным, — сухие дрова.', 'К какому сроку они нужны?'), asked),
+    { reply: 'Речь о результате, который Вы назвали главным, — сухие дрова.', question_text: 'К какому сроку они нужны?' });
+});
+
 function runtime(reply: (body: Record<string, unknown>) => ProviderExchange): ClassifierRuntime & { bodies: Record<string, unknown>[] } {
   const bodies: Record<string, unknown>[] = [];
   return { api_key: 'key', max_tokens: 600, timeout_ms: 5000, bodies,

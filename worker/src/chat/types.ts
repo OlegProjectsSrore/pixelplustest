@@ -34,6 +34,8 @@ export interface ClassifierContext {
   library_version: string;
   mode: 'chat' | 'voice_recovery';
   current_question_id: string | null;
+  /** The current question as the visitor sees it (the chat's own wording); absent when none is on screen. */
+  current_question_text?: string;
   questions: readonly Pick<Question, 'id' | 'chat' | 'voice' | 'fact_ids'>[];
   facts: readonly ClassifierFact[];
   allowed_answers: readonly AllowedAnswer[];

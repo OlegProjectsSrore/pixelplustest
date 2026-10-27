@@ -343,6 +343,48 @@ test('the composer sees the dialog as the visitor saw it and the question being 
   } finally { f.db.close(); }
 });
 
+const explained = { reply: 'Речь о Вашей должности в компании.', question: 'Кем Вы работаете в компании, например директором или менеджером?' };
+
+test('a question about the current question is explained from the real dialog and the survey goes on', async () => {
+  const seen: Record<string, Json>[] = [];
+  const classified: ClassifierContext[] = [];
+  const f = await fixture((context, call) => {
+    if ('next_question' in context) { seen.push(context as unknown as Record<string, Json>); return call === 2 ? worded : explained; }
+    classified.push(context);
+    return call === 1 ? reportFromText(context) : { ...intent('clarify'), clarification_question_id: 'context_position' };
+  });
+  f.env.CHAT_COMPOSER_ENABLED = 'true';
+  try {
+    await f.handler(f.request, f.context(f.body()));
+    const response = await f.handler(f.request, f.context(f.body('turn-2', 1, { kind: 'text', text: 'В смысле, какая должность?' }, 'context_position'))) as { operation: Record<string, Json> };
+    // The classifier saw the chat as the visitor saw it and the question as worded on screen.
+    assert.deepEqual(classified[1].history.map(item => [item.role, item.text]), [['user', 'Олег'], ['assistant', worded.reply], ['assistant', worded.question]]);
+    assert.equal(classified[1].current_question_text, worded.question);
+    assert.equal(seen[1].explain_question, true); assert.equal(seen[1].answered_question, worded.question);
+    assert.deepEqual([response.operation.text, response.operation.question_id, response.operation.question_text], [explained.reply, 'context_position', explained.question]);
+    const session = await f.core.store.requireSession(f.session.id);
+    assert.equal(session.state.mode, 'diagnostic', 'the survey is not paused'); assert.equal(session.state.current_question_id, 'context_position');
+    assert.equal((await f.core.store.listAnswers(f.session.id)).length, 1, 'nothing new is saved');
+  } finally { f.db.close(); }
+});
+
+test('during the survey a question the materials cannot answer is explained as a question about the survey, not paused', async () => {
+  const seen: Record<string, Json>[] = [];
+  const f = await fixture((context, call) => {
+    if ('fragments' in context) return { answer: '', sources: [] };
+    if ('next_question' in context) { seen.push(context as unknown as Record<string, Json>); return call === 2 ? worded : explained; }
+    return call === 1 ? reportFromText(context) : intent('question');
+  });
+  enableKnowledge(f); f.env.CHAT_COMPOSER_ENABLED = 'true';
+  try {
+    await f.handler(f.request, f.context(f.body()));
+    const response = await f.handler(f.request, f.context(f.body('turn-2', 1, { kind: 'text', text: 'Какой именно результат ?' }, 'context_position'))) as { operation: Record<string, Json> };
+    assert.equal(seen.at(-1)!.explain_question, true);
+    assert.deepEqual([response.operation.text, response.operation.question_id], [explained.reply, 'context_position']);
+    assert.equal((await f.core.store.requireSession(f.session.id)).state.mode, 'diagnostic');
+  } finally { f.db.close(); }
+});
+
 function enableKnowledge(f: Awaited<ReturnType<typeof fixture>>) {
   f.env.KNOWLEDGE_ANSWERS_ENABLED = 'true';
   f.env.BUDGETS_JSON = JSON.stringify({ ...JSON.parse(f.env.BUDGETS_JSON!), knowledge_searches: 10 });

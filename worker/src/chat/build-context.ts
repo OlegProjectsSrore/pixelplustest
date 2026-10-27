@@ -17,6 +17,11 @@ export interface ChatContextInput {
   faqs?: readonly { id: string; question: string }[];
   clarificationQuestions?: readonly { id: string; text: string }[];
   allowedAttemptIds?: Readonly<Record<string, readonly string[]>>;
+  /** The chat as the visitor saw it: their messages, the chat's reactions and questions. Replaces the event history when given:
+   * in the chat only the visitor's messages are events. */
+  dialog?: readonly { role: string; text: string }[];
+  /** The current question as worded on screen. */
+  currentQuestionText?: string | null;
 }
 const STATES = ['known', 'unknown', 'not_measured', 'not_applicable', 'declined', 'ambiguous', 'other'];
 const record = (v: unknown): v is Record<string, unknown> => v !== null && typeof v === 'object' && !Array.isArray(v);
@@ -147,13 +152,14 @@ export function buildChatContext(input: ChatContextInput): ClassifierContext {
   const sources = sourceEvents.filter(e => e.role === 'user' && ['utterance', 'answer', 'correction'].includes(e.kind) && nonempty(e.text) && (mode === 'chat' ? e.source === 'chat' : ['voice', 'webhook'].includes(e.source)));
   if (sources.length !== sourceEvents.length || new Set(sources.map(e => e.id)).size !== sources.length || sources.some(e => e.text!.length > 10000)) throw new Error('Invalid classifier source events');
   return {
-    library_version: lib.version, mode, current_question_id: currentQuestion?.id ?? null,
+    library_version: lib.version, mode, current_question_id: currentQuestion?.id ?? null, ...(currentQuestion && input.currentQuestionText ? { current_question_text: input.currentQuestionText } : {}),
     questions: questions.map(q => ({ id: q.id, chat: q.chat, voice: q.voice, fact_ids: [...q.fact_ids] })),
     facts, allowed_answers: allowedAnswers,
     accepted_facts: Object.values(state.facts).filter(f => factIds.has(f.fact_id)).map(f => ({ fact_id: f.fact_id, state: f.state, value: f.value, answer_ids: [...f.answer_ids], confirmation: f.confirmation, ...(f.parameters ? { parameters: f.parameters } : {}) })),
     correctable_answers: existingAnswers.filter(a => a.library_version === lib.version && factIds.has(a.fact_id) && !superseded.has(a.id)).map(a => ({ id: a.id, fact_id: a.fact_id, value: a.value, event_ids: [...a.event_ids] })),
     source_events: sources.map(e => ({ id: e.id, role: e.role, text: e.text })),
-    history: events.filter(e => nonempty(e.text) && ['user', 'assistant'].includes(e.role)).slice(-12).map(e => ({ id: e.id, role: e.role, text: e.text })),
+    history: input.dialog ? input.dialog.slice(-12).map((item, index) => ({ id: `dialog:${index + 1}`, role: item.role as AuditEvent['role'], text: item.text }))
+      : events.filter(e => nonempty(e.text) && ['user', 'assistant'].includes(e.role)).slice(-12).map(e => ({ id: e.id, role: e.role, text: e.text })),
     clarification_questions: [...(input.clarificationQuestions ?? [])], faqs: [...(input.faqs ?? [])],
     joke_categories: lib.jokes.categories.map(c => {
       const raw: unknown = c;

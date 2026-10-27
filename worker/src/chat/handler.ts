@@ -30,7 +30,7 @@ export interface ChatHandlerDependencies {
    * It must recheck revision/channel/time after the external request. No partial commits.
    */
   commitTurn(request: Request, context: AdapterContext, session: StoredSession, turn: PreparedChatTurn): Promise<Response | Json>;
-  context?(context: AdapterContext, session: StoredSession, lib: AuditLibrary): Promise<Pick<ChatContextInput, 'allowedQuestionIds' | 'allowedAttemptIds'> & {
+  context?(context: AdapterContext, session: StoredSession, lib: AuditLibrary): Promise<Pick<ChatContextInput, 'allowedQuestionIds' | 'allowedAttemptIds' | 'dialog' | 'currentQuestionText'> & {
     faqs?: { id: string; question: string; answer: string }[];
     clarificationQuestions?: { id: string; text: string }[];
   }>;

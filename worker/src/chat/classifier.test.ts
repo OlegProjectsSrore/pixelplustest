@@ -155,7 +155,11 @@ test('prompt file has only the intents mark; every intent is listed and visitor 
   assert.doesNotMatch(system.content, /\{\{\w+\}\}/);
   assert(system.content.includes(`intent только из списка: ${INTENTS.join(', ')}.`));
   assert.match(system.content, /Схема JSON: \{"intent":"unknown","answers":\[\],"clarification_question_id":null,"faq_id":null,"joke_category_id":null,"humor_preference":null\}/);
-  assert.equal(system.content.split('\n').length, 19);
+  assert.equal(system.content.split('\n').length, 21);
+  // A question about the question on screen is a clarification, not a question about Pixel Plus services.
+  assert.match(system.content, /clarify — посетитель не отвечает на текущий вопрос, а спрашивает о нём самом: .*«Какой именно результат\?»/);
+  assert.match(system.content, /Вопрос о смысле текущего вопроса опроса — clarify, а не question\./);
+  assert.match(system.content, /history — разговор по порядку, как его видит посетитель: его сообщения \(user\), реплики и вопросы помощника \(assistant\)/);
   assert.match(system.content, /Если посетитель называет причиной трудностей качество продукта, производство, закупки, финансы, логистику или кадры, сохрани это как отдельную причину вне цифровых услуг его словами; не создавай из неё проблему опроса\./);
   assert.match(system.content, /передавай result — итог прошлых работ по теме по всем сведениям: accepted_facts, history и текущей реплике\. Выбирай первое подходящее по порядку: ongoing — работа идёт сейчас; no_result — результата не было или его не измеряли, даже если работу потом бросили или остановили из-за денег; partial_or_stopped — результат частичный/);
   assert.match(system.content, /При каждом новом ответе о прошлых работах передавай result заново по всем сведениям\./);

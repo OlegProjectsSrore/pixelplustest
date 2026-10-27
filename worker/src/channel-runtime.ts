@@ -64,6 +64,8 @@ const TURN_BUDGET_MS = 24_000;
 const NOT_FOUND = 'В материалах Pixel Plus точного ответа на этот вопрос нет. Уточнить детали можно у специалистов студии: https://pixelplus.ru/contact/zakaz/';
 // Reworded by DeepSeek; the composer's reply carries no question mark.
 const HELP_NOTICE = 'Подскажите, чем могу помочь.';
+// Shown when the composer cannot word an explanation of the current question; the question itself stays below.
+const EXPLAIN_FALLBACK = 'Ответьте, как понимаете вопрос: подойдёт любой ответ своими словами.';
 // FAQ answers and jokes are approved texts shown verbatim; other notices are reworded by DeepSeek.
 const APPROVED_TEXT_ACTIONS = ['faq', 'off_topic', 'humor_preference', 'role_change'];
 
@@ -95,8 +97,7 @@ function chatDialog(turns: Turn[], lib: AuditLibrary): { role: string; text: str
   }).filter(item => item.text.trim()).map(item => ({ role: item.role, text: item.text.slice(0, 400) })).slice(-12);
 }
 /** The survey question on screen when the visitor wrote: the wording of the latest turn when it asked this question, else the library text. */
-function answeredQuestion(state: AuditState, turns: Turn[], lib: AuditLibrary): { id: string; text: string } | null {
-  const id = state.current_question_id;
+function questionOnScreen(id: string | null | undefined, turns: Turn[], lib: AuditLibrary): { id: string; text: string } | null {
   if (!id) return null;
   const last = turns.at(-1);
   const text = last && resultOf(last).question_id === id ? shownQuestion(last, lib) : lib.questions.find(question => question.id === id)?.chat ?? '';
@@ -105,16 +106,16 @@ function answeredQuestion(state: AuditState, turns: Turn[], lib: AuditLibrary): 
 
 /** Answers a visitor question from the knowledge base; null when the feature is off or fails, so the turn is never blocked.
  * answered is false for the honest fallbacks (nothing found or no answer in the materials, or only the closest page). */
-async function answerFromKnowledge(context: AdapterContext, session: StoredSession, operationId: string, question: string, history: { role: string; text: string }[], timeoutMs: number): Promise<{ text: string; answered: boolean } | null> {
+async function answerFromKnowledge(context: AdapterContext, session: StoredSession, operationId: string, question: string, history: { role: string; text: string }[], timeoutMs: number): Promise<{ text: string; answered: boolean; none?: boolean } | null> {
   if (context.env.KNOWLEDGE_ANSWERS_ENABLED !== 'true' || !question.trim() || timeoutMs < 2_000) return null;
   try {
     const { fragments } = await searchKnowledge(context, session, question.slice(0, 500), { limit: 6, maxChars: 1500 });
-    if (!fragments.length) return { text: NOT_FOUND, answered: false };
+    if (!fragments.length) return { text: NOT_FOUND, answered: false, none: true };
     const runtime = await createChatRuntime(context, session, operationId, ANSWER_ATTEMPT);
     const answered = await answerQuestion({ question, fragments, history }, { ...runtime, max_tokens: 900, timeout_ms: timeoutMs });
     // The materials hold no answer: the visitor is told so. The pages found are then only close in wording («Какие работы не делает…»
     // found the FAQ of the 1С page), so no link is offered.
-    if (answered === NO_ANSWER) return { text: NOT_FOUND, answered: false };
+    if (answered === NO_ANSWER) return { text: NOT_FOUND, answered: false, none: true };
     // A failure (provider, format or checks): the closest page is still useful and honest.
     return answered ? { text: formatAnswer(answered), answered: true } : { text: 'Подробнее об этом — на странице «' + fragments[0].title + '»: ' + fragments[0].url, answered: false };
   } catch (error) {
@@ -213,6 +214,11 @@ export async function commitChatTurn(request: Request, context: AdapterContext, 
   if (turn.action === 'question') state.mode = 'questions';
   let question = nextQuestion(state, now, lib, core.engineOptions);
   state.current_question_id = question?.id ?? null;
+  // The visitor asks what the current question means («Какой именно результат?»): the question is explained and asked again;
+  // the survey goes on.
+  let explain = turn.action === 'clarify' && turn.classification?.intent === 'clarify' && question !== null && state.mode !== 'questions';
+  if (explain) serviceText = EXPLAIN_FALLBACK;
+  const surveyOn = session.state.mode !== 'questions' && session.state.current_question_id !== null;
   if (['off_topic', 'humor_preference', 'role_change'].includes(turn.action)) {
     const reply = selectHumorReply(state, humorIntent(turn, now), question, lib);
     serviceText = reply.text; jokeId = reply.joke_id;
@@ -225,8 +231,17 @@ export async function commitChatTurn(request: Request, context: AdapterContext, 
   const asksKnowledge = turn.action === 'question' || (turn.classification?.intent === 'mixed' && !turn.service_text);
   if (asksKnowledge) {
     const found = await answerFromKnowledge(context, session, turn.input.operation_id, turn.event.text ?? '', dialog(evidence), Math.min(12_000, timeLeft()));
+    // During the survey a question the materials have no answer to is most likely about the survey question itself: it is explained
+    // and the survey goes on, rather than «нет ответа» and a pause.
+    if (turn.action === 'question' && surveyOn && found?.none) {
+      state.mode = session.state.mode;
+      question = nextQuestion(state, now, lib, core.engineOptions);
+      state.current_question_id = question?.id ?? null;
+      explain = question !== null;
+    }
     // During the survey a mixed reply shows only a real answer; otherwise its facts get the usual reaction and the next question.
-    if (turn.action === 'question' || state.mode === 'questions') serviceText = found?.text ?? NOT_FOUND;
+    if (explain) serviceText = EXPLAIN_FALLBACK;
+    else if (turn.action === 'question' || state.mode === 'questions') serviceText = found?.text ?? NOT_FOUND;
     else if (found?.answered) serviceText = found.text;
     if (found?.answered && state.mode !== 'questions') { state.mode = 'questions'; question = null; state.current_question_id = null; }
   }
@@ -239,14 +254,14 @@ export async function commitChatTurn(request: Request, context: AdapterContext, 
   const libraryText = serviceText;
   let questionText: string | null = null;
   // The survey question does not change after a pure question, so its earlier wording stays.
-  if (turn.action !== 'sensitive' && turn.action !== 'question' && timeLeft() > 1_500) {
-    const approved = (APPROVED_TEXT_ACTIONS.includes(turn.action) && !offerHelp) || asksKnowledge ? serviceText : null;
+  if (turn.action !== 'sensitive' && (turn.action !== 'question' || explain) && timeLeft() > 1_500) {
+    const approved = explain ? null : (APPROVED_TEXT_ACTIONS.includes(turn.action) && !offerHelp) || asksKnowledge ? serviceText : null;
     // The composer sees the whole exchange and the question being answered, so its reaction is to this answer, not to an earlier one.
     const turns = await context.core.store.recentTurns(session.id);
     const composed = await composeTurn(context, session, turn.input.operation_id, COMPOSE_ATTEMPT, Math.min(8_000, timeLeft()), { visitor_text: turn.event.text ?? null,
-      answered_question: answeredQuestion(session.state, turns, lib),
+      answered_question: questionOnScreen(session.state.current_question_id, turns, lib), ...(explain ? { explain: true } : {}),
       // A clarification of the current question would only repeat it; ask for a clearer answer instead.
-      approved_text: approved, notice_to_rephrase: approved ? null : serviceText && serviceText === question?.text ? 'Ответ не удалось однозначно понять: попросите уточнить его.' : serviceText,
+      approved_text: approved, notice_to_rephrase: approved || explain ? null : serviceText && serviceText === question?.text ? 'Ответ не удалось однозначно понять: попросите уточнить его.' : serviceText,
       question: question ? { text: question.text, options: question.options.map(option => option.text), ...(question.reask ? { reask: true } : {}) } : null, history: chatDialog(turns, lib),
       previous_replies: await context.core.store.recentReplies(session.id) });
     // An empty reworded reply keeps the notice it was meant to convey.
@@ -287,7 +302,10 @@ export function createChatAdapter(): AdapterHandler {
       }) : [];
       const current = nextQuestion(session.state, context.core.now(), lib, context.core.engineOptions);
       const body = object(context.body), operationId = String(body.operation_id);
-      return { faqs, allowedAttemptIds: chatAttemptIds(lib, session.state, current, operationId), clarificationQuestions: current ? [{ id: current.id, text: current.text }] : [] };
+      // The classifier sees the chat as the visitor saw it, so «Какой именно результат?» reads as a question about the question on screen.
+      const turns = await context.core.store.recentTurns(session.id);
+      return { faqs, allowedAttemptIds: chatAttemptIds(lib, session.state, current, operationId), clarificationQuestions: current ? [{ id: current.id, text: current.text }] : [],
+        dialog: chatDialog(turns, lib), currentQuestionText: questionOnScreen(current?.id, turns, lib)?.text ?? null };
     },
   });
 }
