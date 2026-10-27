@@ -2,6 +2,18 @@
 
 ---
 
+- Date/time: 2026-10-27 03:30
+- Scope: S:\PROJECTS\pixelplustest
+- Summary: ветка `codex/expert-chat-panel` (рабочая копия `.deployment\expert-chat-panel`) перемотана вперёд на `main` до коммита с этой записью.
+  - Ветка была чистой, своих коммитов не имела и отставала на один коммит (a9a2279 → 4a92a1b: новый PDF с агентом DeepSeek V4 Pro, 11 разделов, вопросы о компании и сайте, исправление вопросов о прошлых работах).
+  - Перемотка с `core.autocrlf=false`, чтобы файлы в этой рабочей копии остались с LF.
+- Files changed:
+  - project_log.md
+  - вне репозитория: рабочая копия `.deployment/expert-chat-panel`
+- Reference: «Да, перемотай ветку Codex (codex/expert-chat-panel) на main.»
+
+---
+
 - Date/time: 2026-10-27 03:28
 - Scope: S:\PROJECTS\pixelplustest
 - Summary: исправлен пропуск вопросов о прошлых работах. Worker опубликован и проверен на опубликованном. Закоммичено и отправлено на GitHub по просьбе владельца одним коммитом вместе с новым PDF (записи 02:29 и 02:54).
