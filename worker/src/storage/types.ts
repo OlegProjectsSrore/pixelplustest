@@ -33,8 +33,8 @@ export type JobStage = 'reconcile' | 'analyze' | 'render';
 export type JobState = 'pending' | 'running' | 'retry_wait' | 'done' | 'failed';
 export interface AuditJob {
   id: string; sessionId: string; reportId: string; reportVersion: number; stage: JobStage; state: JobState;
-  /** review counts calls of the information check, which retry within the analyze stage. */
-  attempts: Record<JobStage, number> & { review?: number }; nextAttemptAt: number; leaseToken: string | null;
+  /** review and writer count calls of the information check and the report writer, which retry within the analyze stage. */
+  attempts: Record<JobStage, number> & { review?: number; writer?: number }; nextAttemptAt: number; leaseToken: string | null;
   leaseExpiresAt: number | null; errorCode: string | null; createdAt: number; updatedAt: number;
 }
 export interface ReportPatch {
@@ -46,7 +46,7 @@ export interface ReportPatch {
 export interface CheckpointInput {
   stage?: JobStage; state?: JobState; nextAttemptAt?: number; errorCode?: string | null;
   reportPatch?: ReportPatch; snapshot?: { data: AuditSnapshot; hash: string };
-  sessionState?: AuditState; incrementAttempt?: JobStage | 'review'; leaseMs?: number;
+  sessionState?: AuditState; incrementAttempt?: JobStage | 'review' | 'writer'; leaseMs?: number;
   expectedSessionRevision?: number;
 }
 export type EmailStatus = 'pending' | 'sending' | 'sent' | 'unknown' | 'failed';

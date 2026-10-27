@@ -116,6 +116,19 @@ export function mergeHistoryValue(saved: Json, next: Json, asked: readonly strin
   return merged;
 }
 
+/** A history answer as asked. «Unknown», an unclear answer or a refusal in an attempt field its question did not ask was not said
+ * by the visitor — the model filled the gap — so that field stays open and its own question is still asked. A field the question did
+ * ask but the answer left out counts as «unknown»: the visitor was asked, so the question is not repeated. */
+export function withoutUnaskedBlanks(value: Record<string, Json>, asked: readonly string[]): Record<string, Json> {
+  if (!Array.isArray(value.attempts)) return value;
+  return { ...value, attempts: value.attempts.map(attempt => {
+    if (!record(attempt)) return attempt;
+    const kept = Object.fromEntries(Object.entries(attempt).filter(([field, part]) => !((HISTORY_FIELDS as readonly string[]).includes(field) && !asked.includes(field) && uncertain(part))));
+    for (const field of asked) if ((HISTORY_FIELDS as readonly string[]).includes(field) && !Object.hasOwn(kept, field)) kept[field] = { state: 'unknown', value: null };
+    return kept;
+  }) as Json[] };
+}
+
 /** Merge only compatible observations. History array identity is explicit, never positional. */
 export function mergeStructuredValues(first: Json, second: Json, path = ''): Json {
   if (JSON.stringify(first) === JSON.stringify(second)) return structuredClone(first);

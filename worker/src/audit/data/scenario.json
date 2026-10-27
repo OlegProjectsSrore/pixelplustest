@@ -23,6 +23,8 @@
   "entry_questions": [
     "context_name",
     "context_position",
+    "context_company_name",
+    "context_website",
     "context_responsibilities",
     "context_company_size",
     "context_business",
@@ -139,14 +141,18 @@
   "mandatory_entry_questions": [
     "context_name",
     "context_position",
+    "context_company_name",
+    "context_website",
     "context_responsibilities",
     "context_company_size"
   ],
   "required_for_report": {
-    "approved_at": "2026-10-26T23:27:03.000Z",
+    "approved_at": "2026-10-27T00:44:18.000Z",
     "reviewer": "project_owner_chat_approval",
     "max_reasks": 2,
     "reasons": {
+      "company": "Название нужно, чтобы отчёт был подготовлен именно для Вашей компании.",
+      "website": "Адрес сайта нужен, чтобы рекомендации в отчёте относились к Вашему сайту.",
       "business": "Это нужно, чтобы рекомендации в отчёте подходили именно Вашему бизнесу.",
       "goal": "По этой цели в отчёте выбираются приоритеты и порядок работ.",
       "topics": "От этого зависит, какие темы войдут в отчёт.",

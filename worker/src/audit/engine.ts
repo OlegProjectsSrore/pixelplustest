@@ -1,8 +1,9 @@
 import { INTERVIEW_BUDGET_MS, MAX_VOICE_QUESTIONS, type AuditAnswer, type AuditEvent, type AuditFact, type AuditResult, type AuditSnapshot, type AuditState, type Contradiction, type Json, type QuestionView } from './contracts.ts';
 import { assertLibraryReady, isApproved, library, type AuditLibrary, type FactDefinition, type PriorAttemptPath, type Question, type Solution } from './library.ts';
+import { codePriorities, formatPriority, orderPairs, problemFacts } from './priority.ts';
 import { evaluateRule, isRecord } from './rules.ts';
 import { validateAuditResult, validateAuditState } from './validation.ts';
-import { mergeHistoryValue, mergeStructuredValues, validateRuntimeValue } from './value-schemas.ts';
+import { mergeHistoryValue, mergeStructuredValues, validateRuntimeValue, withoutUnaskedBlanks } from './value-schemas.ts';
 
 export interface EngineOptions { allowDraft?: boolean }
 const allowedStates = ['known', 'unknown', 'not_measured', 'not_applicable', 'declined', 'ambiguous', 'other'];
@@ -145,7 +146,10 @@ export function deriveFacts(answers: AuditAnswer[], lib: AuditLibrary = library)
   const groups = new Map<string, AuditAnswer[]>();
   for (const answer of answers) if (!superseded.has(answer.id)) groups.set(answer.fact_id, [...(groups.get(answer.fact_id) ?? []), answer]);
   const facts: Record<string, AuditFact> = Object.create(null), contradictions: Contradiction[] = [];
-  for (const [factId, submitted] of groups) {
+  const asked = (answer: AuditAnswer) => lib.questions.find(question => question.id === answer.question_id)?.fields ?? [];
+  for (const [factId, given] of groups) {
+    // A history keeps only what was said: «unknown» in a field the answered question did not ask is not an answer.
+    const submitted = factId.endsWith('.history') ? given.map(answer => answer.state === 'known' && isRecord(answer.value) ? { ...answer, value: withoutUnaskedBlanks(answer.value, asked(answer)) } : answer) : given;
     // Learning a previously unknown value is not a contradiction or an implicit correction.
     // Assertions such as not_applicable/not_measured remain distinct and cannot be overwritten this way.
     const hasExplicitValue = submitted.some(answer => answer.state === 'known' && answer.confirmation === 'explicit');
@@ -157,7 +161,6 @@ export function deriveFacts(answers: AuditAnswer[], lib: AuditLibrary = library)
     if (variants.size > 1 && definition?.runtime_schema && group.every(answer => answer.state === 'known' && answer.confirmation !== 'disputed' && isRecord(answer.value) && canonical(answer.parameters ?? null) === canonical(first.parameters ?? null))) {
       try {
         // A history takes from each later answer the fields its question asks and details not saved yet; repeats are dropped.
-        const asked = (answer: AuditAnswer) => lib.questions.find(question => question.id === answer.question_id)?.fields ?? [];
         merged = factId.endsWith('.history')
           ? group.slice(1).reduce((value, answer) => mergeHistoryValue(value, answer.value, asked(answer)), first.value)
           : group.slice(1).reduce((value, answer) => mergeStructuredValues(value, answer.value), first.value);
@@ -351,7 +354,7 @@ export function analyzeAudit(snapshot: AuditSnapshot, lib: AuditLibrary = librar
     const duplicates = lib.relationships.find(relation => ['same_observation', 'same_work', 'shared_deliverable'].includes(relation.relation) && ((relation.a === block.id && selected.has(relation.b)) || (relation.b === block.id && selected.has(relation.a))));
     if (duplicates) { result.limitations.push(`Тема «${block.title}» пересекается с уже включённым блоком; повторный объём работ не назначен.`); continue; }
     selected.add(block.id);
-    // Significance prose is not a numeric/ordinal approved rule. Unknown is preserved until such a rule exists.
+    // Significance starts unknown; problems that get a recommendation receive the approved priority below.
     result.situations.push({ id: block.id, title: status === 'supported' ? block.pdf.heading as string || block.title : `Требует проверки: ${block.title}`, kind: block.type === 'opportunity' ? 'opportunity' : block.type === 'reported_issue' ? 'problem' : block.type === 'data_gap' ? 'verification' : 'hypothesis', evidence_status: status, evidence_answer_ids: evidence, significance: { level: 'unknown', reason: 'Значимость не установлена утверждённым правилом по полученным сведениям.' }, limitations: [...block.solution.limitations, ...(status !== 'supported' ? ['Недостаточно оснований для утверждения проблемы.'] : [])] });
     const prior = priorAttemptPath(block, facts, lib);
     if (status !== 'supported' || prior === 'blocked') { result.gaps.push(block.previous_attempts.fact); continue; }
@@ -373,6 +376,13 @@ export function analyzeAudit(snapshot: AuditSnapshot, lib: AuditLibrary = librar
     const before = result.solutions.find(solution => solution.id === relation.a), after = result.solutions.find(solution => solution.id === relation.b);
     // Link the problems' own steps: shared prior-attempt steps come before both and must not depend on either.
     if (before && after) { const action = result.actions.find(item => item.id === after.action_ids.find(id => id.startsWith(`${after.id}:`))); if (action) action.after.push(before.action_ids[before.action_ids.length - 1]); }
+  }
+  // The approved code priority of every problem with a recommendation; the report writer may refine it within the same limits.
+  const problemIds = result.solutions.map(solution => solution.id);
+  const priorities = codePriorities(problemFacts(problemIds, facts, lib), orderPairs(problemIds, lib), lib);
+  for (const situation of result.situations) {
+    const priority = priorities.get(situation.id);
+    if (priority) situation.significance = { level: priority.level, reason: formatPriority(priority.level, priority.reasons, lib) };
   }
   const services = new Set(result.solutions.flatMap(solution => solution.service_ids));
   for (const tariff of lib.tariffs) {

@@ -27,9 +27,12 @@ test("PDF rendering rejects provider errors, incorrect MIME, invalid PDF and ove
 });
 
 test("saved report HTML is reproducible, escaped and includes its fixed font resources", () => {
-  const snapshot: AuditSnapshot = { id: "snap", session_id: "session", library_version: library.version, created_at: date, through_seq: 0, answers: [], state: initialAuditState(library.version, "chat", date), limitations: [] };
+  // Visitor words reach the PDF only escaped, wherever they appear (here the company name in the header and «О компании»).
+  const attack = '<img src="https://attacker.example/" onerror="alert(1)">';
+  const snapshot: AuditSnapshot = { id: "snap", session_id: "session", library_version: library.version, created_at: date, through_seq: 0,
+    answers: [{ id: "company", question_id: "context_company_name", fact_id: "context.company_name", state: "known", value: attack, event_ids: ["visitor-1"], channel: "chat", method: "classification", confirmation: "explicit", library_version: library.version, created_at: date }],
+    state: initialAuditState(library.version, "chat", date), limitations: [] };
   const result = analyzeAudit(snapshot, library, { allowDraft: true });
-  result.goal = '<img src="https://attacker.example/" onerror="alert(1)">';
   const first = buildReportContent(result, snapshot, library);
   assert.equal(first.html, buildReportContent(result, snapshot, library).html);
   assert.ok(first.html.includes("&lt;img"));
@@ -51,14 +54,15 @@ test("PDF content shows evidence-matched tariff alternatives with prices, scope 
       answer('a4', 'analytics.history', { attempts_status: 'not_tried', attempts: [] })],
     state: initialAuditState(library.version, 'chat', date), limitations: [] };
   const html = buildReportContent(analyzeAudit(snapshot, library), snapshot, library).html;
-  assert.match(html, /Предварительные тарифные варианты/);
+  assert.ok(html.includes('<h2>Стоимость</h2>'));
+  assert.match(html, /Для проблемы «/);
   assert.match(html, /Это не индивидуальная смета: пакет, объём и итоговая стоимость определяются при подготовке коммерческого предложения/);
   assert.match(html, /Арифметика — разовая настройка/);
   assert.match(html, /14[\u00a0\u202f ]000 ₽/);
   assert.match(html, /от 60[\u00a0\u202f ]000 ₽/);
   assert.match(html, /Источник проверен: 2026-10-22/);
   assert.match(html, /Что входит/);
-  assert.ok(html.indexOf('class="report-cover"') < html.indexOf('Предварительные тарифные варианты'));
+  assert.ok(html.indexOf('class="report-cover"') < html.indexOf('<h2>Стоимость</h2>'));
   // A range is shown as a range.
   assert.match(html, /3[   ]000 ₽–9[   ]500 ₽/);
   // VAT is mentioned only where the page states it; an unstated VAT is not a line in the report.

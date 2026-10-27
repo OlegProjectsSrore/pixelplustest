@@ -12,6 +12,7 @@ import { presentPayload, sessionView } from './http-view.ts';
 import { normalizeVoiceAnswers } from './channel-voice.ts';
 import { composeFirstQuestion, createChatRuntime } from './channel-runtime.ts';
 import { reviewReport } from './report/review.ts';
+import { writeReport } from './report/report-writer.ts';
 import type { AdapterContext } from './integration.ts';
 import { parseVoiceAnswerPayload } from './voice/client-tools.ts';
 import type { AuditAnswer } from './audit/contracts.ts';
@@ -25,7 +26,7 @@ function finishResponse(response: Response, origin: string | null, requestId: st
   headers.set('Access-Control-Expose-Headers', 'Retry-After, X-Request-ID');
   return new Response(response.body, { status: response.status, headers });
 }
-async function pipeline(core: CoreServices, adapters: ChannelAdapters) {
+async function pipeline(core: CoreServices, adapters: ChannelAdapters, longTasks = false) {
   const env = core.env; let smtp: SmtpTransport | undefined;
   if (env.SMTP_HOST && env.SMTP_USERNAME && env.SMTP_PASSWORD && env.SMTP_FROM && env.PUBLIC_WORKER_URL && (!env.SMTP_PORT || env.SMTP_PORT === '465' || env.SMTP_PORT === '587')) {
     const { connect } = await import('cloudflare:sockets');
@@ -35,7 +36,10 @@ async function pipeline(core: CoreServices, adapters: ChannelAdapters) {
   return runOneJob({ store: core.store, kv: env.REPORTS_KV, browser: env.BROWSER, budgets: budgets(env),
     publicWorkerUrl: env.PUBLIC_WORKER_URL ?? '', smtp, reconcile: adapters.reconcile ? (session, now) => adapters.reconcile!(session, now, core) : undefined, now: core.now, allowDraft: core.engineOptions.allowDraft,
     // DeepSeek V4 Pro checks the information before the PDF; each try is metered like a chat call.
-    review: env.DEEPSEEK_API_KEY ? async (session, input, attempt) => reviewReport(input, { ...await createChatRuntime({ core, env } as AdapterContext, session, `report-review:${session.reportId}`, attempt), max_tokens: 800, timeout_ms: 35_000 }) : undefined });
+    review: env.DEEPSEEK_API_KEY ? async (session, input, attempt) => reviewReport(input, { ...await createChatRuntime({ core, env } as AdapterContext, session, `report-review:${session.reportId}`, attempt), max_tokens: 800, timeout_ms: 35_000 }) : undefined,
+    // DeepSeek V4 Pro with reasoning high writes the report texts; it thinks for up to a few minutes, so only scheduled runs call it.
+    writer: env.DEEPSEEK_API_KEY ? async (session, input, attempt) => writeReport(input, { ...await createChatRuntime({ core, env } as AdapterContext, session, `report-writer:${session.reportId}`, attempt), max_tokens: 12_000, timeout_ms: 180_000 }) : undefined,
+    longTasks });
 }
 export function createWorker(adapters: ChannelAdapters = channelAdapters, options: { now?: () => number; fetcher?: typeof fetch } = {}) {
   return {
@@ -169,9 +173,10 @@ export function createWorker(adapters: ChannelAdapters = channelAdapters, option
     async scheduled(_controller: ScheduledController, env: Env, execution: ExecutionContext): Promise<void> {
       const core = new CoreServices(env, options.now, options.fetcher);
       if (env.VOICE_PROVIDER !== 'openai') execution.waitUntil(refreshVoiceAccounts(core));
-      execution.waitUntil((async () => { if (adapters.recoverVoice) await adapters.recoverVoice(core);
-        await core.store.closeExpiredSessions(core.now(), 10); await core.store.recoverExpiredSending(core.now(), 20);
-        await pipeline(core, adapters); await core.store.cleanup(core.now(), 20); })());
+      // Awaited rather than waitUntil: a scheduled run has 15 minutes of wall time, which the report writer needs.
+      if (adapters.recoverVoice) await adapters.recoverVoice(core);
+      await core.store.closeExpiredSessions(core.now(), 10); await core.store.recoverExpiredSending(core.now(), 20);
+      await pipeline(core, adapters, true); await core.store.cleanup(core.now(), 20);
     },
   };
 }

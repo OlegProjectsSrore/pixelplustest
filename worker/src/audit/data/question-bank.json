@@ -51,6 +51,52 @@
       "answer_mode": "structured_fact"
     },
     {
+      "id": "context_company_name",
+      "fact_ids": [
+        "context.company_name"
+      ],
+      "chat": "Как называется Ваша компания?",
+      "voice": "Как называется Ваша компания?",
+      "skip_if": "Ответ уже явно сообщён посетителем; не повторять при смене канала.",
+      "version": "0.1.5",
+      "status": "approved",
+      "author": "Claude — по утверждённому плану PDF",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T00:44:18.000Z",
+      "phase": "orientation",
+      "estimated_seconds": 25,
+      "related_blocks": [],
+      "time_importance": "context_or_routing",
+      "duration_status": "author_estimate_not_measured",
+      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
+      "max_clarifications": 1,
+      "answer_mode": "structured_fact",
+      "required_for_report": "company"
+    },
+    {
+      "id": "context_website",
+      "fact_ids": [
+        "context.website"
+      ],
+      "chat": "Какой адрес сайта Вашей компании? Если сайта пока нет, так и напишите.",
+      "voice": "Какой адрес сайта Вашей компании? Если сайта пока нет, так и скажите.",
+      "skip_if": "Ответ уже явно сообщён посетителем; не повторять при смене канала.",
+      "version": "0.1.5",
+      "status": "approved",
+      "author": "Claude — по утверждённому плану PDF",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T00:44:18.000Z",
+      "phase": "orientation",
+      "estimated_seconds": 25,
+      "related_blocks": [],
+      "time_importance": "context_or_routing",
+      "duration_status": "author_estimate_not_measured",
+      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
+      "max_clarifications": 1,
+      "answer_mode": "structured_fact",
+      "required_for_report": "website"
+    },
+    {
       "id": "context_responsibilities",
       "fact_ids": [
         "context.responsibilities"

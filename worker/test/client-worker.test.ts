@@ -27,7 +27,7 @@ test('real client/transport/Worker: creation, key phrase, text, multi-selection,
     if (String(url).includes('turnstile')) return Response.json({ success: true, hostname: 'olegprojectssrore.github.io', action: 'session' });
     providerCalls++;
     const context = JSON.parse(JSON.parse(String(init?.body)).messages[1].content), event = context.source_events[0];
-    const answers = [ ['context_name', 'context.name', 'Олег'], ['context_position', 'context.position', 'Директор'], ['context_responsibilities', 'context.responsibilities', 'Продажи'], ['context_company_size', 'context.company_size', '50 сотрудников'], ['context_business', 'context.business', 'Магазин'], ['context_goal', 'context.goal', 'Рост продаж'], ['context_assets', 'context.assets', ['Сайт']] ]
+    const answers = [ ['context_name', 'context.name', 'Олег'], ['context_position', 'context.position', 'Директор'], ['context_company_name', 'context.company_name', 'Магазин «Дом»'], ['context_website', 'context.website', 'dom-shop.ru'], ['context_responsibilities', 'context.responsibilities', 'Продажи'], ['context_company_size', 'context.company_size', '50 сотрудников'], ['context_business', 'context.business', 'Магазин'], ['context_goal', 'context.goal', 'Рост продаж'], ['context_assets', 'context.assets', ['Сайт']] ]
       .map(([question_id, fact_id, value]) => ({ question_id, fact_id, value, state: 'known', event_ids: [event.id], evidence: [{ event_id: event.id, text: event.text }] }));
     const start = event.text.includes('диагностик');
     return Response.json({ usage: { prompt_tokens: 80, completion_tokens: 20, total_tokens: 100 }, choices: [{ finish_reason: 'stop', message: { content: JSON.stringify({
@@ -71,7 +71,7 @@ test('real client/transport/Worker: creation, key phrase, text, multi-selection,
     assert.equal(selectionBodies.length, 2); assert.equal(selectionBodies[0], selectionBodies[1]);
     assert.equal(client.session.revision, revision); assert.equal(providerCalls, 2);
     const answers = await core.store.listAnswers(client.session.session_id);
-    assert.equal(answers.length, 8);
+    assert.equal(answers.length, 10);
     assert.deepEqual(answers.find(answer => answer.fact_id === 'context.priority')?.value, ['strategy', 'analytics']);
     await handlers.onPause(); assert.equal(client.session.paused, true);
     await handlers.onResume(); assert.equal(client.session.paused, false);

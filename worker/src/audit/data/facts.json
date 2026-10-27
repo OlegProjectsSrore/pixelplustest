@@ -51,6 +51,51 @@
       "purpose": "Обязательное знакомство перед основным опросом"
     },
     {
+      "id": "context.company_name",
+      "label": "Название компании",
+      "value_type": "text",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.1.5",
+      "status": "approved",
+      "author": "Claude — по утверждённому плану PDF",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T00:44:18.000Z",
+      "purpose": "Знакомство: для кого подготовлен отчёт"
+    },
+    {
+      "id": "context.website",
+      "label": "Адрес сайта компании",
+      "value_type": "text",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.1.5",
+      "status": "approved",
+      "author": "Claude — по утверждённому плану PDF",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T00:44:18.000Z",
+      "purpose": "Знакомство: к какому сайту относятся рекомендации",
+      "normalization": "Адрес сайта сохраняй так, как его назвал посетитель, без исправлений и без придуманного домена. Если посетитель говорит, что сайта нет, сохраняй state not_applicable и value null."
+    },
+    {
       "id": "context.responsibilities",
       "label": "Функционал и зона ответственности посетителя",
       "value_type": "text",

@@ -1,39 +1,21 @@
 import type { AuditFact, AuditResult, AuditSnapshot, Json } from "../audit/contracts.ts";
+import { deriveFacts } from "../audit/engine.ts";
 import type { AuditLibrary } from "../audit/library.ts";
+import { codePriorities, executionOrder, importanceOrder, levelCap, orderPairs, PRIORITY_RANK, problemFacts, type PriorityLevel } from "../audit/priority.ts";
 import { coverPngBase64 } from "./cover-image.ts";
 import { regularFont, boldFont } from "./fonts.ts";
 import { ReportFailure } from "./pdf.ts";
+import type { WriterOutput } from "./report-writer.ts";
+import { historyText, object, strings, textValue } from "./told.ts";
 
-export const TEMPLATE_VERSION = "1.2.0";
+export const TEMPLATE_VERSION = "1.3.0";
 export type ReportContent = { title: string; templateVersion: string; html: string; generatedAt: number };
-// The report states only what the visitor told: no «unknown», «not stated» or «needs clarification» lines.
-const fieldLabels: Record<string, string> = { description: "описание", object: "объект", observation: "что происходит", period: "период", context: "обстоятельства",
-  task: "задача", current_way: "как сейчас", constraint: "ограничение", level: "насколько важно" };
 
 export function escapeHtml(value: string): string {
   return value.replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[character]!));
 }
-/** What the visitor said, as text; an empty string when nothing usable was said. */
-function textValue(value: Json): string {
-  if (value === null) return "";
-  if (typeof value === "boolean") return value ? "да" : "нет";
-  if (Array.isArray(value)) return value.map(textValue).filter(Boolean).join("; ");
-  if (typeof value === "object") {
-    if (typeof value.state === "string" && "value" in value && Object.keys(value).every(key => key === "state" || key === "value")) {
-      return value.state === "known" || value.state === "other" ? textValue(value.value) : "";
-    }
-    if (typeof value.unit === "string" && (typeof value.value === "number" || (typeof value.min === "number" && typeof value.max === "number"))) {
-      const amount = typeof value.value === "number" ? String(value.value) : `${value.min}–${value.max}`;
-      return [value.approximate === true ? "около" : "", amount, value.unit, typeof value.currency === "string" ? value.currency : "", typeof value.period === "string" ? `за ${value.period}` : ""].filter(Boolean).join(" ");
-    }
-    return Object.entries(value).map(([key, val]) => [fieldLabels[key] ?? key, textValue(val)] as const).filter(([, text]) => text).map(([label, text]) => `${label}: ${text}`).join("; ");
-  }
-  return String(value);
-}
 function list(values: string[]): string { return values.length ? `<ul>${values.map(value => `<li>${escapeHtml(value)}</li>`).join("")}</ul>` : ""; }
 function section(title: string, body: string): string { return body ? `<section><h2>${escapeHtml(title)}</h2>${body}</section>` : ""; }
-function object(value: Json | undefined): Record<string, Json> | null { return value !== null && typeof value === "object" && !Array.isArray(value) ? value : null; }
-function strings(value: Json | undefined): string[] { return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : []; }
 function tariffPrice(details: Record<string, Json>): string {
   const price = object(details.price);
   if (!price || price.type === "individual") return "";
@@ -48,62 +30,103 @@ function tariffPrice(details: Record<string, Json>): string {
   const period = price.billing_period === "monthly" && price.unit === "month" ? "" : periods[String(price.billing_period)] ?? "";
   return [value, unit, period].filter(Boolean).join(" · ");
 }
+// Client-facing names of the told facts in «О компании» and «Ваша задача и цель».
+const COMPANY: [string, string][] = [["context.company_name", "Компания"], ["context.website", "Сайт"], ["context.business", "Чем занимается и кому продаёт"], ["context.audience", "Кто покупает"],
+  ["context.company_size", "Размер компании"], ["context.geography", "Регионы"], ["context.model", "Модель продаж"], ["context.channels", "Откуда приходят клиенты"],
+  ["context.assets", "Площадки и системы"], ["context.stage", "Стадия проекта"], ["context.scale", "Масштаб"]];
+const GOAL: [string, string][] = [["context.goal", "Желаемый результат"], ["context.goal_period", "Срок"], ["context.resources", "Ресурсы на внедрение"], ["context.constraints", "Ограничения"], ["context.budget", "Бюджет"]];
+const sentence = (text: string) => text ? text.charAt(0).toUpperCase() + text.slice(1) + (/[.!?]$/.test(text) ? "" : ".") : "";
 
-const historyFields: [string, string][] = [["work", "что делали"], ["period_and_duration", "когда и как долго"], ["goal", "какого результата ждали"], ["executor_and_resources", "исполнитель и ресурсы"],
-  ["outcome", "что получилось"], ["measurement", "как оценивали"], ["current_status", "сейчас"], ["stop_reason", "причина остановки"]];
-/** A short account of earlier work in the visitor's words: reported fields only, no bookkeeping IDs. */
-function historyText(history: Record<string, Json>): string {
-  if (history.attempts_status === "not_tried") return "ранее не предпринимались";
-  const attempts = Array.isArray(history.attempts) ? history.attempts.map(object).filter(item => item !== null) : [];
-  return attempts.map(attempt => historyFields.map(([key, label]) => [label, textValue(attempt[key] ?? null)] as const).filter(([, text]) => text).map(([label, text]) => `${label} — ${text}`).join("; ")).filter(Boolean).join(" / ");
-}
-
-/** Produces fixed, escaped HTML before any provider call. Subsequent attempts use this exact HTML. */
-export function buildReportContent(result: AuditResult, snapshot: AuditSnapshot, library: AuditLibrary, maxBytes = 1_000_000): ReportContent {
+/** Produces fixed, escaped HTML of the eleven approved sections. written: the report writer's checked texts; null keeps the template texts and the code priority. */
+export function buildReportContent(result: AuditResult, snapshot: AuditSnapshot, library: AuditLibrary, maxBytes = 1_000_000, written: WriterOutput | null = null): ReportContent {
   if (result.template_version !== TEMPLATE_VERSION || result.library_version !== snapshot.library_version || result.snapshot_id !== snapshot.id) {
     throw new ReportFailure("REPORT_VERSION_MISMATCH", false);
   }
-  const factLabel = (id: string) => library.facts.find(fact => fact.id === id)?.label ?? id;
-  const factValue = (id: string, value: Json) => library.facts.find(item => item.id === id)?.values?.find(option => option.id === value)?.label ?? textValue(value);
-  // Only told facts are listed; an empty value drops the line.
-  const told = (fact: AuditFact) => ["known", "other"].includes(fact.state) && fact.confirmation !== "disputed";
-  const factText = (fact: AuditFact) => {
-    const displayed = fact.fact_id.endsWith(".history") && object(fact.value) ? historyText(object(fact.value)!) : factValue(fact.fact_id, fact.value);
-    return displayed ? `${factLabel(fact.fact_id)}: ${displayed}` : "";
-  };
-  const supported = result.situations.filter(situation => situation.evidence_status === "supported");
-  const actionText = (id: string) => result.actions.find(item => item.id === id)?.text ?? id;
+  const titles = Object.fromEntries(library.report.sections.map(item => [item.id, item.title]));
+  const texts = library.report.texts, levelNames = library.report.priority.levels;
+  const { facts } = deriveFacts(snapshot.answers, library);
+  const told = (id: string) => { const fact: AuditFact | undefined = facts[id]; return fact && ["known", "other"].includes(fact.state) && fact.confirmation !== "disputed" ? textValue(fact.value) : ""; };
+  const website = facts["context.website"]?.state === "not_applicable" ? texts.no_website : told("context.website");
+  const value = (id: string) => id === "context.website" ? website : told(id);
+  const lines = (fields: [string, string][]) => fields.map(([id, label]) => value(id) ? `${label}: ${value(id)}` : "").filter(Boolean);
+
+  // Priority: the writer's levels when they keep the approved limits, otherwise the code rule.
+  const ids = result.solutions.map(solution => solution.id);
+  const problems = problemFacts(ids, facts, library), pairs = orderPairs(ids, library), code = codePriorities(problems, pairs, library);
+  const writerLevels = written ? new Map(written.problems.map(problem => [problem.id, problem.priority])) : null;
+  const writerValid = writerLevels !== null && problems.every(problem => writerLevels.has(problem.id) && PRIORITY_RANK[writerLevels.get(problem.id)!] <= PRIORITY_RANK[levelCap(problem)]) &&
+    pairs.every(([before, after]) => PRIORITY_RANK[writerLevels.get(before)!] >= Math.min(PRIORITY_RANK[writerLevels.get(after)!], PRIORITY_RANK[levelCap(problems.find(problem => problem.id === before)!)]));
+  const writer = writerValid ? written : null;
+  const levels = new Map<string, PriorityLevel>(ids.map(id => [id, writer ? writerLevels!.get(id)! : code.get(id)!.level]));
+  const why = (id: string) => writer ? writer.problems.find(problem => problem.id === id)!.why : sentence(code.get(id)!.reasons.join("; "));
+  const order = importanceOrder(problems, levels), stages = executionOrder(order, pairs);
+  const title = (id: string) => problems.find(problem => problem.id === id)!.title;
+  const solution = (id: string) => result.solutions.find(item => item.id === id)!;
+  const actionText = (actionId: string) => result.actions.find(item => item.id === actionId)?.text ?? actionId;
+  // Shared prior-attempt steps of a topic are listed once, under its first problem.
+  const shownPrior = new Set<string>();
+  const stepsOf = (id: string) => solution(id).action_ids.filter(actionId => {
+    if (actionId.startsWith(`${id}:`)) return true;
+    if (shownPrior.has(actionId)) return false;
+    shownPrior.add(actionId); return true;
+  });
+  const firstStage = stages[0];
+
+  const today = new Date(snapshot.created_at).toISOString().slice(0, 10);
+  const company = [value("context.company_name"), value("context.website") && `сайт: ${value("context.website")}`].filter(Boolean).join(" · ");
+  const preparedFor = [told("context.name"), told("context.position")].filter(Boolean).join(", ");
+  const header = `<header><h1>ПРЕДВАРИТЕЛЬНЫЙ АУДИТ</h1>${company ? `<p class="company">${escapeHtml(company)}</p>` : ""}${preparedFor ? `<p>Подготовлено для: ${escapeHtml(preparedFor)}</p>` : ""}<p>Pixel Plus · ${escapeHtml(today)}</p></header>`;
   const approvedSourceUrls = new Set(library.sources.map(source => source.url));
+  const shownTariffs = new Set<string>();
+  const tariffCard = (tariff: AuditResult["tariffs"][number]) => {
+    for (const url of tariff.source_urls) if (!approvedSourceUrls.has(url) || new URL(url).protocol !== "https:") throw new ReportFailure("REPORT_UNVERIFIED_SOURCE", false);
+    const details = tariff.details;
+    const service = library.services.find(item => item.id === details.service_id);
+    const tax = object(details.tax);
+    const checked = typeof details.source_checked_on === "string" ? `Источник проверен: ${escapeHtml(details.source_checked_on)}. ` : "";
+    const group = (name: string, values: string[]) => values.length ? `<h5>${escapeHtml(name)}</h5>${list(values)}` : "";
+    const price = tariffPrice(details);
+    // VAT is mentioned only where the page states it.
+    return `<article class="tariff-option"><h4>${escapeHtml(tariff.title)}</h4>${price ? `<p class="tariff-price">${escapeHtml(price)}</p>` : ""}<p>${escapeHtml(service?.name ?? String(details.service_id ?? "Услуга"))}. Подходящий пакет и объём подбираются при подготовке предложения.</p>${group("Что входит", strings(details.included))}${group("Условия", strings(details.conditions))}${group("Что не входит", strings(details.excluded))}${typeof tax?.source_text === "string" && tax.status === "source_says_excluded" ? `<p>${escapeHtml(tax.source_text)}.</p>` : ""}<p>${checked}${tariff.source_urls.map(url => `<a href="${escapeHtml(url)}">${escapeHtml(library.sources.find(source => source.url === url)?.title ?? url)}</a>`).join("; ")}</p></article>`;
+  };
+  // Earlier work only for the topics of the problems in this report.
+  const histories = library.domains.filter(domain => problems.some(problem => problem.domain === domain.id)).map(domain => {
+    const fact = facts[`${domain.id}.history`], history = fact && ["known", "other"].includes(fact.state) && fact.confirmation !== "disputed" ? object(fact.value) : null;
+    const text = history ? historyText(history) : "";
+    return text ? `${domain.title}: ${text}` : "";
+  }).filter(Boolean);
+  const nextStep = escapeHtml(texts.next_step).replace(escapeHtml(texts.contact_url), `<a href="${escapeHtml(texts.contact_url)}">${escapeHtml(texts.contact_url)}</a>`);
+
   const body = [
-    section("Исходная задача", textValue(result.goal) ? `<p>${escapeHtml(textValue(result.goal))}</p>` : ""),
-    section("Профиль и существенные сведения", `<p>Сведения получены в ходе опроса посетителя. Независимая проверка сайта, рекламных кабинетов и CRM не выполнялась.</p>${list(Object.entries(result.profile).map(([key, value]) => textValue(value) ? `${factLabel(key)}: ${textValue(value)}` : "").filter(Boolean))}${list(result.facts.filter(fact => !fact.fact_id.startsWith("context.") && !fact.fact_id.endsWith(".history") && told(fact)).map(factText).filter(Boolean))}`),
-    // Only confirmed situations: a topic without enough information stays out of the report.
-    section("Значимые ситуации", supported.length ? `<p>${escapeHtml(result.summary)}</p>` + supported.map(situation => {
-      const evidence = snapshot.answers.filter(answer => situation.evidence_answer_ids.includes(answer.id) && ["known", "other"].includes(answer.state)).map(answer => {
-        const text = factValue(answer.fact_id, answer.value);
-        return text ? `${factLabel(answer.fact_id)}: ${text}` : "";
-      }).filter(Boolean);
-      return `<article><h3>${escapeHtml(situation.title)}</h3>${list(evidence)}${list(situation.limitations)}</article>`;
+    section(titles.summary!, ids.length ? `<p>${escapeHtml(writer?.summary ?? texts.summary_fallback)}</p>${list(order.slice(0, 3).map(id => `${title(id)} — ${levelNames[levels.get(id)!]}`))}${firstStage ? `<p><strong>С чего начать:</strong> ${escapeHtml(`«${title(firstStage)}»: ${actionText(solution(firstStage).action_ids[0] ?? "")}`)}</p>` : ""}` : ""),
+    section(titles.company!, list([...lines(COMPANY), ...(preparedFor ? [`Контактное лицо: ${preparedFor}`] : [])])),
+    section(titles.goal!, list(lines(GOAL))),
+    section(titles.problems!, order.map(id => {
+      const domain = problems.find(problem => problem.id === id)!.domain, impact = object(facts[`${domain}.impact`]?.value ?? null);
+      const fallback = [told(`${id}.details`) && `Что происходит: ${told(`${id}.details`)}.`, told(`${domain}.impact`) && impact && textValue(impact.description ?? null) ? `Последствия: ${textValue(impact.description ?? null)}.` : ""].filter(Boolean).join(" ");
+      const situation = writer?.problems.find(problem => problem.id === id)?.situation ?? fallback;
+      return `<article><h3>${escapeHtml(title(id))}</h3>${situation ? `<p>${escapeHtml(situation)}</p>` : ""}</article>`;
+    }).join("")),
+    section(titles.priorities!, order.length ? `<ol>${order.map(id => `<li><strong>${escapeHtml(title(id))}</strong> — ${escapeHtml(levelNames[levels.get(id)!])}. ${escapeHtml(why(id))}</li>`).join("")}</ol>` : ""),
+    section(titles.history!, list(histories)),
+    section(titles.recommendations!, order.map(id => {
+      const item = solution(id);
+      return `<article><h3>${escapeHtml(title(id))}</h3>${item.prior_attempts ? `<p>${escapeHtml(item.prior_attempts.intro)}</p>` : ""}<p><strong>Результат работ:</strong> ${escapeHtml(item.text)}</p><ol>${stepsOf(id).map(actionId => `<li>${escapeHtml(actionText(actionId))}</li>`).join("")}</ol></article>`;
+    }).join("")),
+    section(titles.plan!, stages.length ? `<p>${escapeHtml(writer?.plan_intro ?? texts.plan_fallback)}</p><ol>${stages.map(id => {
+      const after = pairs.filter(([, dependent]) => dependent === id).map(([before]) => `«${title(before)}»`);
+      return `<li><strong>${escapeHtml(title(id))}</strong>${after.length ? escapeHtml(` — после: ${after.join(", ")}`) : ""}</li>`;
+    }).join("")}</ol>` : ""),
+    section(titles.cost!, result.tariffs.length ? `<p>Варианты относятся к выявленным направлениям работ. Это не индивидуальная смета: пакет, объём и итоговая стоимость определяются при подготовке коммерческого предложения.</p>` + order.map(id => {
+      const cards = result.tariffs.filter(tariff => solution(id).service_ids.includes(String(tariff.details.service_id)) && !shownTariffs.has(tariff.id)).map(tariff => { shownTariffs.add(tariff.id); return tariffCard(tariff); });
+      return cards.length ? `<article><h3>${escapeHtml(`Для проблемы «${title(id)}»`)}</h3>${cards.join("")}</article>` : "";
     }).join("") : ""),
-    section("Ранее выполненные работы", list(result.previous_work.filter(told).map(factText).filter(Boolean))),
-    section("Решения и необходимые проверки", result.solutions.map(solution => `<article><h3>${escapeHtml(solution.title)}</h3>${solution.prior_attempts ? `<p>${escapeHtml(solution.prior_attempts.intro)}</p>` : ""}<p>${escapeHtml(solution.text)}</p>${list(solution.limitations)}</article>`).join("")),
-    section("Порядок действий", result.actions.length ? `<ol>${result.actions.map(action => `<li>${escapeHtml(action.text)}${action.after.length ? `<p>После: ${escapeHtml(action.after.map(actionText).join("; "))}</p>` : ""}${action.parallel_with.length ? `<p>Можно параллельно: ${escapeHtml(action.parallel_with.map(actionText).join("; "))}</p>` : ""}</li>`).join("")}</ol>` : ""),
-    section("Предварительные тарифные варианты", result.tariffs.length ? `<p>Варианты относятся к выявленным направлениям работ. Это не индивидуальная смета: пакет, объём и итоговая стоимость определяются при подготовке коммерческого предложения.</p>` + result.tariffs.map(tariff => {
-      for (const url of tariff.source_urls) if (!approvedSourceUrls.has(url) || new URL(url).protocol !== "https:") throw new ReportFailure("REPORT_UNVERIFIED_SOURCE", false);
-      const details = tariff.details;
-      const service = library.services.find(item => item.id === details.service_id);
-      const tax = object(details.tax);
-      const checked = typeof details.source_checked_on === "string" ? `Источник проверен: ${escapeHtml(details.source_checked_on)}. ` : "";
-      const group = (name: string, values: string[]) => values.length ? `<h4>${escapeHtml(name)}</h4>${list(values)}` : "";
-      const price = tariffPrice(details);
-      // VAT is mentioned only where the page states it.
-      return `<article class="tariff-option"><h3>${escapeHtml(tariff.title)}</h3>${price ? `<p class="tariff-price">${escapeHtml(price)}</p>` : ""}<p>${escapeHtml(service?.name ?? String(details.service_id ?? "Услуга"))}. Подходящий пакет и объём подбираются при подготовке предложения.</p>${group("Что входит", strings(details.included))}${group("Условия", strings(details.conditions))}${group("Что не входит", strings(details.excluded))}${typeof tax?.source_text === "string" && tax.status === "source_says_excluded" ? `<p>${escapeHtml(tax.source_text)}.</p>` : ""}<p>${checked}${tariff.source_urls.map(url => `<a href="${escapeHtml(url)}">${escapeHtml(library.sources.find(source => source.url === url)?.title ?? url)}</a>`).join("; ")}</p></article>`;
-    }).join("") : ""),
+    section(titles.next_step!, `<p>${nextStep}</p>`),
   ].join("");
   const html = `<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; font-src data:; style-src 'unsafe-inline'"><title>ПРЕДВАРИТЕЛЬНЫЙ АУДИТ</title><style>
 @font-face{font-family:AuditUbuntu;src:url(data:font/woff2;base64,${regularFont}) format('woff2');font-weight:400;font-style:normal;font-display:block}
 @font-face{font-family:AuditUbuntu;src:url(data:font/woff2;base64,${boldFont}) format('woff2');font-weight:700;font-style:normal;font-display:block}
-@page{size:A4;margin:18mm 17mm}@page:first{margin:0}*{box-sizing:border-box}body{font-family:AuditUbuntu,sans-serif;color:#222;font-size:10.5pt;line-height:1.5;margin:0}.report-cover{width:210mm;height:297mm;overflow:hidden;break-after:page;page-break-after:always}.report-cover img{display:block;width:100%;height:100%}header{border-bottom:3px solid #d92735;padding-bottom:16pt;margin-bottom:20pt}h1{font-size:23pt;line-height:1.15;margin:0 0 12pt}h2{font-size:15pt;margin:22pt 0 8pt;break-after:avoid}h3{font-size:12pt;margin:14pt 0 5pt;break-after:avoid}h4{font-size:10.5pt;margin:9pt 0 3pt;break-after:avoid}p,li{orphans:3;widows:3;overflow-wrap:anywhere}ul,ol{padding-left:18pt}li{margin:5pt 0}a{color:#ad1c29;text-decoration:underline;overflow-wrap:anywhere}.tariff-option{border-top:1px solid #ddd;margin-top:14pt;padding-top:8pt;break-inside:avoid;page-break-inside:avoid}.tariff-price{font-weight:700;color:#a61420}footer{border-top:1px solid #ccc;margin-top:22pt;padding-top:8pt;color:#555;font-size:8pt}</style></head><body><div class="report-cover"><img src="data:image/png;base64,${coverPngBase64}" alt=""></div><main><header><h1>ПРЕДВАРИТЕЛЬНЫЙ АУДИТ</h1><p>Pixel Plus · ${escapeHtml(new Date(snapshot.created_at).toISOString().slice(0, 10))}</p></header>${body}<footer>Предварительное заключение по предоставленным сведениям. Библиотека ${escapeHtml(result.library_version)}; правила ${escapeHtml(result.rules_version)}; тарифы ${escapeHtml(result.tariffs_version)}; шаблон ${escapeHtml(result.template_version)}.</footer></main></body></html>`;
+@page{size:A4;margin:18mm 17mm}@page:first{margin:0}*{box-sizing:border-box}body{font-family:AuditUbuntu,sans-serif;color:#222;font-size:10.5pt;line-height:1.5;margin:0}.report-cover{width:210mm;height:297mm;overflow:hidden;break-after:page;page-break-after:always}.report-cover img{display:block;width:100%;height:100%}header{border-bottom:3px solid #d92735;padding-bottom:16pt;margin-bottom:20pt}header p{margin:3pt 0}header .company{font-size:13pt;font-weight:700}h1{font-size:23pt;line-height:1.15;margin:0 0 12pt}h2{font-size:15pt;margin:22pt 0 8pt;break-after:avoid}h3{font-size:12pt;margin:14pt 0 5pt;break-after:avoid}h4{font-size:11pt;margin:10pt 0 3pt;break-after:avoid}h5{font-size:10.5pt;margin:8pt 0 3pt;break-after:avoid}p,li{orphans:3;widows:3;overflow-wrap:anywhere}ul,ol{padding-left:18pt}li{margin:5pt 0}a{color:#ad1c29;text-decoration:underline;overflow-wrap:anywhere}.tariff-option{border-top:1px solid #ddd;margin-top:12pt;padding-top:8pt;break-inside:avoid;page-break-inside:avoid}.tariff-price{font-weight:700;color:#a61420}footer{border-top:1px solid #ccc;margin-top:22pt;padding-top:8pt;color:#555;font-size:8pt}</style></head><body><div class="report-cover"><img src="data:image/png;base64,${coverPngBase64}" alt=""></div><main>${header}${body}<footer>Библиотека ${escapeHtml(result.library_version)}; правила ${escapeHtml(result.rules_version)}; тарифы ${escapeHtml(result.tariffs_version)}; шаблон ${escapeHtml(result.template_version)}.</footer></main></body></html>`;
   const content = { title: "ПРЕДВАРИТЕЛЬНЫЙ АУДИТ", templateVersion: TEMPLATE_VERSION, html, generatedAt: snapshot.created_at };
   if (new TextEncoder().encode(JSON.stringify(content)).byteLength > maxBytes) throw new ReportFailure("REPORT_CONTENT_TOO_LARGE", false);
   return content;

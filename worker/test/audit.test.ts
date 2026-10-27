@@ -21,6 +21,8 @@ function answer(fact = 'context.business', value: AuditAnswer['value'] = 'Маг
 const introduction = () => [
   answer('context.name', 'Олег', 'intro-name'),
   answer('context.position', 'Директор', 'intro-position'),
+  answer('context.company_name', 'Мебельная фабрика «Дуб»', 'intro-company'),
+  answer('context.website', 'mebel-dub.ru', 'intro-website'),
   answer('context.responsibilities', 'Отвечаю за продажи', 'intro-responsibilities'),
   answer('context.company_size', '50 сотрудников', 'intro-size'),
 ];
@@ -29,7 +31,8 @@ test('a key question without a usable answer is asked again with its reason, at 
   const rules = library.scenario.required_for_report!;
   assert.equal(rules.max_reasks, 2);
   const keys = library.questions.filter(question => question.required_for_report);
-  assert.equal(keys.length, 315);
+  assert.equal(keys.length, 317);
+  assert.deepEqual(['context_company_name', 'context_website'].map(id => library.questions.find(question => question.id === id)!.required_for_report), ['company', 'website']);
   assert.deepEqual(['context_business', 'context_goal', 'context_priority'].map(id => library.questions.find(question => question.id === id)!.required_for_report), ['business', 'goal', 'topics']);
   assert.equal(library.questions.find(question => question.id === 'context_name')!.required_for_report, undefined);
   const uncertain = (fact: string, state: AuditAnswer['state'], id: string): AuditAnswer => ({ ...answer(fact, null, id), state });
@@ -58,6 +61,8 @@ test('mandatory introduction has the same order and saved progress across repeat
   const expected = [
     ['context_name', 'Как Вас зовут?'],
     ['context_position', 'Какая Ваша должность в компании?'],
+    ['context_company_name', 'Как называется Ваша компания?'],
+    ['context_website', 'Какой адрес сайта Вашей компании? Если сайта пока нет, так и напишите.'],
     ['context_responsibilities', 'Какой у Вас функционал в компании, за что Вы отвечаете?'],
     ['context_company_size', 'Какой размер компании?'],
   ];
@@ -69,7 +74,8 @@ test('mandatory introduction has the same order and saved progress across repeat
       for (const channel of ['chat', 'voice', 'chat', 'voice'] as const) {
         state = { ...state, active_channel: channel, channel_revision: state.channel_revision + 1 };
         const question = nextQuestion(state, now)!;
-        assert.equal(question.id, id); assert.equal(question.text, text);
+        // The chat text is listed above; the voice wording of a question may differ (the website question says «скажите»).
+        assert.equal(question.id, id); assert.equal(question.text, channel === 'chat' ? text : library.questions.find(item => item.id === id)!.voice);
       }
       const reply = { ...introduction()[index], channel: state.active_channel, method: 'voice_batch' as const };
       validateAnswers([reply], [{ ...event(), source: 'voice' }], accepted);
@@ -148,6 +154,8 @@ test('approved library has valid links while a draft fixture remains closed', ()
     assert.deepEqual(block.solution.steps.map(step => step.order), block.solution.steps.map((_, index) => index + 1));
     assert.deepEqual(block.pdf.next_steps, block.solution.steps.map(step => step.text));
   }
+  const noSection = structuredClone(library); noSection.report.sections.splice(5, 1);
+  assert.match(validateLibrary(noSection).errors.join(), /Invalid report template/);
   const missingPath = structuredClone(library); missingPath.priorAttemptPaths.items.pop();
   assert.match(validateLibrary(missingPath).errors.join(), /Invalid prior-attempt paths/);
   const otherResults = structuredClone(library); (otherResults.facts.find(fact => fact.id === 'seo.history')!.fields as Record<string, unknown>).result = ['ongoing'];
@@ -263,7 +271,8 @@ test('approved rules separate sufficiency from significance and open repeated wo
   const answers = [answer('strategy.applicable', true), answer('strategy_goal.signal', 'target', 'answer-2'), answer('strategy_goal.details', { description: { state: 'known', value: 'Показатель не определён' } }, 'answer-3')];
   let result = analyzeAudit(snapshot(answers), lib);
   assert.equal(result.situations[0].evidence_status, 'supported');
-  assert.equal(result.situations[0].significance.level, 'unknown');
+  // The approved code priority: no consequences and no named topic — the usual level with the confirmed-problem reason.
+  assert.deepEqual(result.situations[0].significance, { level: 'low', reason: 'Обычный: проблема подтверждена Вашими ответами.' });
   // No history yet: the «unknown» path restores it first; the history stays among the gaps.
   assert.deepEqual(result.solutions[0].prior_attempts, { result: 'unknown', intro: 'Перед новыми работами восстановим, что уже делалось по этой теме.' });
   assert.deepEqual(result.actions.slice(0, 2).map(action => [action.text, action.after]), [
@@ -484,11 +493,11 @@ test('questions mode asks no survey question, keeps sufficiency honest and still
 
 test('a voice interview asks at most 50 distinct questions, the last being the confirmation; chat has no such cap', () => {
   const voice = { ...initialAuditState(library.version, 'voice', now), paused: false };
-  const answers: AuditAnswer[] = ['context_name', 'context_position', 'context_responsibilities', 'context_company_size'].map((questionId, index) => ({
+  const answers: AuditAnswer[] = ['context_name', 'context_position', 'context_company_name', 'context_website', 'context_responsibilities', 'context_company_size'].map((questionId, index) => ({
     id: `a${index}`, question_id: questionId, fact_id: questionId.replace('context_', 'context.'), state: 'known', value: 'Тест', event_ids: ['e'],
     channel: 'voice', method: 'voice_batch', confirmation: 'explicit', library_version: library.version, created_at: now }));
   const advanced = advanceAudit(voice, answers, now, library, preview);
-  assert.equal(advanced.questions_answered, 4, 'distinct questions answered are counted');
+  assert.equal(advanced.questions_answered, 6, 'distinct questions answered are counted');
   assert.notEqual(nextQuestion(advanced, now, library, preview)?.id, 'context_confirmation');
   assert.equal(nextQuestion({ ...advanced, questions_answered: 49 }, now, library, preview)?.id, 'context_confirmation', 'the 50th place is kept for the confirmation');
   assert.equal(nextQuestion({ ...advanced, questions_answered: 50 }, now, library, preview), null);

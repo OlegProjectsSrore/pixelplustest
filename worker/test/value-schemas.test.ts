@@ -72,12 +72,14 @@ test('history merges by server-reserved attempt ID and never requires invented a
     { attempt_id: 'attempt-one', outcome: { state: 'unknown', value: null } }] };
   assert.deepEqual(classify('strategy.history', first).value, first);
   assert.deepEqual(classify('strategy.history', second).value, second);
-  const answers = [answer('strategy.history', first), answer('strategy.history', second, 'next')];
+  // The second answer replies to the question about the outcome, so its «unknown» outcome is an answer.
+  const answers = [answer('strategy.history', first), { ...answer('strategy.history', second, 'next'), question_id: 'strategy_history_3' }];
   validateAnswers(answers, [event], [], library, preview);
   const merged = deriveFacts(answers).facts['strategy.history'].value as any;
   assert.deepEqual(merged.attempts.map((attempt: any) => attempt.attempt_id), ['attempt-one', 'attempt-two']);
   assert.equal(merged.attempts[0].work.value, 'Настраивали аналитику'); assert.deepEqual(merged.attempts[0].outcome, { state: 'unknown', value: null });
-  assert.equal('goal' in merged.attempts[0], false); assert.equal('outcome' in merged.attempts[1], false);
+  // Nothing is invented for later questions; a part the answered question asked but the answer left out counts as «unknown».
+  assert.equal('goal' in merged.attempts[0], false); assert.deepEqual(merged.attempts[1].outcome, { state: 'unknown', value: null });
   assert.throws(() => classify('strategy.history', { attempts: [{ attempt_id: 'model-invented', work: { state: 'known', value: 'Работы' } }] }));
   assert.throws(() => validateAnswers([answer('strategy.history', { attempts_status: 'not_tried', attempts: first.attempts })], [event], [], library, preview));
 });
@@ -117,7 +119,7 @@ test('a history answer gives its question\'s fields and new details; repeats of 
   assert.deepEqual(derived.contradictions, []);
   assert.equal(fact.state, 'known');
   assert.deepEqual(fact.value, { attempts_status: 'tried', result: 'partial_or_stopped', attempts: [{ attempt_id: 'a', work: known('Работали с агентством по аналитике'), period_and_duration: known('Полгода'),
-    executor_and_resources: known('Агентство'), goal: known('Ждали отчёт по каналам'), outcome: known('Часть отчётов настроили'), current_status: { state: 'unknown', value: null }, stop_reason: known('Закончился бюджет') }] });
+    executor_and_resources: known('Агентство'), goal: known('Ждали отчёт по каналам'), outcome: known('Часть отчётов настроили'), measurement: { state: 'unknown', value: null }, current_status: { state: 'unknown', value: null }, stop_reason: known('Закончился бюджет') }] });
   // A direct answer replaces a passing mention, but «unknown» never erases a known detail.
   const later = reply(4, { attempts: [{ attempt_id: 'a', stop_reason: { state: 'unknown', value: null }, current_status: known('Остановили') }] }, 'five');
   const updated = deriveFacts([...answers, later]).facts['strategy.history'].value as any;
@@ -153,4 +155,29 @@ test('a partial detail fact remains askable until each requested field has been 
   assert.equal(nextQuestion(advanceAudit(unclear, [...base, first, rest, period], now, lib, preview), now, lib, preview), null);
   const stillUnknown = answer('strategy_channels.details', { period: { state: 'declined', value: null } }, 'declined');
   assert.equal(nextQuestion(advanceAudit(unclear, [...base, first, rest, stillUnknown], now, lib, preview), now, lib, preview), null);
+});
+
+test('«unknown» in an attempt field the question did not ask is not an answer: the field stays open and its question is still asked', () => {
+  const lib = structuredClone(library);
+  const reply = (question: number, value: Json, id: string): AuditAnswer => ({ ...answer('strategy.history', value, id), question_id: `strategy_history_${question}` });
+  const blank = { state: 'unknown', value: null };
+  // The live DeepSeek case: the first history answer filled every unasked field with «unknown».
+  const first = reply(1, { attempts_status: 'tried', result: 'unknown', attempts: [{ attempt_id: 'a', work: { state: 'known', value: 'Сами настраивали Метрику' }, period_and_duration: { state: 'known', value: 'Около месяца' },
+    goal: blank, executor_and_resources: { state: 'known', value: 'Сами' }, outcome: blank, measurement: blank, current_status: blank, stop_reason: blank }] }, 'one');
+  const fact = deriveFacts([first], lib).facts['strategy.history'];
+  assert.deepEqual(Object.keys((fact.value as any).attempts[0]).sort(), ['attempt_id', 'executor_and_resources', 'period_and_duration', 'work']);
+  const base = [answer('strategy.applicable', true, 'applies'), answer('strategy_goal.signal', 'target', 'signal'),
+    answer('strategy_goal.details', { description: { state: 'known', value: 'Нет измеримой цели' } }, 'details')];
+  // Only the history questions of this topic, so the introduction does not come first.
+  lib.questions = lib.questions.filter(question => question.phase === 'history' && question.domain === 'strategy');
+  const state = advanceAudit(initialAuditState(lib.version, 'chat', now), [...base, first], now, lib, preview);
+  assert.equal(nextQuestion(state, now, lib, preview)?.id, 'strategy_history_2', 'the next history question is asked');
+  // A part the question asked but the answer left out counts as «unknown», so the same question is not asked again and again.
+  const partial = reply(3, { attempts: [{ attempt_id: 'a', outcome: { state: 'known', value: 'Данные не сошлись' } }] }, 'partial');
+  const afterThird = advanceAudit(state, [...base, first, reply(2, { attempts: [{ attempt_id: 'a', goal: { state: 'known', value: 'Видеть продажи по каналам' } }] }, 'two'), partial], now, lib, preview);
+  assert.deepEqual((afterThird.facts['strategy.history'].value as any).attempts[0].measurement, blank);
+  assert.equal(nextQuestion(afterThird, now, lib, preview)?.id, 'strategy_history_4');
+  // «Don't know» to the question that asks it is an answer and stays.
+  const third = reply(3, { attempts: [{ attempt_id: 'a', outcome: blank, measurement: { state: 'known', value: 'Не измеряли' } }] }, 'three');
+  assert.deepEqual((deriveFacts([first, third], lib).facts['strategy.history'].value as any).attempts[0].outcome, blank);
 });

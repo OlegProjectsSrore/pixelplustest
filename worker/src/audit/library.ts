@@ -7,6 +7,7 @@ import tariffsData from './data/tariffs.json' with { type: 'json' };
 import sourcesData from './data/sources.json' with { type: 'json' };
 import jokesData from './data/off-topic-jokes.json' with { type: 'json' };
 import scenarioData from './data/scenario.json' with { type: 'json' };
+import reportTemplateData from './data/report-template.json' with { type: 'json' };
 import servicesData from './data/services-catalog.json' with { type: 'json' };
 import casesData from './data/cases-map.json' with { type: 'json' };
 import stateSchemaData from './data/audit-state.schema.json' with { type: 'json' };
@@ -62,6 +63,13 @@ export interface Scenario {
 }
 export interface PriorAttemptPath { id: PriorAttemptResult; label: string; intro: string; steps: string[] }
 export interface PriorAttemptPaths { version: string; status: string; reviewer: string | null; approved_at: string | null; items: PriorAttemptPath[] }
+/** The approved PDF: section titles, fixed texts and the priority wording the code rule and the report writer use. */
+export interface ReportTemplate {
+  version: string; status: string; reviewer: string | null; approved_at: string | null;
+  sections: { id: string; title: string; content: string }[];
+  texts: { next_step: string; contact_url: string; no_website: string; summary_fallback: string; plan_fallback: string };
+  priority: { levels: Record<'high' | 'medium' | 'low', string>; reasons: Record<'stops_operation' | 'loss_or_delay' | 'limited' | 'no_effect' | 'named' | 'bottleneck' | 'confirmed', string> };
+}
 export interface JokeCategory { id: string; selection_source: string; do_not_use_when: string; jokes: { id: string; text: string }[] }
 export interface JokeLibrary {
   library_version: string; joke_count: number; categories: JokeCategory[]; return_phrases: string[]; questions_return_phrases?: string[]; neutral_replies: Record<string, string>;
@@ -75,6 +83,7 @@ export interface AuditLibrary {
   domains: { id: string; title: string }[];
   relationships: { a: string; b: string; relation: string }[];
   jokes: JokeLibrary;
+  report: ReportTemplate;
   scenario: Scenario; services: Service[]; cases: Case[];
   /** Editorial content schemas; Worker transport/state schemas are separate runtime-schemas.ts exports. */
   schemas: { state: { required: string[] }; result: { required: string[] } };
@@ -82,14 +91,14 @@ export interface AuditLibrary {
 
 /** Version is intentionally pinned; a changed content release must receive a new version. */
 export const library: AuditLibrary = {
-  version: '0.1.4', rulesVersion: '1.0.0', tariffVersion: tariffsData.version, templateVersion: '1.2.0',
+  version: '0.1.4', rulesVersion: '1.0.0', tariffVersion: tariffsData.version, templateVersion: '1.3.0',
   status: solutionsData.status,
   facts: (factsData.items as FactDefinition[]).map(fact => ({ ...fact, runtime_schema: runtimeSchemaForFact(fact, solutionsData.items.map(block => block.id)) })), questions: questionsData.items as Question[],
   solutions: solutionsData.items as unknown as Solution[], tariffs: tariffsData.items as unknown as Tariff[],
   priorAttemptPaths: solutionsData.prior_attempt_paths as PriorAttemptPaths,
   sources: sourcesData.items as Source[], answers: answersData.items,
   domains: domainsData.items, relationships: domainsData.relationships, jokes: jokesData as JokeLibrary,
-  scenario: scenarioData, services: servicesData.items as Service[], cases: casesData.items,
+  scenario: scenarioData, services: servicesData.items as Service[], cases: casesData.items, report: reportTemplateData as ReportTemplate,
   schemas: { state: stateSchemaData, result: resultSchemaData },
 };
 
@@ -219,6 +228,14 @@ export function validateLibrary(lib: AuditLibrary = library, options: { ruleChec
   const required = lib.scenario.required_for_report;
   if (required && (!Number.isInteger(required.max_reasks) || required.max_reasks < 0 || required.max_reasks > 5 || !isRecord(required.reasons) || Object.values(required.reasons).some(text => typeof text !== 'string' || !text.trim()))) errors.push('Invalid required-for-report rules');
   for (const question of lib.questions) if (question.required_for_report !== undefined && !(required && Object.hasOwn(required.reasons, question.required_for_report))) errors.push(`${question.id}: unknown required-for-report reason`);
+  // The approved PDF: eleven sections in order and every fixed text the renderer and the code priority rule use.
+  const report = lib.report;
+  const sectionIds = ['cover', 'summary', 'company', 'goal', 'problems', 'priorities', 'history', 'recommendations', 'plan', 'cost', 'next_step'];
+  if (!report || !isApproved(report) || report.sections?.map(section => section.id).join() !== sectionIds.join() || report.sections.some(section => !section.title?.trim()) ||
+      Object.values(report.texts ?? {}).some(text => typeof text !== 'string' || !text.trim()) || Object.keys(report.texts ?? {}).length !== 5 ||
+      ['high', 'medium', 'low'].some(level => !report.priority?.levels?.[level as 'high']?.trim()) ||
+      ['stops_operation', 'loss_or_delay', 'limited', 'no_effect', 'named', 'bottleneck', 'confirmed'].some(key => !report.priority?.reasons?.[key as 'named']?.trim()) ||
+      !report.priority.reasons.bottleneck.includes('{title}')) errors.push('Invalid report template');
   // One approved path per prior-attempt result, and every history fact offers exactly these results.
   const paths = lib.priorAttemptPaths;
   if (!paths || !Array.isArray(paths.items) || paths.items.map(path => path.id).join() !== PRIOR_ATTEMPT_RESULTS.join() ||

@@ -76,8 +76,8 @@
     },
     {
       "name": "facts.json",
-      "sha256": "7e7e1def33522624ce1d15de809310f1cd47fce8411ac2b37c0844eda5524a23",
-      "bytes": 490961,
+      "sha256": "b7288fc467cac8d37fcd175b0b67cce942a2eedcfb102674466b78e3e25b5841",
+      "bytes": 492634,
       "role": "runtime_candidate"
     },
     {
@@ -106,8 +106,8 @@
     },
     {
       "name": "question-bank.json",
-      "sha256": "cffdc793aea225579eb8c8c34045c82803be92c763d9aa1d09dfbd89ab12323e",
-      "bytes": 759824,
+      "sha256": "5c046bfea7cd3e640b144d18590c687bbd8bdd05402eb736564b6e8bc3cbe744",
+      "bytes": 762116,
       "role": "runtime_candidate"
     },
     {
@@ -118,8 +118,8 @@
     },
     {
       "name": "report-template.json",
-      "sha256": "742b10ed6c024cef285927d6a6fdf89ff03a192655ad00243da1d8ab19a0aa28",
-      "bytes": 4685,
+      "sha256": "b2a061cf276d9b3372b44b68403ecda1c0e5cd21946e38897215f07be9d5635b",
+      "bytes": 8020,
       "role": "runtime_candidate"
     },
     {
@@ -130,8 +130,8 @@
     },
     {
       "name": "scenario.json",
-      "sha256": "4b651e6ab5eda20a93af5b7ae107582066b4e94d856b6a853bec09b8470d12fc",
-      "bytes": 7143,
+      "sha256": "56519765ac2181da58f09564be3bee1d4f406005975ad403bfca69e39da6c8b0",
+      "bytes": 7550,
       "role": "runtime_candidate"
     },
     {

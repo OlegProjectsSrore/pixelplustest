@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { buildClassifierPrompt, classifyTurn, parseClassification, ClassificationValidationError } from './classifier.ts';
+import { buildClassifierPrompt, classifyTurn, parseClassification, requestDeepseek, ClassificationValidationError } from './classifier.ts';
 import type { AnswerCandidate, Classification, ClassifierContext, ClassifierRuntime, ProviderExchange, ValueSchema } from './types.ts';
 import { INTENTS } from './types.ts';
 import { CLASSIFIER_PROMPT } from './classifier-prompt.ts';
@@ -155,6 +155,7 @@ test('prompt file has only the intents mark; every intent is listed and visitor 
   assert.match(system.content, /передавай result — итог прошлых работ по теме по всем сведениям: accepted_facts, history и текущей реплике\. Выбирай первое подходящее по порядку: ongoing — работа идёт сейчас; no_result — результата не было или его не измеряли, даже если работу потом бросили или остановили из-за денег; partial_or_stopped — результат частичный/);
   assert.match(system.content, /При каждом новом ответе о прошлых работах передавай result заново по всем сведениям\./);
   assert.match(system.content, /Для попытки, уже сохранённой в accepted_facts, бери её attempt_id и передавай только новое: ответ на текущий вопрос и сведения, которых ещё нет; уже сохранённое не повторяй, в том числе другими словами\./);
+  assert.match(system.content, /Поля попытки, о которых посетитель ничего не сказал, не добавляй и не заполняй состоянием unknown: о них спросят отдельно./);
   assert.match(system.content, /start_diagnostic — посетитель хочет начать или продолжить экспресс-диагностику бизнеса: «экспресс-диагностика», «аудит бизнеса», «персональный отчёт»/);
   assert.match(system.content, /Вопрос о цене или составе услуги аудита Pixel Plus \(например, SEO-аудита сайта\) — question, а не start_diagnostic\./);
   assert.match(system.content, /mixed без хотя бы одного кандидата в answers не бывает\. Начатая, но не законченная фраза \(«Меня зовут…», «Я…»\) — не факт и не ambiguous: не создавай для неё кандидата, в том числе ради mixed\./);
@@ -249,4 +250,14 @@ test('a runtime cannot execute the same authorized attempt twice', async () => {
   const rt = runtime(async () => { calls++; return new Response(JSON.stringify(envelope())); });
   rt.runAuthorized = async (_request, call) => { await call(); return call(); };
   await assert.rejects(classifyTurn(context(), rt), /already invoked/); assert.equal(calls, 1);
+});
+
+test('reasoning switches thinking on at the given effort, drops the temperature and allows a longer wait', async () => {
+  const bodies: Record<string, unknown>[] = [];
+  const fetcher = (async (_url: string, init?: RequestInit) => { bodies.push(JSON.parse(String(init?.body))); return new Response(JSON.stringify({ choices: [] }), { headers: { 'Content-Type': 'application/json' } }); }) as typeof fetch;
+  await requestDeepseek([{ role: 'user', content: 'x' }], { ...runtime(fetcher), timeout_ms: 180_000 }, 0, 'deepseek-v4-pro', 'high');
+  assert.deepEqual([bodies[0]!.thinking, bodies[0]!.reasoning_effort, 'temperature' in bodies[0]!, bodies[0]!.model], [{ type: 'enabled' }, 'high', false, 'deepseek-v4-pro']);
+  await requestDeepseek([{ role: 'user', content: 'x' }], runtime(fetcher), 0.3);
+  assert.deepEqual([bodies[1]!.thinking, 'reasoning_effort' in bodies[1]!, bodies[1]!.temperature], [{ type: 'disabled' }, false, 0.3]);
+  await assert.rejects(() => requestDeepseek([{ role: 'user', content: 'x' }], { ...runtime(fetcher), timeout_ms: 180_000 }), /Invalid classifier limits/);
 });

@@ -11,6 +11,7 @@ import type { PdfBrowser } from "./pdf.ts";
 import { validateMailbox } from "./smtp.ts";
 import type { MailTransport } from "./smtp.ts";
 import { buildReviewInput, INSUFFICIENT_NOTICE, meetsMinimum, REVIEW_MODEL, type ReviewVerdict } from "./review.ts";
+import { buildWriterInput, WRITER_MODEL, type WriterInput, type WriterOutput } from "./report-writer.ts";
 
 export interface PipelineDependencies {
   store: D1Store;
@@ -23,11 +24,19 @@ export interface PipelineDependencies {
   reconcile?: (session: StoredSession, now: number) => Promise<{ complete: boolean; limitations: string[] }>;
   /** The information check by DeepSeek V4 Pro; null when the call failed. Without it the code minimum decides. */
   review?: (session: StoredSession, input: Json, attempt: number) => Promise<ReviewVerdict | null>;
+  /** The report writer (DeepSeek V4 Pro, reasoning high); null when the call or its checks failed. Without it the template texts are used. */
+  writer?: (session: StoredSession, input: WriterInput, attempt: number) => Promise<WriterOutput | null>;
+  /** True only in a scheduled run: 15 minutes of wall time, while waitUntil after an HTTP response ends after 30 seconds. */
+  longTasks?: boolean;
   now?: () => number;
 }
 // A failed information check is retried for about half an hour; then the code minimum decides.
 const REVIEW_ATTEMPTS = 10;
 const REVIEW_RETRY_MS = 3 * 60_000;
+// The writer thinks for up to a few minutes: its step holds a longer lease and is retried twice before the template texts.
+const WRITER_LEASE_MS = 5 * 60_000;
+const WRITER_ATTEMPTS = 3;
+const WRITER_RETRY_MS = 2 * 60_000;
 const LEASE_MS = 60_000;
 // Stop/status, provider history and metered extraction can each take up to 12s.
 // Leave lease time for rereading durable progress and committing the snapshot.
@@ -48,7 +57,10 @@ async function reserve(dependencies: PipelineDependencies, kind: string, amount:
 async function runAuditJob(dependencies: PipelineDependencies, candidate: AuditJob): Promise<boolean> {
   const { store } = dependencies;
   const owner = crypto.randomUUID();
-  const job = await store.claimJob(candidate.id, owner, nowOf(dependencies), LEASE_MS);
+  // The writer's step runs only in a scheduled run and under a longer lease.
+  const composing = candidate.stage === "analyze" && dependencies.writer !== undefined && await store.getReport(candidate.reportId).then(item => item?.outcome === "report" && item.content === null);
+  if (composing && !dependencies.longTasks) return false;
+  const job = await store.claimJob(candidate.id, owner, nowOf(dependencies), composing ? WRITER_LEASE_MS : LEASE_MS);
   if (!job) return false;
   try {
     const report = await store.getReport(job.reportId);
@@ -128,6 +140,22 @@ async function runAuditJob(dependencies: PipelineDependencies, candidate: AuditJ
       if (!snapshot) throw new ReportFailure("SNAPSHOT_MISSING", false);
       const library = getLibrary(snapshot.library_version);
       if (library.status !== "approved" && !dependencies.allowDraft) throw new ReportFailure("LIBRARY_NOT_APPROVED", false);
+      if (report.outcome === "report" && report.result) {
+        // The writer's step: its checked texts, or the template texts and the code priority after the last failed try.
+        const tries = job.attempts.writer ?? 0;
+        const input = buildWriterInput(snapshot, report.result, library);
+        const written = dependencies.writer ? await dependencies.writer(await store.requireSession(job.sessionId), input, tries).catch(() => null) : null;
+        if (!written && dependencies.writer && tries + 1 < WRITER_ATTEMPTS) {
+          await store.checkpointJob(job.id, owner, nowOf(dependencies), { state: "retry_wait", errorCode: "WRITER_UNAVAILABLE", nextAttemptAt: nowOf(dependencies) + WRITER_RETRY_MS, incrementAttempt: "writer" });
+          return true;
+        }
+        const composed = buildReportContent(report.result, snapshot, library, 512_000, written);
+        await store.checkpointJob(job.id, owner, nowOf(dependencies), { stage: "render", state: "pending", nextAttemptAt: nowOf(dependencies), reportPatch: {
+          content: composed as unknown as Json, contentHash: await sha256(JSON.stringify(composed)),
+          review: { ...(report.review && typeof report.review === "object" && !Array.isArray(report.review) ? report.review : {}), writer: written ? WRITER_MODEL : "template", writer_tries: tries + 1 },
+        } });
+        return true;
+      }
       const result = analyzeAudit(snapshot, library, { allowDraft: dependencies.allowDraft });
       const content = buildReportContent(result, snapshot, library, 512_000);
       if (new TextEncoder().encode(JSON.stringify(result)).byteLength > 512_000) throw new ReportFailure("RESULT_TOO_LARGE", false);
@@ -150,6 +178,13 @@ async function runAuditJob(dependencies: PipelineDependencies, candidate: AuditJ
         await store.checkpointJob(job.id, owner, nowOf(dependencies), { state: "done", errorCode: null, reportPatch: {
           result, outcome: "insufficient", review: review as unknown as Json, status: "ready", reportExpiresAt, publishedAt: nowOf(dependencies), errorCode: null,
           rulesVersion: result.rules_version, tariffsVersion: result.tariffs_version, templateVersion: result.template_version,
+        } });
+        return true;
+      }
+      if (dependencies.writer) {
+        // Enough information: the result is kept and the writer's step follows in a scheduled run.
+        await store.checkpointJob(job.id, owner, nowOf(dependencies), { stage: "analyze", state: "pending", nextAttemptAt: nowOf(dependencies), reportPatch: {
+          result, outcome: "report", review: review as unknown as Json, rulesVersion: result.rules_version, tariffsVersion: result.tariffs_version, templateVersion: result.template_version,
         } });
         return true;
       }

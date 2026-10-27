@@ -328,3 +328,45 @@ test("DeepSeek V4 Pro may stop the report; a failed check is retried, then the c
     assert.equal((await failing.store.getReport("report"))!.status, "ready"); assert.equal(failing.renders, 1);
   } finally { failing.db.close(); }
 });
+
+test("the report writer runs only in a scheduled run, under a longer lease; its texts go into the PDF, failures fall back to the template", async () => {
+  const f = await fixture();
+  try {
+    const inputs: unknown[] = []; let calls = 0;
+    const leases: number[] = [];
+    f.dependencies.writer = async (_session, input) => { calls++; inputs.push(input); leases.push((f.db.sqlite.prepare("SELECT lease_expires_at FROM audit_jobs").get() as { lease_expires_at: number }).lease_expires_at); return { summary: "Главное — связать оплаты с источниками заявок, начать стоит с этого.", plan_intro: "Сначала связываем источники и оплаты.",
+      problems: input.problems.map(problem => ({ id: problem.id, situation: "Продажи из CRM не связаны с рекламными источниками, поэтому отдачу каналов не видно.", priority: "low" as const, why: "Проблема подтверждена Вашими ответами." })) }; };
+    await runOneJob(f.dependencies); await runOneJob(f.dependencies);
+    // Enough information: the result is kept and the writer's step waits for a scheduled run.
+    const analysed = (await f.store.getReport("report"))!;
+    assert.equal(analysed.outcome, "report"); assert.ok(analysed.result); assert.equal(analysed.content, null);
+    assert.equal((await runOneJob(f.dependencies)).kind, "idle", "an HTTP waitUntil run never starts the writer");
+    assert.equal(calls, 0);
+    f.dependencies.longTasks = true;
+    await runOneJob(f.dependencies);
+    const lease = f.db.sqlite.prepare("SELECT stage FROM audit_jobs").get() as { stage: string };
+    assert.equal(lease.stage, "render"); assert.equal(calls, 1);
+    assert.deepEqual(leases, [start + 5 * 60_000], "the writer holds a five-minute lease");
+    const composed = (await f.store.getReport("report"))!;
+    assert.ok(JSON.stringify(composed.content).includes("Главное — связать оплаты с источниками заявок"));
+    assert.equal((composed.review as Record<string, unknown>).writer, "deepseek-v4-pro");
+    assert.ok((inputs[0] as { problems: unknown[] }).problems.length === 1);
+    await runOneJob(f.dependencies);
+    assert.equal((await f.store.getReport("report"))!.status, "ready"); assert.equal(f.renders, 1);
+  } finally { f.db.close(); }
+  const failing = await fixture();
+  try {
+    let calls = 0;
+    failing.dependencies.writer = async () => { calls++; return null; };
+    failing.dependencies.longTasks = true;
+    await runOneJob(failing.dependencies); await runOneJob(failing.dependencies); await runOneJob(failing.dependencies);
+    const job = failing.db.sqlite.prepare("SELECT state, attempts_json, next_attempt_at, lease_expires_at FROM audit_jobs").get() as { state: string; attempts_json: string; next_attempt_at: number };
+    assert.equal(job.state, "retry_wait"); assert.equal(JSON.parse(job.attempts_json).writer, 1); assert.equal(job.next_attempt_at, start + 2 * 60_000);
+    failing.setNow(start + 2 * 60_000); await runOneJob(failing.dependencies);
+    failing.setNow(start + 4 * 60_000); await runOneJob(failing.dependencies);
+    assert.equal(calls, 3);
+    const composed = (await failing.store.getReport("report"))!;
+    assert.equal((composed.review as Record<string, unknown>).writer, "template");
+    assert.ok(JSON.stringify(composed.content).includes(library.report.texts.summary_fallback));
+  } finally { failing.db.close(); }
+});
