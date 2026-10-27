@@ -2,6 +2,18 @@
 
 ---
 
+- Date/time: 2026-10-27 01:07
+- Scope: S:\PROJECTS\pixelplustest
+- Summary: ветка `codex/expert-chat-panel` (рабочая копия `.deployment\expert-chat-panel`) перемотана вперёд на `main` до коммита с этой записью.
+  - Ветка была чистой, своих коммитов не имела и отставала на один коммит (94c7c13 → 2a1da84: «Вы» с заглавной и без «небольшую» в приветствии).
+  - Перемотка с `core.autocrlf=false`, чтобы файлы в этой рабочей копии остались с LF.
+- Files changed:
+  - project_log.md
+  - вне репозитория: рабочая копия `.deployment/expert-chat-panel`
+- Reference: «Да, перемотай ветку Codex (codex/expert-chat-panel) на main.»
+
+---
+
 - Date/time: 2026-10-27 01:04
 - Scope: S:\PROJECTS\pixelplustest
 - Summary: в приветствии чата и первой реплике голоса — только два изменения по указанию владельца. Остальной текст не менялся.
