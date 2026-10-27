@@ -1,7 +1,7 @@
 import { createChatHandler as createPreparedChatHandler, type PreparedChatTurn } from './chat/handler.ts';
 import type { ClassifierRuntime } from './chat/types.ts';
 import { composeChatMessage, type ComposeInput, type Composed } from './chat/composer.ts';
-import { answerQuestion, formatAnswer } from './chat/answerer.ts';
+import { answerQuestion, formatAnswer, NO_ANSWER } from './chat/answerer.ts';
 import { checkPersonalName, screenNameAnswers } from './chat/name-check.ts';
 import { screenWebsiteAnswers, websiteExists } from './chat/website-check.ts';
 import { searchKnowledge } from './search/service.ts';
@@ -80,7 +80,7 @@ async function composeTurn(context: AdapterContext, session: StoredSession, oper
   }
 }
 /** Answers a visitor question from the knowledge base; null when the feature is off or fails, so the turn is never blocked.
- * answered is false for the honest fallbacks (nothing found, or only the closest page). */
+ * answered is false for the honest fallbacks (nothing found or no answer in the materials, or only the closest page). */
 async function answerFromKnowledge(context: AdapterContext, session: StoredSession, operationId: string, question: string, history: { role: string; text: string }[], timeoutMs: number): Promise<{ text: string; answered: boolean } | null> {
   if (context.env.KNOWLEDGE_ANSWERS_ENABLED !== 'true' || !question.trim() || timeoutMs < 2_000) return null;
   try {
@@ -88,7 +88,10 @@ async function answerFromKnowledge(context: AdapterContext, session: StoredSessi
     if (!fragments.length) return { text: NOT_FOUND, answered: false };
     const runtime = await createChatRuntime(context, session, operationId, ANSWER_ATTEMPT);
     const answered = await answerQuestion({ question, fragments, history }, { ...runtime, max_tokens: 900, timeout_ms: timeoutMs });
-    // Without a checked answer the closest page is still useful and honest.
+    // The materials hold no answer: the visitor is told so. The pages found are then only close in wording («Какие работы не делает…»
+    // found the FAQ of the 1С page), so no link is offered.
+    if (answered === NO_ANSWER) return { text: NOT_FOUND, answered: false };
+    // A failure (provider, format or checks): the closest page is still useful and honest.
     return answered ? { text: formatAnswer(answered), answered: true } : { text: 'Подробнее об этом — на странице «' + fragments[0].title + '»: ' + fragments[0].url, answered: false };
   } catch (error) {
     console.warn(JSON.stringify({ event: 'knowledge_answer_failed', reason: error instanceof Error ? error.message : 'unknown' }));
@@ -101,7 +104,7 @@ export async function voiceKnowledgeAnswer(context: AdapterContext, session: Sto
   try {
     const runtime = await createChatRuntime(context, session, `voice-answer:${crypto.randomUUID()}`, ANSWER_ATTEMPT);
     const answered = await answerQuestion({ question, fragments, history: [], channel: 'voice' }, { ...runtime, max_tokens: 600, timeout_ms: 15_000 });
-    return answered?.answer ?? null;
+    return answered && answered !== NO_ANSWER ? answered.answer : null;
   } catch (error) {
     console.warn(JSON.stringify({ event: 'voice_knowledge_answer_failed', reason: error instanceof Error ? error.message : 'unknown' }));
     return null;

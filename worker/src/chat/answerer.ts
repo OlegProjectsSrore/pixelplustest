@@ -5,6 +5,9 @@ import type { ClassifierRuntime, DeepseekModel } from './types.ts';
 export interface Fragment { title: string; heading: string; url: string; text: string }
 export interface AnswerInput { question: string; fragments: Fragment[]; history: { role: string; text: string }[]; channel?: 'chat' | 'voice' }
 export interface Answered { answer: string; sources: string[] }
+/** The model found no answer in the fragments: an empty answer, or an answer based on no fragment («Во фрагментах нет информации…»). */
+export const NO_ANSWER = 'no_answer';
+export type AnswerResult = Answered | typeof NO_ANSWER | null;
 
 // The output format is a contract with checkAnswer, so it stays here rather than in the editable style.
 const CONTRACT = `Верни только JSON-объект {"answer":"...","sources":["..."]}: оба поля обязательны, других полей нет.
@@ -31,24 +34,26 @@ const clean = (text: string) => text.replace(/\s+/g, ' ').trim();
 // \s includes the no-break space used in prices like «15 000 ₽».
 const numbers = (text: string) => (text.match(/\d[\d\s]*(?:[.,]\d+)?/g) ?? []).map(number => number.replace(/\s/g, '').replace(',', '.'));
 
-/** Code checks: plain text, sources only from the fragments, and every number (prices, terms) must occur in them. */
-export function checkAnswer(content: string, input: AnswerInput): Answered | null {
+/** Code checks: plain text, sources only from the fragments, and every number (prices, terms) must occur in them.
+ * NO_ANSWER when the model found no answer there; null when the reply breaks the format or the checks. */
+export function checkAnswer(content: string, input: AnswerInput): AnswerResult {
   let raw: unknown;
   try { raw = JSON.parse(content); } catch { return null; }
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
   const value = raw as Record<string, unknown>;
   if (Object.keys(value).sort().join(',') !== 'answer,sources' || typeof value.answer !== 'string' || !Array.isArray(value.sources)) return null;
   const answer = clean(value.answer), sources = [...new Set(value.sources)];
-  if (!answer || answer.length < 20 || answer.length > 1200 || MARKUP.test(answer)) return null;
+  if (!answer || !sources.length) return NO_ANSWER;
+  if (answer.length < 20 || answer.length > 1200 || MARKUP.test(answer)) return null;
   const urls = new Set(input.fragments.map(fragment => fragment.url));
-  if (!sources.length || sources.length > 2 || sources.some(source => typeof source !== 'string' || !urls.has(source))) return null;
+  if (sources.length > 2 || sources.some(source => typeof source !== 'string' || !urls.has(source))) return null;
   const known = new Set(numbers(input.fragments.map(fragment => `${fragment.title} ${fragment.heading} ${fragment.text}`).join(' ')));
   if (numbers(answer).some(number => !known.has(number))) return null;
   return { answer, sources: sources as string[] };
 }
 
-/** One metered attempt to answer from the fragments. Null on any provider or check failure. */
-export async function answerQuestion(input: AnswerInput, runtime: ClassifierRuntime): Promise<Answered | null> {
+/** One metered attempt to answer from the fragments. NO_ANSWER when the fragments hold no answer; null on any provider or check failure. */
+export async function answerQuestion(input: AnswerInput, runtime: ClassifierRuntime): Promise<AnswerResult> {
   if (!runtime.api_key?.trim() || !input.fragments.length) return null;
   const exchange = await requestDeepseek(buildAnswerPrompt(input), runtime, ANSWER_TEMPERATURE, ANSWER_MODEL);
   const body = exchange.body as { choices?: { finish_reason?: unknown; message?: { content?: unknown } }[] } | null;

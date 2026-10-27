@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { ANSWER_MODEL, ANSWER_TEMPERATURE, answerQuestion, buildAnswerPrompt, checkAnswer, formatAnswer, type AnswerInput } from './answerer.ts';
+import { ANSWER_MODEL, ANSWER_TEMPERATURE, answerQuestion, buildAnswerPrompt, checkAnswer, formatAnswer, NO_ANSWER, type AnswerInput } from './answerer.ts';
 import { ANSWER_STYLE } from './answer-style.ts';
 import type { ClassifierRuntime, ProviderExchange } from './types.ts';
 
@@ -21,9 +21,15 @@ test('numbers absent from the fragments, foreign sources, links and markup are r
   assert.equal(checkAnswer(out('Продвижение по позициям — от 79 500 руб. в месяц.', ['https://pixelplus.ru/other/']), input), null);
   assert.equal(checkAnswer(out('Подробнее на https://pixelplus.ru/tarify/seo/ — от 79 500 руб.', [seo]), input), null);
   assert.equal(checkAnswer(out('**Цена:** от 79 500 руб. в месяц за продвижение.', [seo]), input), null);
-  assert.equal(checkAnswer(out('Продвижение по позициям — от 79 500 руб. в месяц.', []), input), null, 'sources are required');
-  assert.equal(checkAnswer(out('', []), input), null, 'no answer in the fragments');
+  assert.equal(checkAnswer(out('Продвижение по позициям — от 79 500 руб. в месяц.', [seo, dev, 'https://pixelplus.ru/third/']), input), null, 'at most two sources');
   assert.equal(checkAnswer(JSON.stringify({ answer: 'Длинный достаточный ответ без цифр.', sources: [seo], extra: 1 }), input), null);
+});
+
+test('no answer in the fragments is a result of its own, not a failure: an empty answer or an answer based on no fragment', () => {
+  assert.equal(checkAnswer(out('', []), input), NO_ANSWER);
+  assert.equal(checkAnswer(out('Во фрагментах нет информации о том, какие работы «Пиксель Плюс» не выполняет.', []), input), NO_ANSWER);
+  assert.equal(checkAnswer(out('', [seo]), input), NO_ANSWER);
+  assert.equal(checkAnswer('не JSON', input), null, 'a broken reply is still a failure');
 });
 
 test('the prompt keeps the editable style, the fixed contract and the fragments as data', () => {
@@ -41,8 +47,9 @@ test('one DeepSeek call at a low temperature; failures and empty fragments retur
   assert.deepEqual(await answerQuestion(input, runtime(completed(out('Создаём сайты на Битрикс с 2007 года.', [dev])))), { answer: 'Создаём сайты на Битрикс с 2007 года.', sources: [dev] });
   assert.equal(bodies[0].temperature, ANSWER_TEMPERATURE);
   assert.equal(await answerQuestion(input, runtime({ outcome: 'unknown', status: null, body: null, usage: null, error: 'timeout' })), null);
+  assert.equal(await answerQuestion(input, runtime(completed(out('', [])))), NO_ANSWER);
   assert.equal(await answerQuestion({ ...input, fragments: [] }, runtime(completed('{}'))), null);
-  assert.equal(bodies.length, 2, 'no call without fragments');
+  assert.equal(bodies.length, 3, 'no call without fragments');
 });
 
 test('visitor answers are written by DeepSeek V4 Pro; the spoken variant asks for short sentences', async () => {

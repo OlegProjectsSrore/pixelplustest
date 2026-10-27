@@ -356,6 +356,17 @@ test('a service question is answered from the knowledge base and pauses the diag
   } finally { f.db.close(); }
 });
 
+test('no answer in the materials gives the honest reply, not a link to a page that is only close in wording', async () => {
+  for (const reply of [{ answer: '', sources: [] }, { answer: 'Во фрагментах нет информации о том, какие работы «Пиксель Плюс» не выполняет.', sources: [] }]) {
+    const f = await fixture(context => 'fragments' in context ? reply : intent('question'));
+    enableKnowledge(f);
+    try {
+      const response = await f.handler(f.request, f.context(f.body('q-1', 0, asked('Какие работы не делает Пиксель плюс?')))) as { operation: Record<string, Json> };
+      assert.equal(response.operation.text, 'В материалах Pixel Plus точного ответа на этот вопрос нет. Уточнить детали можно у специалистов студии: https://pixelplus.ru/contact/zakaz/');
+    } finally { f.db.close(); }
+  }
+});
+
 test('an unchecked answer falls back to the closest page; nothing found or the feature off gives an honest reply', async () => {
   const f = await fixture(context => 'fragments' in context ? { answer: 'Продвижение стоит от 1 рубля навсегда.', sources: [(context as never as { fragments: { url: string }[] }).fragments[0].url] } : intent('question'));
   enableKnowledge(f);
