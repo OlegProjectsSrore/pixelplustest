@@ -1,4 +1,4 @@
-import { createAuditView } from './audit-ui.js?v=cc35ba0f24';
+import { createAuditView } from './audit-ui.js?v=07c4e8d01c';
 import { createAuditTransport, createAuditStorage, AuditRequestError } from './audit-http.js';
 import { getTurnstileToken } from './audit-turnstile.js';
 import { checkMicrophone, createVoiceAdapter, loadVoiceSdk } from './audit-voice.js?v=7f69e524a9';
@@ -85,13 +85,19 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
     const notice = session?.status === 'ready' && session.report?.outcome === 'insufficient' ? session.report.message || '' : null;
     view?.render({ mode, phase: phase(), question, diagnostic: session?.diagnostic_started !== false, notice,
       launchPending: !session && config?.publicSessionsEnabled === false,
-      messages: saved.messages || [], remaining_seconds: remaining(), busy,
+      messages: shownMessages(), remaining_seconds: remaining(), busy,
       voice_status: voiceStatus, email_status: emailStatus, error,
       capabilities: { chat: !!allowed, voice: !!allowed && !!(config?.voiceProvider === 'openai' || config?.ultravoxSdkUrl),
         resume: !!allowed && session.paused, pause: !!allowed && !session.paused,
         finish: !!allowed, email: session?.status === 'ready' && canManage && !busy && !saved.pending,
         restart: !!(session || saved.pending) },
     });
+  }
+  // The visitor's message is shown as soon as it is sent, while the reply is awaited; a refused request takes it away again.
+  function shownMessages() {
+    const messages = saved.messages || [], pending = saved.pending;
+    const id = pending?.user_text && pending.body?.operation_id ? `user:${pending.body.operation_id}` : null;
+    return id && !messages.some(message => message.id === id) ? [...messages, { id, role: 'user', text: pending.user_text }] : messages;
   }
   function addMessage(id, role, text) {
     if (!text || saved.messages.some(message => message.id === id)) return;
@@ -198,6 +204,8 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
     const previous = structuredClone(saved);
     const clearDraft = pending.clear_draft && (view?.getDraft?.() ?? saved.draft).trim() === pending.user_text;
     try {
+      // The visitor's message precedes the reply to it.
+      if (pending.user_text) addMessage(`user:${pending.body.operation_id}`, 'user', pending.user_text);
       accept(data);
       if (pending.path === '/api/voice/transcript') {
         const acceptedIds = data.accepted_event_ids;
@@ -218,7 +226,6 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
       if (pending.path === '/api/audit/finish' && ['closing', 'preparing', 'ready'].includes(saved.session.status)) saved.control_intent = null;
       if (pending.followup?.path === '/api/audit/finish') saved.control_intent = { action: 'finish', reason: pending.followup.extra.reason };
       if (pending.path === '/api/voice/start') saved.voice_call = { call_id: data.call_id, state: 'unconfirmed' };
-      if (pending.user_text) addMessage(`user:${pending.body.operation_id}`, 'user', pending.user_text);
       if (clearDraft) saved.draft = '';
       // Persist the second step before sending it, including its new revision/operation ID.
       saved.pending = pending.followup ? { path: pending.followup.path, body: mutationBody(pending.followup.extra) } : null;
@@ -235,6 +242,7 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
     if (saved.pending) throw new Error('Сначала повторите неподтверждённую отправку.');
     saved.pending = { path, body: mutationBody(extra), user_text: userText, clear_draft: clearDraft, followup };
     persist();
+    if (userText) render();
     return sendPending();
   }
   async function action(task) {

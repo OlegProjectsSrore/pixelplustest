@@ -186,6 +186,10 @@ export function createAuditView(handlers = {}) {
   const retryButton = button('Попробовать ещё раз', 'primary');
   recovery.append(retryButton);
 
+  // Empty room below the content, so that the visitor's latest question can reach the top of the window while the reply is short.
+  const reserve = element('div', 'audit-scroll-reserve');
+  reserve.setAttribute('aria-hidden', 'true');
+
   const footer = element('footer', 'audit-footer');
   const sessionActions = element('div', 'audit-session-actions');
   const pauseButton = button('На паузу');
@@ -200,9 +204,74 @@ export function createAuditView(handlers = {}) {
   const greeting = element('p', 'audit-greeting', 'Здравствуйте! Я могу ответить на вопросы об услугах Pixel Plus, помочь подобрать подходящее решение или провести экспресс-диагностику Вашего бизнеса. ');
   greeting.append(element('strong', 'audit-greeting-result', 'По её итогам Вы получите персональный PDF-отчёт с основными проблемами, приоритетами и рекомендациями.'));
   body.append(greeting, status, voiceStatus, notice, error, challengeElement,
-    messages, questionSection, readySection, recovery);
+    messages, questionSection, readySection, recovery, reserve);
   dialog.append(header, body, footer);
   document.body.append(dialog);
+
+  // The question at the top of the window, as in the portfolio chat: anchorId is the visitor's latest chat message, pinned holds it at
+  // the top while the content above or below changes, until the visitor scrolls.
+  let anchorId = null;
+  let lastUser = null;
+  let pinned = false;
+  let frame = 0;
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  function anchorNode() {
+    return anchorId ? [...messages.children].find(node => node.dataset.messageId === anchorId) ?? null : null;
+  }
+  // The scroll position that puts the question at the top; the reserve grows or shrinks so that this position exists.
+  function measure() {
+    const anchor = anchorNode();
+    if (!anchor || !dialog.open || messages.hidden) { reserve.style.height = '0px'; return body.scrollTop; }
+    const style = getComputedStyle(body);
+    const paddingTop = parseFloat(style.paddingTop) || 0;
+    const paddingBottom = parseFloat(style.paddingBottom) || 0;
+    const target = Math.max(0, body.scrollTop + anchor.getBoundingClientRect().top - body.getBoundingClientRect().top - body.clientTop - paddingTop);
+    reserve.style.height = `${Math.ceil(Math.max(0, target + body.clientHeight - reserve.offsetTop - paddingBottom))}px`;
+    return target;
+  }
+  function cancelScroll() {
+    cancelAnimationFrame(frame);
+    frame = 0;
+  }
+  function keepQuestion() {
+    const target = measure();
+    if (pinned && !frame && anchorNode()) body.scrollTop = target;
+  }
+  function scrollToQuestion(animate) {
+    cancelScroll();
+    if (!anchorNode()) return;
+    const start = body.scrollTop;
+    const started = performance.now();
+    measure();
+    if (!animate || reducedMotion.matches) {
+      body.scrollTop = measure();
+      return;
+    }
+    const step = time => {
+      const progress = Math.min(1, Math.max(0, (time - started) / 800));
+      const eased = 1 - Math.pow(1 - progress, 3);
+      body.scrollTop = start + (measure() - start) * eased;
+      frame = progress < 1 ? requestAnimationFrame(step) : 0;
+    };
+    frame = requestAnimationFrame(step);
+  }
+  // The visitor's own scrolling takes precedence: the animation stops and the question is no longer held at the top.
+  function releaseQuestion() {
+    cancelScroll();
+    pinned = false;
+  }
+  body.addEventListener('wheel', releaseQuestion, { passive: true });
+  body.addEventListener('touchstart', releaseQuestion, { passive: true });
+  body.addEventListener('pointerdown', releaseQuestion, { passive: true });
+  body.addEventListener('keydown', event => {
+    if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(event.key)) releaseQuestion();
+  });
+  // A reply, the next question, a status line or a resized window: the question stays where it is.
+  const resize = typeof ResizeObserver === 'function' ? new ResizeObserver(() => { if (!destroyed) keepQuestion(); }) : null;
+  if (resize) {
+    resize.observe(body);
+    for (const node of body.children) if (node !== reserve) resize.observe(node);
+  }
 
   function call(name, ...args) {
     if (!destroyed && typeof handlers[name] === 'function') handlers[name](...args);
@@ -367,6 +436,7 @@ export function createAuditView(handlers = {}) {
       messages.replaceChildren(...nextMessages.map(message => {
         const user = message.role === 'user';
         const item = element('div', `audit-message${user ? ' audit-message--user' : ''}`);
+        item.dataset.messageId = typeof message.id === 'string' ? message.id : '';
         const role = element('span', 'audit-message-role', user ? 'Вы' : 'Ассистент');
         const text = messageText(safeText(message.text), !user);
         item.append(role, text);
@@ -443,7 +513,22 @@ export function createAuditView(handlers = {}) {
     sessionActions.hidden = !interviewing && !paused && !capabilities.restart;
     if (dialog.open && previousPhase !== 'interview' && interviewing && model.mode === 'chat' && dialog.contains(document.activeElement)) draft.focus({ preventScroll: true });
     const hasNewQuestion = previousQuestionId && previousQuestionId !== question?.id;
-    if (dialog.open && (hasNewQuestion || (messagesChanged && nearEnd))) {
+    // A new message of the visitor in the chat goes to the top of the window once; the reply and the next question appear below it.
+    // Voice keeps following the end of the conversation.
+    const latestUser = [...nextMessages].reverse().find(message => message.role === 'user')?.id ?? null;
+    const asked = model.mode === 'chat' && latestUser !== null && latestUser !== lastUser;
+    lastUser = latestUser;
+    if (asked) {
+      anchorId = latestUser;
+      pinned = true;
+    }
+    if (model.mode !== 'chat' || latestUser === null) {
+      anchorId = null;
+      releaseQuestion();
+    }
+    if (dialog.open && asked) scrollToQuestion(true);
+    else keepQuestion();
+    if (dialog.open && !anchorId && (hasNewQuestion || (messagesChanged && nearEnd))) {
       requestAnimationFrame(() => {
         if (destroyed) return;
         if (hasNewQuestion && !questionSection.hidden) body.scrollTop = Math.max(0, questionSection.offsetTop - 16);
@@ -461,6 +546,11 @@ export function createAuditView(handlers = {}) {
       if (destroyed || dialog.open) return;
       opener = document.activeElement;
       showPanel();
+      // Reopened chat: back to the visitor's latest question, without animation.
+      if (anchorId) {
+        pinned = true;
+        scrollToQuestion(false);
+      }
       opener?.setAttribute('aria-expanded', 'true');
       (canAnswer() ? draft : closeButton).focus({ preventScroll: true });
     },
@@ -486,6 +576,8 @@ export function createAuditView(handlers = {}) {
       if (destroyed) return;
       close();
       destroyed = true;
+      cancelScroll();
+      resize?.disconnect();
       mobile.removeEventListener('change', changeViewport);
       document.removeEventListener('keydown', escape);
       dialog.remove();

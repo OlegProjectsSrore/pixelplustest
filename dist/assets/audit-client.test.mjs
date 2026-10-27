@@ -565,3 +565,30 @@ test('a voice answer that the company has a site moves the interview to the chat
   assert.equal(texts[reply + 1], 'Дальше можно отвечать здесь или вернуться к голосу — кнопка «Голос» вверху окна.');
   assert.equal(texts.filter(text => text.startsWith('Дальше можно')).length, 1, 'the hint is given once');
 });
+
+test('the visitor\'s message is shown as soon as it is sent and stays above the reply', async t => {
+  let during;
+  const f = fixture(t, { request: async (path, options, context) => {
+    if (path !== '/api/chat') return undefined;
+    during = f.model.messages.map(message => [message.role, message.text]);
+    context.server.revision++;
+    return { session: structuredClone(context.server), operation: { operation_id: options.body.operation_id, text: 'Нет, созданием игр мы не занимаемся.' } };
+  } });
+  await f.client.open(); f.draft = 'А Пиксель плюс занимается созданием игр?';
+  await f.handlers.onText(f.draft);
+  assert.deepEqual(during, [['user', 'А Пиксель плюс занимается созданием игр?']], 'the message is on screen before the reply');
+  assert.deepEqual(f.model.messages.map(message => [message.role, message.text]), [['user', 'А Пиксель плюс занимается созданием игр?'], ['assistant', 'Нет, созданием игр мы не занимаемся.']]);
+  assert.deepEqual(f.stored.messages.map(message => message.role), ['user', 'assistant']);
+  assert.equal(f.model.messages[0].id, `user:${f.calls.find(call => call.path === '/api/chat').body.operation_id}`, 'the shown message keeps its place when confirmed');
+});
+
+test('a refused message is taken off the screen and its text stays in the draft', async t => {
+  const f = fixture(t, { request: async path => {
+    if (path === '/api/chat') throw new AuditRequestError('Запрос отклонён.', { status: 400, code: 'invalid_answer' });
+    return undefined;
+  } });
+  await f.client.open(); f.draft = 'Ответ';
+  await f.handlers.onText(f.draft);
+  assert.deepEqual(f.model.messages, []);
+  assert.equal(f.draft, 'Ответ');
+});
