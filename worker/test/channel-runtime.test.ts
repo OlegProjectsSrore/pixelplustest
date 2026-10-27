@@ -368,6 +368,17 @@ test('a question about the current question is explained from the real dialog an
   } finally { f.db.close(); }
 });
 
+test('when the classifier cannot tell whether a question is about the audit or about Pixel Plus, the visitor is asked; the survey goes on', async () => {
+  const f = await fixture((context, call) => call === 1 ? reportFromText(context) : intent('clarify'));
+  try {
+    await f.handler(f.request, f.context(f.body()));
+    const response = await f.handler(f.request, f.context(f.body('turn-2', 1, { kind: 'text', text: 'А вы это делаете?' }, 'context_position'))) as { operation: Record<string, Json> };
+    assert.equal(response.operation.text, 'Уточните, пожалуйста, о чём Ваш вопрос: о текущем вопросе опроса или о работе Pixel Plus — её услугах, ценах и кейсах.');
+    assert.equal(response.operation.question_id, 'context_position');
+    assert.equal((await f.core.store.requireSession(f.session.id)).state.mode, 'diagnostic');
+  } finally { f.db.close(); }
+});
+
 test('during the survey a question the materials cannot answer is explained as a question about the survey, not paused', async () => {
   const seen: Record<string, Json>[] = [];
   const f = await fixture((context, call) => {

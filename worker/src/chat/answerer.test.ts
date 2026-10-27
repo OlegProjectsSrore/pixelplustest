@@ -52,6 +52,11 @@ test('one DeepSeek call at a low temperature; failures and empty fragments retur
   assert.equal(bodies.length, 3, 'no call without fragments');
 });
 
+test('the answer style knows both kinds of chat questions and asks to clarify an unclear one with the options', () => {
+  assert.match(ANSWER_STYLE, /В чате спрашивают о деятельности Pixel Plus — услугах, ценах, сроках, кейсах, компании — и о проводимом аудите/);
+  assert.match(ANSWER_STYLE, /Если вопрос неясен \(например, «Сколько стоит\?» без названия услуги\), не угадывай: коротко попроси уточнить и назови подходящие варианты из фрагментов\./);
+});
+
 test('visitor answers are written by DeepSeek V4 Pro; the spoken variant asks for short sentences', async () => {
   const bodies: Record<string, unknown>[] = [];
   const runtime: ClassifierRuntime = { api_key: 'key', max_tokens: 900, timeout_ms: 5000,

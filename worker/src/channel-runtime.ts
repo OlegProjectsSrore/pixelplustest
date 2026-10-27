@@ -67,6 +67,9 @@ const NOT_FOUND = 'В материалах Pixel Plus точного ответ�
 const HELP_NOTICE = 'Подскажите, чем могу помочь.';
 // The visitor asks what is going on before the survey («Ты меня спрашиваешь?»): what the assistant can do.
 const HELP_EXPLAINED = 'Я помощник Pixel Plus: отвечу на вопросы об услугах студии или проведу экспресс-диагностику Вашего бизнеса, по итогам которой Вы получите PDF-отчёт. Напишите, что Вам интереснее.';
+// The classifier could not tell whether the visitor asks about the audit or about Pixel Plus: the visitor is asked. Shown as is: the
+// composer, asked to reword it, left its reply empty or put the request into the survey question.
+const ASK_WHICH = 'Уточните, пожалуйста, о чём Ваш вопрос: о текущем вопросе опроса или о работе Pixel Plus — её услугах, ценах и кейсах.';
 // Shown when the composer cannot word an explanation of the current question; the question itself stays below.
 const EXPLAIN_FALLBACK = 'Ответьте, как понимаете вопрос: подойдёт любой ответ своими словами.';
 // FAQ answers and jokes are approved texts shown verbatim; other notices are reworded by DeepSeek.
@@ -219,8 +222,12 @@ export async function commitChatTurn(request: Request, context: AdapterContext, 
   state.current_question_id = question?.id ?? null;
   // The visitor asks what the current question means («Какой именно результат?»): the question is explained and asked again;
   // the survey goes on.
-  let explain = turn.action === 'clarify' && turn.classification?.intent === 'clarify' && question !== null && state.mode !== 'questions';
+  const clarifying = turn.action === 'clarify' && turn.classification?.intent === 'clarify' && question !== null && state.mode !== 'questions';
+  let explain = clarifying && turn.classification?.clarification_question_id === question?.id;
   if (explain) serviceText = EXPLAIN_FALLBACK;
+  // Unclear whether the question is about the audit or about Pixel Plus: the visitor is asked what they mean; the survey goes on.
+  const askWhich = clarifying && !explain;
+  if (askWhich) serviceText = ASK_WHICH;
   const surveyOn = session.state.mode !== 'questions' && session.state.current_question_id !== null;
   if (['off_topic', 'humor_preference', 'role_change'].includes(turn.action)) {
     const reply = selectHumorReply(state, humorIntent(turn, now), question, lib);
@@ -258,7 +265,7 @@ export async function commitChatTurn(request: Request, context: AdapterContext, 
   let questionText: string | null = null;
   // The survey question does not change after a pure question, so its earlier wording stays.
   if (turn.action !== 'sensitive' && (turn.action !== 'question' || explain) && timeLeft() > 1_500) {
-    const approved = explain ? null : (APPROVED_TEXT_ACTIONS.includes(turn.action) && !offerHelp) || asksKnowledge ? serviceText : null;
+    const approved = explain ? null : (APPROVED_TEXT_ACTIONS.includes(turn.action) && !offerHelp) || asksKnowledge || askWhich ? serviceText : null;
     // The composer sees the whole exchange and the question being answered, so its reaction is to this answer, not to an earlier one.
     const turns = await context.core.store.recentTurns(session.id);
     const composed = await composeTurn(context, session, turn.input.operation_id, COMPOSE_ATTEMPT, Math.min(8_000, timeLeft()), { visitor_text: turn.event.text ?? null,

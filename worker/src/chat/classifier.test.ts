@@ -155,7 +155,10 @@ test('prompt file has only the intents mark; every intent is listed and visitor 
   assert.doesNotMatch(system.content, /\{\{\w+\}\}/);
   assert(system.content.includes(`intent только из списка: ${INTENTS.join(', ')}.`));
   assert.match(system.content, /Схема JSON: \{"intent":"unknown","answers":\[\],"clarification_question_id":null,"faq_id":null,"joke_category_id":null,"humor_preference":null\}/);
-  assert.equal(system.content.split('\n').length, 21);
+  assert.equal(system.content.split('\n').length, 22);
+  // Two kinds of questions: within the audit, or about Pixel Plus; when it cannot tell which, it does not guess.
+  assert.match(system.content, /Вопросы посетителя бывают двух видов\. Первый — в рамках аудита, то есть экспресс-диагностики его бизнеса: .* — это clarify\. Второй — о деятельности Pixel Plus: .* — это question/);
+  assert.match(system.content, /Если по реплике и разговору нельзя понять, о чём вопрос — об аудите или о деятельности Pixel Plus, не угадывай: выбирай clarify с clarification_question_id null/);
   // A question about the question on screen is a clarification, not a question about Pixel Plus services.
   assert.match(system.content, /clarify — посетитель не отвечает на текущий вопрос, а спрашивает о нём самом: .*«Какой именно результат\?»/);
   assert.match(system.content, /Вопрос о смысле текущего вопроса опроса — clarify, а не question\./);

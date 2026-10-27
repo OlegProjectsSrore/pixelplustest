@@ -73,6 +73,11 @@ test('a question about the current question is explained: the flag is sent, an e
     { reply: 'Речь о результате, который Вы назвали главным, — сухие дрова.', question_text: 'К какому сроку они нужны?' });
 });
 
+test('the chat style names both kinds of questions and asks to clarify when it is unclear which', () => {
+  assert.match(CHAT_STYLE, /О чём спрашивает посетитель\n- Посетитель может спрашивать в рамках аудита: .*\n- Он может спрашивать и просто о деятельности Pixel Plus: /);
+  assert.match(CHAT_STYLE, /Если непонятно, о чём вопрос — об аудите или о Pixel Plus — или что посетитель имеет в виду, не угадывай: вежливо попроси уточнить/);
+});
+
 function runtime(reply: (body: Record<string, unknown>) => ProviderExchange): ClassifierRuntime & { bodies: Record<string, unknown>[] } {
   const bodies: Record<string, unknown>[] = [];
   return { api_key: 'key', max_tokens: 600, timeout_ms: 5000, bodies,
