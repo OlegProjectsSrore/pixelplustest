@@ -2,7 +2,8 @@ import type { Json } from "../audit/contracts.ts";
 
 // The report states only what the visitor told: no «unknown», «not stated» or «needs clarification» lines.
 export const fieldLabels: Record<string, string> = { description: "описание", object: "объект", observation: "что происходит", period: "период", context: "обстоятельства",
-  task: "задача", current_way: "как сейчас", constraint: "ограничение", level: "насколько важно" };
+  task: "задача", current_way: "как сейчас", constraint: "ограничение", level: "насколько важно",
+  frequency: "как часто", effort: "время и люди", data_location: "где данные", human_decision: "решение человека", error_cost: "цена ошибки" };
 
 export function object(value: Json | undefined): Record<string, Json> | null { return value !== null && typeof value === "object" && !Array.isArray(value) ? value : null; }
 export function strings(value: Json | undefined): string[] { return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : []; }

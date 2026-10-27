@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0.0",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "status": "approved",
   "author": "Codex — подготовка по методике и локальным источникам",
   "reviewer": "project_owner_chat_approval",
-  "approved_at": "2026-10-23T06:01:25.796Z",
+  "approved_at": "2026-10-27T03:08:12Z",
   "items": [
     {
       "id": "strategy_goal",
@@ -9805,6 +9805,1355 @@
         "clarification": "Сколько ручной работы занимает сборка согласованных показателей из 1С для регулярного отчёта?"
       },
       "negative_example": "Согласованные отчёты собираются без существенной ручной работы"
+    },
+    {
+      "id": "ads_social",
+      "fact_id": "ads_social.signal",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "standard_values": [
+        {
+          "value": "target",
+          "meaning": "Есть данные о расходах и обращениях из соцсетей, подходящих обращений мало или они дороже ориентира",
+          "training_paraphrases": [
+            "Есть данные о расходах и обращениях из соцсетей, подходящих обращений мало или они дороже ориентира",
+            "Таргет во ВКонтакте за месяц обошёлся в 80 тысяч, а подходящих заявок пришло всего три."
+          ],
+          "entailment": "Все существенные части значения должны быть явно сообщены; не достраивать их из вопроса."
+        },
+        {
+          "value": "alternative",
+          "meaning": "Реклама в соцсетях не запускалась либо её результат устраивает",
+          "training_paraphrases": [
+            "Реклама в соцсетях не запускалась либо её результат устраивает"
+          ],
+          "entailment": "Не выводить alternative из молчания, неизвестности или отсутствия вопроса."
+        }
+      ],
+      "state_answers": [
+        {
+          "state": "unknown",
+          "value": null
+        },
+        {
+          "state": "not_measured",
+          "value": null
+        },
+        {
+          "state": "not_applicable",
+          "value": null
+        },
+        {
+          "state": "declined",
+          "value": null
+        },
+        {
+          "state": "ambiguous",
+          "value": null
+        },
+        {
+          "state": "other",
+          "value": null
+        },
+        {
+          "state": "not_asked",
+          "value": null
+        },
+        {
+          "state": "conflicting",
+          "value": null
+        }
+      ],
+      "bare_yes_no": "Разрешать только по смыслу последнего однозначного вопроса; текущие открытые вопросы не дают автоматического соответствия «да» -> target.",
+      "boundary_example": {
+        "utterance": "Хотим проверить тему: Реклама в соцсетях не приносит подходящих обращений.",
+        "expected_state": "ambiguous",
+        "reason": "Запрос проверки не подтверждает наличие ситуации.",
+        "clarification": "Сколько подходящих обращений дала реклама в соцсетях за последний месяц и во что она обошлась?"
+      },
+      "negative_example": "Реклама в соцсетях не запускалась либо её результат устраивает",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "ads_awareness",
+      "fact_id": "ads_awareness.signal",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "standard_values": [
+        {
+          "value": "target",
+          "meaning": "Поисковых запросов мало: кампании не набирают показов или бюджет не расходуется, продукт новый или малоизвестный",
+          "training_paraphrases": [
+            "Поисковых запросов мало: кампании не набирают показов или бюджет не расходуется, продукт новый или малоизвестный",
+            "Продукт новый, его почти не ищут: кампания в Директе за месяц не потратила и половины бюджета."
+          ],
+          "entailment": "Все существенные части значения должны быть явно сообщены; не достраивать их из вопроса."
+        },
+        {
+          "value": "alternative",
+          "meaning": "Поискового спроса хватает для нужного объёма обращений",
+          "training_paraphrases": [
+            "Поискового спроса хватает для нужного объёма обращений"
+          ],
+          "entailment": "Не выводить alternative из молчания, неизвестности или отсутствия вопроса."
+        }
+      ],
+      "state_answers": [
+        {
+          "state": "unknown",
+          "value": null
+        },
+        {
+          "state": "not_measured",
+          "value": null
+        },
+        {
+          "state": "not_applicable",
+          "value": null
+        },
+        {
+          "state": "declined",
+          "value": null
+        },
+        {
+          "state": "ambiguous",
+          "value": null
+        },
+        {
+          "state": "other",
+          "value": null
+        },
+        {
+          "state": "not_asked",
+          "value": null
+        },
+        {
+          "state": "conflicting",
+          "value": null
+        }
+      ],
+      "bare_yes_no": "Разрешать только по смыслу последнего однозначного вопроса; текущие открытые вопросы не дают автоматического соответствия «да» -> target.",
+      "boundary_example": {
+        "utterance": "Хотим проверить тему: Продукт мало ищут: поисковой рекламе не хватает спроса.",
+        "expected_state": "ambiguous",
+        "reason": "Запрос проверки не подтверждает наличие ситуации.",
+        "clarification": "Набирает ли поисковая реклама достаточно показов, или Ваш продукт пока мало ищут?"
+      },
+      "negative_example": "Поискового спроса хватает для нужного объёма обращений",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "ads_management",
+      "fact_id": "ads_management.signal",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "standard_values": [
+        {
+          "value": "target",
+          "meaning": "Регулярной работы с кампаниями нет: настройки меняют редко или от случая к случаю",
+          "training_paraphrases": [
+            "Регулярной работы с кампаниями нет: настройки меняют редко или от случая к случаю",
+            "Рекламу настроили год назад, с тех пор в кампаниях почти ничего не меняли."
+          ],
+          "entailment": "Все существенные части значения должны быть явно сообщены; не достраивать их из вопроса."
+        },
+        {
+          "value": "alternative",
+          "meaning": "Кампании регулярно анализируют и корректируют",
+          "training_paraphrases": [
+            "Кампании регулярно анализируют и корректируют"
+          ],
+          "entailment": "Не выводить alternative из молчания, неизвестности или отсутствия вопроса."
+        }
+      ],
+      "state_answers": [
+        {
+          "state": "unknown",
+          "value": null
+        },
+        {
+          "state": "not_measured",
+          "value": null
+        },
+        {
+          "state": "not_applicable",
+          "value": null
+        },
+        {
+          "state": "declined",
+          "value": null
+        },
+        {
+          "state": "ambiguous",
+          "value": null
+        },
+        {
+          "state": "other",
+          "value": null
+        },
+        {
+          "state": "not_asked",
+          "value": null
+        },
+        {
+          "state": "conflicting",
+          "value": null
+        }
+      ],
+      "bare_yes_no": "Разрешать только по смыслу последнего однозначного вопроса; текущие открытые вопросы не дают автоматического соответствия «да» -> target.",
+      "boundary_example": {
+        "utterance": "Хотим проверить тему: Кампании не оптимизируются регулярно.",
+        "expected_state": "ambiguous",
+        "reason": "Запрос проверки не подтверждает наличие ситуации.",
+        "clarification": "Кто и как часто проверяет и корректирует рекламные кампании?"
+      },
+      "negative_example": "Кампании регулярно анализируют и корректируют",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "geo_competitors",
+      "fact_id": "geo_competitors.signal",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "standard_values": [
+        {
+          "value": "target",
+          "meaning": "Есть примеры запросов, где нейросети называют конкурентов и не называют компанию",
+          "training_paraphrases": [
+            "Есть примеры запросов, где нейросети называют конкурентов и не называют компанию",
+            "Спросили у Алисы, где заказать кухню в Москве, — она назвала трёх конкурентов, нас нет."
+          ],
+          "entailment": "Все существенные части значения должны быть явно сообщены; не достраивать их из вопроса."
+        },
+        {
+          "value": "alternative",
+          "meaning": "Компанию называют по важным запросам либо таких проверок не было",
+          "training_paraphrases": [
+            "Компанию называют по важным запросам либо таких проверок не было"
+          ],
+          "entailment": "Не выводить alternative из молчания, неизвестности или отсутствия вопроса."
+        }
+      ],
+      "state_answers": [
+        {
+          "state": "unknown",
+          "value": null
+        },
+        {
+          "state": "not_measured",
+          "value": null
+        },
+        {
+          "state": "not_applicable",
+          "value": null
+        },
+        {
+          "state": "declined",
+          "value": null
+        },
+        {
+          "state": "ambiguous",
+          "value": null
+        },
+        {
+          "state": "other",
+          "value": null
+        },
+        {
+          "state": "not_asked",
+          "value": null
+        },
+        {
+          "state": "conflicting",
+          "value": null
+        }
+      ],
+      "bare_yes_no": "Разрешать только по смыслу последнего однозначного вопроса; текущие открытые вопросы не дают автоматического соответствия «да» -> target.",
+      "boundary_example": {
+        "utterance": "Хотим проверить тему: Нейросети советуют конкурентов, а не компанию.",
+        "expected_state": "ambiguous",
+        "reason": "Запрос проверки не подтверждает наличие ситуации.",
+        "clarification": "Когда Вы спрашиваете у ChatGPT, Алисы или других нейросетей о своей категории, кого они советуют?"
+      },
+      "negative_example": "Компанию называют по важным запросам либо таких проверок не было",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "geo_negative",
+      "fact_id": "geo_negative.signal",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "standard_values": [
+        {
+          "value": "target",
+          "meaning": "Есть сохранённые примеры негативных оценок компании в ответах нейросетей",
+          "training_paraphrases": [
+            "Есть сохранённые примеры негативных оценок компании в ответах нейросетей",
+            "ChatGPT на вопрос о нас пересказывает старые жалобы с отзовика, скриншоты сохранили."
+          ],
+          "entailment": "Все существенные части значения должны быть явно сообщены; не достраивать их из вопроса."
+        },
+        {
+          "value": "alternative",
+          "meaning": "Негатива в ответах не встречали",
+          "training_paraphrases": [
+            "Негатива в ответах не встречали"
+          ],
+          "entailment": "Не выводить alternative из молчания, неизвестности или отсутствия вопроса."
+        }
+      ],
+      "state_answers": [
+        {
+          "state": "unknown",
+          "value": null
+        },
+        {
+          "state": "not_measured",
+          "value": null
+        },
+        {
+          "state": "not_applicable",
+          "value": null
+        },
+        {
+          "state": "declined",
+          "value": null
+        },
+        {
+          "state": "ambiguous",
+          "value": null
+        },
+        {
+          "state": "other",
+          "value": null
+        },
+        {
+          "state": "not_asked",
+          "value": null
+        },
+        {
+          "state": "conflicting",
+          "value": null
+        }
+      ],
+      "bare_yes_no": "Разрешать только по смыслу последнего однозначного вопроса; текущие открытые вопросы не дают автоматического соответствия «да» -> target.",
+      "boundary_example": {
+        "utterance": "Хотим проверить тему: В ответах нейросетей негатив о компании.",
+        "expected_state": "ambiguous",
+        "reason": "Запрос проверки не подтверждает наличие ситуации.",
+        "clarification": "Встречали ли Вы в ответах нейросетей отрицательные отзывы или оценки компании?"
+      },
+      "negative_example": "Негатива в ответах не встречали",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "geo_zero_click",
+      "fact_id": "geo_zero_click.signal",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "standard_values": [
+        {
+          "value": "target",
+          "meaning": "Позиции по важным запросам сохранились, а переходов из поиска стало заметно меньше",
+          "training_paraphrases": [
+            "Позиции по важным запросам сохранились, а переходов из поиска стало заметно меньше",
+            "Позиции в Яндексе те же, что и год назад, а переходов из поиска стало на треть меньше."
+          ],
+          "entailment": "Все существенные части значения должны быть явно сообщены; не достраивать их из вопроса."
+        },
+        {
+          "value": "alternative",
+          "meaning": "Переходы снижаются вместе с позициями либо не снижаются",
+          "training_paraphrases": [
+            "Переходы снижаются вместе с позициями либо не снижаются"
+          ],
+          "entailment": "Не выводить alternative из молчания, неизвестности или отсутствия вопроса."
+        }
+      ],
+      "state_answers": [
+        {
+          "state": "unknown",
+          "value": null
+        },
+        {
+          "state": "not_measured",
+          "value": null
+        },
+        {
+          "state": "not_applicable",
+          "value": null
+        },
+        {
+          "state": "declined",
+          "value": null
+        },
+        {
+          "state": "ambiguous",
+          "value": null
+        },
+        {
+          "state": "other",
+          "value": null
+        },
+        {
+          "state": "not_asked",
+          "value": null
+        },
+        {
+          "state": "conflicting",
+          "value": null
+        }
+      ],
+      "bare_yes_no": "Разрешать только по смыслу последнего однозначного вопроса; текущие открытые вопросы не дают автоматического соответствия «да» -> target.",
+      "boundary_example": {
+        "utterance": "Хотим проверить тему: Переходов из поиска меньше при тех же позициях: ответ забирают нейроответы.",
+        "expected_state": "ambiguous",
+        "reason": "Запрос проверки не подтверждает наличие ситуации.",
+        "clarification": "Как изменились переходы из поиска при прежних позициях сайта?"
+      },
+      "negative_example": "Переходы снижаются вместе с позициями либо не снижаются",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "seo_sanctions",
+      "fact_id": "seo_sanctions.signal",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "standard_values": [
+        {
+          "value": "target",
+          "meaning": "Трафик из поиска резко упал за короткий период без переноса сайта и сезонной причины",
+          "training_paraphrases": [
+            "Трафик из поиска резко упал за короткий период без переноса сайта и сезонной причины",
+            "В марте за неделю трафик из Яндекса упал вдвое, сайт никуда не переносили, сезон ни при чём."
+          ],
+          "entailment": "Все существенные части значения должны быть явно сообщены; не достраивать их из вопроса."
+        },
+        {
+          "value": "alternative",
+          "meaning": "Резкого падения не было либо его объясняют перенос или сезон",
+          "training_paraphrases": [
+            "Резкого падения не было либо его объясняют перенос или сезон"
+          ],
+          "entailment": "Не выводить alternative из молчания, неизвестности или отсутствия вопроса."
+        }
+      ],
+      "state_answers": [
+        {
+          "state": "unknown",
+          "value": null
+        },
+        {
+          "state": "not_measured",
+          "value": null
+        },
+        {
+          "state": "not_applicable",
+          "value": null
+        },
+        {
+          "state": "declined",
+          "value": null
+        },
+        {
+          "state": "ambiguous",
+          "value": null
+        },
+        {
+          "state": "other",
+          "value": null
+        },
+        {
+          "state": "not_asked",
+          "value": null
+        },
+        {
+          "state": "conflicting",
+          "value": null
+        }
+      ],
+      "bare_yes_no": "Разрешать только по смыслу последнего однозначного вопроса; текущие открытые вопросы не дают автоматического соответствия «да» -> target.",
+      "boundary_example": {
+        "utterance": "Хотим проверить тему: Резкое падение поискового трафика без переноса сайта.",
+        "expected_state": "ambiguous",
+        "reason": "Запрос проверки не подтверждает наличие ситуации.",
+        "clarification": "Было ли резкое падение поискового трафика, не связанное с переносом сайта или сезоном?"
+      },
+      "negative_example": "Резкого падения не было либо его объясняют перенос или сезон",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "seo_commercial",
+      "fact_id": "seo_commercial.signal",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "standard_values": [
+        {
+          "value": "target",
+          "meaning": "Есть сравнение с конкурентами и у них полнее цены, ассортимент, условия, контакты или отзывы",
+          "training_paraphrases": [
+            "Есть сравнение с конкурентами и у них полнее цены, ассортимент, условия, контакты или отзывы",
+            "Сравнивали с конкурентами из топа: у них на страницах цены, доставка и отзывы, у нас только описание."
+          ],
+          "entailment": "Все существенные части значения должны быть явно сообщены; не достраивать их из вопроса."
+        },
+        {
+          "value": "alternative",
+          "meaning": "Страницы не уступают конкурентам либо сравнения не было",
+          "training_paraphrases": [
+            "Страницы не уступают конкурентам либо сравнения не было"
+          ],
+          "entailment": "Не выводить alternative из молчания, неизвестности или отсутствия вопроса."
+        }
+      ],
+      "state_answers": [
+        {
+          "state": "unknown",
+          "value": null
+        },
+        {
+          "state": "not_measured",
+          "value": null
+        },
+        {
+          "state": "not_applicable",
+          "value": null
+        },
+        {
+          "state": "declined",
+          "value": null
+        },
+        {
+          "state": "ambiguous",
+          "value": null
+        },
+        {
+          "state": "other",
+          "value": null
+        },
+        {
+          "state": "not_asked",
+          "value": null
+        },
+        {
+          "state": "conflicting",
+          "value": null
+        }
+      ],
+      "bare_yes_no": "Разрешать только по смыслу последнего однозначного вопроса; текущие открытые вопросы не дают автоматического соответствия «да» -> target.",
+      "boundary_example": {
+        "utterance": "Хотим проверить тему: Конкуренты убедительнее по коммерческим факторам.",
+        "expected_state": "ambiguous",
+        "reason": "Запрос проверки не подтверждает наличие ситуации.",
+        "clarification": "Чем страницы конкурентов из первой десятки отличаются от Ваших: ценами, ассортиментом, доставкой, контактами, отзывами?"
+      },
+      "negative_example": "Страницы не уступают конкурентам либо сравнения не было",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "seo_competitors",
+      "fact_id": "seo_competitors.signal",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "standard_values": [
+        {
+          "value": "target",
+          "meaning": "Есть главные запросы, по которым конкуренты стабильно выше несколько месяцев",
+          "training_paraphrases": [
+            "Есть главные запросы, по которым конкуренты стабильно выше несколько месяцев",
+            "По запросу «кухни на заказ Москва» трое конкурентов уже полгода в топ-5, а мы на второй странице."
+          ],
+          "entailment": "Все существенные части значения должны быть явно сообщены; не достраивать их из вопроса."
+        },
+        {
+          "value": "alternative",
+          "meaning": "По главным запросам сайт не уступает конкурентам либо позиции не отслеживаются",
+          "training_paraphrases": [
+            "По главным запросам сайт не уступает конкурентам либо позиции не отслеживаются"
+          ],
+          "entailment": "Не выводить alternative из молчания, неизвестности или отсутствия вопроса."
+        }
+      ],
+      "state_answers": [
+        {
+          "state": "unknown",
+          "value": null
+        },
+        {
+          "state": "not_measured",
+          "value": null
+        },
+        {
+          "state": "not_applicable",
+          "value": null
+        },
+        {
+          "state": "declined",
+          "value": null
+        },
+        {
+          "state": "ambiguous",
+          "value": null
+        },
+        {
+          "state": "other",
+          "value": null
+        },
+        {
+          "state": "not_asked",
+          "value": null
+        },
+        {
+          "state": "conflicting",
+          "value": null
+        }
+      ],
+      "bare_yes_no": "Разрешать только по смыслу последнего однозначного вопроса; текущие открытые вопросы не дают автоматического соответствия «да» -> target.",
+      "boundary_example": {
+        "utterance": "Хотим проверить тему: Сайт стабильно ниже конкурентов по главным запросам.",
+        "expected_state": "ambiguous",
+        "reason": "Запрос проверки не подтверждает наличие ситуации.",
+        "clarification": "По каким главным запросам конкуренты стабильно выше Вас и как давно?"
+      },
+      "negative_example": "По главным запросам сайт не уступает конкурентам либо позиции не отслеживаются",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "seo_contractor",
+      "fact_id": "seo_contractor.signal",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "standard_values": [
+        {
+          "value": "target",
+          "meaning": "Решение о смене подрядчика принято или обсуждается",
+          "training_paraphrases": [
+            "Решение о смене подрядчика принято или обсуждается",
+            "Хотим уйти от нынешнего SEO-подрядчика, но боимся потерять позиции и купленные ссылки."
+          ],
+          "entailment": "Все существенные части значения должны быть явно сообщены; не достраивать их из вопроса."
+        },
+        {
+          "value": "alternative",
+          "meaning": "Смену подрядчика не планируют",
+          "training_paraphrases": [
+            "Смену подрядчика не планируют"
+          ],
+          "entailment": "Не выводить alternative из молчания, неизвестности или отсутствия вопроса."
+        }
+      ],
+      "state_answers": [
+        {
+          "state": "unknown",
+          "value": null
+        },
+        {
+          "state": "not_measured",
+          "value": null
+        },
+        {
+          "state": "not_applicable",
+          "value": null
+        },
+        {
+          "state": "declined",
+          "value": null
+        },
+        {
+          "state": "ambiguous",
+          "value": null
+        },
+        {
+          "state": "other",
+          "value": null
+        },
+        {
+          "state": "not_asked",
+          "value": null
+        },
+        {
+          "state": "conflicting",
+          "value": null
+        }
+      ],
+      "bare_yes_no": "Разрешать только по смыслу последнего однозначного вопроса; текущие открытые вопросы не дают автоматического соответствия «да» -> target.",
+      "boundary_example": {
+        "utterance": "Хотим проверить тему: Смена SEO-подрядчика с риском потерять позиции.",
+        "expected_state": "ambiguous",
+        "reason": "Запрос проверки не подтверждает наличие ситуации.",
+        "clarification": "Планируете ли Вы сменить подрядчика по продвижению и что важно сохранить при переходе?"
+      },
+      "negative_example": "Смену подрядчика не планируют",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "seo_inhouse",
+      "fact_id": "seo_inhouse.signal",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "standard_values": [
+        {
+          "value": "target",
+          "meaning": "Продвижением занимаются свои сотрудники и есть вопросы или объём работ, с которыми они не справляются",
+          "training_paraphrases": [
+            "Продвижением занимаются свои сотрудники и есть вопросы или объём работ, с которыми они не справляются",
+            "SEO ведёт наш штатный специалист, но со ссылками и технической оптимизацией он не справляется."
+          ],
+          "entailment": "Все существенные части значения должны быть явно сообщены; не достраивать их из вопроса."
+        },
+        {
+          "value": "alternative",
+          "meaning": "Своей команды нет либо ей хватает опыта и ресурсов",
+          "training_paraphrases": [
+            "Своей команды нет либо ей хватает опыта и ресурсов"
+          ],
+          "entailment": "Не выводить alternative из молчания, неизвестности или отсутствия вопроса."
+        }
+      ],
+      "state_answers": [
+        {
+          "state": "unknown",
+          "value": null
+        },
+        {
+          "state": "not_measured",
+          "value": null
+        },
+        {
+          "state": "not_applicable",
+          "value": null
+        },
+        {
+          "state": "declined",
+          "value": null
+        },
+        {
+          "state": "ambiguous",
+          "value": null
+        },
+        {
+          "state": "other",
+          "value": null
+        },
+        {
+          "state": "not_asked",
+          "value": null
+        },
+        {
+          "state": "conflicting",
+          "value": null
+        }
+      ],
+      "bare_yes_no": "Разрешать только по смыслу последнего однозначного вопроса; текущие открытые вопросы не дают автоматического соответствия «да» -> target.",
+      "boundary_example": {
+        "utterance": "Хотим проверить тему: Своя SEO-команда без внешней экспертизы.",
+        "expected_state": "ambiguous",
+        "reason": "Запрос проверки не подтверждает наличие ситуации.",
+        "clarification": "Кто занимается продвижением сайта внутри компании и по каким вопросам ему не хватает опыта?"
+      },
+      "negative_example": "Своей команды нет либо ей хватает опыта и ресурсов",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "avito_leads",
+      "fact_id": "avito_leads.signal",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "standard_values": [
+        {
+          "value": "target",
+          "meaning": "Объявления размещены, а обращений мало или стало меньше",
+          "training_paraphrases": [
+            "Объявления размещены, а обращений мало или стало меньше",
+            "На Авито висит двадцать объявлений, а звонков за месяц было всего пять, раньше было больше."
+          ],
+          "entailment": "Все существенные части значения должны быть явно сообщены; не достраивать их из вопроса."
+        },
+        {
+          "value": "alternative",
+          "meaning": "Обращений с Авито достаточно либо на Авито не продают",
+          "training_paraphrases": [
+            "Обращений с Авито достаточно либо на Авито не продают"
+          ],
+          "entailment": "Не выводить alternative из молчания, неизвестности или отсутствия вопроса."
+        }
+      ],
+      "state_answers": [
+        {
+          "state": "unknown",
+          "value": null
+        },
+        {
+          "state": "not_measured",
+          "value": null
+        },
+        {
+          "state": "not_applicable",
+          "value": null
+        },
+        {
+          "state": "declined",
+          "value": null
+        },
+        {
+          "state": "ambiguous",
+          "value": null
+        },
+        {
+          "state": "other",
+          "value": null
+        },
+        {
+          "state": "not_asked",
+          "value": null
+        },
+        {
+          "state": "conflicting",
+          "value": null
+        }
+      ],
+      "bare_yes_no": "Разрешать только по смыслу последнего однозначного вопроса; текущие открытые вопросы не дают автоматического соответствия «да» -> target.",
+      "boundary_example": {
+        "utterance": "Хотим проверить тему: Объявления на Авито дают мало обращений.",
+        "expected_state": "ambiguous",
+        "reason": "Запрос проверки не подтверждает наличие ситуации.",
+        "clarification": "Сколько обращений приносят объявления на Авито и как это меняется?"
+      },
+      "negative_example": "Обращений с Авито достаточно либо на Авито не продают",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "avito_cost",
+      "fact_id": "avito_cost.signal",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "standard_values": [
+        {
+          "value": "target",
+          "meaning": "Есть расходы на продвижение на Авито, а продажи от него не окупают затраты",
+          "training_paraphrases": [
+            "Есть расходы на продвижение на Авито, а продажи от него не окупают затраты",
+            "На продвижение объявлений на Авито уходит 40 тысяч в месяц, а продаж с него на 30 тысяч."
+          ],
+          "entailment": "Все существенные части значения должны быть явно сообщены; не достраивать их из вопроса."
+        },
+        {
+          "value": "alternative",
+          "meaning": "Платное продвижение окупается либо не используется",
+          "training_paraphrases": [
+            "Платное продвижение окупается либо не используется"
+          ],
+          "entailment": "Не выводить alternative из молчания, неизвестности или отсутствия вопроса."
+        }
+      ],
+      "state_answers": [
+        {
+          "state": "unknown",
+          "value": null
+        },
+        {
+          "state": "not_measured",
+          "value": null
+        },
+        {
+          "state": "not_applicable",
+          "value": null
+        },
+        {
+          "state": "declined",
+          "value": null
+        },
+        {
+          "state": "ambiguous",
+          "value": null
+        },
+        {
+          "state": "other",
+          "value": null
+        },
+        {
+          "state": "not_asked",
+          "value": null
+        },
+        {
+          "state": "conflicting",
+          "value": null
+        }
+      ],
+      "bare_yes_no": "Разрешать только по смыслу последнего однозначного вопроса; текущие открытые вопросы не дают автоматического соответствия «да» -> target.",
+      "boundary_example": {
+        "utterance": "Хотим проверить тему: Платное продвижение на Авито не окупается.",
+        "expected_state": "ambiguous",
+        "reason": "Запрос проверки не подтверждает наличие ситуации.",
+        "clarification": "Сколько тратите на платное продвижение на Авито и сколько продаж оно приносит?"
+      },
+      "negative_example": "Платное продвижение окупается либо не используется",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "rep_local_ads",
+      "fact_id": "rep_local_ads.signal",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "standard_values": [
+        {
+          "value": "target",
+          "meaning": "Карточка заполнена, но просмотров и маршрутов мало для нужного потока клиентов",
+          "training_paraphrases": [
+            "Карточка заполнена, но просмотров и маршрутов мало для нужного потока клиентов",
+            "Карточка в Яндекс Картах заполнена, но маршрутов к нам строят десяток в месяц — мало для салона."
+          ],
+          "entailment": "Все существенные части значения должны быть явно сообщены; не достраивать их из вопроса."
+        },
+        {
+          "value": "alternative",
+          "meaning": "Потока с карт достаточно либо карточки нет",
+          "training_paraphrases": [
+            "Потока с карт достаточно либо карточки нет"
+          ],
+          "entailment": "Не выводить alternative из молчания, неизвестности или отсутствия вопроса."
+        }
+      ],
+      "state_answers": [
+        {
+          "state": "unknown",
+          "value": null
+        },
+        {
+          "state": "not_measured",
+          "value": null
+        },
+        {
+          "state": "not_applicable",
+          "value": null
+        },
+        {
+          "state": "declined",
+          "value": null
+        },
+        {
+          "state": "ambiguous",
+          "value": null
+        },
+        {
+          "state": "other",
+          "value": null
+        },
+        {
+          "state": "not_asked",
+          "value": null
+        },
+        {
+          "state": "conflicting",
+          "value": null
+        }
+      ],
+      "bare_yes_no": "Разрешать только по смыслу последнего однозначного вопроса; текущие открытые вопросы не дают автоматического соответствия «да» -> target.",
+      "boundary_example": {
+        "utterance": "Хотим проверить тему: Карточка на картах есть, но рядом с точкой о компании мало знают.",
+        "expected_state": "ambiguous",
+        "reason": "Запрос проверки не подтверждает наличие ситуации.",
+        "clarification": "Сколько людей находят Вашу точку через карты и хватает ли этого?"
+      },
+      "negative_example": "Потока с карт достаточно либо карточки нет",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "brand_trademark",
+      "fact_id": "brand_trademark.signal",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "standard_values": [
+        {
+          "value": "target",
+          "meaning": "Товарного знака нет, а площадка его требует или название уже используют другие",
+          "training_paraphrases": [
+            "Товарного знака нет, а площадка его требует или название уже используют другие",
+            "Товарного знака у нас нет, а Wildberries для карточек бренда требует свидетельство."
+          ],
+          "entailment": "Все существенные части значения должны быть явно сообщены; не достраивать их из вопроса."
+        },
+        {
+          "value": "alternative",
+          "meaning": "Товарный знак зарегистрирован либо такой потребности нет",
+          "training_paraphrases": [
+            "Товарный знак зарегистрирован либо такой потребности нет"
+          ],
+          "entailment": "Не выводить alternative из молчания, неизвестности или отсутствия вопроса."
+        }
+      ],
+      "state_answers": [
+        {
+          "state": "unknown",
+          "value": null
+        },
+        {
+          "state": "not_measured",
+          "value": null
+        },
+        {
+          "state": "not_applicable",
+          "value": null
+        },
+        {
+          "state": "declined",
+          "value": null
+        },
+        {
+          "state": "ambiguous",
+          "value": null
+        },
+        {
+          "state": "other",
+          "value": null
+        },
+        {
+          "state": "not_asked",
+          "value": null
+        },
+        {
+          "state": "conflicting",
+          "value": null
+        }
+      ],
+      "bare_yes_no": "Разрешать только по смыслу последнего однозначного вопроса; текущие открытые вопросы не дают автоматического соответствия «да» -> target.",
+      "boundary_example": {
+        "utterance": "Хотим проверить тему: Название не защищено товарным знаком.",
+        "expected_state": "ambiguous",
+        "reason": "Запрос проверки не подтверждает наличие ситуации.",
+        "clarification": "Зарегистрирован ли товарный знак на название и были ли случаи, когда его требовала площадка или название использовали другие?"
+      },
+      "negative_example": "Товарный знак зарегистрирован либо такой потребности нет",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "ai_routine",
+      "fact_id": "ai_routine.signal",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "standard_values": [
+        {
+          "value": "target",
+          "meaning": "Есть частая однотипная операция, которая занимает заметное время или даёт ошибки",
+          "training_paraphrases": [
+            "Есть частая однотипная операция, которая занимает заметное время или даёт ошибки",
+            "Два менеджера каждый день по три часа переносят заказы из почты в таблицу и в 1С."
+          ],
+          "entailment": "Все существенные части значения должны быть явно сообщены; не достраивать их из вопроса."
+        },
+        {
+          "value": "alternative",
+          "meaning": "Существенных повторяющихся ручных операций нет",
+          "training_paraphrases": [
+            "Существенных повторяющихся ручных операций нет"
+          ],
+          "entailment": "Не выводить alternative из молчания, неизвестности или отсутствия вопроса."
+        }
+      ],
+      "state_answers": [
+        {
+          "state": "unknown",
+          "value": null
+        },
+        {
+          "state": "not_measured",
+          "value": null
+        },
+        {
+          "state": "not_applicable",
+          "value": null
+        },
+        {
+          "state": "declined",
+          "value": null
+        },
+        {
+          "state": "ambiguous",
+          "value": null
+        },
+        {
+          "state": "other",
+          "value": null
+        },
+        {
+          "state": "not_asked",
+          "value": null
+        },
+        {
+          "state": "conflicting",
+          "value": null
+        }
+      ],
+      "bare_yes_no": "Разрешать только по смыслу последнего однозначного вопроса; текущие открытые вопросы не дают автоматического соответствия «да» -> target.",
+      "boundary_example": {
+        "utterance": "Хотим проверить тему: Сотрудники вручную повторяют одни и те же операции.",
+        "expected_state": "ambiguous",
+        "reason": "Запрос проверки не подтверждает наличие ситуации.",
+        "clarification": "Какую операцию сотрудники чаще всего повторяют вручную и сколько времени она занимает?"
+      },
+      "negative_example": "Существенных повторяющихся ручных операций нет",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "ai_repeat_questions",
+      "fact_id": "ai_repeat_questions.signal",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "standard_values": [
+        {
+          "value": "target",
+          "meaning": "Значимая часть обращений — повторяющиеся вопросы, ответы на которые занимают заметное время или задерживаются",
+          "training_paraphrases": [
+            "Значимая часть обращений — повторяющиеся вопросы, ответы на которые занимают заметное время или задерживаются",
+            "Половина сообщений — одни и те же вопросы о сроках и доставке, а ночью и в выходные ответить некому."
+          ],
+          "entailment": "Все существенные части значения должны быть явно сообщены; не достраивать их из вопроса."
+        },
+        {
+          "value": "alternative",
+          "meaning": "Повторяющихся вопросов немного либо ответы не задерживаются",
+          "training_paraphrases": [
+            "Повторяющихся вопросов немного либо ответы не задерживаются"
+          ],
+          "entailment": "Не выводить alternative из молчания, неизвестности или отсутствия вопроса."
+        }
+      ],
+      "state_answers": [
+        {
+          "state": "unknown",
+          "value": null
+        },
+        {
+          "state": "not_measured",
+          "value": null
+        },
+        {
+          "state": "not_applicable",
+          "value": null
+        },
+        {
+          "state": "declined",
+          "value": null
+        },
+        {
+          "state": "ambiguous",
+          "value": null
+        },
+        {
+          "state": "other",
+          "value": null
+        },
+        {
+          "state": "not_asked",
+          "value": null
+        },
+        {
+          "state": "conflicting",
+          "value": null
+        }
+      ],
+      "bare_yes_no": "Разрешать только по смыслу последнего однозначного вопроса; текущие открытые вопросы не дают автоматического соответствия «да» -> target.",
+      "boundary_example": {
+        "utterance": "Хотим проверить тему: Сотрудники отвечают на одни и те же вопросы клиентов.",
+        "expected_state": "ambiguous",
+        "reason": "Запрос проверки не подтверждает наличие ситуации.",
+        "clarification": "Какие вопросы клиенты задают чаще всего и сколько времени сотрудники тратят на ответы, в том числе вне рабочего времени?"
+      },
+      "negative_example": "Повторяющихся вопросов немного либо ответы не задерживаются",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "ai_doc_search",
+      "fact_id": "ai_doc_search.signal",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "standard_values": [
+        {
+          "value": "target",
+          "meaning": "Сотрудники регулярно тратят заметное время на поиск сведений в разрозненных документах",
+          "training_paraphrases": [
+            "Сотрудники регулярно тратят заметное время на поиск сведений в разрозненных документах",
+            "Новички по полдня ищут регламенты по папкам и в чатах, а потом всё равно спрашивают старших."
+          ],
+          "entailment": "Все существенные части значения должны быть явно сообщены; не достраивать их из вопроса."
+        },
+        {
+          "value": "alternative",
+          "meaning": "Нужные сведения находятся быстро",
+          "training_paraphrases": [
+            "Нужные сведения находятся быстро"
+          ],
+          "entailment": "Не выводить alternative из молчания, неизвестности или отсутствия вопроса."
+        }
+      ],
+      "state_answers": [
+        {
+          "state": "unknown",
+          "value": null
+        },
+        {
+          "state": "not_measured",
+          "value": null
+        },
+        {
+          "state": "not_applicable",
+          "value": null
+        },
+        {
+          "state": "declined",
+          "value": null
+        },
+        {
+          "state": "ambiguous",
+          "value": null
+        },
+        {
+          "state": "other",
+          "value": null
+        },
+        {
+          "state": "not_asked",
+          "value": null
+        },
+        {
+          "state": "conflicting",
+          "value": null
+        }
+      ],
+      "bare_yes_no": "Разрешать только по смыслу последнего однозначного вопроса; текущие открытые вопросы не дают автоматического соответствия «да» -> target.",
+      "boundary_example": {
+        "utterance": "Хотим проверить тему: Сотрудники долго ищут ответы во внутренних документах.",
+        "expected_state": "ambiguous",
+        "reason": "Запрос проверки не подтверждает наличие ситуации.",
+        "clarification": "Сколько времени сотрудники тратят на поиск нужных сведений в документах и инструкциях?"
+      },
+      "negative_example": "Нужные сведения находятся быстро",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "mobile_installs",
+      "fact_id": "mobile_installs.signal",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "standard_values": [
+        {
+          "value": "target",
+          "meaning": "Установок меньше нужного или их стоимость выше ориентира",
+          "training_paraphrases": [
+            "Установок меньше нужного или их стоимость выше ориентира",
+            "Установок около тысячи в месяц, одна обходится в 450 рублей — для нас это дорого."
+          ],
+          "entailment": "Все существенные части значения должны быть явно сообщены; не достраивать их из вопроса."
+        },
+        {
+          "value": "alternative",
+          "meaning": "Установок достаточно и их стоимость устраивает",
+          "training_paraphrases": [
+            "Установок достаточно и их стоимость устраивает"
+          ],
+          "entailment": "Не выводить alternative из молчания, неизвестности или отсутствия вопроса."
+        }
+      ],
+      "state_answers": [
+        {
+          "state": "unknown",
+          "value": null
+        },
+        {
+          "state": "not_measured",
+          "value": null
+        },
+        {
+          "state": "not_applicable",
+          "value": null
+        },
+        {
+          "state": "declined",
+          "value": null
+        },
+        {
+          "state": "ambiguous",
+          "value": null
+        },
+        {
+          "state": "other",
+          "value": null
+        },
+        {
+          "state": "not_asked",
+          "value": null
+        },
+        {
+          "state": "conflicting",
+          "value": null
+        }
+      ],
+      "bare_yes_no": "Разрешать только по смыслу последнего однозначного вопроса; текущие открытые вопросы не дают автоматического соответствия «да» -> target.",
+      "boundary_example": {
+        "utterance": "Хотим проверить тему: Установки приложения дорогие или их мало.",
+        "expected_state": "ambiguous",
+        "reason": "Запрос проверки не подтверждает наличие ситуации.",
+        "clarification": "Сколько установок приложения в месяц и во что обходится одна установка?"
+      },
+      "negative_example": "Установок достаточно и их стоимость устраивает",
+      "introduced_in": "0.2.0"
     }
   ],
   "mapping_rules": [

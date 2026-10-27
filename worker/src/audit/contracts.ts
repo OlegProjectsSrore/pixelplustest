@@ -80,6 +80,8 @@ export interface AuditState {
   mode?: 'questions' | 'diagnostic';
   /** Distinct questions answered so far (current library); the voice interview stops at MAX_VOICE_QUESTIONS. */
   questions_answered?: number;
+  /** Problems whose screening question was asked to check another possible cause of a complaint; at most MAX_CROSS_CHECKS. */
+  cross_checked?: string[];
 }
 
 export interface AuditSnapshot {
@@ -155,6 +157,9 @@ export interface ApiErrorBody {
 export const INTERVIEW_BUDGET_MS = 25 * 60 * 1000;
 /** A voice interview asks at most this many distinct questions; the last one is kept for the confirmation. */
 export const MAX_VOICE_QUESTIONS = 50;
+/** Another possible cause is checked for at most two links of a complaint and four times per interview. */
+export const MAX_CROSS_PER_COMPLAINT = 2;
+export const MAX_CROSS_CHECKS = 4;
 export const SESSION_LIFETIME_MS = 24 * 60 * 60 * 1000;
 export const REPORT_PREPARATION_MS = 48 * 60 * 60 * 1000;
 export const HISTORY_WAIT_MS = 90 * 1000;
@@ -167,7 +172,7 @@ export function initialAuditState(libraryVersion: string, channel: Channel, now:
     status: 'in_progress', current_question_id: null, facts: {}, contradictions: [], missing_facts: [], candidate_blocks: [],
     elapsed_ms: 0, active_since: null, paused: channel === 'voice', finish_reason: null,
     humor: { enabled: true, reserved_ids: [], used_ids: [], operations: {} }, through_seq: 0, extracted_through_seq: 0, history_status: 'pending',
-    mode, questions_answered: 0,
+    mode, questions_answered: 0, cross_checked: [],
   };
 }
 /** The diagnostic has begun once the visitor asked for it or gave any answer; until then pause and finish make no sense. */

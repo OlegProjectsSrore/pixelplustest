@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "status": "approved",
   "items": [
     {
@@ -5506,7 +5506,7 @@
       "utterance": "Интересно присутствие в ответах AI, но по одинаковым запросам мы его не проверяли.",
       "fact_fixture": [
         {
-          "fact_id": "seo.applicable",
+          "fact_id": "ai_search.applicable",
           "state": "known",
           "value": true,
           "source_turn_ids": [
@@ -5545,7 +5545,49 @@
         }
       ],
       "expected": "eligible",
-      "note": "Структурная проверка, не измерение NLP."
+      "note": "Структурная проверка, не измерение NLP.",
+      "v0_1_4": {
+        "fact_fixture": [
+          {
+            "fact_id": "seo.applicable",
+            "state": "known",
+            "value": true,
+            "source_turn_ids": [
+              "fixture_turn"
+            ],
+            "observed_at": "2026-10-22T12:00:00Z",
+            "confirmation": "confirmed",
+            "origin": "visitor"
+          },
+          {
+            "fact_id": "seo_ai_visibility.signal",
+            "state": "known",
+            "value": "target",
+            "source_turn_ids": [
+              "fixture_turn"
+            ],
+            "observed_at": "2026-10-22T12:00:00Z",
+            "confirmation": "confirmed",
+            "origin": "visitor"
+          },
+          {
+            "fact_id": "seo_ai_visibility.details",
+            "state": "known",
+            "value": {
+              "description": {
+                "state": "known",
+                "value": "Интересно присутствие в ответах AI, но по одинаковым запросам мы его не проверяли."
+              }
+            },
+            "source_turn_ids": [
+              "fixture_turn"
+            ],
+            "observed_at": "2026-10-22T12:00:00Z",
+            "confirmation": "confirmed",
+            "origin": "visitor"
+          }
+        ]
+      }
     },
     {
       "id": "seo_ai_visibility_excluded",
@@ -5554,7 +5596,7 @@
       "utterance": "Есть повторяемая проверка по выбранным сценариям",
       "fact_fixture": [
         {
-          "fact_id": "seo.applicable",
+          "fact_id": "ai_search.applicable",
           "state": "known",
           "value": true,
           "source_turn_ids": [
@@ -5576,7 +5618,33 @@
           "origin": "visitor"
         }
       ],
-      "expected": "excluded"
+      "expected": "excluded",
+      "v0_1_4": {
+        "fact_fixture": [
+          {
+            "fact_id": "seo.applicable",
+            "state": "known",
+            "value": true,
+            "source_turn_ids": [
+              "fixture_turn"
+            ],
+            "observed_at": "2026-10-22T12:00:00Z",
+            "confirmation": "confirmed",
+            "origin": "visitor"
+          },
+          {
+            "fact_id": "seo_ai_visibility.signal",
+            "state": "known",
+            "value": "alternative",
+            "source_turn_ids": [
+              "fixture_turn"
+            ],
+            "observed_at": "2026-10-22T12:00:00Z",
+            "confirmation": "confirmed",
+            "origin": "visitor"
+          }
+        ]
+      }
     },
     {
       "id": "seo_ai_visibility_missing",
@@ -5585,7 +5653,7 @@
       "utterance": "Не знаю, как сейчас обстоит дело.",
       "fact_fixture": [
         {
-          "fact_id": "seo.applicable",
+          "fact_id": "ai_search.applicable",
           "state": "known",
           "value": true,
           "source_turn_ids": [
@@ -5607,7 +5675,33 @@
           "origin": "visitor"
         }
       ],
-      "expected": "needs_info"
+      "expected": "needs_info",
+      "v0_1_4": {
+        "fact_fixture": [
+          {
+            "fact_id": "seo.applicable",
+            "state": "known",
+            "value": true,
+            "source_turn_ids": [
+              "fixture_turn"
+            ],
+            "observed_at": "2026-10-22T12:00:00Z",
+            "confirmation": "confirmed",
+            "origin": "visitor"
+          },
+          {
+            "fact_id": "seo_ai_visibility.signal",
+            "state": "unknown",
+            "value": null,
+            "source_turn_ids": [
+              "fixture_turn"
+            ],
+            "observed_at": "2026-10-22T12:00:00Z",
+            "confirmation": "confirmed",
+            "origin": "visitor"
+          }
+        ]
+      }
     },
     {
       "id": "seo_ai_visibility_boundary",
@@ -5616,7 +5710,7 @@
       "utterance": "Хотим проверить тему: Присутствие бренда в AI-поиске не измеряется.",
       "fact_fixture": [
         {
-          "fact_id": "seo.applicable",
+          "fact_id": "ai_search.applicable",
           "state": "known",
           "value": true,
           "source_turn_ids": [
@@ -5655,7 +5749,49 @@
         }
       ],
       "expected": "needs_info",
-      "note": "Неподтверждённое распознавание не даёт основания выбрать ситуацию."
+      "note": "Неподтверждённое распознавание не даёт основания выбрать ситуацию.",
+      "v0_1_4": {
+        "fact_fixture": [
+          {
+            "fact_id": "seo.applicable",
+            "state": "known",
+            "value": true,
+            "source_turn_ids": [
+              "fixture_turn"
+            ],
+            "observed_at": "2026-10-22T12:00:00Z",
+            "confirmation": "confirmed",
+            "origin": "visitor"
+          },
+          {
+            "fact_id": "seo_ai_visibility.signal",
+            "state": "known",
+            "value": "target",
+            "source_turn_ids": [
+              "fixture_turn"
+            ],
+            "observed_at": "2026-10-22T12:00:00Z",
+            "confirmation": "pending",
+            "origin": "visitor"
+          },
+          {
+            "fact_id": "seo_ai_visibility.details",
+            "state": "known",
+            "value": {
+              "description": {
+                "state": "known",
+                "value": "Интересно присутствие в ответах AI, но по одинаковым запросам мы его не проверяли."
+              }
+            },
+            "source_turn_ids": [
+              "fixture_turn"
+            ],
+            "observed_at": "2026-10-22T12:00:00Z",
+            "confirmation": "confirmed",
+            "origin": "visitor"
+          }
+        ]
+      }
     },
     {
       "id": "seo_ai_accuracy_positive",
@@ -5664,7 +5800,7 @@
       "utterance": "AI называет неверный адрес компании; сохранили ответ и дату.",
       "fact_fixture": [
         {
-          "fact_id": "seo.applicable",
+          "fact_id": "ai_search.applicable",
           "state": "known",
           "value": true,
           "source_turn_ids": [
@@ -5711,7 +5847,57 @@
         }
       ],
       "expected": "eligible",
-      "note": "Структурная проверка, не измерение NLP."
+      "note": "Структурная проверка, не измерение NLP.",
+      "v0_1_4": {
+        "fact_fixture": [
+          {
+            "fact_id": "seo.applicable",
+            "state": "known",
+            "value": true,
+            "source_turn_ids": [
+              "fixture_turn"
+            ],
+            "observed_at": "2026-10-22T12:00:00Z",
+            "confirmation": "confirmed",
+            "origin": "visitor"
+          },
+          {
+            "fact_id": "seo_ai_accuracy.signal",
+            "state": "known",
+            "value": "target",
+            "source_turn_ids": [
+              "fixture_turn"
+            ],
+            "observed_at": "2026-10-22T12:00:00Z",
+            "confirmation": "confirmed",
+            "origin": "visitor"
+          },
+          {
+            "fact_id": "seo_ai_accuracy.details",
+            "state": "known",
+            "value": {
+              "object": {
+                "state": "known",
+                "value": "обычный поиск и видимость в ответах AI"
+              },
+              "observation": {
+                "state": "known",
+                "value": "AI называет неверный адрес компании; сохранили ответ и дату."
+              },
+              "period": {
+                "state": "known",
+                "value": "Последний завершённый месяц"
+              }
+            },
+            "source_turn_ids": [
+              "fixture_turn"
+            ],
+            "observed_at": "2026-10-22T12:00:00Z",
+            "confirmation": "confirmed",
+            "origin": "visitor"
+          }
+        ]
+      }
     },
     {
       "id": "seo_ai_accuracy_excluded",
@@ -5720,7 +5906,7 @@
       "utterance": "Сохраняемых примеров нет либо сведения корректны",
       "fact_fixture": [
         {
-          "fact_id": "seo.applicable",
+          "fact_id": "ai_search.applicable",
           "state": "known",
           "value": true,
           "source_turn_ids": [
@@ -5742,7 +5928,33 @@
           "origin": "visitor"
         }
       ],
-      "expected": "excluded"
+      "expected": "excluded",
+      "v0_1_4": {
+        "fact_fixture": [
+          {
+            "fact_id": "seo.applicable",
+            "state": "known",
+            "value": true,
+            "source_turn_ids": [
+              "fixture_turn"
+            ],
+            "observed_at": "2026-10-22T12:00:00Z",
+            "confirmation": "confirmed",
+            "origin": "visitor"
+          },
+          {
+            "fact_id": "seo_ai_accuracy.signal",
+            "state": "known",
+            "value": "alternative",
+            "source_turn_ids": [
+              "fixture_turn"
+            ],
+            "observed_at": "2026-10-22T12:00:00Z",
+            "confirmation": "confirmed",
+            "origin": "visitor"
+          }
+        ]
+      }
     },
     {
       "id": "seo_ai_accuracy_missing",
@@ -5751,7 +5963,7 @@
       "utterance": "Не знаю, как сейчас обстоит дело.",
       "fact_fixture": [
         {
-          "fact_id": "seo.applicable",
+          "fact_id": "ai_search.applicable",
           "state": "known",
           "value": true,
           "source_turn_ids": [
@@ -5773,7 +5985,33 @@
           "origin": "visitor"
         }
       ],
-      "expected": "needs_info"
+      "expected": "needs_info",
+      "v0_1_4": {
+        "fact_fixture": [
+          {
+            "fact_id": "seo.applicable",
+            "state": "known",
+            "value": true,
+            "source_turn_ids": [
+              "fixture_turn"
+            ],
+            "observed_at": "2026-10-22T12:00:00Z",
+            "confirmation": "confirmed",
+            "origin": "visitor"
+          },
+          {
+            "fact_id": "seo_ai_accuracy.signal",
+            "state": "unknown",
+            "value": null,
+            "source_turn_ids": [
+              "fixture_turn"
+            ],
+            "observed_at": "2026-10-22T12:00:00Z",
+            "confirmation": "confirmed",
+            "origin": "visitor"
+          }
+        ]
+      }
     },
     {
       "id": "seo_ai_accuracy_boundary",
@@ -5782,7 +6020,7 @@
       "utterance": "Хотим проверить тему: В AI-ответах обнаружены неверные сведения о компании.",
       "fact_fixture": [
         {
-          "fact_id": "seo.applicable",
+          "fact_id": "ai_search.applicable",
           "state": "known",
           "value": true,
           "source_turn_ids": [
@@ -5829,7 +6067,57 @@
         }
       ],
       "expected": "needs_info",
-      "note": "Неподтверждённое распознавание не даёт основания выбрать ситуацию."
+      "note": "Неподтверждённое распознавание не даёт основания выбрать ситуацию.",
+      "v0_1_4": {
+        "fact_fixture": [
+          {
+            "fact_id": "seo.applicable",
+            "state": "known",
+            "value": true,
+            "source_turn_ids": [
+              "fixture_turn"
+            ],
+            "observed_at": "2026-10-22T12:00:00Z",
+            "confirmation": "confirmed",
+            "origin": "visitor"
+          },
+          {
+            "fact_id": "seo_ai_accuracy.signal",
+            "state": "known",
+            "value": "target",
+            "source_turn_ids": [
+              "fixture_turn"
+            ],
+            "observed_at": "2026-10-22T12:00:00Z",
+            "confirmation": "pending",
+            "origin": "visitor"
+          },
+          {
+            "fact_id": "seo_ai_accuracy.details",
+            "state": "known",
+            "value": {
+              "object": {
+                "state": "known",
+                "value": "обычный поиск и видимость в ответах AI"
+              },
+              "observation": {
+                "state": "known",
+                "value": "AI называет неверный адрес компании; сохранили ответ и дату."
+              },
+              "period": {
+                "state": "known",
+                "value": "Последний завершённый месяц"
+              }
+            },
+            "source_turn_ids": [
+              "fixture_turn"
+            ],
+            "observed_at": "2026-10-22T12:00:00Z",
+            "confirmation": "confirmed",
+            "origin": "visitor"
+          }
+        ]
+      }
     },
     {
       "id": "ads_quality_positive",
@@ -23970,9 +24258,3463 @@
       ],
       "expected": "needs_info",
       "note": "Неподтверждённое распознавание не даёт основания выбрать ситуацию."
+    },
+    {
+      "id": "ads_social_positive",
+      "block_id": "ads_social",
+      "introduced_in": "0.2.0",
+      "kind": "positive",
+      "utterance": "Таргет во ВКонтакте за месяц обошёлся в 80 тысяч, а подходящих заявок пришло всего три.",
+      "fact_fixture": [
+        {
+          "fact_id": "advertising.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ads_social.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ads_social.details",
+          "state": "known",
+          "value": {
+            "object": {
+              "state": "known",
+              "value": "Реклама в соцсетях не приносит подходящих обращений"
+            },
+            "observation": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "period": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "context": {
+              "state": "known",
+              "value": "Есть данные о расходах и обращениях из соцсетей, подходящих обращений мало или они дороже ориентира"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "eligible",
+      "note": "Структурная проверка, не измерение NLP."
+    },
+    {
+      "id": "ads_social_excluded",
+      "block_id": "ads_social",
+      "introduced_in": "0.2.0",
+      "kind": "exclusion",
+      "utterance": "Реклама в соцсетях не запускалась либо её результат устраивает",
+      "fact_fixture": [
+        {
+          "fact_id": "advertising.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ads_social.signal",
+          "state": "known",
+          "value": "alternative",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "excluded"
+    },
+    {
+      "id": "ads_social_missing",
+      "block_id": "ads_social",
+      "introduced_in": "0.2.0",
+      "kind": "insufficient",
+      "utterance": "Не знаю, как сейчас обстоит дело.",
+      "fact_fixture": [
+        {
+          "fact_id": "advertising.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ads_social.signal",
+          "state": "unknown",
+          "value": null,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info"
+    },
+    {
+      "id": "ads_social_boundary",
+      "block_id": "ads_social",
+      "introduced_in": "0.2.0",
+      "kind": "boundary",
+      "utterance": "Хотим проверить тему: Реклама в соцсетях не приносит подходящих обращений.",
+      "fact_fixture": [
+        {
+          "fact_id": "advertising.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ads_social.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "pending",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ads_social.details",
+          "state": "known",
+          "value": {
+            "object": {
+              "state": "known",
+              "value": "Реклама в соцсетях не приносит подходящих обращений"
+            },
+            "observation": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "period": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "context": {
+              "state": "known",
+              "value": "Есть данные о расходах и обращениях из соцсетей, подходящих обращений мало или они дороже ориентира"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info",
+      "note": "Неподтверждённое распознавание не даёт основания выбрать ситуацию."
+    },
+    {
+      "id": "ads_awareness_positive",
+      "block_id": "ads_awareness",
+      "introduced_in": "0.2.0",
+      "kind": "positive",
+      "utterance": "Продукт новый, его почти не ищут: кампания в Директе за месяц не потратила и половины бюджета.",
+      "fact_fixture": [
+        {
+          "fact_id": "advertising.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ads_awareness.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ads_awareness.details",
+          "state": "known",
+          "value": {
+            "object": {
+              "state": "known",
+              "value": "Продукт мало ищут: поисковой рекламе не хватает спроса"
+            },
+            "observation": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "period": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "context": {
+              "state": "known",
+              "value": "Поисковых запросов мало: кампании не набирают показов или бюджет не расходуется, продукт новый или малоизвестный"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "eligible",
+      "note": "Структурная проверка, не измерение NLP."
+    },
+    {
+      "id": "ads_awareness_excluded",
+      "block_id": "ads_awareness",
+      "introduced_in": "0.2.0",
+      "kind": "exclusion",
+      "utterance": "Поискового спроса хватает для нужного объёма обращений",
+      "fact_fixture": [
+        {
+          "fact_id": "advertising.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ads_awareness.signal",
+          "state": "known",
+          "value": "alternative",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "excluded"
+    },
+    {
+      "id": "ads_awareness_missing",
+      "block_id": "ads_awareness",
+      "introduced_in": "0.2.0",
+      "kind": "insufficient",
+      "utterance": "Не знаю, как сейчас обстоит дело.",
+      "fact_fixture": [
+        {
+          "fact_id": "advertising.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ads_awareness.signal",
+          "state": "unknown",
+          "value": null,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info"
+    },
+    {
+      "id": "ads_awareness_boundary",
+      "block_id": "ads_awareness",
+      "introduced_in": "0.2.0",
+      "kind": "boundary",
+      "utterance": "Хотим проверить тему: Продукт мало ищут: поисковой рекламе не хватает спроса.",
+      "fact_fixture": [
+        {
+          "fact_id": "advertising.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ads_awareness.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "pending",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ads_awareness.details",
+          "state": "known",
+          "value": {
+            "object": {
+              "state": "known",
+              "value": "Продукт мало ищут: поисковой рекламе не хватает спроса"
+            },
+            "observation": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "period": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "context": {
+              "state": "known",
+              "value": "Поисковых запросов мало: кампании не набирают показов или бюджет не расходуется, продукт новый или малоизвестный"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info",
+      "note": "Неподтверждённое распознавание не даёт основания выбрать ситуацию."
+    },
+    {
+      "id": "ads_management_positive",
+      "block_id": "ads_management",
+      "introduced_in": "0.2.0",
+      "kind": "positive",
+      "utterance": "Рекламу настроили год назад, с тех пор в кампаниях почти ничего не меняли.",
+      "fact_fixture": [
+        {
+          "fact_id": "advertising.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ads_management.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ads_management.details",
+          "state": "known",
+          "value": {
+            "description": {
+              "state": "known",
+              "value": "Кампании не оптимизируются регулярно"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "eligible",
+      "note": "Структурная проверка, не измерение NLP."
+    },
+    {
+      "id": "ads_management_excluded",
+      "block_id": "ads_management",
+      "introduced_in": "0.2.0",
+      "kind": "exclusion",
+      "utterance": "Кампании регулярно анализируют и корректируют",
+      "fact_fixture": [
+        {
+          "fact_id": "advertising.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ads_management.signal",
+          "state": "known",
+          "value": "alternative",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "excluded"
+    },
+    {
+      "id": "ads_management_missing",
+      "block_id": "ads_management",
+      "introduced_in": "0.2.0",
+      "kind": "insufficient",
+      "utterance": "Не знаю, как сейчас обстоит дело.",
+      "fact_fixture": [
+        {
+          "fact_id": "advertising.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ads_management.signal",
+          "state": "unknown",
+          "value": null,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info"
+    },
+    {
+      "id": "ads_management_boundary",
+      "block_id": "ads_management",
+      "introduced_in": "0.2.0",
+      "kind": "boundary",
+      "utterance": "Хотим проверить тему: Кампании не оптимизируются регулярно.",
+      "fact_fixture": [
+        {
+          "fact_id": "advertising.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ads_management.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "pending",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ads_management.details",
+          "state": "known",
+          "value": {
+            "description": {
+              "state": "known",
+              "value": "Кампании не оптимизируются регулярно"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info",
+      "note": "Неподтверждённое распознавание не даёт основания выбрать ситуацию."
+    },
+    {
+      "id": "geo_competitors_positive",
+      "block_id": "geo_competitors",
+      "introduced_in": "0.2.0",
+      "kind": "positive",
+      "utterance": "Спросили у Алисы, где заказать кухню в Москве, — она назвала трёх конкурентов, нас нет.",
+      "fact_fixture": [
+        {
+          "fact_id": "ai_search.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "geo_competitors.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "geo_competitors.details",
+          "state": "known",
+          "value": {
+            "object": {
+              "state": "known",
+              "value": "Нейросети советуют конкурентов, а не компанию"
+            },
+            "observation": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "period": {
+              "state": "known",
+              "value": "Есть примеры запросов, где нейросети называют конкурентов и не называют компанию"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "eligible",
+      "note": "Структурная проверка, не измерение NLP."
+    },
+    {
+      "id": "geo_competitors_excluded",
+      "block_id": "geo_competitors",
+      "introduced_in": "0.2.0",
+      "kind": "exclusion",
+      "utterance": "Компанию называют по важным запросам либо таких проверок не было",
+      "fact_fixture": [
+        {
+          "fact_id": "ai_search.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "geo_competitors.signal",
+          "state": "known",
+          "value": "alternative",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "excluded"
+    },
+    {
+      "id": "geo_competitors_missing",
+      "block_id": "geo_competitors",
+      "introduced_in": "0.2.0",
+      "kind": "insufficient",
+      "utterance": "Не знаю, как сейчас обстоит дело.",
+      "fact_fixture": [
+        {
+          "fact_id": "ai_search.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "geo_competitors.signal",
+          "state": "unknown",
+          "value": null,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info"
+    },
+    {
+      "id": "geo_competitors_boundary",
+      "block_id": "geo_competitors",
+      "introduced_in": "0.2.0",
+      "kind": "boundary",
+      "utterance": "Хотим проверить тему: Нейросети советуют конкурентов, а не компанию.",
+      "fact_fixture": [
+        {
+          "fact_id": "ai_search.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "geo_competitors.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "pending",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "geo_competitors.details",
+          "state": "known",
+          "value": {
+            "object": {
+              "state": "known",
+              "value": "Нейросети советуют конкурентов, а не компанию"
+            },
+            "observation": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "period": {
+              "state": "known",
+              "value": "Есть примеры запросов, где нейросети называют конкурентов и не называют компанию"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info",
+      "note": "Неподтверждённое распознавание не даёт основания выбрать ситуацию."
+    },
+    {
+      "id": "geo_negative_positive",
+      "block_id": "geo_negative",
+      "introduced_in": "0.2.0",
+      "kind": "positive",
+      "utterance": "ChatGPT на вопрос о нас пересказывает старые жалобы с отзовика, скриншоты сохранили.",
+      "fact_fixture": [
+        {
+          "fact_id": "ai_search.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "geo_negative.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "geo_negative.details",
+          "state": "known",
+          "value": {
+            "object": {
+              "state": "known",
+              "value": "В ответах нейросетей негатив о компании"
+            },
+            "observation": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "period": {
+              "state": "known",
+              "value": "Есть сохранённые примеры негативных оценок компании в ответах нейросетей"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "eligible",
+      "note": "Структурная проверка, не измерение NLP."
+    },
+    {
+      "id": "geo_negative_excluded",
+      "block_id": "geo_negative",
+      "introduced_in": "0.2.0",
+      "kind": "exclusion",
+      "utterance": "Негатива в ответах не встречали",
+      "fact_fixture": [
+        {
+          "fact_id": "ai_search.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "geo_negative.signal",
+          "state": "known",
+          "value": "alternative",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "excluded"
+    },
+    {
+      "id": "geo_negative_missing",
+      "block_id": "geo_negative",
+      "introduced_in": "0.2.0",
+      "kind": "insufficient",
+      "utterance": "Не знаю, как сейчас обстоит дело.",
+      "fact_fixture": [
+        {
+          "fact_id": "ai_search.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "geo_negative.signal",
+          "state": "unknown",
+          "value": null,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info"
+    },
+    {
+      "id": "geo_negative_boundary",
+      "block_id": "geo_negative",
+      "introduced_in": "0.2.0",
+      "kind": "boundary",
+      "utterance": "Хотим проверить тему: В ответах нейросетей негатив о компании.",
+      "fact_fixture": [
+        {
+          "fact_id": "ai_search.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "geo_negative.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "pending",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "geo_negative.details",
+          "state": "known",
+          "value": {
+            "object": {
+              "state": "known",
+              "value": "В ответах нейросетей негатив о компании"
+            },
+            "observation": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "period": {
+              "state": "known",
+              "value": "Есть сохранённые примеры негативных оценок компании в ответах нейросетей"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info",
+      "note": "Неподтверждённое распознавание не даёт основания выбрать ситуацию."
+    },
+    {
+      "id": "geo_zero_click_positive",
+      "block_id": "geo_zero_click",
+      "introduced_in": "0.2.0",
+      "kind": "positive",
+      "utterance": "Позиции в Яндексе те же, что и год назад, а переходов из поиска стало на треть меньше.",
+      "fact_fixture": [
+        {
+          "fact_id": "ai_search.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "geo_zero_click.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "geo_zero_click.details",
+          "state": "known",
+          "value": {
+            "object": {
+              "state": "known",
+              "value": "Переходов из поиска меньше при тех же позициях: ответ забирают нейроответы"
+            },
+            "observation": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "period": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "context": {
+              "state": "known",
+              "value": "Позиции по важным запросам сохранились, а переходов из поиска стало заметно меньше"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "eligible",
+      "note": "Структурная проверка, не измерение NLP."
+    },
+    {
+      "id": "geo_zero_click_excluded",
+      "block_id": "geo_zero_click",
+      "introduced_in": "0.2.0",
+      "kind": "exclusion",
+      "utterance": "Переходы снижаются вместе с позициями либо не снижаются",
+      "fact_fixture": [
+        {
+          "fact_id": "ai_search.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "geo_zero_click.signal",
+          "state": "known",
+          "value": "alternative",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "excluded"
+    },
+    {
+      "id": "geo_zero_click_missing",
+      "block_id": "geo_zero_click",
+      "introduced_in": "0.2.0",
+      "kind": "insufficient",
+      "utterance": "Не знаю, как сейчас обстоит дело.",
+      "fact_fixture": [
+        {
+          "fact_id": "ai_search.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "geo_zero_click.signal",
+          "state": "unknown",
+          "value": null,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info"
+    },
+    {
+      "id": "geo_zero_click_boundary",
+      "block_id": "geo_zero_click",
+      "introduced_in": "0.2.0",
+      "kind": "boundary",
+      "utterance": "Хотим проверить тему: Переходов из поиска меньше при тех же позициях: ответ забирают нейроответы.",
+      "fact_fixture": [
+        {
+          "fact_id": "ai_search.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "geo_zero_click.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "pending",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "geo_zero_click.details",
+          "state": "known",
+          "value": {
+            "object": {
+              "state": "known",
+              "value": "Переходов из поиска меньше при тех же позициях: ответ забирают нейроответы"
+            },
+            "observation": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "period": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "context": {
+              "state": "known",
+              "value": "Позиции по важным запросам сохранились, а переходов из поиска стало заметно меньше"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info",
+      "note": "Неподтверждённое распознавание не даёт основания выбрать ситуацию."
+    },
+    {
+      "id": "seo_sanctions_positive",
+      "block_id": "seo_sanctions",
+      "introduced_in": "0.2.0",
+      "kind": "positive",
+      "utterance": "В марте за неделю трафик из Яндекса упал вдвое, сайт никуда не переносили, сезон ни при чём.",
+      "fact_fixture": [
+        {
+          "fact_id": "seo.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_sanctions.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_sanctions.details",
+          "state": "known",
+          "value": {
+            "object": {
+              "state": "known",
+              "value": "Резкое падение поискового трафика без переноса сайта"
+            },
+            "observation": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "period": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "context": {
+              "state": "known",
+              "value": "Трафик из поиска резко упал за короткий период без переноса сайта и сезонной причины"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "eligible",
+      "note": "Структурная проверка, не измерение NLP."
+    },
+    {
+      "id": "seo_sanctions_excluded",
+      "block_id": "seo_sanctions",
+      "introduced_in": "0.2.0",
+      "kind": "exclusion",
+      "utterance": "Резкого падения не было либо его объясняют перенос или сезон",
+      "fact_fixture": [
+        {
+          "fact_id": "seo.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_sanctions.signal",
+          "state": "known",
+          "value": "alternative",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "excluded"
+    },
+    {
+      "id": "seo_sanctions_missing",
+      "block_id": "seo_sanctions",
+      "introduced_in": "0.2.0",
+      "kind": "insufficient",
+      "utterance": "Не знаю, как сейчас обстоит дело.",
+      "fact_fixture": [
+        {
+          "fact_id": "seo.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_sanctions.signal",
+          "state": "unknown",
+          "value": null,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info"
+    },
+    {
+      "id": "seo_sanctions_boundary",
+      "block_id": "seo_sanctions",
+      "introduced_in": "0.2.0",
+      "kind": "boundary",
+      "utterance": "Хотим проверить тему: Резкое падение поискового трафика без переноса сайта.",
+      "fact_fixture": [
+        {
+          "fact_id": "seo.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_sanctions.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "pending",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_sanctions.details",
+          "state": "known",
+          "value": {
+            "object": {
+              "state": "known",
+              "value": "Резкое падение поискового трафика без переноса сайта"
+            },
+            "observation": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "period": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "context": {
+              "state": "known",
+              "value": "Трафик из поиска резко упал за короткий период без переноса сайта и сезонной причины"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info",
+      "note": "Неподтверждённое распознавание не даёт основания выбрать ситуацию."
+    },
+    {
+      "id": "seo_commercial_positive",
+      "block_id": "seo_commercial",
+      "introduced_in": "0.2.0",
+      "kind": "positive",
+      "utterance": "Сравнивали с конкурентами из топа: у них на страницах цены, доставка и отзывы, у нас только описание.",
+      "fact_fixture": [
+        {
+          "fact_id": "seo.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_commercial.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_commercial.details",
+          "state": "known",
+          "value": {
+            "object": {
+              "state": "known",
+              "value": "Конкуренты убедительнее по коммерческим факторам"
+            },
+            "observation": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "period": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "context": {
+              "state": "known",
+              "value": "Есть сравнение с конкурентами и у них полнее цены, ассортимент, условия, контакты или отзывы"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "eligible",
+      "note": "Структурная проверка, не измерение NLP."
+    },
+    {
+      "id": "seo_commercial_excluded",
+      "block_id": "seo_commercial",
+      "introduced_in": "0.2.0",
+      "kind": "exclusion",
+      "utterance": "Страницы не уступают конкурентам либо сравнения не было",
+      "fact_fixture": [
+        {
+          "fact_id": "seo.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_commercial.signal",
+          "state": "known",
+          "value": "alternative",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "excluded"
+    },
+    {
+      "id": "seo_commercial_missing",
+      "block_id": "seo_commercial",
+      "introduced_in": "0.2.0",
+      "kind": "insufficient",
+      "utterance": "Не знаю, как сейчас обстоит дело.",
+      "fact_fixture": [
+        {
+          "fact_id": "seo.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_commercial.signal",
+          "state": "unknown",
+          "value": null,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info"
+    },
+    {
+      "id": "seo_commercial_boundary",
+      "block_id": "seo_commercial",
+      "introduced_in": "0.2.0",
+      "kind": "boundary",
+      "utterance": "Хотим проверить тему: Конкуренты убедительнее по коммерческим факторам.",
+      "fact_fixture": [
+        {
+          "fact_id": "seo.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_commercial.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "pending",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_commercial.details",
+          "state": "known",
+          "value": {
+            "object": {
+              "state": "known",
+              "value": "Конкуренты убедительнее по коммерческим факторам"
+            },
+            "observation": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "period": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "context": {
+              "state": "known",
+              "value": "Есть сравнение с конкурентами и у них полнее цены, ассортимент, условия, контакты или отзывы"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info",
+      "note": "Неподтверждённое распознавание не даёт основания выбрать ситуацию."
+    },
+    {
+      "id": "seo_competitors_positive",
+      "block_id": "seo_competitors",
+      "introduced_in": "0.2.0",
+      "kind": "positive",
+      "utterance": "По запросу «кухни на заказ Москва» трое конкурентов уже полгода в топ-5, а мы на второй странице.",
+      "fact_fixture": [
+        {
+          "fact_id": "seo.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_competitors.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_competitors.details",
+          "state": "known",
+          "value": {
+            "object": {
+              "state": "known",
+              "value": "Сайт стабильно ниже конкурентов по главным запросам"
+            },
+            "observation": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "period": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "context": {
+              "state": "known",
+              "value": "Есть главные запросы, по которым конкуренты стабильно выше несколько месяцев"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "eligible",
+      "note": "Структурная проверка, не измерение NLP."
+    },
+    {
+      "id": "seo_competitors_excluded",
+      "block_id": "seo_competitors",
+      "introduced_in": "0.2.0",
+      "kind": "exclusion",
+      "utterance": "По главным запросам сайт не уступает конкурентам либо позиции не отслеживаются",
+      "fact_fixture": [
+        {
+          "fact_id": "seo.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_competitors.signal",
+          "state": "known",
+          "value": "alternative",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "excluded"
+    },
+    {
+      "id": "seo_competitors_missing",
+      "block_id": "seo_competitors",
+      "introduced_in": "0.2.0",
+      "kind": "insufficient",
+      "utterance": "Не знаю, как сейчас обстоит дело.",
+      "fact_fixture": [
+        {
+          "fact_id": "seo.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_competitors.signal",
+          "state": "unknown",
+          "value": null,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info"
+    },
+    {
+      "id": "seo_competitors_boundary",
+      "block_id": "seo_competitors",
+      "introduced_in": "0.2.0",
+      "kind": "boundary",
+      "utterance": "Хотим проверить тему: Сайт стабильно ниже конкурентов по главным запросам.",
+      "fact_fixture": [
+        {
+          "fact_id": "seo.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_competitors.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "pending",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_competitors.details",
+          "state": "known",
+          "value": {
+            "object": {
+              "state": "known",
+              "value": "Сайт стабильно ниже конкурентов по главным запросам"
+            },
+            "observation": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "period": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "context": {
+              "state": "known",
+              "value": "Есть главные запросы, по которым конкуренты стабильно выше несколько месяцев"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info",
+      "note": "Неподтверждённое распознавание не даёт основания выбрать ситуацию."
+    },
+    {
+      "id": "seo_contractor_positive",
+      "block_id": "seo_contractor",
+      "introduced_in": "0.2.0",
+      "kind": "positive",
+      "utterance": "Хотим уйти от нынешнего SEO-подрядчика, но боимся потерять позиции и купленные ссылки.",
+      "fact_fixture": [
+        {
+          "fact_id": "seo.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_contractor.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_contractor.details",
+          "state": "known",
+          "value": {
+            "task": {
+              "state": "known",
+              "value": "Смена SEO-подрядчика с риском потерять позиции"
+            },
+            "current_way": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "constraint": {
+              "state": "known",
+              "value": "Решение о смене подрядчика принято или обсуждается"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "eligible",
+      "note": "Структурная проверка, не измерение NLP."
+    },
+    {
+      "id": "seo_contractor_excluded",
+      "block_id": "seo_contractor",
+      "introduced_in": "0.2.0",
+      "kind": "exclusion",
+      "utterance": "Смену подрядчика не планируют",
+      "fact_fixture": [
+        {
+          "fact_id": "seo.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_contractor.signal",
+          "state": "known",
+          "value": "alternative",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "excluded"
+    },
+    {
+      "id": "seo_contractor_missing",
+      "block_id": "seo_contractor",
+      "introduced_in": "0.2.0",
+      "kind": "insufficient",
+      "utterance": "Не знаю, как сейчас обстоит дело.",
+      "fact_fixture": [
+        {
+          "fact_id": "seo.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_contractor.signal",
+          "state": "unknown",
+          "value": null,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info"
+    },
+    {
+      "id": "seo_contractor_boundary",
+      "block_id": "seo_contractor",
+      "introduced_in": "0.2.0",
+      "kind": "boundary",
+      "utterance": "Хотим проверить тему: Смена SEO-подрядчика с риском потерять позиции.",
+      "fact_fixture": [
+        {
+          "fact_id": "seo.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_contractor.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "pending",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_contractor.details",
+          "state": "known",
+          "value": {
+            "task": {
+              "state": "known",
+              "value": "Смена SEO-подрядчика с риском потерять позиции"
+            },
+            "current_way": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "constraint": {
+              "state": "known",
+              "value": "Решение о смене подрядчика принято или обсуждается"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info",
+      "note": "Неподтверждённое распознавание не даёт основания выбрать ситуацию."
+    },
+    {
+      "id": "seo_inhouse_positive",
+      "block_id": "seo_inhouse",
+      "introduced_in": "0.2.0",
+      "kind": "positive",
+      "utterance": "SEO ведёт наш штатный специалист, но со ссылками и технической оптимизацией он не справляется.",
+      "fact_fixture": [
+        {
+          "fact_id": "seo.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_inhouse.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_inhouse.details",
+          "state": "known",
+          "value": {
+            "task": {
+              "state": "known",
+              "value": "Своя SEO-команда без внешней экспертизы"
+            },
+            "current_way": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "constraint": {
+              "state": "known",
+              "value": "Продвижением занимаются свои сотрудники и есть вопросы или объём работ, с которыми они не справляются"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "eligible",
+      "note": "Структурная проверка, не измерение NLP."
+    },
+    {
+      "id": "seo_inhouse_excluded",
+      "block_id": "seo_inhouse",
+      "introduced_in": "0.2.0",
+      "kind": "exclusion",
+      "utterance": "Своей команды нет либо ей хватает опыта и ресурсов",
+      "fact_fixture": [
+        {
+          "fact_id": "seo.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_inhouse.signal",
+          "state": "known",
+          "value": "alternative",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "excluded"
+    },
+    {
+      "id": "seo_inhouse_missing",
+      "block_id": "seo_inhouse",
+      "introduced_in": "0.2.0",
+      "kind": "insufficient",
+      "utterance": "Не знаю, как сейчас обстоит дело.",
+      "fact_fixture": [
+        {
+          "fact_id": "seo.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_inhouse.signal",
+          "state": "unknown",
+          "value": null,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info"
+    },
+    {
+      "id": "seo_inhouse_boundary",
+      "block_id": "seo_inhouse",
+      "introduced_in": "0.2.0",
+      "kind": "boundary",
+      "utterance": "Хотим проверить тему: Своя SEO-команда без внешней экспертизы.",
+      "fact_fixture": [
+        {
+          "fact_id": "seo.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_inhouse.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "pending",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "seo_inhouse.details",
+          "state": "known",
+          "value": {
+            "task": {
+              "state": "known",
+              "value": "Своя SEO-команда без внешней экспертизы"
+            },
+            "current_way": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "constraint": {
+              "state": "known",
+              "value": "Продвижением занимаются свои сотрудники и есть вопросы или объём работ, с которыми они не справляются"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info",
+      "note": "Неподтверждённое распознавание не даёт основания выбрать ситуацию."
+    },
+    {
+      "id": "avito_leads_positive",
+      "block_id": "avito_leads",
+      "introduced_in": "0.2.0",
+      "kind": "positive",
+      "utterance": "На Авито висит двадцать объявлений, а звонков за месяц было всего пять, раньше было больше.",
+      "fact_fixture": [
+        {
+          "fact_id": "marketplace.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "avito_leads.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "avito_leads.details",
+          "state": "known",
+          "value": {
+            "object": {
+              "state": "known",
+              "value": "Объявления на Авито дают мало обращений"
+            },
+            "observation": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "period": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "context": {
+              "state": "known",
+              "value": "Объявления размещены, а обращений мало или стало меньше"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "eligible",
+      "note": "Структурная проверка, не измерение NLP."
+    },
+    {
+      "id": "avito_leads_excluded",
+      "block_id": "avito_leads",
+      "introduced_in": "0.2.0",
+      "kind": "exclusion",
+      "utterance": "Обращений с Авито достаточно либо на Авито не продают",
+      "fact_fixture": [
+        {
+          "fact_id": "marketplace.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "avito_leads.signal",
+          "state": "known",
+          "value": "alternative",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "excluded"
+    },
+    {
+      "id": "avito_leads_missing",
+      "block_id": "avito_leads",
+      "introduced_in": "0.2.0",
+      "kind": "insufficient",
+      "utterance": "Не знаю, как сейчас обстоит дело.",
+      "fact_fixture": [
+        {
+          "fact_id": "marketplace.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "avito_leads.signal",
+          "state": "unknown",
+          "value": null,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info"
+    },
+    {
+      "id": "avito_leads_boundary",
+      "block_id": "avito_leads",
+      "introduced_in": "0.2.0",
+      "kind": "boundary",
+      "utterance": "Хотим проверить тему: Объявления на Авито дают мало обращений.",
+      "fact_fixture": [
+        {
+          "fact_id": "marketplace.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "avito_leads.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "pending",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "avito_leads.details",
+          "state": "known",
+          "value": {
+            "object": {
+              "state": "known",
+              "value": "Объявления на Авито дают мало обращений"
+            },
+            "observation": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "period": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "context": {
+              "state": "known",
+              "value": "Объявления размещены, а обращений мало или стало меньше"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info",
+      "note": "Неподтверждённое распознавание не даёт основания выбрать ситуацию."
+    },
+    {
+      "id": "avito_cost_positive",
+      "block_id": "avito_cost",
+      "introduced_in": "0.2.0",
+      "kind": "positive",
+      "utterance": "На продвижение объявлений на Авито уходит 40 тысяч в месяц, а продаж с него на 30 тысяч.",
+      "fact_fixture": [
+        {
+          "fact_id": "marketplace.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "avito_cost.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "avito_cost.details",
+          "state": "known",
+          "value": {
+            "object": {
+              "state": "known",
+              "value": "Платное продвижение на Авито не окупается"
+            },
+            "observation": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "period": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "context": {
+              "state": "known",
+              "value": "Есть расходы на продвижение на Авито, а продажи от него не окупают затраты"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "eligible",
+      "note": "Структурная проверка, не измерение NLP."
+    },
+    {
+      "id": "avito_cost_excluded",
+      "block_id": "avito_cost",
+      "introduced_in": "0.2.0",
+      "kind": "exclusion",
+      "utterance": "Платное продвижение окупается либо не используется",
+      "fact_fixture": [
+        {
+          "fact_id": "marketplace.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "avito_cost.signal",
+          "state": "known",
+          "value": "alternative",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "excluded"
+    },
+    {
+      "id": "avito_cost_missing",
+      "block_id": "avito_cost",
+      "introduced_in": "0.2.0",
+      "kind": "insufficient",
+      "utterance": "Не знаю, как сейчас обстоит дело.",
+      "fact_fixture": [
+        {
+          "fact_id": "marketplace.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "avito_cost.signal",
+          "state": "unknown",
+          "value": null,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info"
+    },
+    {
+      "id": "avito_cost_boundary",
+      "block_id": "avito_cost",
+      "introduced_in": "0.2.0",
+      "kind": "boundary",
+      "utterance": "Хотим проверить тему: Платное продвижение на Авито не окупается.",
+      "fact_fixture": [
+        {
+          "fact_id": "marketplace.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "avito_cost.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "pending",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "avito_cost.details",
+          "state": "known",
+          "value": {
+            "object": {
+              "state": "known",
+              "value": "Платное продвижение на Авито не окупается"
+            },
+            "observation": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "period": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "context": {
+              "state": "known",
+              "value": "Есть расходы на продвижение на Авито, а продажи от него не окупают затраты"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info",
+      "note": "Неподтверждённое распознавание не даёт основания выбрать ситуацию."
+    },
+    {
+      "id": "rep_local_ads_positive",
+      "block_id": "rep_local_ads",
+      "introduced_in": "0.2.0",
+      "kind": "positive",
+      "utterance": "Карточка в Яндекс Картах заполнена, но маршрутов к нам строят десяток в месяц — мало для салона.",
+      "fact_fixture": [
+        {
+          "fact_id": "reputation.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "rep_local_ads.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "rep_local_ads.details",
+          "state": "known",
+          "value": {
+            "object": {
+              "state": "known",
+              "value": "Карточка на картах есть, но рядом с точкой о компании мало знают"
+            },
+            "observation": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "period": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "context": {
+              "state": "known",
+              "value": "Карточка заполнена, но просмотров и маршрутов мало для нужного потока клиентов"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "eligible",
+      "note": "Структурная проверка, не измерение NLP."
+    },
+    {
+      "id": "rep_local_ads_excluded",
+      "block_id": "rep_local_ads",
+      "introduced_in": "0.2.0",
+      "kind": "exclusion",
+      "utterance": "Потока с карт достаточно либо карточки нет",
+      "fact_fixture": [
+        {
+          "fact_id": "reputation.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "rep_local_ads.signal",
+          "state": "known",
+          "value": "alternative",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "excluded"
+    },
+    {
+      "id": "rep_local_ads_missing",
+      "block_id": "rep_local_ads",
+      "introduced_in": "0.2.0",
+      "kind": "insufficient",
+      "utterance": "Не знаю, как сейчас обстоит дело.",
+      "fact_fixture": [
+        {
+          "fact_id": "reputation.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "rep_local_ads.signal",
+          "state": "unknown",
+          "value": null,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info"
+    },
+    {
+      "id": "rep_local_ads_boundary",
+      "block_id": "rep_local_ads",
+      "introduced_in": "0.2.0",
+      "kind": "boundary",
+      "utterance": "Хотим проверить тему: Карточка на картах есть, но рядом с точкой о компании мало знают.",
+      "fact_fixture": [
+        {
+          "fact_id": "reputation.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "rep_local_ads.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "pending",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "rep_local_ads.details",
+          "state": "known",
+          "value": {
+            "object": {
+              "state": "known",
+              "value": "Карточка на картах есть, но рядом с точкой о компании мало знают"
+            },
+            "observation": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "period": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "context": {
+              "state": "known",
+              "value": "Карточка заполнена, но просмотров и маршрутов мало для нужного потока клиентов"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info",
+      "note": "Неподтверждённое распознавание не даёт основания выбрать ситуацию."
+    },
+    {
+      "id": "brand_trademark_positive",
+      "block_id": "brand_trademark",
+      "introduced_in": "0.2.0",
+      "kind": "positive",
+      "utterance": "Товарного знака у нас нет, а Wildberries для карточек бренда требует свидетельство.",
+      "fact_fixture": [
+        {
+          "fact_id": "brand.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "brand_trademark.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "brand_trademark.details",
+          "state": "known",
+          "value": {
+            "task": {
+              "state": "known",
+              "value": "Название не защищено товарным знаком"
+            },
+            "current_way": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "constraint": {
+              "state": "known",
+              "value": "Товарного знака нет, а площадка его требует или название уже используют другие"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "eligible",
+      "note": "Структурная проверка, не измерение NLP."
+    },
+    {
+      "id": "brand_trademark_excluded",
+      "block_id": "brand_trademark",
+      "introduced_in": "0.2.0",
+      "kind": "exclusion",
+      "utterance": "Товарный знак зарегистрирован либо такой потребности нет",
+      "fact_fixture": [
+        {
+          "fact_id": "brand.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "brand_trademark.signal",
+          "state": "known",
+          "value": "alternative",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "excluded"
+    },
+    {
+      "id": "brand_trademark_missing",
+      "block_id": "brand_trademark",
+      "introduced_in": "0.2.0",
+      "kind": "insufficient",
+      "utterance": "Не знаю, как сейчас обстоит дело.",
+      "fact_fixture": [
+        {
+          "fact_id": "brand.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "brand_trademark.signal",
+          "state": "unknown",
+          "value": null,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info"
+    },
+    {
+      "id": "brand_trademark_boundary",
+      "block_id": "brand_trademark",
+      "introduced_in": "0.2.0",
+      "kind": "boundary",
+      "utterance": "Хотим проверить тему: Название не защищено товарным знаком.",
+      "fact_fixture": [
+        {
+          "fact_id": "brand.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "brand_trademark.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "pending",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "brand_trademark.details",
+          "state": "known",
+          "value": {
+            "task": {
+              "state": "known",
+              "value": "Название не защищено товарным знаком"
+            },
+            "current_way": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "constraint": {
+              "state": "known",
+              "value": "Товарного знака нет, а площадка его требует или название уже используют другие"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info",
+      "note": "Неподтверждённое распознавание не даёт основания выбрать ситуацию."
+    },
+    {
+      "id": "ai_routine_positive",
+      "block_id": "ai_routine",
+      "introduced_in": "0.2.0",
+      "kind": "positive",
+      "utterance": "Два менеджера каждый день по три часа переносят заказы из почты в таблицу и в 1С.",
+      "fact_fixture": [
+        {
+          "fact_id": "ai.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ai_routine.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ai_routine.details",
+          "state": "known",
+          "value": {
+            "task": {
+              "state": "known",
+              "value": "Сотрудники вручную повторяют одни и те же операции"
+            },
+            "frequency": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "effort": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "data_location": {
+              "state": "known",
+              "value": "Есть частая однотипная операция, которая занимает заметное время или даёт ошибки"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "eligible",
+      "note": "Структурная проверка, не измерение NLP."
+    },
+    {
+      "id": "ai_routine_excluded",
+      "block_id": "ai_routine",
+      "introduced_in": "0.2.0",
+      "kind": "exclusion",
+      "utterance": "Существенных повторяющихся ручных операций нет",
+      "fact_fixture": [
+        {
+          "fact_id": "ai.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ai_routine.signal",
+          "state": "known",
+          "value": "alternative",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "excluded"
+    },
+    {
+      "id": "ai_routine_missing",
+      "block_id": "ai_routine",
+      "introduced_in": "0.2.0",
+      "kind": "insufficient",
+      "utterance": "Не знаю, как сейчас обстоит дело.",
+      "fact_fixture": [
+        {
+          "fact_id": "ai.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ai_routine.signal",
+          "state": "unknown",
+          "value": null,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info"
+    },
+    {
+      "id": "ai_routine_boundary",
+      "block_id": "ai_routine",
+      "introduced_in": "0.2.0",
+      "kind": "boundary",
+      "utterance": "Хотим проверить тему: Сотрудники вручную повторяют одни и те же операции.",
+      "fact_fixture": [
+        {
+          "fact_id": "ai.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ai_routine.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "pending",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ai_routine.details",
+          "state": "known",
+          "value": {
+            "task": {
+              "state": "known",
+              "value": "Сотрудники вручную повторяют одни и те же операции"
+            },
+            "frequency": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "effort": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "data_location": {
+              "state": "known",
+              "value": "Есть частая однотипная операция, которая занимает заметное время или даёт ошибки"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info",
+      "note": "Неподтверждённое распознавание не даёт основания выбрать ситуацию."
+    },
+    {
+      "id": "ai_repeat_questions_positive",
+      "block_id": "ai_repeat_questions",
+      "introduced_in": "0.2.0",
+      "kind": "positive",
+      "utterance": "Половина сообщений — одни и те же вопросы о сроках и доставке, а ночью и в выходные ответить некому.",
+      "fact_fixture": [
+        {
+          "fact_id": "ai.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ai_repeat_questions.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ai_repeat_questions.details",
+          "state": "known",
+          "value": {
+            "task": {
+              "state": "known",
+              "value": "Сотрудники отвечают на одни и те же вопросы клиентов"
+            },
+            "current_way": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "constraint": {
+              "state": "known",
+              "value": "Значимая часть обращений — повторяющиеся вопросы, ответы на которые занимают заметное время или задерживаются"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "eligible",
+      "note": "Структурная проверка, не измерение NLP."
+    },
+    {
+      "id": "ai_repeat_questions_excluded",
+      "block_id": "ai_repeat_questions",
+      "introduced_in": "0.2.0",
+      "kind": "exclusion",
+      "utterance": "Повторяющихся вопросов немного либо ответы не задерживаются",
+      "fact_fixture": [
+        {
+          "fact_id": "ai.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ai_repeat_questions.signal",
+          "state": "known",
+          "value": "alternative",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "excluded"
+    },
+    {
+      "id": "ai_repeat_questions_missing",
+      "block_id": "ai_repeat_questions",
+      "introduced_in": "0.2.0",
+      "kind": "insufficient",
+      "utterance": "Не знаю, как сейчас обстоит дело.",
+      "fact_fixture": [
+        {
+          "fact_id": "ai.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ai_repeat_questions.signal",
+          "state": "unknown",
+          "value": null,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info"
+    },
+    {
+      "id": "ai_repeat_questions_boundary",
+      "block_id": "ai_repeat_questions",
+      "introduced_in": "0.2.0",
+      "kind": "boundary",
+      "utterance": "Хотим проверить тему: Сотрудники отвечают на одни и те же вопросы клиентов.",
+      "fact_fixture": [
+        {
+          "fact_id": "ai.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ai_repeat_questions.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "pending",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ai_repeat_questions.details",
+          "state": "known",
+          "value": {
+            "task": {
+              "state": "known",
+              "value": "Сотрудники отвечают на одни и те же вопросы клиентов"
+            },
+            "current_way": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "constraint": {
+              "state": "known",
+              "value": "Значимая часть обращений — повторяющиеся вопросы, ответы на которые занимают заметное время или задерживаются"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info",
+      "note": "Неподтверждённое распознавание не даёт основания выбрать ситуацию."
+    },
+    {
+      "id": "ai_doc_search_positive",
+      "block_id": "ai_doc_search",
+      "introduced_in": "0.2.0",
+      "kind": "positive",
+      "utterance": "Новички по полдня ищут регламенты по папкам и в чатах, а потом всё равно спрашивают старших.",
+      "fact_fixture": [
+        {
+          "fact_id": "ai.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ai_doc_search.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ai_doc_search.details",
+          "state": "known",
+          "value": {
+            "task": {
+              "state": "known",
+              "value": "Сотрудники долго ищут ответы во внутренних документах"
+            },
+            "current_way": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "constraint": {
+              "state": "known",
+              "value": "Сотрудники регулярно тратят заметное время на поиск сведений в разрозненных документах"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "eligible",
+      "note": "Структурная проверка, не измерение NLP."
+    },
+    {
+      "id": "ai_doc_search_excluded",
+      "block_id": "ai_doc_search",
+      "introduced_in": "0.2.0",
+      "kind": "exclusion",
+      "utterance": "Нужные сведения находятся быстро",
+      "fact_fixture": [
+        {
+          "fact_id": "ai.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ai_doc_search.signal",
+          "state": "known",
+          "value": "alternative",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "excluded"
+    },
+    {
+      "id": "ai_doc_search_missing",
+      "block_id": "ai_doc_search",
+      "introduced_in": "0.2.0",
+      "kind": "insufficient",
+      "utterance": "Не знаю, как сейчас обстоит дело.",
+      "fact_fixture": [
+        {
+          "fact_id": "ai.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ai_doc_search.signal",
+          "state": "unknown",
+          "value": null,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info"
+    },
+    {
+      "id": "ai_doc_search_boundary",
+      "block_id": "ai_doc_search",
+      "introduced_in": "0.2.0",
+      "kind": "boundary",
+      "utterance": "Хотим проверить тему: Сотрудники долго ищут ответы во внутренних документах.",
+      "fact_fixture": [
+        {
+          "fact_id": "ai.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ai_doc_search.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "pending",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "ai_doc_search.details",
+          "state": "known",
+          "value": {
+            "task": {
+              "state": "known",
+              "value": "Сотрудники долго ищут ответы во внутренних документах"
+            },
+            "current_way": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "constraint": {
+              "state": "known",
+              "value": "Сотрудники регулярно тратят заметное время на поиск сведений в разрозненных документах"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info",
+      "note": "Неподтверждённое распознавание не даёт основания выбрать ситуацию."
+    },
+    {
+      "id": "mobile_installs_positive",
+      "block_id": "mobile_installs",
+      "introduced_in": "0.2.0",
+      "kind": "positive",
+      "utterance": "Установок около тысячи в месяц, одна обходится в 450 рублей — для нас это дорого.",
+      "fact_fixture": [
+        {
+          "fact_id": "mobile.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "mobile_installs.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "mobile_installs.details",
+          "state": "known",
+          "value": {
+            "object": {
+              "state": "known",
+              "value": "Установки приложения дорогие или их мало"
+            },
+            "observation": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "period": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "context": {
+              "state": "known",
+              "value": "Установок меньше нужного или их стоимость выше ориентира"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "eligible",
+      "note": "Структурная проверка, не измерение NLP."
+    },
+    {
+      "id": "mobile_installs_excluded",
+      "block_id": "mobile_installs",
+      "introduced_in": "0.2.0",
+      "kind": "exclusion",
+      "utterance": "Установок достаточно и их стоимость устраивает",
+      "fact_fixture": [
+        {
+          "fact_id": "mobile.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "mobile_installs.signal",
+          "state": "known",
+          "value": "alternative",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "excluded"
+    },
+    {
+      "id": "mobile_installs_missing",
+      "block_id": "mobile_installs",
+      "introduced_in": "0.2.0",
+      "kind": "insufficient",
+      "utterance": "Не знаю, как сейчас обстоит дело.",
+      "fact_fixture": [
+        {
+          "fact_id": "mobile.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "mobile_installs.signal",
+          "state": "unknown",
+          "value": null,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info"
+    },
+    {
+      "id": "mobile_installs_boundary",
+      "block_id": "mobile_installs",
+      "introduced_in": "0.2.0",
+      "kind": "boundary",
+      "utterance": "Хотим проверить тему: Установки приложения дорогие или их мало.",
+      "fact_fixture": [
+        {
+          "fact_id": "mobile.applicable",
+          "state": "known",
+          "value": true,
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "mobile_installs.signal",
+          "state": "known",
+          "value": "target",
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "pending",
+          "origin": "visitor"
+        },
+        {
+          "fact_id": "mobile_installs.details",
+          "state": "known",
+          "value": {
+            "object": {
+              "state": "known",
+              "value": "Установки приложения дорогие или их мало"
+            },
+            "observation": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "period": {
+              "state": "known",
+              "value": "Сведения посетителя из исходной реплики"
+            },
+            "context": {
+              "state": "known",
+              "value": "Установок меньше нужного или их стоимость выше ориентира"
+            }
+          },
+          "source_turn_ids": [
+            "fixture_turn"
+          ],
+          "observed_at": "2026-10-27T12:00:00Z",
+          "confirmation": "confirmed",
+          "origin": "visitor"
+        }
+      ],
+      "expected": "needs_info",
+      "note": "Неподтверждённое распознавание не даёт основания выбрать ситуацию."
     }
   ],
   "interpretation": "Проверки структуры, достаточности и исключений. Не являются независимой проверкой понимания речи.",
   "reviewer": "project_owner_chat_approval",
-  "approved_at": "2026-10-23T06:01:25.796Z"
+  "approved_at": "2026-10-27T03:08:12Z"
 }

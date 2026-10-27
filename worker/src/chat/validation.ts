@@ -1,4 +1,5 @@
 import type { FactStatus, Json } from '../audit/contracts.ts';
+import { declaredDetails } from '../audit/value-schemas.ts';
 import { INTENTS, type AnswerCandidate, type Classification, type ClassifierContext, type ValueSchema } from './types.ts';
 
 export class ClassificationValidationError extends Error {
@@ -93,8 +94,10 @@ export function parseClassification(payload: unknown, context: ClassifierContext
   if (value.intent === 'humor_preference' && value.humor_preference === null) fail('humor_preference');
 
   const answers: AnswerCandidate[] = [];
-  value.answers.forEach((candidate: unknown, i: number) => {
+  value.answers.forEach((original: unknown, i: number) => {
     const path = `answers[${i}]`;
+    // A copy: the repairs below never change the caller's object.
+    const candidate: unknown = record(original) ? { ...original } : original;
     keys(candidate, ['question_id', 'fact_id', 'state', 'value', 'event_ids', 'evidence'], ['answer_id', 'parameters', 'replaces_answer_id'], path);
     text(candidate.question_id, `${path}.question_id`, 200); text(candidate.fact_id, `${path}.fact_id`, 200);
     const question = context.questions.find(q => q.id === candidate.question_id);
@@ -102,12 +105,18 @@ export function parseClassification(payload: unknown, context: ClassifierContext
     if (!question || !fact || !question.fact_ids.includes(fact.id)) fail(`${path}.fact_id`);
     if (!STATES.includes(candidate.state as FactStatus) || !fact.states.includes(candidate.state as string)) fail(`${path}.state`);
     if (value.intent === 'decline' && candidate.state !== 'declined') fail(`${path}.state`);
+    if (candidate.state === 'known') candidate.value = declaredDetails(fact.id, candidate.value, fact.value_schema as { type: string; properties?: Record<string, unknown> });
     json(candidate.value, `${path}.value`);
     if (candidate.state === 'known') {
       if (candidate.value === null || !matches(candidate.value, fact.value_schema)) fail(`${path}.value`);
       if (fact.value_type === 'text') text(candidate.value, `${path}.value`, 8000);
       if (fact.value_type === 'string_list' && (!Array.isArray(candidate.value) || candidate.value.length === 0 || !candidate.value.every(item => typeof item === 'string' && item.trim().length > 0))) fail(`${path}.value`);
       if (fact.value_type === 'object' && (!record(candidate.value) || Object.keys(candidate.value).length === 0)) fail(`${path}.value`);
+      // A known option without its ID takes the one offered option with exactly this value.
+      if (fact.value_type === 'enum' && !own(candidate, 'answer_id')) {
+        const offered = context.allowed_answers.filter(a => a.question_id === question.id && a.fact_id === fact.id && a.state === 'known' && equal(a.value, candidate.value));
+        if (offered.length === 1) candidate.answer_id = offered[0]!.id;
+      }
       if (fact.value_type === 'enum' && !own(candidate, 'answer_id')) fail(`${path}.answer_id`);
     } else if (candidate.state === 'other') {
       text(candidate.value, `${path}.value`);

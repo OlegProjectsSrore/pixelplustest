@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0.0",
-  "version": "0.1.5",
+  "version": "0.2.0",
   "status": "approved",
   "author": "Codex — подготовка библиотеки",
   "reviewer": "project_owner_chat_approval",
-  "approved_at": "2026-10-23T06:01:25.796Z",
+  "approved_at": "2026-10-27T03:08:12Z",
   "items": [
     {
       "id": "strategy",
@@ -120,9 +120,33 @@
         "retention_loyalty",
         "market_entry",
         "market_ads",
+        "avito_cost",
         "ai_prediction",
         "integration_reports"
-      ]
+      ],
+      "v0_1_4": {
+        "block_ids": [
+          "analytics_absent",
+          "analytics_goals",
+          "analytics_sales",
+          "analytics_domains",
+          "analytics_ecommerce",
+          "analytics_margin",
+          "analytics_costs",
+          "analytics_quality",
+          "analytics_disagreement",
+          "analytics_access",
+          "analytics_comparison",
+          "ads_cost",
+          "ads_optimization",
+          "retention_measure",
+          "retention_loyalty",
+          "market_entry",
+          "market_ads",
+          "ai_prediction",
+          "integration_reports"
+        ]
+      }
     },
     {
       "id": "calltracking",
@@ -190,11 +214,25 @@
         "seo_links",
         "seo_mobile",
         "seo_trust",
+        "seo_competitors",
         "dev_languages"
       ],
       "tariff_review_ids": [
         "seo_offer_scope"
-      ]
+      ],
+      "engagement": "audit",
+      "v0_1_4": {
+        "block_ids": [
+          "seo_intent",
+          "seo_region",
+          "seo_assortment",
+          "seo_content",
+          "seo_links",
+          "seo_mobile",
+          "seo_trust",
+          "dev_languages"
+        ]
+      }
     },
     {
       "id": "seo_technical",
@@ -225,8 +263,16 @@
       "block_ids": [
         "seo_index",
         "seo_migration",
-        "seo_duplicates"
-      ]
+        "seo_duplicates",
+        "seo_sanctions"
+      ],
+      "v0_1_4": {
+        "block_ids": [
+          "seo_index",
+          "seo_migration",
+          "seo_duplicates"
+        ]
+      }
     },
     {
       "id": "semantics",
@@ -285,9 +331,18 @@
       ],
       "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
+        "geo_competitors",
+        "geo_negative",
         "seo_ai_visibility",
         "seo_ai_accuracy"
-      ]
+      ],
+      "engagement": "audit",
+      "v0_1_4": {
+        "block_ids": [
+          "seo_ai_visibility",
+          "seo_ai_accuracy"
+        ]
+      }
     },
     {
       "id": "ads",
@@ -326,8 +381,25 @@
         "ads_spread",
         "ads_ownership",
         "ads_creatives",
-        "ads_restart"
-      ]
+        "ads_restart",
+        "ads_management"
+      ],
+      "engagement": "audit",
+      "v0_1_4": {
+        "block_ids": [
+          "ads_quality",
+          "ads_cost",
+          "ads_geo",
+          "ads_capacity",
+          "ads_landing",
+          "ads_optimization",
+          "ads_feed",
+          "ads_spread",
+          "ads_ownership",
+          "ads_creatives",
+          "ads_restart"
+        ]
+      }
     },
     {
       "id": "retarget",
@@ -701,8 +773,26 @@
         "crm_migration",
         "retention_segments",
         "retention_permissions",
-        "retention_winback"
-      ]
+        "retention_winback",
+        "ai_routine"
+      ],
+      "v0_1_4": {
+        "block_ids": [
+          "analytics_quality",
+          "ads_capacity",
+          "crm_capture",
+          "crm_owner",
+          "crm_response",
+          "crm_stages",
+          "crm_duplicates",
+          "crm_handoff",
+          "crm_adoption",
+          "crm_migration",
+          "retention_segments",
+          "retention_permissions",
+          "retention_winback"
+        ]
+      }
     },
     {
       "id": "crm_integration",
@@ -962,8 +1052,16 @@
       "block_ids": [
         "rep_missing",
         "rep_details",
-        "rep_branches"
-      ]
+        "rep_branches",
+        "rep_local_ads"
+      ],
+      "v0_1_4": {
+        "block_ids": [
+          "rep_missing",
+          "rep_details",
+          "rep_branches"
+        ]
+      }
     },
     {
       "id": "reputation",
@@ -993,12 +1091,22 @@
       ],
       "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
+        "geo_negative",
         "rep_branches",
         "rep_response",
         "rep_root",
         "rep_crisis",
         "rep_false"
-      ]
+      ],
+      "v0_1_4": {
+        "block_ids": [
+          "rep_branches",
+          "rep_response",
+          "rep_root",
+          "rep_crisis",
+          "rep_false"
+        ]
+      }
     },
     {
       "id": "serm",
@@ -1062,7 +1170,8 @@
         "social_moderation",
         "social_promotion",
         "content_capacity"
-      ]
+      ],
+      "engagement": "audit"
     },
     {
       "id": "telegram",
@@ -1298,8 +1407,19 @@
         "ai_handoff",
         "ai_actions",
         "ai_eval",
-        "ai_access"
-      ]
+        "ai_access",
+        "ai_repeat_questions",
+        "ai_doc_search"
+      ],
+      "v0_1_4": {
+        "block_ids": [
+          "ai_knowledge",
+          "ai_handoff",
+          "ai_actions",
+          "ai_eval",
+          "ai_access"
+        ]
+      }
     },
     {
       "id": "speech",
@@ -1422,8 +1542,14 @@
       ],
       "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
-        "mobile_store"
-      ]
+        "mobile_store",
+        "mobile_installs"
+      ],
+      "v0_1_4": {
+        "block_ids": [
+          "mobile_store"
+        ]
+      }
     },
     {
       "id": "one_c",
@@ -1457,10 +1583,18 @@
       ],
       "pricing_resolution": "normalized_offers_require_approval",
       "block_ids": [
+        "ai_routine",
         "integration_migration",
         "integration_manual",
         "integration_reports"
-      ]
+      ],
+      "v0_1_4": {
+        "block_ids": [
+          "integration_migration",
+          "integration_manual",
+          "integration_reports"
+        ]
+      }
     },
     {
       "id": "one_c_support",
@@ -1525,6 +1659,1032 @@
         "market_sync",
         "integration_catalog",
         "integration_orders"
+      ]
+    },
+    {
+      "id": "ads_direct",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "Контекстная реклама Яндекс Директ",
+      "source_id": "ads_direct",
+      "scope": [
+        "Настройка и ведение кампаний в Яндекс Директе",
+        "Регулярная оптимизация кампаний и отчётность"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Доступ к рекламному кабинету и аналитике"
+      ],
+      "tariff_ids": [
+        "ads_direct_start",
+        "ads_direct_optima",
+        "ads_direct_maximum",
+        "ads_direct_ultra"
+      ],
+      "price_observation_source_ids": [
+        "ads_direct"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "ads_quality",
+        "ads_cost",
+        "ads_geo",
+        "ads_optimization",
+        "ads_spread",
+        "ads_creatives",
+        "ads_restart",
+        "ads_management"
+      ],
+      "engagement": "ongoing"
+    },
+    {
+      "id": "ads_google",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "Контекстная реклама в Google Ads",
+      "source_id": "ads_google",
+      "scope": [
+        "Настройка и ведение кампаний в Google Ads",
+        "Поиск, контекстно-медийная сеть и ремаркетинг"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Доступ к рекламному кабинету и аналитике"
+      ],
+      "tariff_ids": [
+        "ads_google_start",
+        "ads_google_optimal",
+        "ads_google_maximum"
+      ],
+      "price_observation_source_ids": [
+        "ads_google"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "ads_quality",
+        "ads_cost",
+        "ads_geo",
+        "ads_optimization",
+        "ads_spread",
+        "ads_creatives",
+        "ads_restart",
+        "ads_management"
+      ],
+      "engagement": "ongoing"
+    },
+    {
+      "id": "ads_cpa",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "Контекстная реклама с оплатой за лиды",
+      "source_id": "ads_cpa",
+      "scope": [
+        "Контекстная реклама с фиксированной частью оплаты и оплатой за подтверждённые заявки"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованное определение подтверждённой заявки"
+      ],
+      "tariff_ids": [
+        "ads_cpa_fix"
+      ],
+      "price_observation_source_ids": [
+        "ads_cpa"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "ads_cost",
+        "ads_management"
+      ],
+      "engagement": "ongoing"
+    },
+    {
+      "id": "target",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "Таргетированная реклама в социальных сетях",
+      "source_id": "target",
+      "scope": [
+        "Настройка и ведение таргетированной рекламы в социальных сетях",
+        "Охватные стратегии и лидогенерация"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Доступ к рекламным кабинетам и аналитике"
+      ],
+      "tariff_ids": [
+        "target_base",
+        "target_advanced",
+        "target_expert"
+      ],
+      "price_observation_source_ids": [
+        "target"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "ads_social",
+        "ads_awareness"
+      ]
+    },
+    {
+      "id": "smm",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "Создание и ведение групп в соцсетях",
+      "source_id": "smm",
+      "scope": [
+        "Создание и ведение групп и аккаунтов в социальных сетях",
+        "Контент, продвижение и обработка обращений из соцсетей"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Доступ к аккаунтам и согласование контента"
+      ],
+      "tariff_ids": [
+        "smm_base",
+        "smm_advanced",
+        "smm_expert"
+      ],
+      "price_observation_source_ids": [
+        "smm"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "ads_social",
+        "social_quality",
+        "social_moderation",
+        "content_capacity"
+      ],
+      "engagement": "ongoing"
+    },
+    {
+      "id": "dzen",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "Реклама в Дзене",
+      "source_id": "dzen",
+      "scope": [
+        "Создание и ведение канала в Дзене",
+        "Рекламные кампании и посевы для продвижения статей"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласование тем и материалов"
+      ],
+      "tariff_ids": [
+        "dzen_mini",
+        "dzen_optima",
+        "dzen_complex"
+      ],
+      "price_observation_source_ids": [
+        "dzen"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "ads_awareness"
+      ]
+    },
+    {
+      "id": "promo_pages",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "Продвижение через Яндекс ПромоСтраницы",
+      "source_id": "promo_pages",
+      "scope": [
+        "Продвижение статей через Яндекс ПромоСтраницы",
+        "Охватные кампании и привлечение трафика на сайт"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласование материалов и целевых действий"
+      ],
+      "tariff_ids": [
+        "promo_pages_base",
+        "promo_pages_advanced",
+        "promo_pages_expert"
+      ],
+      "price_observation_source_ids": [
+        "promo_pages"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "ads_awareness"
+      ]
+    },
+    {
+      "id": "media",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "Медийная реклама",
+      "source_id": "media",
+      "scope": [
+        "Размещение медийных баннеров в интернете",
+        "Рост узнаваемости и вывод продукта на рынок"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласование аудитории, площадок и баннеров"
+      ],
+      "tariff_ids": [
+        "media_placement"
+      ],
+      "price_observation_source_ids": [
+        "media"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "ads_awareness"
+      ]
+    },
+    {
+      "id": "video",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "Видеореклама в интернете",
+      "source_id": "video",
+      "scope": [
+        "Запуск и ведение видеорекламы в интернете",
+        "Аналитика и корректировка стратегии"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Готовые или согласованные видеоролики"
+      ],
+      "tariff_ids": [
+        "video_launch"
+      ],
+      "price_observation_source_ids": [
+        "video"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "ads_awareness"
+      ]
+    },
+    {
+      "id": "performance",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "Performance-маркетинг",
+      "source_id": "performance",
+      "scope": [
+        "Комплексная реклама в нескольких каналах привлечения",
+        "Сквозная аналитика и работа с конверсией"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Доступы к рекламным кабинетам, аналитике и CRM"
+      ],
+      "tariff_ids": [
+        "performance_base",
+        "performance_smart",
+        "performance_rocket"
+      ],
+      "price_observation_source_ids": [
+        "performance"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "strategy_channels"
+      ]
+    },
+    {
+      "id": "seo_promotion",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "SEO-продвижение сайта",
+      "source_id": "seo_promotion",
+      "scope": [
+        "Регулярное поисковое продвижение сайта в Яндексе и Google",
+        "Семантика, оптимизация, тексты, ссылки и отчётность"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Доступ к сайту, аналитике и поисковым панелям"
+      ],
+      "tariff_ids": [
+        "seo_promotion_positions",
+        "seo_promotion_traffic",
+        "seo_promotion_leads",
+        "seo_promotion_seo3"
+      ],
+      "price_observation_source_ids": [
+        "t_seo"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "seo_demand",
+        "seo_intent",
+        "seo_region",
+        "seo_competitors"
+      ],
+      "engagement": "ongoing"
+    },
+    {
+      "id": "seo_commercial",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "Аудит коммерческих факторов ранжирования",
+      "source_id": "seo_commercial",
+      "scope": [
+        "Аудит коммерческих факторов ранжирования",
+        "Рекомендации для роста заказов и коммерческой эффективности сайта"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Список запросов и конкурентов для сравнения"
+      ],
+      "tariff_ids": [
+        "seo_commercial_start",
+        "seo_commercial_standard",
+        "seo_commercial_business"
+      ],
+      "price_observation_source_ids": [
+        "seo_commercial"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "seo_commercial"
+      ]
+    },
+    {
+      "id": "seo_sanctions",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "Вывод сайта из-под санкций",
+      "source_id": "seo_sanctions",
+      "scope": [
+        "Диагностика и снятие санкций поисковых систем",
+        "Отчёт о восстановлении позиций, трафика и индексации"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Доступ к поисковым панелям и журналу изменений сайта"
+      ],
+      "tariff_ids": [
+        "seo_sanctions_removal"
+      ],
+      "price_observation_source_ids": [
+        "seo_sanctions"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "seo_sanctions"
+      ]
+    },
+    {
+      "id": "seo_contractor",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "Безопасная смена подрядчика по SEO",
+      "source_id": "seo_contractor",
+      "scope": [
+        "Передача поискового продвижения от прежнего подрядчика",
+        "Сохранение позиций, видимости и трафика при переходе"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Доступы и отчёты прежнего подрядчика"
+      ],
+      "tariff_ids": [
+        "seo_contractor_transition"
+      ],
+      "price_observation_source_ids": [
+        "seo_contractor"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "seo_contractor"
+      ]
+    },
+    {
+      "id": "seo_ymyl",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "Аудит E-E-A-T-факторов для YMYL-сайтов",
+      "source_id": "seo_ymyl",
+      "scope": [
+        "Аудит E-E-A-T-факторов для сайтов YMYL-тематик",
+        "Рекомендации по экспертности и доверию"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Доступ к сайту и сведениям о специалистах компании"
+      ],
+      "tariff_ids": [
+        "seo_ymyl_audit"
+      ],
+      "price_observation_source_ids": [
+        "seo_ymyl"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "seo_trust"
+      ]
+    },
+    {
+      "id": "seo_inhouse",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "Инхаус-команда & агентство",
+      "source_id": "seo_inhouse",
+      "scope": [
+        "Консалтинг и поддержка внутренней SEO-команды",
+        "Независимые аудиты, рутинные работы и обучение команды"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Описание задач и показателей внутренней команды"
+      ],
+      "tariff_ids": [
+        "seo_inhouse_regular",
+        "seo_inhouse_curation"
+      ],
+      "price_observation_source_ids": [
+        "seo_inhouse",
+        "t_seo"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "seo_inhouse"
+      ]
+    },
+    {
+      "id": "seo_consult",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "Частные консультации ведущего специалиста",
+      "source_id": "seo_consult",
+      "scope": [
+        "Частные консультации ведущего специалиста агентства"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Список вопросов к консультации"
+      ],
+      "tariff_ids": [
+        "seo_consult_online",
+        "seo_consult_office"
+      ],
+      "price_observation_source_ids": [
+        "seo_consult"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "seo_inhouse"
+      ]
+    },
+    {
+      "id": "seo_training",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "Курс «SEO для маркетологов»",
+      "source_id": "seo_training",
+      "scope": [
+        "Онлайн-курс «SEO для маркетологов»"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Сотрудник, который пройдёт курс"
+      ],
+      "tariff_ids": [
+        "seo_training_course"
+      ],
+      "price_observation_source_ids": [
+        "seo_training"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "seo_inhouse"
+      ]
+    },
+    {
+      "id": "aeo",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "AEO-продвижение сайтов",
+      "source_id": "aeo",
+      "scope": [
+        "AEO-аудит сайта и оптимизация под нейроответы",
+        "Рост присутствия сайта в генеративных ответах поиска"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Доступ к сайту и поисковым панелям"
+      ],
+      "tariff_ids": [
+        "aeo_promotion"
+      ],
+      "price_observation_source_ids": [
+        "t_geo"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "geo_competitors",
+        "geo_zero_click"
+      ],
+      "engagement": "ongoing"
+    },
+    {
+      "id": "geo_promotion",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "Продвижение в AI-поиске",
+      "source_id": "geo_promotion",
+      "scope": [
+        "Мониторинг и рост присутствия бренда в ответах нейросетей",
+        "Работа с цитируемостью, источниками и репутацией в AI-поиске"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованные вопросы покупателей и нейросети для мониторинга"
+      ],
+      "tariff_ids": [
+        "geo_promotion_aeo_base",
+        "geo_promotion_aeo_geo_optimal",
+        "geo_promotion_aeo_geo_expert"
+      ],
+      "price_observation_source_ids": [
+        "geo_promotion"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "geo_competitors"
+      ],
+      "engagement": "ongoing"
+    },
+    {
+      "id": "geo_strategy",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "GEO-стратегия",
+      "source_id": "geo_strategy",
+      "scope": [
+        "План развития присутствия бренда в ответах нейросетей",
+        "Приоритеты и KPI присутствия в AI-поиске"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Согласованные вопросы покупателей и конкуренты"
+      ],
+      "tariff_ids": [
+        "geo_strategy_base",
+        "geo_strategy_extended"
+      ],
+      "price_observation_source_ids": [
+        "geo_strategy"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "geo_zero_click"
+      ]
+    },
+    {
+      "id": "alisa_ads",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "Реклама в Алисе AI",
+      "source_id": "alisa_ads",
+      "scope": [
+        "Промообъявления в чате нейросети Алиса AI через Яндекс Директ"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Доступ к рекламному кабинету Яндекс Директа"
+      ],
+      "tariff_ids": [
+        "alisa_ads_start",
+        "alisa_ads_optima"
+      ],
+      "price_observation_source_ids": [
+        "alisa_ads"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "geo_competitors"
+      ],
+      "engagement": "ongoing"
+    },
+    {
+      "id": "chatgpt_ads",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "Реклама в ChatGPT",
+      "source_id": "chatgpt_ads",
+      "scope": [
+        "Реклама в ChatGPT с оплатой в рублях",
+        "Кабинет, кампании, аналитика и ведение"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Проверка допуска рекламодателя"
+      ],
+      "tariff_ids": [
+        "chatgpt_ads_pilot",
+        "chatgpt_ads_base"
+      ],
+      "price_observation_source_ids": [
+        "chatgpt_ads"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "geo_competitors"
+      ],
+      "engagement": "ongoing"
+    },
+    {
+      "id": "avito",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "Продвижение бизнеса на Авито",
+      "source_id": "avito",
+      "scope": [
+        "Продвижение бизнеса на Авито: объявления, тексты, оформление профиля",
+        "Регулярная публикация и отчётность"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Доступ к кабинету Авито и ассортименту"
+      ],
+      "tariff_ids": [
+        "avito_start",
+        "avito_pro",
+        "avito_maximum"
+      ],
+      "price_observation_source_ids": [
+        "avito"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "avito_leads"
+      ]
+    },
+    {
+      "id": "avito_ads",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "Реклама на Авито",
+      "source_id": "avito_ads",
+      "scope": [
+        "Платное продвижение и реклама на Авито",
+        "Тестирование связок и оптимизация кампаний"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Отдельный рекламный бюджет"
+      ],
+      "tariff_ids": [
+        "avito_ads_launch",
+        "avito_ads_managed",
+        "avito_ads_complex"
+      ],
+      "price_observation_source_ids": [
+        "avito_ads"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "avito_cost"
+      ]
+    },
+    {
+      "id": "geomedia",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "Реклама на геосервисах",
+      "source_id": "geomedia",
+      "scope": [
+        "Реклама на геосервисах: Яндекс Карты, Навигатор, 2ГИС",
+        "Нацеливание на аудиторию по геолокации"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Заполненная карточка компании на картах"
+      ],
+      "tariff_ids": [
+        "geomedia_yandex",
+        "geomedia_2gis"
+      ],
+      "price_observation_source_ids": [
+        "s_geomediynaya_reklama_v_yandeks",
+        "s_geomediynaya_reklama_v_2gis"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "rep_local_ads"
+      ]
+    },
+    {
+      "id": "trademark",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "Регистрация товарного знака",
+      "source_id": "trademark",
+      "scope": [
+        "Регистрация товарного знака"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Обозначение и перечень товаров и услуг"
+      ],
+      "tariff_ids": [
+        "trademark_registration"
+      ],
+      "price_observation_source_ids": [
+        "trademark"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "brand_trademark"
+      ]
+    },
+    {
+      "id": "express",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "Экспресс-услуги: сайт на Тильде",
+      "source_id": "express",
+      "scope": [
+        "Быстрый запуск сайта для проверки бизнес-модели"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Тексты и материалы для сайта"
+      ],
+      "tariff_ids": [
+        "express_site"
+      ],
+      "price_observation_source_ids": [
+        "express"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "dev_launch"
+      ]
+    },
+    {
+      "id": "knowledge_base",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "Разработка корпоративной базы знаний",
+      "source_id": "knowledge_base",
+      "scope": [
+        "Разработка корпоративной базы знаний",
+        "Поиск, роли пользователей и интеграции"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Перечень документов и их владельцев"
+      ],
+      "tariff_ids": [
+        "knowledge_base_starter",
+        "knowledge_base_professional",
+        "knowledge_base_corporate"
+      ],
+      "price_observation_source_ids": [
+        "knowledge_base"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "ai_knowledge",
+        "ai_doc_search"
+      ]
+    },
+    {
+      "id": "ai_automation",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "Автоматизация процессов с помощью ИИ",
+      "source_id": "ai_automation",
+      "scope": [
+        "Автоматизация рутинных процессов с помощью ИИ",
+        "Связка с CRM, 1С и почтой"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Описание процесса и доступ к системам"
+      ],
+      "tariff_ids": [
+        "ai_automation_minimal",
+        "ai_automation_optimal",
+        "ai_automation_enterprise"
+      ],
+      "price_observation_source_ids": [
+        "ai_automation"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "ai_routine"
+      ]
+    },
+    {
+      "id": "ai_site",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "Внедрение ИИ на сайт",
+      "source_id": "ai_site",
+      "scope": [
+        "ИИ-консультант, умный поиск и помощник на сайте",
+        "Передача диалога менеджеру и в CRM"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Проверенные материалы для ответов"
+      ],
+      "tariff_ids": [
+        "ai_site_minimal",
+        "ai_site_optimal",
+        "ai_site_enterprise"
+      ],
+      "price_observation_source_ids": [
+        "ai_site"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "ai_repeat_questions"
+      ]
+    },
+    {
+      "id": "mobile_performance",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "name": "Мобильный performance-маркетинг",
+      "source_id": "mobile_performance",
+      "scope": [
+        "Мобильная реклама для привлечения установок и пользователей"
+      ],
+      "excluded": [],
+      "unspecified": "Лицензии, инфраструктура, расходы площадок, объём и сопровождение не считаются включёнными без явного указания в тарифе.",
+      "prerequisites": [
+        "Доступ к статистике приложения и рекламным кабинетам"
+      ],
+      "tariff_ids": [
+        "mobile_performance_hourly"
+      ],
+      "price_observation_source_ids": [
+        "mobile_performance"
+      ],
+      "pricing_resolution": "normalized_offers_require_approval",
+      "block_ids": [
+        "mobile_installs"
       ]
     }
   ],

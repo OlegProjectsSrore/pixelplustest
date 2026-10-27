@@ -62,8 +62,12 @@ test('rejects fabricated IDs, enum values, states, extra fields and parameter ty
     { ...answer(), answer_id: null },
   ];
   for (const candidate of cases) assert.throws(() => parseClassification({ ...output(), answers: [candidate] }, context()), ClassificationValidationError);
+  // A known option without its ID takes the one offered option with exactly this value; a value no option offers stays rejected.
   const enumWithoutId = answer(); delete enumWithoutId.answer_id;
-  assert.throws(() => parseClassification(output([enumWithoutId]), context()), ClassificationValidationError);
+  assert.equal(parseClassification(output([enumWithoutId]), context()).answers[0].answer_id, 'core-choice-42');
+  assert.equal(enumWithoutId.answer_id, undefined, 'the caller object is not changed');
+  const unoffered: AnswerCandidate = { ...answer(), value: 'enough' }; delete unoffered.answer_id;
+  assert.throws(() => parseClassification(output([unoffered]), context()), ClassificationValidationError);
   const budget = { question_id: 'q-budget', fact_id: 'context.budget', state: 'known', value: { min: 20 }, parameters: { period: 30 }, event_ids: ['turn-1'], evidence: [{ event_id: 'turn-1', text: '20–30 тысяч рублей' }] };
   assert.throws(() => parseClassification({ ...output(), answers: [budget] }, context()), ClassificationValidationError);
 });
@@ -151,7 +155,8 @@ test('prompt file has only the intents mark; every intent is listed and visitor 
   assert.doesNotMatch(system.content, /\{\{\w+\}\}/);
   assert(system.content.includes(`intent только из списка: ${INTENTS.join(', ')}.`));
   assert.match(system.content, /Схема JSON: \{"intent":"unknown","answers":\[\],"clarification_question_id":null,"faq_id":null,"joke_category_id":null,"humor_preference":null\}/);
-  assert.equal(system.content.split('\n').length, 18);
+  assert.equal(system.content.split('\n').length, 19);
+  assert.match(system.content, /Если посетитель называет причиной трудностей качество продукта, производство, закупки, финансы, логистику или кадры, сохрани это как отдельную причину вне цифровых услуг его словами; не создавай из неё проблему опроса\./);
   assert.match(system.content, /передавай result — итог прошлых работ по теме по всем сведениям: accepted_facts, history и текущей реплике\. Выбирай первое подходящее по порядку: ongoing — работа идёт сейчас; no_result — результата не было или его не измеряли, даже если работу потом бросили или остановили из-за денег; partial_or_stopped — результат частичный/);
   assert.match(system.content, /При каждом новом ответе о прошлых работах передавай result заново по всем сведениям\./);
   assert.match(system.content, /Для попытки, уже сохранённой в accepted_facts, бери её attempt_id и передавай только новое: ответ на текущий вопрос и сведения, которых ещё нет; уже сохранённое не повторяй, в том числе другими словами\./);

@@ -2,7 +2,7 @@ import { INTERVIEW_BUDGET_MS, type AuditAnswer, type AuditEvent, type AuditState
 import { advanceAudit, nextQuestion, validateAnswers } from './audit/engine.ts';
 import { compileVoiceBlocks, getLibrary } from './audit/library.ts';
 import type { HumorIntent } from './audit/humor.ts';
-import { validateRuntimeValue, type RuntimeValueSchema } from './audit/value-schemas.ts';
+import { declaredDetails, validateRuntimeValue, type RuntimeValueSchema } from './audit/value-schemas.ts';
 import type { CoreServices } from './core.ts';
 import type { AdapterContext, ChannelAdapters } from './integration.ts';
 import { fail, hashToken, HttpError, identifier, mutation, object, readBytes, requestHash, revision, textField } from './security.ts';
@@ -201,7 +201,8 @@ export async function normalizeVoiceAnswers(core: CoreServices, session: StoredS
     // Ambiguous replacement targets or unverified correction speech preserve the dispute and history.
     const optionId = answerId(candidate);
     answers.push({ id: crypto.randomUUID(), question_id: candidate.question_id, fact_id: candidate.fact_id, ...(optionId ? { answer_id: optionId } : {}),
-      state: candidate.state, value: candidate.value, ...(candidate.parameters ? { parameters: candidate.parameters } : {}), event_ids: evidence.map(event => event.id), channel: 'voice', method: 'voice_batch',
+      // A description keeps only its declared parts; a part brought over from another description is dropped.
+      state: candidate.state, value: candidate.state === 'known' ? declaredDetails(candidate.fact_id, candidate.value, facts.find(fact => fact.id === candidate.fact_id)?.runtime_schema) as Json : candidate.value, ...(candidate.parameters ? { parameters: candidate.parameters } : {}), event_ids: evidence.map(event => event.id), channel: 'voice', method: 'voice_batch',
       confirmation: correction ? 'explicit' : candidate.is_correction ? 'disputed' : confirmation ? 'explicit' : 'unconfirmed',
       ...(correction ? { replaces_answer_id: previous[0].id } : {}), library_version: session.state.library_version, created_at: core.now() });
   }
@@ -217,7 +218,7 @@ const stateWords: Record<string, readonly string[]> = {
 // These are field headings, not unit/currency aliases or semantic synonyms for arbitrary values.
 const fieldHeadings: Record<string, string> = {
   description: 'описание', object: 'объект', observation: 'наблюдение', period: 'период', context: 'контекст', task: 'задача',
-  current_way: 'текущий способ', constraint: 'ограничение', metric: 'показатель', value: 'значение', min: 'минимум', max: 'максимум',
+  current_way: 'текущий способ', constraint: 'ограничение', frequency: 'частота', effort: 'затраты времени и людей', data_location: 'где данные', human_decision: 'решение человека', error_cost: 'цена ошибки', metric: 'показатель', value: 'значение', min: 'минимум', max: 'максимум',
   unit: 'единица', currency: 'валюта', approximate: 'приблизительно', attempts_status: 'попытки', work: 'работа',
   period_and_duration: 'период и длительность', goal: 'цель', executor_and_resources: 'исполнитель и ресурсы', outcome: 'результат',
   measurement: 'измерение', current_status: 'текущий статус', stop_reason: 'причина остановки', level: 'уровень',

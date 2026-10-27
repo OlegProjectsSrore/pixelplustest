@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0.0",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "status": "approved",
   "author": "Codex — подготовка по методике и локальным источникам",
   "reviewer": "project_owner_chat_approval",
-  "approved_at": "2026-10-23T06:01:25.796Z",
+  "approved_at": "2026-10-27T03:08:12Z",
   "items": [
     {
       "id": "strategy",
@@ -21,14 +21,29 @@
     {
       "id": "seo",
       "title": "Поисковое продвижение",
-      "target_blocks": 14,
-      "scope": "обычный поиск и видимость в ответах AI"
+      "target_blocks": 17,
+      "scope": "обычный поиск Яндекса и Google",
+      "v0_1_4": {
+        "scope": "обычный поиск и видимость в ответах AI",
+        "target_blocks": 14
+      }
+    },
+    {
+      "id": "ai_search",
+      "title": "Видимость в нейросетях",
+      "target_blocks": 5,
+      "scope": "ответы нейросетей и AI-поиска о компании",
+      "introduced_in": "0.2.0"
     },
     {
       "id": "advertising",
       "title": "Платная реклама",
-      "target_blocks": 12,
-      "scope": "рекламные кампании и качество обращений"
+      "target_blocks": 15,
+      "scope": "реклама в поиске, соцсетях и медиа и качество обращений",
+      "v0_1_4": {
+        "scope": "рекламные кампании и качество обращений",
+        "target_blocks": 12
+      }
     },
     {
       "id": "ux",
@@ -62,15 +77,23 @@
     },
     {
       "id": "marketplace",
-      "title": "Маркетплейсы",
-      "target_blocks": 8,
-      "scope": "карточки, заказы и экономика площадок"
+      "title": "Маркетплейсы и Авито",
+      "target_blocks": 10,
+      "scope": "карточки, объявления, заказы и экономика площадок",
+      "v0_1_4": {
+        "title": "Маркетплейсы",
+        "scope": "карточки, заказы и экономика площадок",
+        "target_blocks": 8
+      }
     },
     {
       "id": "reputation",
       "title": "Локальное присутствие и репутация",
-      "target_blocks": 8,
-      "scope": "карты, отзывы и информация о компании"
+      "target_blocks": 9,
+      "scope": "карты, отзывы и информация о компании",
+      "v0_1_4": {
+        "target_blocks": 8
+      }
     },
     {
       "id": "content",
@@ -81,20 +104,29 @@
     {
       "id": "brand",
       "title": "Брендинг и материалы продаж",
-      "target_blocks": 5,
-      "scope": "идентичность бренда и презентация предложения"
+      "target_blocks": 6,
+      "scope": "идентичность бренда и презентация предложения",
+      "v0_1_4": {
+        "target_blocks": 5
+      }
     },
     {
       "id": "ai",
       "title": "AI и автоматизация",
-      "target_blocks": 8,
-      "scope": "повторяемые операции, знания и контроль AI"
+      "target_blocks": 11,
+      "scope": "повторяемые операции, знания и контроль AI",
+      "v0_1_4": {
+        "target_blocks": 8
+      }
     },
     {
       "id": "mobile",
       "title": "Мобильные приложения",
-      "target_blocks": 5,
-      "scope": "сценарии приложения, установки и удержание"
+      "target_blocks": 6,
+      "scope": "сценарии приложения, установки и удержание",
+      "v0_1_4": {
+        "target_blocks": 5
+      }
     },
     {
       "id": "integration",
@@ -243,6 +275,300 @@
       "a": "content_goal",
       "b": "content_process",
       "relation": "goal_before_production"
+    },
+    {
+      "a": "ads_social",
+      "b": "social_quality",
+      "relation": "related_but_distinct_work",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "ads_awareness",
+      "b": "strategy_new_market",
+      "relation": "related_but_distinct_work",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "ads_management",
+      "b": "ads_restart",
+      "relation": "related_but_distinct_work",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "geo_competitors",
+      "b": "seo_ai_visibility",
+      "relation": "shared_deliverable",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "geo_negative",
+      "b": "rep_false",
+      "relation": "related_but_distinct_work",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "seo_sanctions",
+      "b": "seo_migration",
+      "relation": "alternatives_require_comparison",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "seo_commercial",
+      "b": "ux_service",
+      "relation": "related_but_distinct_work",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "seo_competitors",
+      "b": "seo_demand",
+      "relation": "related_but_distinct_work",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "seo_contractor",
+      "b": "seo_links",
+      "relation": "related_but_distinct_work",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "seo_inhouse",
+      "b": "strategy_resources",
+      "relation": "related_but_distinct_work",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "analytics_sales",
+      "b": "avito_cost",
+      "relation": "measurement_before_optimization",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "rep_details",
+      "b": "rep_local_ads",
+      "relation": "restore_before_change",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "brand_trademark",
+      "b": "brand_name",
+      "relation": "related_but_distinct_work",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "ai_routine",
+      "b": "integration_manual",
+      "relation": "related_but_distinct_work",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "ai_repeat_questions",
+      "b": "ai_handoff",
+      "relation": "knowledge_and_fallback",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "ai_doc_search",
+      "b": "ai_knowledge",
+      "relation": "related_but_distinct_work",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "mobile_store",
+      "b": "mobile_installs",
+      "relation": "measurement_before_optimization",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "ads_cost",
+      "b": "crm_response",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "ads_cost",
+      "b": "ux_contact",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "ads_cost",
+      "b": "analytics_sales",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "ads_quality",
+      "b": "analytics_quality",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "ads_quality",
+      "b": "strategy_segments",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "ads_social",
+      "b": "crm_capture",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "ads_social",
+      "b": "analytics_absent",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "social_quality",
+      "b": "crm_capture",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "social_quality",
+      "b": "analytics_absent",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "ux_contact",
+      "b": "analytics_absent",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "ux_contact",
+      "b": "crm_capture",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "ux_contact",
+      "b": "ads_landing",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "ux_form",
+      "b": "crm_capture",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "ux_form",
+      "b": "analytics_absent",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "ux_redesign",
+      "b": "support_speed",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "ux_redesign",
+      "b": "ux_navigation",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "dev_platform",
+      "b": "support_speed",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "dev_platform",
+      "b": "analytics_absent",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "crm_adoption",
+      "b": "integration_manual",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "crm_adoption",
+      "b": "crm_capture",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "retention_winback",
+      "b": "rep_root",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "retention_winback",
+      "b": "crm_handoff",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "seo_competitors",
+      "b": "seo_commercial",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "seo_competitors",
+      "b": "seo_index",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "seo_sanctions",
+      "b": "seo_migration",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "seo_sanctions",
+      "b": "geo_zero_click",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "geo_zero_click",
+      "b": "seo_sanctions",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "geo_zero_click",
+      "b": "seo_migration",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "ai_process",
+      "b": "ai_routine",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "ai_process",
+      "b": "ai_repeat_questions",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "avito_leads",
+      "b": "crm_response",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "a": "mobile_installs",
+      "b": "mobile_store",
+      "relation": "alternative_cause",
+      "introduced_in": "0.2.0"
     }
   ]
 }

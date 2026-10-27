@@ -33,15 +33,16 @@ function statefulField(): RuntimeValueSchema {
   ] };
 }
 export const HISTORY_FIELDS = ['work', 'period_and_duration', 'goal', 'executor_and_resources', 'outcome', 'measurement', 'current_status', 'stop_reason'] as const;
-const DETAIL_FIELDS = new Set(['description', 'object', 'observation', 'period', 'context', 'task', 'current_way', 'constraint']);
+const DETAIL_FIELDS = new Set(['description', 'object', 'observation', 'period', 'context', 'task', 'current_way', 'constraint', 'frequency', 'effort', 'data_location', 'human_decision', 'error_cost']);
 
 /** Select by documented family AND declared field names; an unknown content shape stays unsupported. */
 export function runtimeSchemaForFact(fact: FactDefinition, blockIds: readonly string[] = []): RuntimeValueSchema | undefined {
   if (fact.value_type === 'money' || fact.value_type === 'number') return quantitySchema(fact.value_type === 'money');
   if (fact.value_type === 'period') return text;
   if (fact.value_type !== 'object') return undefined;
-  if (fact.id.endsWith('.details') && fact.field_states === true && fact.required_fields?.length && fact.required_fields.every(field => DETAIL_FIELDS.has(field))) {
-    return object(Object.fromEntries(fact.required_fields.map(field => [field, statefulField()])));
+  const detailFields = [...(fact.required_fields ?? []), ...(fact.optional_fields ?? [])];
+  if (fact.id.endsWith('.details') && fact.field_states === true && fact.required_fields?.length && detailFields.every(field => DETAIL_FIELDS.has(field))) {
+    return object(Object.fromEntries(detailFields.map(field => [field, statefulField()])));
   }
   if (fact.id.endsWith('.history') && record(fact.fields) && Array.isArray(fact.fields.attempts_status) &&
       fact.fields.attempts_status.every(value => typeof value === 'string') && record(fact.fields.attempts) && record(fact.fields.attempts.item)) {
@@ -64,6 +65,14 @@ export function runtimeSchemaForFact(fact: FactDefinition, blockIds: readonly st
     return object(Object.fromEntries(fact.parameters.map(field => [field, field === 'metric' ? text : quantity.properties[field]!])));
   }
   return undefined;
+}
+
+/** A description (a .details fact) keeps only the parts its schema declares: a part the model brought over from another
+ * description is dropped, not the whole answer. Other values, and descriptions with no declared part, are returned as they are. */
+export function declaredDetails(factId: string, value: unknown, schema: { type: string; properties?: Readonly<Record<string, unknown>> } | undefined): unknown {
+  if (!factId.endsWith('.details') || !record(value) || schema?.type !== 'object' || !schema.properties) return value;
+  const kept = Object.fromEntries(Object.entries(value).filter(([key]) => Object.hasOwn(schema.properties!, key)));
+  return Object.keys(kept).length ? kept : value;
 }
 
 /** Validates supplied fields only. It never coerces, enriches, mutates or fills missing data. */

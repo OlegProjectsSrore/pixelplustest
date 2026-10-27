@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0.0",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "status": "approved",
   "author": "Codex — подготовка по методике и локальным источникам",
   "reviewer": "project_owner_chat_approval",
-  "approved_at": "2026-10-26T11:14:36.181Z",
+  "approved_at": "2026-10-27T03:08:12Z",
   "items": [
     {
       "id": "context.name",
@@ -700,7 +700,10 @@
       "reviewer": "project_owner_chat_approval",
       "approved_at": "2026-10-23T06:01:25.796Z",
       "purpose": "Не обсуждать несуществующие каналы или системы",
-      "scope": "обычный поиск и видимость в ответах AI"
+      "scope": "обычный поиск Яндекса и Google",
+      "v0_1_4": {
+        "scope": "обычный поиск и видимость в ответах AI"
+      }
     },
     {
       "id": "seo.impact",
@@ -831,7 +834,10 @@
       "reviewer": "project_owner_chat_approval",
       "approved_at": "2026-10-23T06:01:25.796Z",
       "purpose": "Не обсуждать несуществующие каналы или системы",
-      "scope": "рекламные кампании и качество обращений"
+      "scope": "реклама в поиске, соцсетях и медиа и качество обращений",
+      "v0_1_4": {
+        "scope": "рекламные кампании и качество обращений"
+      }
     },
     {
       "id": "advertising.impact",
@@ -1598,7 +1604,7 @@
     },
     {
       "id": "marketplace.applicable",
-      "label": "Применимость темы: Маркетплейсы",
+      "label": "Применимость темы: Маркетплейсы и Авито",
       "value_type": "boolean",
       "states": [
         "known",
@@ -1617,11 +1623,52 @@
       "reviewer": "project_owner_chat_approval",
       "approved_at": "2026-10-23T06:01:25.796Z",
       "purpose": "Не обсуждать несуществующие каналы или системы",
-      "scope": "карточки, заказы и экономика площадок"
+      "scope": "карточки, объявления, заказы и экономика площадок",
+      "v0_1_4": {
+        "label": "Применимость темы: Маркетплейсы",
+        "scope": "карточки, заказы и экономика площадок"
+      }
+    },
+    {
+      "id": "marketplace.platforms",
+      "label": "Площадки продаж: Маркетплейсы и Авито",
+      "value_type": "enum",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждено владельцем 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T04:48:21Z",
+      "introduced_in": "0.2.0",
+      "values": [
+        {
+          "id": "marketplaces",
+          "label": "На маркетплейсах вроде Ozon и Wildberries"
+        },
+        {
+          "id": "avito",
+          "label": "На Авито"
+        },
+        {
+          "id": "both",
+          "label": "И там и там"
+        }
+      ],
+      "purpose": "Задавать вопросы только выбранных площадок: маркетплейсов товаров, Авито или обеих"
     },
     {
       "id": "marketplace.impact",
-      "label": "Последствия для бизнеса: Маркетплейсы",
+      "label": "Последствия для бизнеса: Маркетплейсы и Авито",
       "value_type": "object",
       "states": [
         "known",
@@ -1650,11 +1697,14 @@
         "description": "Слова посетителя; не рассчитывать потери самостоятельно",
         "period": "Период последствий"
       },
-      "purpose": "Приоритет, отдельный от достоверности признака"
+      "purpose": "Приоритет, отдельный от достоверности признака",
+      "v0_1_4": {
+        "label": "Последствия для бизнеса: Маркетплейсы"
+      }
     },
     {
       "id": "marketplace.history",
-      "label": "Прошлые попытки: Маркетплейсы",
+      "label": "Прошлые попытки: Маркетплейсы и Авито",
       "value_type": "object",
       "states": [
         "known",
@@ -1725,7 +1775,10 @@
           }
         }
       },
-      "purpose": "Не повторять прежнюю работу без объяснения, что изменится"
+      "purpose": "Не повторять прежнюю работу без объяснения, что изменится",
+      "v0_1_4": {
+        "label": "Прошлые попытки: Маркетплейсы"
+      }
     },
     {
       "id": "reputation.applicable",
@@ -12906,6 +12959,1727 @@
       "author": "Codex — подготовка по методике",
       "reviewer": "project_owner_chat_approval",
       "approved_at": "2026-10-23T06:01:25.796Z"
+    },
+    {
+      "id": "ai_search.applicable",
+      "label": "Применимость темы: Видимость в нейросетях",
+      "value_type": "boolean",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "purpose": "Не обсуждать несуществующие каналы или системы",
+      "scope": "ответы нейросетей и AI-поиска о компании",
+      "v0_1_4": {
+        "scope": "обычный поиск и видимость в ответах AI"
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "ai_search.impact",
+      "label": "Последствия для бизнеса: Видимость в нейросетях",
+      "value_type": "object",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "fields": {
+        "level": [
+          "stops_operation",
+          "loss_or_delay",
+          "limited",
+          "no_effect",
+          "unknown"
+        ],
+        "description": "Слова посетителя; не рассчитывать потери самостоятельно",
+        "period": "Период последствий"
+      },
+      "purpose": "Приоритет, отдельный от достоверности признака",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "ai_search.history",
+      "label": "Прошлые попытки: Видимость в нейросетях",
+      "value_type": "object",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "fields": {
+        "attempts_status": [
+          "not_tried",
+          "tried",
+          "unknown",
+          "declined"
+        ],
+        "result": [
+          "ongoing",
+          "no_result",
+          "partial_or_stopped",
+          "unknown"
+        ],
+        "attempts": {
+          "type": "array",
+          "item": {
+            "attempt_id": "string",
+            "applies_to_block_ids": "array",
+            "work": {
+              "state": "fact_state",
+              "value": "text_or_structured_quantity"
+            },
+            "period_and_duration": {
+              "state": "fact_state",
+              "value": "text_or_structured_quantity"
+            },
+            "goal": {
+              "state": "fact_state",
+              "value": "text_or_structured_quantity"
+            },
+            "executor_and_resources": {
+              "state": "fact_state",
+              "value": "text_or_structured_quantity"
+            },
+            "outcome": {
+              "state": "fact_state",
+              "value": "text_or_structured_quantity"
+            },
+            "measurement": {
+              "state": "fact_state",
+              "value": "text_or_structured_quantity"
+            },
+            "current_status": {
+              "state": "fact_state",
+              "value": "text_or_structured_quantity"
+            },
+            "stop_reason": {
+              "state": "fact_state",
+              "value": "text_or_structured_quantity"
+            }
+          }
+        }
+      },
+      "purpose": "Не повторять прежнюю работу без объяснения, что изменится",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "ads_social.signal",
+      "label": "Реклама в соцсетях не приносит подходящих обращений",
+      "value_type": "enum",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "values": [
+        {
+          "id": "target",
+          "label": "Есть данные о расходах и обращениях из соцсетей, подходящих обращений мало или они дороже ориентира"
+        },
+        {
+          "id": "alternative",
+          "label": "Реклама в соцсетях не запускалась либо её результат устраивает"
+        }
+      ],
+      "normalization": "target означает точное выполнение всего описанного условия; частичное совпадение, голое «да» вне контекста и одно ключевое слово недостаточны.",
+      "purpose": "Выбор либо исключение конкретной ситуации",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "ads_social.details",
+      "label": "Основания: Реклама в соцсетях не приносит подходящих обращений",
+      "value_type": "object",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "required_fields": [
+        "object",
+        "observation",
+        "period",
+        "context"
+      ],
+      "field_states": true,
+      "purpose": "Наблюдение в конкретных условиях. В PDF допустима только гипотеза; причинность проверяется отдельной работой.",
+      "example_schema": {
+        "object": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "observation": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "period": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "context": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        }
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "ads_awareness.signal",
+      "label": "Продукт мало ищут: поисковой рекламе не хватает спроса",
+      "value_type": "enum",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "values": [
+        {
+          "id": "target",
+          "label": "Поисковых запросов мало: кампании не набирают показов или бюджет не расходуется, продукт новый или малоизвестный"
+        },
+        {
+          "id": "alternative",
+          "label": "Поискового спроса хватает для нужного объёма обращений"
+        }
+      ],
+      "normalization": "target означает точное выполнение всего описанного условия; частичное совпадение, голое «да» вне контекста и одно ключевое слово недостаточны.",
+      "purpose": "Выбор либо исключение конкретной ситуации",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "ads_awareness.details",
+      "label": "Основания: Продукт мало ищут: поисковой рекламе не хватает спроса",
+      "value_type": "object",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "required_fields": [
+        "object",
+        "observation",
+        "period",
+        "context"
+      ],
+      "field_states": true,
+      "purpose": "Наблюдение в конкретных условиях. В PDF допустима только гипотеза; причинность проверяется отдельной работой.",
+      "example_schema": {
+        "object": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "observation": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "period": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "context": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        }
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "ads_management.signal",
+      "label": "Кампании не оптимизируются регулярно",
+      "value_type": "enum",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "values": [
+        {
+          "id": "target",
+          "label": "Регулярной работы с кампаниями нет: настройки меняют редко или от случая к случаю"
+        },
+        {
+          "id": "alternative",
+          "label": "Кампании регулярно анализируют и корректируют"
+        }
+      ],
+      "normalization": "target означает точное выполнение всего описанного условия; частичное совпадение, голое «да» вне контекста и одно ключевое слово недостаточны.",
+      "purpose": "Выбор либо исключение конкретной ситуации",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "ads_management.details",
+      "label": "Основания: Кампании не оптимизируются регулярно",
+      "value_type": "object",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "required_fields": [
+        "description"
+      ],
+      "field_states": true,
+      "purpose": "Явное сообщение об отсутствии конкретного учёта, критерия или процесса. Незнание посетителя не равно отсутствию в компании.",
+      "example_schema": {
+        "description": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        }
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "geo_competitors.signal",
+      "label": "Нейросети советуют конкурентов, а не компанию",
+      "value_type": "enum",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "values": [
+        {
+          "id": "target",
+          "label": "Есть примеры запросов, где нейросети называют конкурентов и не называют компанию"
+        },
+        {
+          "id": "alternative",
+          "label": "Компанию называют по важным запросам либо таких проверок не было"
+        }
+      ],
+      "normalization": "target означает точное выполнение всего описанного условия; частичное совпадение, голое «да» вне контекста и одно ключевое слово недостаточны.",
+      "purpose": "Выбор либо исключение конкретной ситуации",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "geo_competitors.details",
+      "label": "Основания: Нейросети советуют конкурентов, а не компанию",
+      "value_type": "object",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "required_fields": [
+        "object",
+        "observation",
+        "period"
+      ],
+      "field_states": true,
+      "purpose": "Конкретный объект, наблюдаемый сбой и период. Это сообщение посетителя, а не технически установленная причина.",
+      "example_schema": {
+        "object": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "observation": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "period": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        }
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "geo_negative.signal",
+      "label": "В ответах нейросетей негатив о компании",
+      "value_type": "enum",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "values": [
+        {
+          "id": "target",
+          "label": "Есть сохранённые примеры негативных оценок компании в ответах нейросетей"
+        },
+        {
+          "id": "alternative",
+          "label": "Негатива в ответах не встречали"
+        }
+      ],
+      "normalization": "target означает точное выполнение всего описанного условия; частичное совпадение, голое «да» вне контекста и одно ключевое слово недостаточны.",
+      "purpose": "Выбор либо исключение конкретной ситуации",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "geo_negative.details",
+      "label": "Основания: В ответах нейросетей негатив о компании",
+      "value_type": "object",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "required_fields": [
+        "object",
+        "observation",
+        "period"
+      ],
+      "field_states": true,
+      "purpose": "Конкретный объект, наблюдаемый сбой и период. Это сообщение посетителя, а не технически установленная причина.",
+      "example_schema": {
+        "object": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "observation": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "period": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        }
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "geo_zero_click.signal",
+      "label": "Переходов из поиска меньше при тех же позициях: ответ забирают нейроответы",
+      "value_type": "enum",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "values": [
+        {
+          "id": "target",
+          "label": "Позиции по важным запросам сохранились, а переходов из поиска стало заметно меньше"
+        },
+        {
+          "id": "alternative",
+          "label": "Переходы снижаются вместе с позициями либо не снижаются"
+        }
+      ],
+      "normalization": "target означает точное выполнение всего описанного условия; частичное совпадение, голое «да» вне контекста и одно ключевое слово недостаточны.",
+      "purpose": "Выбор либо исключение конкретной ситуации",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "geo_zero_click.details",
+      "label": "Основания: Переходов из поиска меньше при тех же позициях: ответ забирают нейроответы",
+      "value_type": "object",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "required_fields": [
+        "object",
+        "observation",
+        "period",
+        "context"
+      ],
+      "field_states": true,
+      "purpose": "Наблюдение в конкретных условиях. В PDF допустима только гипотеза; причинность проверяется отдельной работой.",
+      "example_schema": {
+        "object": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "observation": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "period": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "context": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        }
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "seo_sanctions.signal",
+      "label": "Резкое падение поискового трафика без переноса сайта",
+      "value_type": "enum",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "values": [
+        {
+          "id": "target",
+          "label": "Трафик из поиска резко упал за короткий период без переноса сайта и сезонной причины"
+        },
+        {
+          "id": "alternative",
+          "label": "Резкого падения не было либо его объясняют перенос или сезон"
+        }
+      ],
+      "normalization": "target означает точное выполнение всего описанного условия; частичное совпадение, голое «да» вне контекста и одно ключевое слово недостаточны.",
+      "purpose": "Выбор либо исключение конкретной ситуации",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "seo_sanctions.details",
+      "label": "Основания: Резкое падение поискового трафика без переноса сайта",
+      "value_type": "object",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "required_fields": [
+        "object",
+        "observation",
+        "period",
+        "context"
+      ],
+      "field_states": true,
+      "purpose": "Наблюдение в конкретных условиях. В PDF допустима только гипотеза; причинность проверяется отдельной работой.",
+      "example_schema": {
+        "object": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "observation": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "period": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "context": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        }
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "seo_commercial.signal",
+      "label": "Конкуренты убедительнее по коммерческим факторам",
+      "value_type": "enum",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "values": [
+        {
+          "id": "target",
+          "label": "Есть сравнение с конкурентами и у них полнее цены, ассортимент, условия, контакты или отзывы"
+        },
+        {
+          "id": "alternative",
+          "label": "Страницы не уступают конкурентам либо сравнения не было"
+        }
+      ],
+      "normalization": "target означает точное выполнение всего описанного условия; частичное совпадение, голое «да» вне контекста и одно ключевое слово недостаточны.",
+      "purpose": "Выбор либо исключение конкретной ситуации",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "seo_commercial.details",
+      "label": "Основания: Конкуренты убедительнее по коммерческим факторам",
+      "value_type": "object",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "required_fields": [
+        "object",
+        "observation",
+        "period",
+        "context"
+      ],
+      "field_states": true,
+      "purpose": "Наблюдение в конкретных условиях. В PDF допустима только гипотеза; причинность проверяется отдельной работой.",
+      "example_schema": {
+        "object": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "observation": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "period": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "context": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        }
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "seo_competitors.signal",
+      "label": "Сайт стабильно ниже конкурентов по главным запросам",
+      "value_type": "enum",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "values": [
+        {
+          "id": "target",
+          "label": "Есть главные запросы, по которым конкуренты стабильно выше несколько месяцев"
+        },
+        {
+          "id": "alternative",
+          "label": "По главным запросам сайт не уступает конкурентам либо позиции не отслеживаются"
+        }
+      ],
+      "normalization": "target означает точное выполнение всего описанного условия; частичное совпадение, голое «да» вне контекста и одно ключевое слово недостаточны.",
+      "purpose": "Выбор либо исключение конкретной ситуации",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "seo_competitors.details",
+      "label": "Основания: Сайт стабильно ниже конкурентов по главным запросам",
+      "value_type": "object",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "required_fields": [
+        "object",
+        "observation",
+        "period",
+        "context"
+      ],
+      "field_states": true,
+      "purpose": "Наблюдение в конкретных условиях. В PDF допустима только гипотеза; причинность проверяется отдельной работой.",
+      "example_schema": {
+        "object": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "observation": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "period": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "context": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        }
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "seo_contractor.signal",
+      "label": "Смена SEO-подрядчика с риском потерять позиции",
+      "value_type": "enum",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "values": [
+        {
+          "id": "target",
+          "label": "Решение о смене подрядчика принято или обсуждается"
+        },
+        {
+          "id": "alternative",
+          "label": "Смену подрядчика не планируют"
+        }
+      ],
+      "normalization": "target означает точное выполнение всего описанного условия; частичное совпадение, голое «да» вне контекста и одно ключевое слово недостаточны.",
+      "purpose": "Выбор либо исключение конкретной ситуации",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "seo_contractor.details",
+      "label": "Основания: Смена SEO-подрядчика с риском потерять позиции",
+      "value_type": "object",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "required_fields": [
+        "task",
+        "current_way",
+        "constraint"
+      ],
+      "field_states": true,
+      "purpose": "Понятна нужная задача, текущий способ и его ограничение. Применимость внедрения ещё проверяется по ресурсам и прошлому опыту.",
+      "example_schema": {
+        "task": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "current_way": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "constraint": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        }
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "seo_inhouse.signal",
+      "label": "Своя SEO-команда без внешней экспертизы",
+      "value_type": "enum",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "values": [
+        {
+          "id": "target",
+          "label": "Продвижением занимаются свои сотрудники и есть вопросы или объём работ, с которыми они не справляются"
+        },
+        {
+          "id": "alternative",
+          "label": "Своей команды нет либо ей хватает опыта и ресурсов"
+        }
+      ],
+      "normalization": "target означает точное выполнение всего описанного условия; частичное совпадение, голое «да» вне контекста и одно ключевое слово недостаточны.",
+      "purpose": "Выбор либо исключение конкретной ситуации",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "seo_inhouse.details",
+      "label": "Основания: Своя SEO-команда без внешней экспертизы",
+      "value_type": "object",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "required_fields": [
+        "task",
+        "current_way",
+        "constraint"
+      ],
+      "field_states": true,
+      "purpose": "Понятна нужная задача, текущий способ и его ограничение. Применимость внедрения ещё проверяется по ресурсам и прошлому опыту.",
+      "example_schema": {
+        "task": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "current_way": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "constraint": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        }
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "avito_leads.signal",
+      "label": "Объявления на Авито дают мало обращений",
+      "value_type": "enum",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "values": [
+        {
+          "id": "target",
+          "label": "Объявления размещены, а обращений мало или стало меньше"
+        },
+        {
+          "id": "alternative",
+          "label": "Обращений с Авито достаточно либо на Авито не продают"
+        }
+      ],
+      "normalization": "target означает точное выполнение всего описанного условия; частичное совпадение, голое «да» вне контекста и одно ключевое слово недостаточны.",
+      "purpose": "Выбор либо исключение конкретной ситуации",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "avito_leads.details",
+      "label": "Основания: Объявления на Авито дают мало обращений",
+      "value_type": "object",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "required_fields": [
+        "object",
+        "observation",
+        "period",
+        "context"
+      ],
+      "field_states": true,
+      "purpose": "Наблюдение в конкретных условиях. В PDF допустима только гипотеза; причинность проверяется отдельной работой.",
+      "example_schema": {
+        "object": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "observation": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "period": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "context": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        }
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "avito_cost.signal",
+      "label": "Платное продвижение на Авито не окупается",
+      "value_type": "enum",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "values": [
+        {
+          "id": "target",
+          "label": "Есть расходы на продвижение на Авито, а продажи от него не окупают затраты"
+        },
+        {
+          "id": "alternative",
+          "label": "Платное продвижение окупается либо не используется"
+        }
+      ],
+      "normalization": "target означает точное выполнение всего описанного условия; частичное совпадение, голое «да» вне контекста и одно ключевое слово недостаточны.",
+      "purpose": "Выбор либо исключение конкретной ситуации",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "avito_cost.details",
+      "label": "Основания: Платное продвижение на Авито не окупается",
+      "value_type": "object",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "required_fields": [
+        "object",
+        "observation",
+        "period",
+        "context"
+      ],
+      "field_states": true,
+      "purpose": "Наблюдение в конкретных условиях. В PDF допустима только гипотеза; причинность проверяется отдельной работой.",
+      "example_schema": {
+        "object": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "observation": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "period": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "context": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        }
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "rep_local_ads.signal",
+      "label": "Карточка на картах есть, но рядом с точкой о компании мало знают",
+      "value_type": "enum",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "values": [
+        {
+          "id": "target",
+          "label": "Карточка заполнена, но просмотров и маршрутов мало для нужного потока клиентов"
+        },
+        {
+          "id": "alternative",
+          "label": "Потока с карт достаточно либо карточки нет"
+        }
+      ],
+      "normalization": "target означает точное выполнение всего описанного условия; частичное совпадение, голое «да» вне контекста и одно ключевое слово недостаточны.",
+      "purpose": "Выбор либо исключение конкретной ситуации",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "rep_local_ads.details",
+      "label": "Основания: Карточка на картах есть, но рядом с точкой о компании мало знают",
+      "value_type": "object",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "required_fields": [
+        "object",
+        "observation",
+        "period",
+        "context"
+      ],
+      "field_states": true,
+      "purpose": "Наблюдение в конкретных условиях. В PDF допустима только гипотеза; причинность проверяется отдельной работой.",
+      "example_schema": {
+        "object": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "observation": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "period": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "context": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        }
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "brand_trademark.signal",
+      "label": "Название не защищено товарным знаком",
+      "value_type": "enum",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "values": [
+        {
+          "id": "target",
+          "label": "Товарного знака нет, а площадка его требует или название уже используют другие"
+        },
+        {
+          "id": "alternative",
+          "label": "Товарный знак зарегистрирован либо такой потребности нет"
+        }
+      ],
+      "normalization": "target означает точное выполнение всего описанного условия; частичное совпадение, голое «да» вне контекста и одно ключевое слово недостаточны.",
+      "purpose": "Выбор либо исключение конкретной ситуации",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "brand_trademark.details",
+      "label": "Основания: Название не защищено товарным знаком",
+      "value_type": "object",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "required_fields": [
+        "task",
+        "current_way",
+        "constraint"
+      ],
+      "field_states": true,
+      "purpose": "Понятна нужная задача, текущий способ и его ограничение. Применимость внедрения ещё проверяется по ресурсам и прошлому опыту.",
+      "example_schema": {
+        "task": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "current_way": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "constraint": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        }
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "ai_routine.signal",
+      "label": "Сотрудники вручную повторяют одни и те же операции",
+      "value_type": "enum",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "values": [
+        {
+          "id": "target",
+          "label": "Есть частая однотипная операция, которая занимает заметное время или даёт ошибки"
+        },
+        {
+          "id": "alternative",
+          "label": "Существенных повторяющихся ручных операций нет"
+        }
+      ],
+      "normalization": "target означает точное выполнение всего описанного условия; частичное совпадение, голое «да» вне контекста и одно ключевое слово недостаточны.",
+      "purpose": "Выбор либо исключение конкретной ситуации",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "ai_routine.details",
+      "label": "Основания: Сотрудники вручную повторяют одни и те же операции",
+      "value_type": "object",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "required_fields": [
+        "task",
+        "frequency",
+        "effort",
+        "data_location"
+      ],
+      "field_states": true,
+      "purpose": "Понятна нужная задача, текущий способ и его ограничение. Применимость внедрения ещё проверяется по ресурсам и прошлому опыту.",
+      "example_schema": {
+        "task": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "frequency": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "effort": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "data_location": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "human_decision": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "error_cost": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        }
+      },
+      "introduced_in": "0.2.0",
+      "optional_fields": [
+        "human_decision",
+        "error_cost"
+      ]
+    },
+    {
+      "id": "ai_repeat_questions.signal",
+      "label": "Сотрудники отвечают на одни и те же вопросы клиентов",
+      "value_type": "enum",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "values": [
+        {
+          "id": "target",
+          "label": "Значимая часть обращений — повторяющиеся вопросы, ответы на которые занимают заметное время или задерживаются"
+        },
+        {
+          "id": "alternative",
+          "label": "Повторяющихся вопросов немного либо ответы не задерживаются"
+        }
+      ],
+      "normalization": "target означает точное выполнение всего описанного условия; частичное совпадение, голое «да» вне контекста и одно ключевое слово недостаточны.",
+      "purpose": "Выбор либо исключение конкретной ситуации",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "ai_repeat_questions.details",
+      "label": "Основания: Сотрудники отвечают на одни и те же вопросы клиентов",
+      "value_type": "object",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "required_fields": [
+        "task",
+        "current_way",
+        "constraint"
+      ],
+      "field_states": true,
+      "purpose": "Понятна нужная задача, текущий способ и его ограничение. Применимость внедрения ещё проверяется по ресурсам и прошлому опыту.",
+      "example_schema": {
+        "task": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "current_way": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "constraint": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        }
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "ai_doc_search.signal",
+      "label": "Сотрудники долго ищут ответы во внутренних документах",
+      "value_type": "enum",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "values": [
+        {
+          "id": "target",
+          "label": "Сотрудники регулярно тратят заметное время на поиск сведений в разрозненных документах"
+        },
+        {
+          "id": "alternative",
+          "label": "Нужные сведения находятся быстро"
+        }
+      ],
+      "normalization": "target означает точное выполнение всего описанного условия; частичное совпадение, голое «да» вне контекста и одно ключевое слово недостаточны.",
+      "purpose": "Выбор либо исключение конкретной ситуации",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "ai_doc_search.details",
+      "label": "Основания: Сотрудники долго ищут ответы во внутренних документах",
+      "value_type": "object",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "required_fields": [
+        "task",
+        "current_way",
+        "constraint"
+      ],
+      "field_states": true,
+      "purpose": "Понятна нужная задача, текущий способ и его ограничение. Применимость внедрения ещё проверяется по ресурсам и прошлому опыту.",
+      "example_schema": {
+        "task": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "current_way": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "constraint": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        }
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "mobile_installs.signal",
+      "label": "Установки приложения дорогие или их мало",
+      "value_type": "enum",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "values": [
+        {
+          "id": "target",
+          "label": "Установок меньше нужного или их стоимость выше ориентира"
+        },
+        {
+          "id": "alternative",
+          "label": "Установок достаточно и их стоимость устраивает"
+        }
+      ],
+      "normalization": "target означает точное выполнение всего описанного условия; частичное совпадение, голое «да» вне контекста и одно ключевое слово недостаточны.",
+      "purpose": "Выбор либо исключение конкретной ситуации",
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "mobile_installs.details",
+      "label": "Основания: Установки приложения дорогие или их мало",
+      "value_type": "object",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "required_fields": [
+        "object",
+        "observation",
+        "period",
+        "context"
+      ],
+      "field_states": true,
+      "purpose": "Наблюдение в конкретных условиях. В PDF допустима только гипотеза; причинность проверяется отдельной работой.",
+      "example_schema": {
+        "object": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "observation": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "period": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        },
+        "context": {
+          "state": "known",
+          "value": "Дословно подтверждённые сведения посетителя"
+        }
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "context.funnel",
+      "label": "Где теряется больше всего клиентов",
+      "value_type": "enum",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "values": [
+        {
+          "id": "few_leads",
+          "label": "Мало обращений"
+        },
+        {
+          "id": "leads_not_converting",
+          "label": "Обращения не превращаются в продажи"
+        },
+        {
+          "id": "customers_not_returning",
+          "label": "Клиенты не возвращаются"
+        },
+        {
+          "id": "unclear",
+          "label": "Трудно сказать"
+        }
+      ],
+      "purpose": "Добавить к выбранным темам обработку обращений или повторные продажи, если посетитель видит потерю клиентов там"
+    },
+    {
+      "id": "context.external_cause",
+      "label": "Причина трудностей вне цифровых услуг",
+      "value_type": "text",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "introduced_in": "0.2.0",
+      "purpose": "Отделить причины вне маркетинга и цифровых систем: их не диагностируют и не превращают в рекомендации"
     }
   ],
   "state_definitions": [

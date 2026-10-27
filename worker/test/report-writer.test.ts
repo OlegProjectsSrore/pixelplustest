@@ -88,6 +88,15 @@ test("the writer's reply passes only with every problem, no invented numbers, pr
     ["foreign script", ok([{ ...good[0]!, why: "Вы назвали это направление главным 上." }, good[1]!])],
     ["extra field", JSON.stringify({ ...JSON.parse(ok(good)), extra: 1 })],
   ] as const) assert.equal(checkWriter(broken, input), null, name);
+  // A price word passes only where the problem's name or the visitor's own words use it.
+  const prices = ok([{ ...good[0]!, why: "Цены и фото Вы не меняли, а заявки идут без источника." }, good[1]!]);
+  assert.equal(checkWriter(prices, input), null, "price word the visitor did not use");
+  const told = { ...input, problems: input.problems.map((problem, index) => index ? problem : { ...problem, visitor_example: `${problem.visitor_example} Цены и фото не меняли.` }) };
+  assert.ok(checkWriter(prices, told), "the visitor's own word");
+  const titled = { ...input, problems: input.problems.map((problem, index) => index ? problem : { ...problem, title: "Стоимость подходящего обращения превышает согласованный ориентир" }) };
+  const cost = ok([{ ...good[0]!, why: "Стоимость обращения выше ориентира." }, good[1]!]);
+  assert.equal(checkWriter(cost, input), null); assert.ok(checkWriter(cost, titled), "a word of the problem's name");
+  assert.equal(checkWriter(ok([{ ...good[0]!, why: "Тариф выбирайте сами." }, good[1]!]), titled), null, "other price words stay forbidden");
 });
 
 test("the PDF has the eleven approved sections in order, the header, and uses the writer's texts", () => {

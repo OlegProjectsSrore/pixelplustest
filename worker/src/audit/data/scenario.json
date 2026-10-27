@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0.0",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "status": "approved",
   "author": "Codex — подготовка библиотеки",
   "reviewer": "project_owner_chat_approval",
-  "approved_at": "2026-10-26T11:14:36.181Z",
+  "approved_at": "2026-10-27T03:08:12Z",
   "channels": [
     "chat",
     "voice"
@@ -30,7 +30,8 @@
     "context_business",
     "context_goal",
     "context_assets",
-    "context_priority"
+    "context_priority",
+    "context_funnel"
   ],
   "routing": {
     "domain_activation": "Только явные факты о задачах, активах и процессах; неизвестную применимость уточнить одним scope-вопросом.",
@@ -159,5 +160,27 @@
       "problem": "Без Вашего примера в отчёт нельзя включить эту проблему с шагами и стоимостью работ.",
       "history": "От этого зависит, с чего начинать: с нуля или с разбора того, что уже делалось."
     }
+  },
+  "v0_1_4": {
+    "entry_questions": [
+      "context_name",
+      "context_position",
+      "context_company_name",
+      "context_website",
+      "context_responsibilities",
+      "context_company_size",
+      "context_business",
+      "context_goal",
+      "context_assets",
+      "context_priority"
+    ]
+  },
+  "funnel": {
+    "fact": "context.funnel",
+    "adds": {
+      "leads_not_converting": "crm",
+      "customers_not_returning": "retention"
+    },
+    "introduced_in": "0.2.0"
   }
 }

@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "status": "approved",
   "purpose": "Сервер выбирает один блок; не передавать весь каталог агенту или браузеру.",
   "blocks": [
@@ -435,7 +435,7 @@
       "questions": [
         {
           "id": "seo_scope",
-          "text": "Нужно ли обсудить обычный поиск и видимость в ответах AI?",
+          "text": "Нужно ли обсудить обычный поиск Яндекса и Google?",
           "fact_ids": [
             "seo.applicable"
           ],
@@ -674,6 +674,187 @@
           "answer_set": null
         },
         {
+          "id": "seo_sanctions_screen",
+          "text": "Было ли резкое падение поискового трафика, не связанное с переносом сайта или сезоном?",
+          "fact_ids": [
+            "seo_sanctions.signal"
+          ],
+          "answer_set": "seo_sanctions"
+        },
+        {
+          "id": "seo_sanctions_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "seo_sanctions.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "seo_commercial_screen",
+          "text": "Чем страницы конкурентов из первой десятки отличаются от Ваших: ценами, ассортиментом, доставкой, контактами, отзывами?",
+          "fact_ids": [
+            "seo_commercial.signal"
+          ],
+          "answer_set": "seo_commercial"
+        },
+        {
+          "id": "seo_commercial_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "seo_commercial.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "seo_competitors_screen",
+          "text": "По каким главным запросам конкуренты стабильно выше Вас и как давно?",
+          "fact_ids": [
+            "seo_competitors.signal"
+          ],
+          "answer_set": "seo_competitors"
+        },
+        {
+          "id": "seo_competitors_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "seo_competitors.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "seo_contractor_screen",
+          "text": "Планируете ли Вы сменить подрядчика по продвижению и что важно сохранить при переходе?",
+          "fact_ids": [
+            "seo_contractor.signal"
+          ],
+          "answer_set": "seo_contractor"
+        },
+        {
+          "id": "seo_contractor_detail",
+          "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
+          "fact_ids": [
+            "seo_contractor.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "seo_inhouse_screen",
+          "text": "Кто занимается продвижением сайта внутри компании и по каким вопросам ему не хватает опыта?",
+          "fact_ids": [
+            "seo_inhouse.signal"
+          ],
+          "answer_set": "seo_inhouse"
+        },
+        {
+          "id": "seo_inhouse_detail",
+          "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
+          "fact_ids": [
+            "seo_inhouse.details"
+          ],
+          "answer_set": null
+        }
+      ]
+    },
+    {
+      "id": "ai_search",
+      "questions": [
+        {
+          "id": "ai_search_scope",
+          "text": "Нужно ли обсудить ответы нейросетей и AI-поиска о компании?",
+          "fact_ids": [
+            "ai_search.applicable"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ai_search_impact",
+          "text": "Что меняется для бизнеса из-за этой ситуации?",
+          "fact_ids": [
+            "ai_search.impact"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ai_search_history_1",
+          "text": "Что уже делали по этой теме, когда и как долго?",
+          "fact_ids": [
+            "ai_search.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ai_search_history_2",
+          "text": "Какого результата ждали и кто выполнял работу?",
+          "fact_ids": [
+            "ai_search.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ai_search_history_3",
+          "text": "Что получилось и по каким данным оценивали результат?",
+          "fact_ids": [
+            "ai_search.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ai_search_history_4",
+          "text": "Работа продолжается? Если остановили или изменили подход, почему?",
+          "fact_ids": [
+            "ai_search.history"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "geo_competitors_screen",
+          "text": "Когда Вы спрашиваете у ChatGPT, Алисы или других нейросетей о своей категории, кого они советуют?",
+          "fact_ids": [
+            "geo_competitors.signal"
+          ],
+          "answer_set": "geo_competitors"
+        },
+        {
+          "id": "geo_competitors_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "geo_competitors.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "geo_negative_screen",
+          "text": "Встречали ли Вы в ответах нейросетей отрицательные отзывы или оценки компании?",
+          "fact_ids": [
+            "geo_negative.signal"
+          ],
+          "answer_set": "geo_negative"
+        },
+        {
+          "id": "geo_negative_detail",
+          "text": "Уточните конкретный пример: где и что произошло, в какой период?",
+          "fact_ids": [
+            "geo_negative.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "geo_zero_click_screen",
+          "text": "Как изменились переходы из поиска при прежних позициях сайта?",
+          "fact_ids": [
+            "geo_zero_click.signal"
+          ],
+          "answer_set": "geo_zero_click"
+        },
+        {
+          "id": "geo_zero_click_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "geo_zero_click.details"
+          ],
+          "answer_set": null
+        },
+        {
           "id": "seo_ai_visibility_screen",
           "text": "Как Вы проверяете, что AI-сервисы отвечают о Вашем бренде и категории?",
           "fact_ids": [
@@ -712,7 +893,7 @@
       "questions": [
         {
           "id": "advertising_scope",
-          "text": "Нужно ли обсудить рекламные кампании и качество обращений?",
+          "text": "Нужно ли обсудить реклама в поиске, соцсетях и медиа и качество обращений?",
           "fact_ids": [
             "advertising.applicable"
           ],
@@ -947,6 +1128,54 @@
           "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
           "fact_ids": [
             "ads_restart.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ads_social_screen",
+          "text": "Сколько подходящих обращений дала реклама в соцсетях за последний месяц и во что она обошлась?",
+          "fact_ids": [
+            "ads_social.signal"
+          ],
+          "answer_set": "ads_social"
+        },
+        {
+          "id": "ads_social_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "ads_social.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ads_awareness_screen",
+          "text": "Набирает ли поисковая реклама достаточно показов, или Ваш продукт пока мало ищут?",
+          "fact_ids": [
+            "ads_awareness.signal"
+          ],
+          "answer_set": "ads_awareness"
+        },
+        {
+          "id": "ads_awareness_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "ads_awareness.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ads_management_screen",
+          "text": "Кто и как часто проверяет и корректирует рекламные кампании?",
+          "fact_ids": [
+            "ads_management.signal"
+          ],
+          "answer_set": "ads_management"
+        },
+        {
+          "id": "ads_management_detail",
+          "text": "Что именно сейчас не фиксируется или не определено? Это известно наверняка или вы пока не знаете?",
+          "fact_ids": [
+            "ads_management.details"
           ],
           "answer_set": null
         }
@@ -1926,9 +2155,17 @@
       "questions": [
         {
           "id": "marketplace_scope",
-          "text": "Нужно ли обсудить карточки, заказы и экономика площадок?",
+          "text": "Нужно ли обсудить карточки, объявления, заказы и экономика площадок?",
           "fact_ids": [
             "marketplace.applicable"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "marketplace_platforms",
+          "text": "Где Вы продаёте: на маркетплейсах вроде Ozon и Wildberries, на Авито или и там и там?",
+          "fact_ids": [
+            "marketplace.platforms"
           ],
           "answer_set": null
         },
@@ -2097,6 +2334,38 @@
           "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
           "fact_ids": [
             "market_dependence.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "avito_leads_screen",
+          "text": "Сколько обращений приносят объявления на Авито и как это меняется?",
+          "fact_ids": [
+            "avito_leads.signal"
+          ],
+          "answer_set": "avito_leads"
+        },
+        {
+          "id": "avito_leads_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "avito_leads.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "avito_cost_screen",
+          "text": "Сколько тратите на платное продвижение на Авито и сколько продаж оно приносит?",
+          "fact_ids": [
+            "avito_cost.signal"
+          ],
+          "answer_set": "avito_cost"
+        },
+        {
+          "id": "avito_cost_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "avito_cost.details"
           ],
           "answer_set": null
         }
@@ -2278,6 +2547,22 @@
           "text": "Уточните конкретный пример: где и что произошло, в какой период?",
           "fact_ids": [
             "rep_false.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "rep_local_ads_screen",
+          "text": "Сколько людей находят Вашу точку через карты и хватает ли этого?",
+          "fact_ids": [
+            "rep_local_ads.signal"
+          ],
+          "answer_set": "rep_local_ads"
+        },
+        {
+          "id": "rep_local_ads_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "rep_local_ads.details"
           ],
           "answer_set": null
         }
@@ -2626,6 +2911,22 @@
             "brand_templates.details"
           ],
           "answer_set": null
+        },
+        {
+          "id": "brand_trademark_screen",
+          "text": "Зарегистрирован ли товарный знак на название и были ли случаи, когда его требовала площадка или название использовали другие?",
+          "fact_ids": [
+            "brand_trademark.signal"
+          ],
+          "answer_set": "brand_trademark"
+        },
+        {
+          "id": "brand_trademark_detail",
+          "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
+          "fact_ids": [
+            "brand_trademark.details"
+          ],
+          "answer_set": null
         }
       ]
     },
@@ -2807,6 +3108,54 @@
             "ai_access.details"
           ],
           "answer_set": null
+        },
+        {
+          "id": "ai_routine_screen",
+          "text": "Какую операцию сотрудники чаще всего повторяют вручную и сколько времени она занимает?",
+          "fact_ids": [
+            "ai_routine.signal"
+          ],
+          "answer_set": "ai_routine"
+        },
+        {
+          "id": "ai_routine_detail",
+          "text": "Как часто выполняется эта операция, сколько сотрудников ей заняты, где лежат нужные данные и нужно ли в ней решение человека?",
+          "fact_ids": [
+            "ai_routine.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ai_repeat_questions_screen",
+          "text": "Какие вопросы клиенты задают чаще всего и сколько времени сотрудники тратят на ответы, в том числе вне рабочего времени?",
+          "fact_ids": [
+            "ai_repeat_questions.signal"
+          ],
+          "answer_set": "ai_repeat_questions"
+        },
+        {
+          "id": "ai_repeat_questions_detail",
+          "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
+          "fact_ids": [
+            "ai_repeat_questions.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "ai_doc_search_screen",
+          "text": "Сколько времени сотрудники тратят на поиск нужных сведений в документах и инструкциях?",
+          "fact_ids": [
+            "ai_doc_search.signal"
+          ],
+          "answer_set": "ai_doc_search"
+        },
+        {
+          "id": "ai_doc_search_detail",
+          "text": "Какую задачу нужно решить, как её решаете сейчас и что ограничивает этот способ?",
+          "fact_ids": [
+            "ai_doc_search.details"
+          ],
+          "answer_set": null
         }
       ]
     },
@@ -2938,6 +3287,22 @@
           "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
           "fact_ids": [
             "mobile_return.details"
+          ],
+          "answer_set": null
+        },
+        {
+          "id": "mobile_installs_screen",
+          "text": "Сколько установок приложения в месяц и во что обходится одна установка?",
+          "fact_ids": [
+            "mobile_installs.signal"
+          ],
+          "answer_set": "mobile_installs"
+        },
+        {
+          "id": "mobile_installs_detail",
+          "text": "На каком конкретном примере это видно, в какой период и при каких условиях?",
+          "fact_ids": [
+            "mobile_installs.details"
           ],
           "answer_set": null
         }
@@ -3109,6 +3474,20 @@
       ]
     },
     {
+      "id": "context_company_name",
+      "text": "Как называется Ваша компания?",
+      "fact_ids": [
+        "context.company_name"
+      ]
+    },
+    {
+      "id": "context_website",
+      "text": "Какой адрес сайта Вашей компании? Если сайта пока нет, так и скажите.",
+      "fact_ids": [
+        "context.website"
+      ]
+    },
+    {
       "id": "context_responsibilities",
       "text": "Какой у Вас функционал в компании, за что Вы отвечаете?",
       "fact_ids": [
@@ -3193,10 +3572,24 @@
       ]
     },
     {
+      "id": "context_funnel",
+      "text": "Где, по Вашему ощущению, теряется больше всего клиентов: мало обращений, обращения не превращаются в продажи или клиенты не возвращаются?",
+      "fact_ids": [
+        "context.funnel"
+      ]
+    },
+    {
       "id": "context_constraints",
       "text": "Какие сроки, обязательства или ограничения нужно учитывать?",
       "fact_ids": [
         "context.constraints"
+      ]
+    },
+    {
+      "id": "context_external_cause",
+      "text": "Есть ли у трудностей причины вне маркетинга и цифровых систем: качество продукта, производство, закупки, финансы, логистика или кадры?",
+      "fact_ids": [
+        "context.external_cause"
       ]
     },
     {

@@ -66,7 +66,7 @@ test('standard selection never calls the model and only accepts offered options'
     await f.handler(f.request, f.context(selected));
     assert.equal(f.calls(), 0);
     assert.deepEqual((await f.core.store.listAnswers(f.session.id)).find(answer => answer.fact_id === 'context.priority')?.value, ['strategy']);
-    await assert.rejects(() => f.handler(f.request, f.context({ ...selected, operation_id: 'invalid', expected_revision: 2, question_id: 'strategy_scope', input: { kind: 'selection', option_ids: ['invented'] } })), (error: unknown) => error instanceof HttpError && error.code === 'invalid_selection');
+    await assert.rejects(() => f.handler(f.request, f.context({ ...selected, operation_id: 'invalid', expected_revision: 2, question_id: 'context_funnel', input: { kind: 'selection', option_ids: ['invented'] } })), (error: unknown) => error instanceof HttpError && error.code === 'invalid_selection');
   } finally { f.db.close(); }
 });
 

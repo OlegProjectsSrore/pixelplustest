@@ -16,7 +16,7 @@
       "const": "ПРЕДВАРИТЕЛЬНЫЙ АУДИТ"
     },
     "library_version": {
-      "const": "0.1.4"
+      "const": "0.2.0"
     },
     "preview": {
       "type": "boolean"

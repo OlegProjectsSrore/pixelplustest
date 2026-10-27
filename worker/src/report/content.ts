@@ -21,6 +21,8 @@ function tariffPrice(details: Record<string, Json>): string {
   if (!price || price.type === "individual") return "";
   const money = (value: Json | undefined) => typeof value === "number" && Number.isFinite(value) ? `${new Intl.NumberFormat("ru-RU").format(value)} ${price.currency === "RUB" ? "₽" : String(price.currency ?? "")}` : null;
   const amount = money(price.amount), minimum = money(price.min), maximum = money(price.max);
+  // A fixed price of zero is a free offer: no unit or period.
+  if (price.type === "fixed" && price.amount === 0) return "бесплатно";
   const value = price.type === "fixed" ? amount : price.type === "from" && amount ? `от ${amount}` : price.type === "range" && minimum && maximum ? `${minimum}–${maximum}` : null;
   if (!value) return "";
   const units: Record<string, string> = { project: "за проект", month: "в месяц", audit: "за аудит", hour: "за час", database: "за базу", slide: "за слайд", prepaid_package: "за пакет" };
@@ -95,17 +97,27 @@ export function buildReportContent(result: AuditResult, snapshot: AuditSnapshot,
     const text = history ? historyText(history) : "";
     return text ? `${domain.title}: ${text}` : "";
   }).filter(Boolean);
+  // A cause outside digital services the visitor named is mentioned once and never becomes a recommendation.
+  const externalCause = told("context.external_cause").replace(/[.!?]+$/, "");
+  const external = texts.external_cause && externalCause ? texts.external_cause.replace("{{external_cause}}", externalCause) : "";
+  // A problem found while checking another possible cause of a complaint in this report says so.
+  const crossFound = (id: string) => {
+    if (!texts.cross_found || !(snapshot.state.cross_checked ?? []).includes(id)) return "";
+    const complaint = library.relationships.find(relation => relation.relation === "alternative_cause" && relation.b === id && ids.includes(relation.a));
+    return complaint ? texts.cross_found.replace("{{complaint}}", title(complaint.a)) : "";
+  };
   const nextStep = escapeHtml(texts.next_step).replace(escapeHtml(texts.contact_url), `<a href="${escapeHtml(texts.contact_url)}">${escapeHtml(texts.contact_url)}</a>`);
 
   const body = [
     section(titles.summary!, ids.length ? `<p>${escapeHtml(writer?.summary ?? texts.summary_fallback)}</p>${list(order.slice(0, 3).map(id => `${title(id)} — ${levelNames[levels.get(id)!]}`))}${firstStage ? `<p><strong>С чего начать:</strong> ${escapeHtml(`«${title(firstStage)}»: ${actionText(solution(firstStage).action_ids[0] ?? "")}`)}</p>` : ""}` : ""),
     section(titles.company!, list([...lines(COMPANY), ...(preparedFor ? [`Контактное лицо: ${preparedFor}`] : [])])),
-    section(titles.goal!, list(lines(GOAL))),
+    section(titles.goal!, list(lines(GOAL)) + (external ? `<p>${escapeHtml(external)}</p>` : "")),
     section(titles.problems!, order.map(id => {
       const domain = problems.find(problem => problem.id === id)!.domain, impact = object(facts[`${domain}.impact`]?.value ?? null);
       const fallback = [told(`${id}.details`) && `Что происходит: ${told(`${id}.details`)}.`, told(`${domain}.impact`) && impact && textValue(impact.description ?? null) ? `Последствия: ${textValue(impact.description ?? null)}.` : ""].filter(Boolean).join(" ");
       const situation = writer?.problems.find(problem => problem.id === id)?.situation ?? fallback;
-      return `<article><h3>${escapeHtml(title(id))}</h3>${situation ? `<p>${escapeHtml(situation)}</p>` : ""}</article>`;
+      const found = crossFound(id);
+      return `<article><h3>${escapeHtml(title(id))}</h3>${situation ? `<p>${escapeHtml(situation)}</p>` : ""}${found ? `<p>${escapeHtml(found)}</p>` : ""}</article>`;
     }).join("")),
     section(titles.priorities!, order.length ? `<ol>${order.map(id => `<li><strong>${escapeHtml(title(id))}</strong> — ${escapeHtml(levelNames[levels.get(id)!])}. ${escapeHtml(why(id))}</li>`).join("")}</ol>` : ""),
     section(titles.history!, list(histories)),

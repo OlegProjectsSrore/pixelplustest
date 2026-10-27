@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0.0",
-  "library_version": "0.1.4",
+  "library_version": "0.2.0",
   "status": "approved",
   "language": "ru",
   "reviewer": "project_owner_chat_approval",
-  "approved_at": "2026-10-26T11:14:36.181Z",
+  "approved_at": "2026-10-27T03:08:12Z",
   "storage": {
     "library": "Project JSON imported into the server bundle; not D1",
     "visitor_data": "D1 per architecture; no database writes performed by these tools"
@@ -28,26 +28,26 @@
   "files": [
     {
       "name": "answer-options.json",
-      "sha256": "db7fe63c889b245b7888b4f21f13382f4b802a68854d012c3dbb2714f5f9fb6e",
-      "bytes": 431206,
+      "sha256": "4833cba1af1be627a969028bb83d4d11a941265669d86dd93ab4310ad49e209a",
+      "bytes": 493730,
       "role": "runtime_candidate"
     },
     {
       "name": "audit-result.schema.json",
-      "sha256": "77ac4eff10ec4aa3e5e18eea0c2589c1a6af21605430d0f7e549846c65757e3c",
+      "sha256": "d42a7bcfe0913f1fe82c47ab0e4c561ced0164d12f45efb60d2d6581cc3bb188",
       "bytes": 7378,
       "role": "runtime_candidate"
     },
     {
       "name": "audit-state.schema.json",
-      "sha256": "fc4ab9d2638b2136c34f7c37772bae9c39a8269fe6372aa905efcfd863d94c43",
+      "sha256": "e0e4c95d8ab9d79acff159558d9a0e4097df5da1245580449c84da28870a0a94",
       "bytes": 55510,
       "role": "runtime_candidate"
     },
     {
       "name": "bottlenecks.json",
-      "sha256": "86938bdc0f77df170121d769fb6daab2ff414ebf74248955743f8e02dcd6d2aa",
-      "bytes": 1604316,
+      "sha256": "75f87ca66812df8cc0a706544a67ef22595f1771fc8ae88de766a28218a54a55",
+      "bytes": 1833103,
       "role": "runtime_candidate"
     },
     {
@@ -64,8 +64,8 @@
     },
     {
       "name": "domains.json",
-      "sha256": "61146667561d0efa5655601c0ed0a4fddff157bdd6218ed5103a63470758c9c5",
-      "bytes": 6862,
+      "sha256": "433b77e294d423351d57689391242d2ef0b18406a12fb7674c0766027ac021e3",
+      "bytes": 14766,
       "role": "runtime_candidate"
     },
     {
@@ -76,8 +76,8 @@
     },
     {
       "name": "facts.json",
-      "sha256": "b7288fc467cac8d37fcd175b0b67cce942a2eedcfb102674466b78e3e25b5841",
-      "bytes": 492634,
+      "sha256": "8d243787bf501d63e939b9b8d373db9b53ad9130b40071f4a672e7da5ae6dfd6",
+      "bytes": 562309,
       "role": "runtime_candidate"
     },
     {
@@ -106,8 +106,8 @@
     },
     {
       "name": "question-bank.json",
-      "sha256": "5c046bfea7cd3e640b144d18590c687bbd8bdd05402eb736564b6e8bc3cbe744",
-      "bytes": 762116,
+      "sha256": "0dc36c7fdd6cd2c37d2b5ac45cd90a5201249c2a9fec169780f40d9ae9917bd4",
+      "bytes": 945475,
       "role": "runtime_candidate"
     },
     {
@@ -118,26 +118,26 @@
     },
     {
       "name": "report-template.json",
-      "sha256": "b2a061cf276d9b3372b44b68403ecda1c0e5cd21946e38897215f07be9d5635b",
-      "bytes": 8020,
+      "sha256": "9b82572afa5d043a241a26119cc81a2ec8eab25b98f6321d648c7b310c551dcc",
+      "bytes": 8552,
       "role": "runtime_candidate"
     },
     {
       "name": "rule-checks.json",
-      "sha256": "3404a5dd9987dc2f0bcb2fe54b9adce0a1f1f6a06e255261f62f2385ff7d703a",
-      "bytes": 778712,
+      "sha256": "eeab578e5f3e92a6b358296b487e352a4870695384a0e59e336c7aa8864b8429",
+      "bytes": 903048,
       "role": "editorial"
     },
     {
       "name": "scenario.json",
-      "sha256": "56519765ac2181da58f09564be3bee1d4f406005975ad403bfca69e39da6c8b0",
-      "bytes": 7550,
+      "sha256": "97ca3abced33d47f2caaff1cd26bf71481a5ec70bbf529ab29f28f6ef26d1aaf",
+      "bytes": 8063,
       "role": "runtime_candidate"
     },
     {
       "name": "services-catalog.json",
-      "sha256": "c5a53bbc03f8555ac6d2982ba52b8197ac01635b09db811125909efb5efc6437",
-      "bytes": 59715,
+      "sha256": "9b006e5483c7bdf2a8a5c63c72726dc014d2276b39f596c383a72b01e3becadb",
+      "bytes": 105598,
       "role": "runtime_candidate"
     },
     {
@@ -148,32 +148,32 @@
     },
     {
       "name": "sources.json",
-      "sha256": "31049025ca0015f7092867c8fee523db48f9ab860f70b5a084d8ef1c558f9782",
-      "bytes": 189669,
+      "sha256": "6a3b6cf97bafc9e87fd1e056b89ddea5f95b09fa2324709a447e61fb3dd89cb2",
+      "bytes": 251965,
       "role": "editorial"
     },
     {
       "name": "tariffs.json",
-      "sha256": "f50e961a7ba71ebdd3de884b314de0f541a565007737925b1adfe9b8b9591787",
-      "bytes": 619920,
+      "sha256": "5eedc9f07933a1d4413aa6f89eb63306276cb5f31277b9fccc552ba51cbae47f",
+      "bytes": 1026434,
       "role": "runtime_candidate"
     },
     {
       "name": "voice-question-blocks.json",
-      "sha256": "de16508540d9fd3ca2708f2173b9d31af4a0c90d530ec20faafec419f858155b",
-      "bytes": 125189,
+      "sha256": "29a129ac729380644d2c20f48cc6f54819fb70d17a92eb0fc0151c19f31995ba",
+      "bytes": 141360,
       "role": "runtime_candidate"
     }
   ],
   "counts": {
-    "situations": 140,
-    "domains": 16,
-    "facts": 349,
-    "questions": 397,
-    "answer_sets": 140,
-    "services": 44,
-    "normalized_tariffs": 39,
-    "sources": 65,
+    "situations": 159,
+    "domains": 17,
+    "facts": 395,
+    "questions": 446,
+    "answer_sets": 159,
+    "services": 76,
+    "normalized_tariffs": 184,
+    "sources": 101,
     "inventory": 1705,
     "jokes": 150,
     "authored_evaluation_cases": 30,

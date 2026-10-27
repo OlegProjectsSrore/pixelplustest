@@ -102,8 +102,10 @@ export function buildChatContext(input: ChatContextInput): ClassifierContext {
   if (state.library_version !== lib.version) throw new Error('Classifier library version mismatch');
   const availableFacts = new Map(lib.facts.filter(f => permitted(f, allowDraft)).map(f => [f.id, f]));
   const availableQuestions = lib.questions.filter(q => permitted(q, allowDraft));
+  // An orientation question with answer options (buttons) joins only when asked or answered: its options among
+  // the free-text questions led the model to use a fact ID as the question ID.
   const wanted = new Set(input.allowedQuestionIds ?? [
-    ...availableQuestions.filter(q => q.phase === 'orientation').map(q => q.id),
+    ...availableQuestions.filter(q => q.phase === 'orientation' && !q.fact_ids.some(id => { const fact = availableFacts.get(id); return fact !== undefined && vocabulary(fact).length > 0; })).map(q => q.id),
     ...existingAnswers.filter(a => a.library_version === lib.version).map(a => a.question_id),
   ]);
   if (currentQuestion) {

@@ -36,9 +36,16 @@ export function problemFacts(ids: readonly string[], facts: Record<string, Audit
   });
 }
 
-/** Pairs [bottleneck, dependent] among the given problems. */
+/** Pairs [bottleneck, dependent] among the given problems. Another possible cause of a complaint comes before it,
+ * unless each is listed as a possible cause of the other. */
 export function orderPairs(ids: readonly string[], lib: AuditLibrary): [string, string][] {
-  return lib.relationships.filter(relation => ORDER_RELATIONS.includes(relation.relation) && ids.includes(relation.a) && ids.includes(relation.b)).map(relation => [relation.a, relation.b]);
+  const among = (relation: { a: string; b: string }) => ids.includes(relation.a) && ids.includes(relation.b);
+  const cause = (a: string, b: string) => lib.relationships.some(relation => relation.relation === 'alternative_cause' && relation.a === a && relation.b === b);
+  const pairs: [string, string][] = [
+    ...lib.relationships.filter(relation => ORDER_RELATIONS.includes(relation.relation) && among(relation)).map((relation): [string, string] => [relation.a, relation.b]),
+    ...lib.relationships.filter(relation => relation.relation === 'alternative_cause' && among(relation) && !cause(relation.b, relation.a)).map((relation): [string, string] => [relation.b, relation.a]),
+  ];
+  return pairs.filter(([before, after], index) => pairs.findIndex(([a, b]) => a === before && b === after) === index);
 }
 
 /** High needs named consequences that stop work or bring losses or delays; the library forbids high when they are unknown. */

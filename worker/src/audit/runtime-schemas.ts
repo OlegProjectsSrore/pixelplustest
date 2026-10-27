@@ -85,7 +85,8 @@ export const runtimeStateSchema = {
     history_status: { type: 'string', enum: ['pending', 'complete', 'incomplete'] },
     mode: { type: 'string', enum: ['questions', 'diagnostic'] },
     questions_answered: integer,
-  }, ['mode', 'questions_answered']),
+    cross_checked: strings(true),
+  }, ['mode', 'questions_answered', 'cross_checked']),
   $defs: {
     ...common,
     Humor: closed<HumorState>({

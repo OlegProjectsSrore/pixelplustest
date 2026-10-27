@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0.0",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "status": "approved",
   "author": "Codex — подготовка по методике и локальным источникам",
   "reviewer": "project_owner_chat_approval",
-  "approved_at": "2026-10-26T22:26:15.000Z",
+  "approved_at": "2026-10-27T03:08:12Z",
   "prior_attempt_paths": {
     "version": "0.1.1",
     "status": "approved",
@@ -408,7 +408,8 @@
       },
       "relationships": [],
       "services": [
-        "strategy"
+        "strategy",
+        "performance"
       ],
       "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
       "pdf": {
@@ -451,6 +452,11 @@
         "exclusion": "strategy_channels_excluded",
         "insufficient": "strategy_channels_missing",
         "boundary": "strategy_channels_boundary"
+      },
+      "v0_1_4": {
+        "services": [
+          "strategy"
+        ]
       }
     },
     {
@@ -838,7 +844,12 @@
           "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
         ]
       },
-      "relationships": [],
+      "relationships": [
+        {
+          "block_id": "ads_awareness",
+          "relation": "related_but_distinct_work"
+        }
+      ],
       "services": [
         "strategy"
       ],
@@ -884,6 +895,9 @@
         "exclusion": "strategy_new_market_excluded",
         "insufficient": "strategy_new_market_missing",
         "boundary": "strategy_new_market_boundary"
+      },
+      "v0_1_4": {
+        "relationships": []
       }
     },
     {
@@ -1252,7 +1266,12 @@
           "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
         ]
       },
-      "relationships": [],
+      "relationships": [
+        {
+          "block_id": "seo_inhouse",
+          "relation": "related_but_distinct_work"
+        }
+      ],
       "services": [
         "marketing_audit"
       ],
@@ -1297,6 +1316,9 @@
         "exclusion": "strategy_resources_excluded",
         "insufficient": "strategy_resources_missing",
         "boundary": "strategy_resources_boundary"
+      },
+      "v0_1_4": {
+        "relationships": []
       }
     },
     {
@@ -2302,6 +2324,10 @@
         {
           "block_id": "ads_cost",
           "relation": "measurement_before_optimization"
+        },
+        {
+          "block_id": "avito_cost",
+          "relation": "measurement_before_optimization"
         }
       ],
       "services": [
@@ -2355,6 +2381,14 @@
         "exclusion": "analytics_sales_excluded",
         "insufficient": "analytics_sales_missing",
         "boundary": "analytics_sales_boundary"
+      },
+      "v0_1_4": {
+        "relationships": [
+          {
+            "block_id": "ads_cost",
+            "relation": "measurement_before_optimization"
+          }
+        ]
       }
     },
     {
@@ -4614,7 +4648,12 @@
           "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
         ]
       },
-      "relationships": [],
+      "relationships": [
+        {
+          "block_id": "seo_sanctions",
+          "relation": "alternatives_require_comparison"
+        }
+      ],
       "services": [
         "seo_technical"
       ],
@@ -4660,6 +4699,9 @@
         "exclusion": "seo_migration_excluded",
         "insufficient": "seo_migration_missing",
         "boundary": "seo_migration_boundary"
+      },
+      "v0_1_4": {
+        "relationships": []
       }
     },
     {
@@ -5042,9 +5084,15 @@
           "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
         ]
       },
-      "relationships": [],
+      "relationships": [
+        {
+          "block_id": "seo_competitors",
+          "relation": "related_but_distinct_work"
+        }
+      ],
       "services": [
-        "semantics"
+        "semantics",
+        "seo_promotion"
       ],
       "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
       "pdf": {
@@ -5088,6 +5136,12 @@
         "exclusion": "seo_demand_excluded",
         "insufficient": "seo_demand_missing",
         "boundary": "seo_demand_boundary"
+      },
+      "v0_1_4": {
+        "services": [
+          "semantics"
+        ],
+        "relationships": []
       }
     },
     {
@@ -5264,7 +5318,8 @@
         }
       ],
       "services": [
-        "seo"
+        "seo",
+        "seo_promotion"
       ],
       "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
       "pdf": {
@@ -5308,6 +5363,11 @@
         "exclusion": "seo_intent_excluded",
         "insufficient": "seo_intent_missing",
         "boundary": "seo_intent_boundary"
+      },
+      "v0_1_4": {
+        "services": [
+          "seo"
+        ]
       }
     },
     {
@@ -5479,7 +5539,8 @@
       },
       "relationships": [],
       "services": [
-        "seo"
+        "seo",
+        "seo_promotion"
       ],
       "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
       "pdf": {
@@ -5523,6 +5584,11 @@
         "exclusion": "seo_region_excluded",
         "insufficient": "seo_region_missing",
         "boundary": "seo_region_boundary"
+      },
+      "v0_1_4": {
+        "services": [
+          "seo"
+        ]
       }
     },
     {
@@ -6118,7 +6184,12 @@
           "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
         ]
       },
-      "relationships": [],
+      "relationships": [
+        {
+          "block_id": "seo_contractor",
+          "relation": "related_but_distinct_work"
+        }
+      ],
       "services": [
         "seo"
       ],
@@ -6163,6 +6234,9 @@
         "exclusion": "seo_links_excluded",
         "insufficient": "seo_links_missing",
         "boundary": "seo_links_boundary"
+      },
+      "v0_1_4": {
+        "relationships": []
       }
     },
     {
@@ -6557,7 +6631,8 @@
         }
       ],
       "services": [
-        "seo"
+        "seo",
+        "seo_ymyl"
       ],
       "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
       "pdf": {
@@ -6600,6 +6675,11 @@
         "exclusion": "seo_trust_excluded",
         "insufficient": "seo_trust_missing",
         "boundary": "seo_trust_boundary"
+      },
+      "v0_1_4": {
+        "services": [
+          "seo"
+        ]
       }
     },
     {
@@ -6813,21 +6893,21 @@
       }
     },
     {
-      "id": "seo_ai_visibility",
-      "version": "0.1.2",
+      "id": "seo_sanctions",
+      "version": "0.2.0",
       "status": "approved",
-      "author": "Codex — подготовка по методике и локальным источникам",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
       "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-26T22:26:15.000Z",
+      "approved_at": "2026-10-27T03:08:12Z",
       "domain": "seo",
-      "title": "Присутствие бренда в AI-поиске не измеряется",
-      "type": "data_gap",
-      "context": "обычный поиск и видимость в ответах AI",
+      "title": "Резкое падение поискового трафика без переноса сайта",
+      "type": "hypothesis",
+      "context": "обычный поиск Яндекса и Google",
       "matrix": {
         "required": [
           "seo.applicable",
-          "seo_ai_visibility.signal",
-          "seo_ai_visibility.details"
+          "seo_sanctions.signal",
+          "seo_sanctions.details"
         ],
         "clarifying": [
           "seo.impact",
@@ -6838,13 +6918,1778 @@
         ],
         "excluding": [
           "seo.applicable",
-          "seo_ai_visibility.signal"
+          "seo_sanctions.signal"
         ]
       },
       "inclusion": {
         "all": [
           {
             "fact": "seo.applicable",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "fact": "seo_sanctions.signal",
+            "op": "eq",
+            "value": "target"
+          },
+          {
+            "fact": "seo_sanctions.details",
+            "op": "fields_known",
+            "fields": [
+              "object",
+              "observation",
+              "period",
+              "context"
+            ]
+          }
+        ]
+      },
+      "exclusion": {
+        "any": [
+          {
+            "fact": "seo.applicable",
+            "op": "eq",
+            "value": false
+          },
+          {
+            "fact": "seo_sanctions.signal",
+            "op": "eq",
+            "value": "alternative"
+          },
+          {
+            "fact": "seo_sanctions.signal",
+            "op": "state",
+            "value": "not_applicable"
+          }
+        ]
+      },
+      "minimum_evidence": {
+        "meaning": "Наблюдение в конкретных условиях. В PDF допустима только гипотеза; причинность проверяется отдельной работой.",
+        "specific_condition": "Трафик из поиска резко упал за короткий период без переноса сайта и сезонной причины",
+        "detail_fields": [
+          "object",
+          "observation",
+          "period",
+          "context"
+        ],
+        "not_sufficient": [
+          "Резкого падения не было либо его объясняют перенос или сезон",
+          "Незнание посетителя без уточнения",
+          "Цель бизнеса сама по себе"
+        ]
+      },
+      "evidence": {
+        "level": "visitor_report",
+        "onsite_verification": false,
+        "causality": "unconfirmed",
+        "uncertainty": "Не называть санкции причиной без проверки панелей веб-мастера."
+      },
+      "significance": {
+        "fact": "seo.impact",
+        "rule": "Последствия и приоритет показываются отдельно от достаточности фактов; при unknown приоритет не объявлять высоким."
+      },
+      "previous_attempts": {
+        "fact": "seo.history",
+        "required_before_recommendation": true,
+        "if_failed": "Уточнить различие нового подхода, условия и критерий проверки. Без различия — предложить разбор прежних данных, не повторный запуск.",
+        "if_unknown": "Сначала восстановить сведения о прежних попытках; не объявлять новый запуск подходящим."
+      },
+      "solution": {
+        "steps": [
+          {
+            "order": 1,
+            "text": "Собрать данные поисковых панелей, аналитики и журнал изменений сайта за период падения",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Подтверждён объём проверки",
+              "Доступны разрешённые обезличенные примеры"
+            ]
+          },
+          {
+            "order": 2,
+            "text": "Проверить уведомления о нарушениях, ручные меры и технические ошибки",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 3,
+            "text": "Сопоставить дату падения с изменениями на сайте, ссылками и обновлениями поиска",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 4,
+            "text": "Составить план устранения найденных нарушений",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 5,
+            "text": "Внедрить исправления и при необходимости подать запрос на пересмотр",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 6,
+            "text": "Проверить восстановление трафика и позиций",
+            "owner": "Владелец процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          }
+        ],
+        "deliverable": "Заключение о причине падения и план восстановления",
+        "acceptance": "Результат «Заключение о причине падения и план восстановления» согласован владельцем процесса; перечислены исходные данные, ограничения и проверка результата.",
+        "prerequisites": [
+          "Уточнить цель и ограничения",
+          "Разобрать применимые прошлые попытки",
+          "Подтвердить доступность ресурсов и данных"
+        ],
+        "limitations": [
+          "Не называть санкции причиной без проверки панелей веб-мастера.",
+          "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
+        ]
+      },
+      "relationships": [
+        {
+          "block_id": "seo_migration",
+          "relation": "alternatives_require_comparison"
+        }
+      ],
+      "services": [
+        "seo_sanctions",
+        "seo_technical"
+      ],
+      "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
+      "pdf": {
+        "allowed_placeholders": [
+          "evidence_summary",
+          "history_summary",
+          "impact_summary"
+        ],
+        "heading": "Резкое падение поискового трафика без переноса сайта",
+        "basis": "По вашим ответам: {{evidence_summary}}.",
+        "interpretation": "Это основание для проверки гипотезы, а не установленная причина результата.",
+        "history": "Предыдущие действия: {{history_summary}}.",
+        "priority": "Последствия для бизнеса: {{impact_summary}}.",
+        "next_steps": [
+          "Собрать данные поисковых панелей, аналитики и журнал изменений сайта за период падения",
+          "Проверить уведомления о нарушениях, ручные меры и технические ошибки",
+          "Сопоставить дату падения с изменениями на сайте, ссылками и обновлениями поиска",
+          "Составить план устранения найденных нарушений",
+          "Внедрить исправления и при необходимости подать запрос на пересмотр",
+          "Проверить восстановление трафика и позиций"
+        ],
+        "deliverable": "Заключение о причине падения и план восстановления",
+        "limitation": "Не называть санкции причиной без проверки панелей веб-мастера.",
+        "missing_data": "Недостаточно сведений, чтобы включить содержательный вывод по теме «Резкое падение поискового трафика без переноса сайта». Нужно уточнить: object, observation, period, context.",
+        "blocked_recommendation": "Сначала уточнить прошлые попытки, доступные ресурсы и условия повторной проверки. Перезапуск работ пока не обоснован."
+      },
+      "sources": [
+        {
+          "source_id": "seo_sanctions",
+          "locator": "Содержание услуги; точные заголовки и строки — sources.json",
+          "supports": "Наличие направления и предмет работ; не экспертное утверждение диагностического правила"
+        }
+      ],
+      "editorial_basis": {
+        "source": "methodology",
+        "section": "Разделы 4–16",
+        "kind": "proposed_diagnostic_rule"
+      },
+      "checks": {
+        "positive": "seo_sanctions_positive",
+        "exclusion": "seo_sanctions_excluded",
+        "insufficient": "seo_sanctions_missing",
+        "boundary": "seo_sanctions_boundary"
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "seo_commercial",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "domain": "seo",
+      "title": "Конкуренты убедительнее по коммерческим факторам",
+      "type": "hypothesis",
+      "context": "обычный поиск Яндекса и Google",
+      "matrix": {
+        "required": [
+          "seo.applicable",
+          "seo_commercial.signal",
+          "seo_commercial.details"
+        ],
+        "clarifying": [
+          "seo.impact",
+          "seo.history",
+          "context.goal",
+          "context.resources",
+          "context.constraints"
+        ],
+        "excluding": [
+          "seo.applicable",
+          "seo_commercial.signal"
+        ]
+      },
+      "inclusion": {
+        "all": [
+          {
+            "fact": "seo.applicable",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "fact": "seo_commercial.signal",
+            "op": "eq",
+            "value": "target"
+          },
+          {
+            "fact": "seo_commercial.details",
+            "op": "fields_known",
+            "fields": [
+              "object",
+              "observation",
+              "period",
+              "context"
+            ]
+          }
+        ]
+      },
+      "exclusion": {
+        "any": [
+          {
+            "fact": "seo.applicable",
+            "op": "eq",
+            "value": false
+          },
+          {
+            "fact": "seo_commercial.signal",
+            "op": "eq",
+            "value": "alternative"
+          },
+          {
+            "fact": "seo_commercial.signal",
+            "op": "state",
+            "value": "not_applicable"
+          }
+        ]
+      },
+      "minimum_evidence": {
+        "meaning": "Наблюдение в конкретных условиях. В PDF допустима только гипотеза; причинность проверяется отдельной работой.",
+        "specific_condition": "Есть сравнение с конкурентами и у них полнее цены, ассортимент, условия, контакты или отзывы",
+        "detail_fields": [
+          "object",
+          "observation",
+          "period",
+          "context"
+        ],
+        "not_sufficient": [
+          "Страницы не уступают конкурентам либо сравнения не было",
+          "Незнание посетителя без уточнения",
+          "Цель бизнеса сама по себе"
+        ]
+      },
+      "evidence": {
+        "level": "visitor_report",
+        "onsite_verification": false,
+        "causality": "unconfirmed",
+        "uncertainty": "Не обещать рост позиций только от добавления элементов на страницу."
+      },
+      "significance": {
+        "fact": "seo.impact",
+        "rule": "Последствия и приоритет показываются отдельно от достаточности фактов; при unknown приоритет не объявлять высоким."
+      },
+      "previous_attempts": {
+        "fact": "seo.history",
+        "required_before_recommendation": true,
+        "if_failed": "Уточнить различие нового подхода, условия и критерий проверки. Без различия — предложить разбор прежних данных, не повторный запуск.",
+        "if_unknown": "Сначала восстановить сведения о прежних попытках; не объявлять новый запуск подходящим."
+      },
+      "solution": {
+        "steps": [
+          {
+            "order": 1,
+            "text": "Согласовать запросы и конкурентов для сравнения",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Подтверждён объём проверки",
+              "Доступны разрешённые обезличенные примеры"
+            ]
+          },
+          {
+            "order": 2,
+            "text": "Собрать данные о страницах компании и конкурентов по коммерческим факторам",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 3,
+            "text": "Выделить различия, важные для выбора покупателя и для поиска",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 4,
+            "text": "Составить план изменений страниц с приоритетами",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 5,
+            "text": "Внедрить изменения на приоритетных страницах",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 6,
+            "text": "Проверить видимость и обращения по изменённым страницам",
+            "owner": "Владелец процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          }
+        ],
+        "deliverable": "Сравнение коммерческих факторов и план изменений страниц",
+        "acceptance": "Результат «Сравнение коммерческих факторов и план изменений страниц» согласован владельцем процесса; перечислены исходные данные, ограничения и проверка результата.",
+        "prerequisites": [
+          "Уточнить цель и ограничения",
+          "Разобрать применимые прошлые попытки",
+          "Подтвердить доступность ресурсов и данных"
+        ],
+        "limitations": [
+          "Не обещать рост позиций только от добавления элементов на страницу.",
+          "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
+        ]
+      },
+      "relationships": [
+        {
+          "block_id": "ux_service",
+          "relation": "related_but_distinct_work"
+        }
+      ],
+      "services": [
+        "seo_commercial"
+      ],
+      "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
+      "pdf": {
+        "allowed_placeholders": [
+          "evidence_summary",
+          "history_summary",
+          "impact_summary"
+        ],
+        "heading": "Конкуренты убедительнее по коммерческим факторам",
+        "basis": "По вашим ответам: {{evidence_summary}}.",
+        "interpretation": "Это основание для проверки гипотезы, а не установленная причина результата.",
+        "history": "Предыдущие действия: {{history_summary}}.",
+        "priority": "Последствия для бизнеса: {{impact_summary}}.",
+        "next_steps": [
+          "Согласовать запросы и конкурентов для сравнения",
+          "Собрать данные о страницах компании и конкурентов по коммерческим факторам",
+          "Выделить различия, важные для выбора покупателя и для поиска",
+          "Составить план изменений страниц с приоритетами",
+          "Внедрить изменения на приоритетных страницах",
+          "Проверить видимость и обращения по изменённым страницам"
+        ],
+        "deliverable": "Сравнение коммерческих факторов и план изменений страниц",
+        "limitation": "Не обещать рост позиций только от добавления элементов на страницу.",
+        "missing_data": "Недостаточно сведений, чтобы включить содержательный вывод по теме «Конкуренты убедительнее по коммерческим факторам». Нужно уточнить: object, observation, period, context.",
+        "blocked_recommendation": "Сначала уточнить прошлые попытки, доступные ресурсы и условия повторной проверки. Перезапуск работ пока не обоснован."
+      },
+      "sources": [
+        {
+          "source_id": "seo_commercial",
+          "locator": "Содержание услуги; точные заголовки и строки — sources.json",
+          "supports": "Наличие направления и предмет работ; не экспертное утверждение диагностического правила"
+        }
+      ],
+      "editorial_basis": {
+        "source": "methodology",
+        "section": "Разделы 4–16",
+        "kind": "proposed_diagnostic_rule"
+      },
+      "checks": {
+        "positive": "seo_commercial_positive",
+        "exclusion": "seo_commercial_excluded",
+        "insufficient": "seo_commercial_missing",
+        "boundary": "seo_commercial_boundary"
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "seo_competitors",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "domain": "seo",
+      "title": "Сайт стабильно ниже конкурентов по главным запросам",
+      "type": "hypothesis",
+      "context": "обычный поиск Яндекса и Google",
+      "matrix": {
+        "required": [
+          "seo.applicable",
+          "seo_competitors.signal",
+          "seo_competitors.details"
+        ],
+        "clarifying": [
+          "seo.impact",
+          "seo.history",
+          "context.goal",
+          "context.resources",
+          "context.constraints"
+        ],
+        "excluding": [
+          "seo.applicable",
+          "seo_competitors.signal"
+        ]
+      },
+      "inclusion": {
+        "all": [
+          {
+            "fact": "seo.applicable",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "fact": "seo_competitors.signal",
+            "op": "eq",
+            "value": "target"
+          },
+          {
+            "fact": "seo_competitors.details",
+            "op": "fields_known",
+            "fields": [
+              "object",
+              "observation",
+              "period",
+              "context"
+            ]
+          }
+        ]
+      },
+      "exclusion": {
+        "any": [
+          {
+            "fact": "seo.applicable",
+            "op": "eq",
+            "value": false
+          },
+          {
+            "fact": "seo_competitors.signal",
+            "op": "eq",
+            "value": "alternative"
+          },
+          {
+            "fact": "seo_competitors.signal",
+            "op": "state",
+            "value": "not_applicable"
+          }
+        ]
+      },
+      "minimum_evidence": {
+        "meaning": "Наблюдение в конкретных условиях. В PDF допустима только гипотеза; причинность проверяется отдельной работой.",
+        "specific_condition": "Есть главные запросы, по которым конкуренты стабильно выше несколько месяцев",
+        "detail_fields": [
+          "object",
+          "observation",
+          "period",
+          "context"
+        ],
+        "not_sufficient": [
+          "По главным запросам сайт не уступает конкурентам либо позиции не отслеживаются",
+          "Незнание посетителя без уточнения",
+          "Цель бизнеса сама по себе"
+        ]
+      },
+      "evidence": {
+        "level": "visitor_report",
+        "onsite_verification": false,
+        "causality": "unconfirmed",
+        "uncertainty": "Не обещать конкретные позиции и сроки выхода в топ."
+      },
+      "significance": {
+        "fact": "seo.impact",
+        "rule": "Последствия и приоритет показываются отдельно от достаточности фактов; при unknown приоритет не объявлять высоким."
+      },
+      "previous_attempts": {
+        "fact": "seo.history",
+        "required_before_recommendation": true,
+        "if_failed": "Уточнить различие нового подхода, условия и критерий проверки. Без различия — предложить разбор прежних данных, не повторный запуск.",
+        "if_unknown": "Сначала восстановить сведения о прежних попытках; не объявлять новый запуск подходящим."
+      },
+      "solution": {
+        "steps": [
+          {
+            "order": 1,
+            "text": "Согласовать главные запросы, регионы и конкурентов",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Подтверждён объём проверки",
+              "Доступны разрешённые обезличенные примеры"
+            ]
+          },
+          {
+            "order": 2,
+            "text": "Собрать данные о позициях, страницах и трафике компании и конкурентов",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 3,
+            "text": "Найти отличия: структура, содержание, техническое состояние, ссылки, коммерческие факторы",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 4,
+            "text": "Составить план продвижения с приоритетами и показателями",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 5,
+            "text": "Выполнить первую очередь работ",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 6,
+            "text": "Проверить динамику позиций и трафика по согласованным запросам",
+            "owner": "Владелец процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          }
+        ],
+        "deliverable": "Сравнение с конкурентами и план продвижения по главным запросам",
+        "acceptance": "Результат «Сравнение с конкурентами и план продвижения по главным запросам» согласован владельцем процесса; перечислены исходные данные, ограничения и проверка результата.",
+        "prerequisites": [
+          "Уточнить цель и ограничения",
+          "Разобрать применимые прошлые попытки",
+          "Подтвердить доступность ресурсов и данных"
+        ],
+        "limitations": [
+          "Не обещать конкретные позиции и сроки выхода в топ.",
+          "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
+        ]
+      },
+      "relationships": [
+        {
+          "block_id": "seo_demand",
+          "relation": "related_but_distinct_work"
+        }
+      ],
+      "services": [
+        "seo",
+        "seo_promotion"
+      ],
+      "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
+      "pdf": {
+        "allowed_placeholders": [
+          "evidence_summary",
+          "history_summary",
+          "impact_summary"
+        ],
+        "heading": "Сайт стабильно ниже конкурентов по главным запросам",
+        "basis": "По вашим ответам: {{evidence_summary}}.",
+        "interpretation": "Это основание для проверки гипотезы, а не установленная причина результата.",
+        "history": "Предыдущие действия: {{history_summary}}.",
+        "priority": "Последствия для бизнеса: {{impact_summary}}.",
+        "next_steps": [
+          "Согласовать главные запросы, регионы и конкурентов",
+          "Собрать данные о позициях, страницах и трафике компании и конкурентов",
+          "Найти отличия: структура, содержание, техническое состояние, ссылки, коммерческие факторы",
+          "Составить план продвижения с приоритетами и показателями",
+          "Выполнить первую очередь работ",
+          "Проверить динамику позиций и трафика по согласованным запросам"
+        ],
+        "deliverable": "Сравнение с конкурентами и план продвижения по главным запросам",
+        "limitation": "Не обещать конкретные позиции и сроки выхода в топ.",
+        "missing_data": "Недостаточно сведений, чтобы включить содержательный вывод по теме «Сайт стабильно ниже конкурентов по главным запросам». Нужно уточнить: object, observation, period, context.",
+        "blocked_recommendation": "Сначала уточнить прошлые попытки, доступные ресурсы и условия повторной проверки. Перезапуск работ пока не обоснован."
+      },
+      "sources": [
+        {
+          "source_id": "seo",
+          "locator": "Содержание услуги; точные заголовки и строки — sources.json",
+          "supports": "Наличие направления и предмет работ; не экспертное утверждение диагностического правила"
+        }
+      ],
+      "editorial_basis": {
+        "source": "methodology",
+        "section": "Разделы 4–16",
+        "kind": "proposed_diagnostic_rule"
+      },
+      "checks": {
+        "positive": "seo_competitors_positive",
+        "exclusion": "seo_competitors_excluded",
+        "insufficient": "seo_competitors_missing",
+        "boundary": "seo_competitors_boundary"
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "seo_contractor",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "domain": "seo",
+      "title": "Смена SEO-подрядчика с риском потерять позиции",
+      "type": "opportunity",
+      "context": "обычный поиск Яндекса и Google",
+      "matrix": {
+        "required": [
+          "seo.applicable",
+          "seo_contractor.signal",
+          "seo_contractor.details"
+        ],
+        "clarifying": [
+          "seo.impact",
+          "seo.history",
+          "context.goal",
+          "context.resources",
+          "context.constraints"
+        ],
+        "excluding": [
+          "seo.applicable",
+          "seo_contractor.signal"
+        ]
+      },
+      "inclusion": {
+        "all": [
+          {
+            "fact": "seo.applicable",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "fact": "seo_contractor.signal",
+            "op": "eq",
+            "value": "target"
+          },
+          {
+            "fact": "seo_contractor.details",
+            "op": "fields_known",
+            "fields": [
+              "task",
+              "current_way",
+              "constraint"
+            ]
+          }
+        ]
+      },
+      "exclusion": {
+        "any": [
+          {
+            "fact": "seo.applicable",
+            "op": "eq",
+            "value": false
+          },
+          {
+            "fact": "seo_contractor.signal",
+            "op": "eq",
+            "value": "alternative"
+          },
+          {
+            "fact": "seo_contractor.signal",
+            "op": "state",
+            "value": "not_applicable"
+          }
+        ]
+      },
+      "minimum_evidence": {
+        "meaning": "Понятна нужная задача, текущий способ и его ограничение. Применимость внедрения ещё проверяется по ресурсам и прошлому опыту.",
+        "specific_condition": "Решение о смене подрядчика принято или обсуждается",
+        "detail_fields": [
+          "task",
+          "current_way",
+          "constraint"
+        ],
+        "not_sufficient": [
+          "Смену подрядчика не планируют",
+          "Незнание посетителя без уточнения",
+          "Цель бизнеса сама по себе"
+        ]
+      },
+      "evidence": {
+        "level": "visitor_report",
+        "onsite_verification": false,
+        "causality": "not_inferred",
+        "uncertainty": "Не обвинять прежнего подрядчика без проверки его работ."
+      },
+      "significance": {
+        "fact": "seo.impact",
+        "rule": "Последствия и приоритет показываются отдельно от достаточности фактов; при unknown приоритет не объявлять высоким."
+      },
+      "previous_attempts": {
+        "fact": "seo.history",
+        "required_before_recommendation": true,
+        "if_failed": "Уточнить различие нового подхода, условия и критерий проверки. Без различия — предложить разбор прежних данных, не повторный запуск.",
+        "if_unknown": "Сначала восстановить сведения о прежних попытках; не объявлять новый запуск подходящим."
+      },
+      "solution": {
+        "steps": [
+          {
+            "order": 1,
+            "text": "Собрать доступы, отчёты и перечень работ прежнего подрядчика",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Подтверждён объём проверки",
+              "Доступны разрешённые обезличенные примеры"
+            ]
+          },
+          {
+            "order": 2,
+            "text": "Зафиксировать исходные позиции, трафик и обращения перед переходом",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 3,
+            "text": "Проверить ссылки, тексты и изменения, которые нельзя потерять или нужно убрать",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 4,
+            "text": "Составить план передачи работ без перерыва",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 5,
+            "text": "Принять проект и начать работы по плану",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 6,
+            "text": "Через месяц сравнить показатели с исходными",
+            "owner": "Владелец процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          }
+        ],
+        "deliverable": "План безопасной передачи продвижения с исходными показателями",
+        "acceptance": "Результат «План безопасной передачи продвижения с исходными показателями» согласован владельцем процесса; перечислены исходные данные, ограничения и проверка результата.",
+        "prerequisites": [
+          "Уточнить цель и ограничения",
+          "Разобрать применимые прошлые попытки",
+          "Подтвердить доступность ресурсов и данных"
+        ],
+        "limitations": [
+          "Не обвинять прежнего подрядчика без проверки его работ.",
+          "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
+        ]
+      },
+      "relationships": [
+        {
+          "block_id": "seo_links",
+          "relation": "related_but_distinct_work"
+        }
+      ],
+      "services": [
+        "seo_contractor"
+      ],
+      "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
+      "pdf": {
+        "allowed_placeholders": [
+          "evidence_summary",
+          "history_summary",
+          "impact_summary"
+        ],
+        "heading": "Смена SEO-подрядчика с риском потерять позиции",
+        "basis": "По вашим ответам: {{evidence_summary}}.",
+        "interpretation": "Есть задача для рассмотрения; полезность и объём внедрения нужно подтвердить.",
+        "history": "Предыдущие действия: {{history_summary}}.",
+        "priority": "Последствия для бизнеса: {{impact_summary}}.",
+        "next_steps": [
+          "Собрать доступы, отчёты и перечень работ прежнего подрядчика",
+          "Зафиксировать исходные позиции, трафик и обращения перед переходом",
+          "Проверить ссылки, тексты и изменения, которые нельзя потерять или нужно убрать",
+          "Составить план передачи работ без перерыва",
+          "Принять проект и начать работы по плану",
+          "Через месяц сравнить показатели с исходными"
+        ],
+        "deliverable": "План безопасной передачи продвижения с исходными показателями",
+        "limitation": "Не обвинять прежнего подрядчика без проверки его работ.",
+        "missing_data": "Недостаточно сведений, чтобы включить содержательный вывод по теме «Смена SEO-подрядчика с риском потерять позиции». Нужно уточнить: task, current_way, constraint.",
+        "blocked_recommendation": "Сначала уточнить прошлые попытки, доступные ресурсы и условия повторной проверки. Перезапуск работ пока не обоснован."
+      },
+      "sources": [
+        {
+          "source_id": "seo_contractor",
+          "locator": "Содержание услуги; точные заголовки и строки — sources.json",
+          "supports": "Наличие направления и предмет работ; не экспертное утверждение диагностического правила"
+        }
+      ],
+      "editorial_basis": {
+        "source": "methodology",
+        "section": "Разделы 4–16",
+        "kind": "proposed_diagnostic_rule"
+      },
+      "checks": {
+        "positive": "seo_contractor_positive",
+        "exclusion": "seo_contractor_excluded",
+        "insufficient": "seo_contractor_missing",
+        "boundary": "seo_contractor_boundary"
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "seo_inhouse",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "domain": "seo",
+      "title": "Своя SEO-команда без внешней экспертизы",
+      "type": "opportunity",
+      "context": "обычный поиск Яндекса и Google",
+      "matrix": {
+        "required": [
+          "seo.applicable",
+          "seo_inhouse.signal",
+          "seo_inhouse.details"
+        ],
+        "clarifying": [
+          "seo.impact",
+          "seo.history",
+          "context.goal",
+          "context.resources",
+          "context.constraints"
+        ],
+        "excluding": [
+          "seo.applicable",
+          "seo_inhouse.signal"
+        ]
+      },
+      "inclusion": {
+        "all": [
+          {
+            "fact": "seo.applicable",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "fact": "seo_inhouse.signal",
+            "op": "eq",
+            "value": "target"
+          },
+          {
+            "fact": "seo_inhouse.details",
+            "op": "fields_known",
+            "fields": [
+              "task",
+              "current_way",
+              "constraint"
+            ]
+          }
+        ]
+      },
+      "exclusion": {
+        "any": [
+          {
+            "fact": "seo.applicable",
+            "op": "eq",
+            "value": false
+          },
+          {
+            "fact": "seo_inhouse.signal",
+            "op": "eq",
+            "value": "alternative"
+          },
+          {
+            "fact": "seo_inhouse.signal",
+            "op": "state",
+            "value": "not_applicable"
+          }
+        ]
+      },
+      "minimum_evidence": {
+        "meaning": "Понятна нужная задача, текущий способ и его ограничение. Применимость внедрения ещё проверяется по ресурсам и прошлому опыту.",
+        "specific_condition": "Продвижением занимаются свои сотрудники и есть вопросы или объём работ, с которыми они не справляются",
+        "detail_fields": [
+          "task",
+          "current_way",
+          "constraint"
+        ],
+        "not_sufficient": [
+          "Своей команды нет либо ей хватает опыта и ресурсов",
+          "Незнание посетителя без уточнения",
+          "Цель бизнеса сама по себе"
+        ]
+      },
+      "evidence": {
+        "level": "visitor_report",
+        "onsite_verification": false,
+        "causality": "not_inferred",
+        "uncertainty": "Не подменять внутреннюю команду, внешняя помощь дополняет её работу."
+      },
+      "significance": {
+        "fact": "seo.impact",
+        "rule": "Последствия и приоритет показываются отдельно от достаточности фактов; при unknown приоритет не объявлять высоким."
+      },
+      "previous_attempts": {
+        "fact": "seo.history",
+        "required_before_recommendation": true,
+        "if_failed": "Уточнить различие нового подхода, условия и критерий проверки. Без различия — предложить разбор прежних данных, не повторный запуск.",
+        "if_unknown": "Сначала восстановить сведения о прежних попытках; не объявлять новый запуск подходящим."
+      },
+      "solution": {
+        "steps": [
+          {
+            "order": 1,
+            "text": "Описать состав команды, задачи и текущие показатели",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Подтверждён объём проверки",
+              "Доступны разрешённые обезличенные примеры"
+            ]
+          },
+          {
+            "order": 2,
+            "text": "Выделить вопросы, где нужна экспертиза, и объём рутинной работы",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 3,
+            "text": "Определить формат помощи: консультации, независимый аудит, обучение или выполнение части работ",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 4,
+            "text": "Согласовать порядок взаимодействия и показатели",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 5,
+            "text": "Начать работу в согласованном формате",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 6,
+            "text": "Через месяц проверить, закрыты ли вопросы команды и как изменились показатели",
+            "owner": "Владелец процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          }
+        ],
+        "deliverable": "Формат помощи внутренней команде с задачами и показателями",
+        "acceptance": "Результат «Формат помощи внутренней команде с задачами и показателями» согласован владельцем процесса; перечислены исходные данные, ограничения и проверка результата.",
+        "prerequisites": [
+          "Уточнить цель и ограничения",
+          "Разобрать применимые прошлые попытки",
+          "Подтвердить доступность ресурсов и данных"
+        ],
+        "limitations": [
+          "Не подменять внутреннюю команду, внешняя помощь дополняет её работу.",
+          "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
+        ]
+      },
+      "relationships": [
+        {
+          "block_id": "strategy_resources",
+          "relation": "related_but_distinct_work"
+        }
+      ],
+      "services": [
+        "seo_inhouse",
+        "seo_consult",
+        "seo_training"
+      ],
+      "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
+      "pdf": {
+        "allowed_placeholders": [
+          "evidence_summary",
+          "history_summary",
+          "impact_summary"
+        ],
+        "heading": "Своя SEO-команда без внешней экспертизы",
+        "basis": "По вашим ответам: {{evidence_summary}}.",
+        "interpretation": "Есть задача для рассмотрения; полезность и объём внедрения нужно подтвердить.",
+        "history": "Предыдущие действия: {{history_summary}}.",
+        "priority": "Последствия для бизнеса: {{impact_summary}}.",
+        "next_steps": [
+          "Описать состав команды, задачи и текущие показатели",
+          "Выделить вопросы, где нужна экспертиза, и объём рутинной работы",
+          "Определить формат помощи: консультации, независимый аудит, обучение или выполнение части работ",
+          "Согласовать порядок взаимодействия и показатели",
+          "Начать работу в согласованном формате",
+          "Через месяц проверить, закрыты ли вопросы команды и как изменились показатели"
+        ],
+        "deliverable": "Формат помощи внутренней команде с задачами и показателями",
+        "limitation": "Не подменять внутреннюю команду, внешняя помощь дополняет её работу.",
+        "missing_data": "Недостаточно сведений, чтобы включить содержательный вывод по теме «Своя SEO-команда без внешней экспертизы». Нужно уточнить: task, current_way, constraint.",
+        "blocked_recommendation": "Сначала уточнить прошлые попытки, доступные ресурсы и условия повторной проверки. Перезапуск работ пока не обоснован."
+      },
+      "sources": [
+        {
+          "source_id": "seo_inhouse",
+          "locator": "Содержание услуги; точные заголовки и строки — sources.json",
+          "supports": "Наличие направления и предмет работ; не экспертное утверждение диагностического правила"
+        }
+      ],
+      "editorial_basis": {
+        "source": "methodology",
+        "section": "Разделы 4–16",
+        "kind": "proposed_diagnostic_rule"
+      },
+      "checks": {
+        "positive": "seo_inhouse_positive",
+        "exclusion": "seo_inhouse_excluded",
+        "insufficient": "seo_inhouse_missing",
+        "boundary": "seo_inhouse_boundary"
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "geo_competitors",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "domain": "ai_search",
+      "title": "Нейросети советуют конкурентов, а не компанию",
+      "type": "reported_issue",
+      "context": "ответы нейросетей и AI-поиска о компании",
+      "matrix": {
+        "required": [
+          "ai_search.applicable",
+          "geo_competitors.signal",
+          "geo_competitors.details"
+        ],
+        "clarifying": [
+          "ai_search.impact",
+          "ai_search.history",
+          "context.goal",
+          "context.resources",
+          "context.constraints"
+        ],
+        "excluding": [
+          "ai_search.applicable",
+          "geo_competitors.signal"
+        ]
+      },
+      "inclusion": {
+        "all": [
+          {
+            "fact": "ai_search.applicable",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "fact": "geo_competitors.signal",
+            "op": "eq",
+            "value": "target"
+          },
+          {
+            "fact": "geo_competitors.details",
+            "op": "fields_known",
+            "fields": [
+              "object",
+              "observation",
+              "period"
+            ]
+          }
+        ]
+      },
+      "exclusion": {
+        "any": [
+          {
+            "fact": "ai_search.applicable",
+            "op": "eq",
+            "value": false
+          },
+          {
+            "fact": "geo_competitors.signal",
+            "op": "eq",
+            "value": "alternative"
+          },
+          {
+            "fact": "geo_competitors.signal",
+            "op": "state",
+            "value": "not_applicable"
+          }
+        ]
+      },
+      "minimum_evidence": {
+        "meaning": "Конкретный объект, наблюдаемый сбой и период. Это сообщение посетителя, а не технически установленная причина.",
+        "specific_condition": "Есть примеры запросов, где нейросети называют конкурентов и не называют компанию",
+        "detail_fields": [
+          "object",
+          "observation",
+          "period"
+        ],
+        "not_sufficient": [
+          "Компанию называют по важным запросам либо таких проверок не было",
+          "Незнание посетителя без уточнения",
+          "Цель бизнеса сама по себе"
+        ]
+      },
+      "evidence": {
+        "level": "visitor_report",
+        "onsite_verification": false,
+        "causality": "not_inferred",
+        "uncertainty": "Не обещать попадание в ответы конкретной модели и место в ответе."
+      },
+      "significance": {
+        "fact": "ai_search.impact",
+        "rule": "Последствия и приоритет показываются отдельно от достаточности фактов; при unknown приоритет не объявлять высоким."
+      },
+      "previous_attempts": {
+        "fact": "ai_search.history",
+        "required_before_recommendation": true,
+        "if_failed": "Уточнить различие нового подхода, условия и критерий проверки. Без различия — предложить разбор прежних данных, не повторный запуск.",
+        "if_unknown": "Сначала восстановить сведения о прежних попытках; не объявлять новый запуск подходящим."
+      },
+      "solution": {
+        "steps": [
+          {
+            "order": 1,
+            "text": "Согласовать вопросы, которые задают покупатели, и нейросети для проверки",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Подтверждён объём проверки",
+              "Доступны разрешённые обезличенные примеры"
+            ]
+          },
+          {
+            "order": 2,
+            "text": "Зафиксировать ответы, названных конкурентов и источники, на которые ссылаются ответы",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 3,
+            "text": "Сравнить источники конкурентов с материалами компании",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 4,
+            "text": "Составить план: материалы на сайте, внешние публикации и при необходимости реклама в нейросетях",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 5,
+            "text": "Внедрить первую очередь материалов и публикаций",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 6,
+            "text": "Повторить проверку по тем же вопросам и сравнить долю упоминаний компании",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          }
+        ],
+        "deliverable": "Срез ответов нейросетей с конкурентами и план появления в них",
+        "acceptance": "Результат «Срез ответов нейросетей с конкурентами и план появления в них» согласован владельцем процесса; перечислены исходные данные, ограничения и проверка результата.",
+        "prerequisites": [
+          "Уточнить цель и ограничения",
+          "Разобрать применимые прошлые попытки",
+          "Подтвердить доступность ресурсов и данных"
+        ],
+        "limitations": [
+          "Не обещать попадание в ответы конкретной модели и место в ответе.",
+          "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
+        ]
+      },
+      "relationships": [
+        {
+          "block_id": "seo_ai_visibility",
+          "relation": "shared_deliverable"
+        }
+      ],
+      "services": [
+        "geo_promotion",
+        "aeo",
+        "alisa_ads",
+        "chatgpt_ads",
+        "geo"
+      ],
+      "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
+      "pdf": {
+        "allowed_placeholders": [
+          "evidence_summary",
+          "history_summary",
+          "impact_summary"
+        ],
+        "heading": "Нейросети советуют конкурентов, а не компанию",
+        "basis": "По вашим ответам: {{evidence_summary}}.",
+        "interpretation": "Зафиксирована описанная вами ситуация; причина требует проверки.",
+        "history": "Предыдущие действия: {{history_summary}}.",
+        "priority": "Последствия для бизнеса: {{impact_summary}}.",
+        "next_steps": [
+          "Согласовать вопросы, которые задают покупатели, и нейросети для проверки",
+          "Зафиксировать ответы, названных конкурентов и источники, на которые ссылаются ответы",
+          "Сравнить источники конкурентов с материалами компании",
+          "Составить план: материалы на сайте, внешние публикации и при необходимости реклама в нейросетях",
+          "Внедрить первую очередь материалов и публикаций",
+          "Повторить проверку по тем же вопросам и сравнить долю упоминаний компании"
+        ],
+        "deliverable": "Срез ответов нейросетей с конкурентами и план появления в них",
+        "limitation": "Не обещать попадание в ответы конкретной модели и место в ответе.",
+        "missing_data": "Недостаточно сведений, чтобы включить содержательный вывод по теме «Нейросети советуют конкурентов, а не компанию». Нужно уточнить: object, observation, period.",
+        "blocked_recommendation": "Сначала уточнить прошлые попытки, доступные ресурсы и условия повторной проверки. Перезапуск работ пока не обоснован."
+      },
+      "sources": [
+        {
+          "source_id": "geo_promotion",
+          "locator": "Содержание услуги; точные заголовки и строки — sources.json",
+          "supports": "Наличие направления и предмет работ; не экспертное утверждение диагностического правила"
+        }
+      ],
+      "editorial_basis": {
+        "source": "methodology",
+        "section": "Разделы 4–16",
+        "kind": "proposed_diagnostic_rule"
+      },
+      "checks": {
+        "positive": "geo_competitors_positive",
+        "exclusion": "geo_competitors_excluded",
+        "insufficient": "geo_competitors_missing",
+        "boundary": "geo_competitors_boundary"
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "geo_negative",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "domain": "ai_search",
+      "title": "В ответах нейросетей негатив о компании",
+      "type": "reported_issue",
+      "context": "ответы нейросетей и AI-поиска о компании",
+      "matrix": {
+        "required": [
+          "ai_search.applicable",
+          "geo_negative.signal",
+          "geo_negative.details"
+        ],
+        "clarifying": [
+          "ai_search.impact",
+          "ai_search.history",
+          "context.goal",
+          "context.resources",
+          "context.constraints"
+        ],
+        "excluding": [
+          "ai_search.applicable",
+          "geo_negative.signal"
+        ]
+      },
+      "inclusion": {
+        "all": [
+          {
+            "fact": "ai_search.applicable",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "fact": "geo_negative.signal",
+            "op": "eq",
+            "value": "target"
+          },
+          {
+            "fact": "geo_negative.details",
+            "op": "fields_known",
+            "fields": [
+              "object",
+              "observation",
+              "period"
+            ]
+          }
+        ]
+      },
+      "exclusion": {
+        "any": [
+          {
+            "fact": "ai_search.applicable",
+            "op": "eq",
+            "value": false
+          },
+          {
+            "fact": "geo_negative.signal",
+            "op": "eq",
+            "value": "alternative"
+          },
+          {
+            "fact": "geo_negative.signal",
+            "op": "state",
+            "value": "not_applicable"
+          }
+        ]
+      },
+      "minimum_evidence": {
+        "meaning": "Конкретный объект, наблюдаемый сбой и период. Это сообщение посетителя, а не технически установленная причина.",
+        "specific_condition": "Есть сохранённые примеры негативных оценок компании в ответах нейросетей",
+        "detail_fields": [
+          "object",
+          "observation",
+          "period"
+        ],
+        "not_sufficient": [
+          "Негатива в ответах не встречали",
+          "Незнание посетителя без уточнения",
+          "Цель бизнеса сама по себе"
+        ]
+      },
+      "evidence": {
+        "level": "visitor_report",
+        "onsite_verification": false,
+        "causality": "not_inferred",
+        "uncertainty": "Не обещать удаление ответа; работать можно только с источниками, на которые он опирается."
+      },
+      "significance": {
+        "fact": "ai_search.impact",
+        "rule": "Последствия и приоритет показываются отдельно от достаточности фактов; при unknown приоритет не объявлять высоким."
+      },
+      "previous_attempts": {
+        "fact": "ai_search.history",
+        "required_before_recommendation": true,
+        "if_failed": "Уточнить различие нового подхода, условия и критерий проверки. Без различия — предложить разбор прежних данных, не повторный запуск.",
+        "if_unknown": "Сначала восстановить сведения о прежних попытках; не объявлять новый запуск подходящим."
+      },
+      "solution": {
+        "steps": [
+          {
+            "order": 1,
+            "text": "Собрать примеры негативных ответов с датами и запросами",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Подтверждён объём проверки",
+              "Доступны разрешённые обезличенные примеры"
+            ]
+          },
+          {
+            "order": 2,
+            "text": "Найти источники, на которые опираются эти ответы: отзывы, статьи, обсуждения",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 3,
+            "text": "Разделить справедливые жалобы и недостоверные сведения",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 4,
+            "text": "Составить план: ответы на отзывы, исправление недостоверных публикаций, новые материалы",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 5,
+            "text": "Выполнить план по первоочередным источникам",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 6,
+            "text": "Повторить проверку ответов нейросетей по тем же запросам",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          }
+        ],
+        "deliverable": "Реестр негативных ответов с источниками и план работы с ними",
+        "acceptance": "Результат «Реестр негативных ответов с источниками и план работы с ними» согласован владельцем процесса; перечислены исходные данные, ограничения и проверка результата.",
+        "prerequisites": [
+          "Уточнить цель и ограничения",
+          "Разобрать применимые прошлые попытки",
+          "Подтвердить доступность ресурсов и данных"
+        ],
+        "limitations": [
+          "Не обещать удаление ответа; работать можно только с источниками, на которые он опирается.",
+          "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
+        ]
+      },
+      "relationships": [
+        {
+          "block_id": "rep_false",
+          "relation": "related_but_distinct_work"
+        }
+      ],
+      "services": [
+        "geo",
+        "reputation"
+      ],
+      "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
+      "pdf": {
+        "allowed_placeholders": [
+          "evidence_summary",
+          "history_summary",
+          "impact_summary"
+        ],
+        "heading": "В ответах нейросетей негатив о компании",
+        "basis": "По вашим ответам: {{evidence_summary}}.",
+        "interpretation": "Зафиксирована описанная вами ситуация; причина требует проверки.",
+        "history": "Предыдущие действия: {{history_summary}}.",
+        "priority": "Последствия для бизнеса: {{impact_summary}}.",
+        "next_steps": [
+          "Собрать примеры негативных ответов с датами и запросами",
+          "Найти источники, на которые опираются эти ответы: отзывы, статьи, обсуждения",
+          "Разделить справедливые жалобы и недостоверные сведения",
+          "Составить план: ответы на отзывы, исправление недостоверных публикаций, новые материалы",
+          "Выполнить план по первоочередным источникам",
+          "Повторить проверку ответов нейросетей по тем же запросам"
+        ],
+        "deliverable": "Реестр негативных ответов с источниками и план работы с ними",
+        "limitation": "Не обещать удаление ответа; работать можно только с источниками, на которые он опирается.",
+        "missing_data": "Недостаточно сведений, чтобы включить содержательный вывод по теме «В ответах нейросетей негатив о компании». Нужно уточнить: object, observation, period.",
+        "blocked_recommendation": "Сначала уточнить прошлые попытки, доступные ресурсы и условия повторной проверки. Перезапуск работ пока не обоснован."
+      },
+      "sources": [
+        {
+          "source_id": "geo",
+          "locator": "Содержание услуги; точные заголовки и строки — sources.json",
+          "supports": "Наличие направления и предмет работ; не экспертное утверждение диагностического правила"
+        }
+      ],
+      "editorial_basis": {
+        "source": "methodology",
+        "section": "Разделы 4–16",
+        "kind": "proposed_diagnostic_rule"
+      },
+      "checks": {
+        "positive": "geo_negative_positive",
+        "exclusion": "geo_negative_excluded",
+        "insufficient": "geo_negative_missing",
+        "boundary": "geo_negative_boundary"
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "geo_zero_click",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "domain": "ai_search",
+      "title": "Переходов из поиска меньше при тех же позициях: ответ забирают нейроответы",
+      "type": "hypothesis",
+      "context": "ответы нейросетей и AI-поиска о компании",
+      "matrix": {
+        "required": [
+          "ai_search.applicable",
+          "geo_zero_click.signal",
+          "geo_zero_click.details"
+        ],
+        "clarifying": [
+          "ai_search.impact",
+          "ai_search.history",
+          "context.goal",
+          "context.resources",
+          "context.constraints"
+        ],
+        "excluding": [
+          "ai_search.applicable",
+          "geo_zero_click.signal"
+        ]
+      },
+      "inclusion": {
+        "all": [
+          {
+            "fact": "ai_search.applicable",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "fact": "geo_zero_click.signal",
+            "op": "eq",
+            "value": "target"
+          },
+          {
+            "fact": "geo_zero_click.details",
+            "op": "fields_known",
+            "fields": [
+              "object",
+              "observation",
+              "period",
+              "context"
+            ]
+          }
+        ]
+      },
+      "exclusion": {
+        "any": [
+          {
+            "fact": "ai_search.applicable",
+            "op": "eq",
+            "value": false
+          },
+          {
+            "fact": "geo_zero_click.signal",
+            "op": "eq",
+            "value": "alternative"
+          },
+          {
+            "fact": "geo_zero_click.signal",
+            "op": "state",
+            "value": "not_applicable"
+          }
+        ]
+      },
+      "minimum_evidence": {
+        "meaning": "Наблюдение в конкретных условиях. В PDF допустима только гипотеза; причинность проверяется отдельной работой.",
+        "specific_condition": "Позиции по важным запросам сохранились, а переходов из поиска стало заметно меньше",
+        "detail_fields": [
+          "object",
+          "observation",
+          "period",
+          "context"
+        ],
+        "not_sufficient": [
+          "Переходы снижаются вместе с позициями либо не снижаются",
+          "Незнание посетителя без уточнения",
+          "Цель бизнеса сама по себе"
+        ]
+      },
+      "evidence": {
+        "level": "visitor_report",
+        "onsite_verification": false,
+        "causality": "unconfirmed",
+        "uncertainty": "Не объявлять нейроответы единственной причиной, ведь снижение дают и сезон, и изменение спроса."
+      },
+      "significance": {
+        "fact": "ai_search.impact",
+        "rule": "Последствия и приоритет показываются отдельно от достаточности фактов; при unknown приоритет не объявлять высоким."
+      },
+      "previous_attempts": {
+        "fact": "ai_search.history",
+        "required_before_recommendation": true,
+        "if_failed": "Уточнить различие нового подхода, условия и критерий проверки. Без различия — предложить разбор прежних данных, не повторный запуск.",
+        "if_unknown": "Сначала восстановить сведения о прежних попытках; не объявлять новый запуск подходящим."
+      },
+      "solution": {
+        "steps": [
+          {
+            "order": 1,
+            "text": "Собрать данные о позициях, показах и переходах из поисковых панелей за сопоставимые периоды",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Подтверждён объём проверки",
+              "Доступны разрешённые обезличенные примеры"
+            ]
+          },
+          {
+            "order": 2,
+            "text": "Исключить сезонность, изменение спроса и технические причины",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 3,
+            "text": "Выделить запросы, по которым поиск показывает готовый ответ",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 4,
+            "text": "Составить план: ответы на эти вопросы на сайте в форме, которую нейроответы могут процитировать",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 5,
+            "text": "Внедрить изменения на приоритетных страницах",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 6,
+            "text": "Проверить упоминания сайта в нейроответах и динамику переходов",
+            "owner": "Владелец процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          }
+        ],
+        "deliverable": "Перечень запросов с нейроответами и план изменений страниц",
+        "acceptance": "Результат «Перечень запросов с нейроответами и план изменений страниц» согласован владельцем процесса; перечислены исходные данные, ограничения и проверка результата.",
+        "prerequisites": [
+          "Уточнить цель и ограничения",
+          "Разобрать применимые прошлые попытки",
+          "Подтвердить доступность ресурсов и данных"
+        ],
+        "limitations": [
+          "Не объявлять нейроответы единственной причиной, ведь снижение дают и сезон, и изменение спроса.",
+          "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
+        ]
+      },
+      "relationships": [],
+      "services": [
+        "aeo",
+        "geo_strategy"
+      ],
+      "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
+      "pdf": {
+        "allowed_placeholders": [
+          "evidence_summary",
+          "history_summary",
+          "impact_summary"
+        ],
+        "heading": "Переходов из поиска меньше при тех же позициях: ответ забирают нейроответы",
+        "basis": "По вашим ответам: {{evidence_summary}}.",
+        "interpretation": "Это основание для проверки гипотезы, а не установленная причина результата.",
+        "history": "Предыдущие действия: {{history_summary}}.",
+        "priority": "Последствия для бизнеса: {{impact_summary}}.",
+        "next_steps": [
+          "Собрать данные о позициях, показах и переходах из поисковых панелей за сопоставимые периоды",
+          "Исключить сезонность, изменение спроса и технические причины",
+          "Выделить запросы, по которым поиск показывает готовый ответ",
+          "Составить план: ответы на эти вопросы на сайте в форме, которую нейроответы могут процитировать",
+          "Внедрить изменения на приоритетных страницах",
+          "Проверить упоминания сайта в нейроответах и динамику переходов"
+        ],
+        "deliverable": "Перечень запросов с нейроответами и план изменений страниц",
+        "limitation": "Не объявлять нейроответы единственной причиной, ведь снижение дают и сезон, и изменение спроса.",
+        "missing_data": "Недостаточно сведений, чтобы включить содержательный вывод по теме «Переходов из поиска меньше при тех же позициях: ответ забирают нейроответы». Нужно уточнить: object, observation, period, context.",
+        "blocked_recommendation": "Сначала уточнить прошлые попытки, доступные ресурсы и условия повторной проверки. Перезапуск работ пока не обоснован."
+      },
+      "sources": [
+        {
+          "source_id": "aeo",
+          "locator": "Содержание услуги; точные заголовки и строки — sources.json",
+          "supports": "Наличие направления и предмет работ; не экспертное утверждение диагностического правила"
+        }
+      ],
+      "editorial_basis": {
+        "source": "methodology",
+        "section": "Разделы 4–16",
+        "kind": "proposed_diagnostic_rule"
+      },
+      "checks": {
+        "positive": "geo_zero_click_positive",
+        "exclusion": "geo_zero_click_excluded",
+        "insufficient": "geo_zero_click_missing",
+        "boundary": "geo_zero_click_boundary"
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "seo_ai_visibility",
+      "version": "0.1.2",
+      "status": "approved",
+      "author": "Codex — подготовка по методике и локальным источникам",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-26T22:26:15.000Z",
+      "domain": "ai_search",
+      "title": "Присутствие бренда в AI-поиске не измеряется",
+      "type": "data_gap",
+      "context": "ответы нейросетей и AI-поиска о компании",
+      "matrix": {
+        "required": [
+          "ai_search.applicable",
+          "seo_ai_visibility.signal",
+          "seo_ai_visibility.details"
+        ],
+        "clarifying": [
+          "ai_search.impact",
+          "ai_search.history",
+          "context.goal",
+          "context.resources",
+          "context.constraints"
+        ],
+        "excluding": [
+          "ai_search.applicable",
+          "seo_ai_visibility.signal"
+        ]
+      },
+      "inclusion": {
+        "all": [
+          {
+            "fact": "ai_search.applicable",
             "op": "eq",
             "value": true
           },
@@ -6865,7 +8710,7 @@
       "exclusion": {
         "any": [
           {
-            "fact": "seo.applicable",
+            "fact": "ai_search.applicable",
             "op": "eq",
             "value": false
           },
@@ -6900,11 +8745,11 @@
         "uncertainty": "Не обещать обязательное попадание в ответы моделей."
       },
       "significance": {
-        "fact": "seo.impact",
+        "fact": "ai_search.impact",
         "rule": "Последствия и приоритет показываются отдельно от достаточности фактов; при unknown приоритет не объявлять высоким."
       },
       "previous_attempts": {
-        "fact": "seo.history",
+        "fact": "ai_search.history",
         "required_before_recommendation": true,
         "if_failed": "Уточнить различие нового подхода, условия и критерий проверки. Без различия — предложить разбор прежних данных, не повторный запуск.",
         "if_unknown": "Сначала восстановить сведения о прежних попытках; не объявлять новый запуск подходящим."
@@ -6973,7 +8818,12 @@
           "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
         ]
       },
-      "relationships": [],
+      "relationships": [
+        {
+          "block_id": "geo_competitors",
+          "relation": "shared_deliverable"
+        }
+      ],
       "services": [
         "geo"
       ],
@@ -7019,6 +8869,79 @@
         "exclusion": "seo_ai_visibility_excluded",
         "insufficient": "seo_ai_visibility_missing",
         "boundary": "seo_ai_visibility_boundary"
+      },
+      "v0_1_4": {
+        "domain": "seo",
+        "context": "обычный поиск и видимость в ответах AI",
+        "matrix": {
+          "required": [
+            "seo.applicable",
+            "seo_ai_visibility.signal",
+            "seo_ai_visibility.details"
+          ],
+          "clarifying": [
+            "seo.impact",
+            "seo.history",
+            "context.goal",
+            "context.resources",
+            "context.constraints"
+          ],
+          "excluding": [
+            "seo.applicable",
+            "seo_ai_visibility.signal"
+          ]
+        },
+        "inclusion": {
+          "all": [
+            {
+              "fact": "seo.applicable",
+              "op": "eq",
+              "value": true
+            },
+            {
+              "fact": "seo_ai_visibility.signal",
+              "op": "eq",
+              "value": "target"
+            },
+            {
+              "fact": "seo_ai_visibility.details",
+              "op": "fields_known",
+              "fields": [
+                "description"
+              ]
+            }
+          ]
+        },
+        "exclusion": {
+          "any": [
+            {
+              "fact": "seo.applicable",
+              "op": "eq",
+              "value": false
+            },
+            {
+              "fact": "seo_ai_visibility.signal",
+              "op": "eq",
+              "value": "alternative"
+            },
+            {
+              "fact": "seo_ai_visibility.signal",
+              "op": "state",
+              "value": "not_applicable"
+            }
+          ]
+        },
+        "significance": {
+          "fact": "seo.impact",
+          "rule": "Последствия и приоритет показываются отдельно от достаточности фактов; при unknown приоритет не объявлять высоким."
+        },
+        "previous_attempts": {
+          "fact": "seo.history",
+          "required_before_recommendation": true,
+          "if_failed": "Уточнить различие нового подхода, условия и критерий проверки. Без различия — предложить разбор прежних данных, не повторный запуск.",
+          "if_unknown": "Сначала восстановить сведения о прежних попытках; не объявлять новый запуск подходящим."
+        },
+        "relationships": []
       }
     },
     {
@@ -7028,32 +8951,32 @@
       "author": "Codex — подготовка по методике и локальным источникам",
       "reviewer": "project_owner_chat_approval",
       "approved_at": "2026-10-26T22:26:15.000Z",
-      "domain": "seo",
+      "domain": "ai_search",
       "title": "В AI-ответах обнаружены неверные сведения о компании",
       "type": "reported_issue",
-      "context": "обычный поиск и видимость в ответах AI",
+      "context": "ответы нейросетей и AI-поиска о компании",
       "matrix": {
         "required": [
-          "seo.applicable",
+          "ai_search.applicable",
           "seo_ai_accuracy.signal",
           "seo_ai_accuracy.details"
         ],
         "clarifying": [
-          "seo.impact",
-          "seo.history",
+          "ai_search.impact",
+          "ai_search.history",
           "context.goal",
           "context.resources",
           "context.constraints"
         ],
         "excluding": [
-          "seo.applicable",
+          "ai_search.applicable",
           "seo_ai_accuracy.signal"
         ]
       },
       "inclusion": {
         "all": [
           {
-            "fact": "seo.applicable",
+            "fact": "ai_search.applicable",
             "op": "eq",
             "value": true
           },
@@ -7076,7 +8999,7 @@
       "exclusion": {
         "any": [
           {
-            "fact": "seo.applicable",
+            "fact": "ai_search.applicable",
             "op": "eq",
             "value": false
           },
@@ -7113,11 +9036,11 @@
         "uncertainty": "Не обещать удаление ответа или управление поведением чужой модели."
       },
       "significance": {
-        "fact": "seo.impact",
+        "fact": "ai_search.impact",
         "rule": "Последствия и приоритет показываются отдельно от достаточности фактов; при unknown приоритет не объявлять высоким."
       },
       "previous_attempts": {
-        "fact": "seo.history",
+        "fact": "ai_search.history",
         "required_before_recommendation": true,
         "if_failed": "Уточнить различие нового подхода, условия и критерий проверки. Без различия — предложить разбор прежних данных, не повторный запуск.",
         "if_unknown": "Сначала восстановить сведения о прежних попытках; не объявлять новый запуск подходящим."
@@ -7232,6 +9155,80 @@
         "exclusion": "seo_ai_accuracy_excluded",
         "insufficient": "seo_ai_accuracy_missing",
         "boundary": "seo_ai_accuracy_boundary"
+      },
+      "v0_1_4": {
+        "domain": "seo",
+        "context": "обычный поиск и видимость в ответах AI",
+        "matrix": {
+          "required": [
+            "seo.applicable",
+            "seo_ai_accuracy.signal",
+            "seo_ai_accuracy.details"
+          ],
+          "clarifying": [
+            "seo.impact",
+            "seo.history",
+            "context.goal",
+            "context.resources",
+            "context.constraints"
+          ],
+          "excluding": [
+            "seo.applicable",
+            "seo_ai_accuracy.signal"
+          ]
+        },
+        "inclusion": {
+          "all": [
+            {
+              "fact": "seo.applicable",
+              "op": "eq",
+              "value": true
+            },
+            {
+              "fact": "seo_ai_accuracy.signal",
+              "op": "eq",
+              "value": "target"
+            },
+            {
+              "fact": "seo_ai_accuracy.details",
+              "op": "fields_known",
+              "fields": [
+                "object",
+                "observation",
+                "period"
+              ]
+            }
+          ]
+        },
+        "exclusion": {
+          "any": [
+            {
+              "fact": "seo.applicable",
+              "op": "eq",
+              "value": false
+            },
+            {
+              "fact": "seo_ai_accuracy.signal",
+              "op": "eq",
+              "value": "alternative"
+            },
+            {
+              "fact": "seo_ai_accuracy.signal",
+              "op": "state",
+              "value": "not_applicable"
+            }
+          ]
+        },
+        "significance": {
+          "fact": "seo.impact",
+          "rule": "Последствия и приоритет показываются отдельно от достаточности фактов; при unknown приоритет не объявлять высоким."
+        },
+        "previous_attempts": {
+          "fact": "seo.history",
+          "required_before_recommendation": true,
+          "if_failed": "Уточнить различие нового подхода, условия и критерий проверки. Без различия — предложить разбор прежних данных, не повторный запуск.",
+          "if_unknown": "Сначала восстановить сведения о прежних попытках; не объявлять новый запуск подходящим."
+        }
       }
     },
     {
@@ -7400,7 +9397,9 @@
         }
       ],
       "services": [
-        "ads"
+        "ads",
+        "ads_direct",
+        "ads_google"
       ],
       "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
       "pdf": {
@@ -7443,6 +9442,11 @@
         "exclusion": "ads_quality_excluded",
         "insufficient": "ads_quality_missing",
         "boundary": "ads_quality_boundary"
+      },
+      "v0_1_4": {
+        "services": [
+          "ads"
+        ]
       }
     },
     {
@@ -7620,7 +9624,10 @@
       ],
       "services": [
         "ads",
-        "analytics"
+        "analytics",
+        "ads_direct",
+        "ads_google",
+        "ads_cpa"
       ],
       "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
       "pdf": {
@@ -7669,6 +9676,12 @@
         "exclusion": "ads_cost_excluded",
         "insufficient": "ads_cost_missing",
         "boundary": "ads_cost_boundary"
+      },
+      "v0_1_4": {
+        "services": [
+          "ads",
+          "analytics"
+        ]
       }
     },
     {
@@ -7838,7 +9851,9 @@
       },
       "relationships": [],
       "services": [
-        "ads"
+        "ads",
+        "ads_direct",
+        "ads_google"
       ],
       "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
       "pdf": {
@@ -7882,6 +9897,11 @@
         "exclusion": "ads_geo_excluded",
         "insufficient": "ads_geo_missing",
         "boundary": "ads_geo_boundary"
+      },
+      "v0_1_4": {
+        "services": [
+          "ads"
+        ]
       }
     },
     {
@@ -8499,7 +10519,9 @@
       "relationships": [],
       "services": [
         "ads",
-        "analytics"
+        "analytics",
+        "ads_direct",
+        "ads_google"
       ],
       "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
       "pdf": {
@@ -8548,6 +10570,12 @@
         "exclusion": "ads_optimization_excluded",
         "insufficient": "ads_optimization_missing",
         "boundary": "ads_optimization_boundary"
+      },
+      "v0_1_4": {
+        "services": [
+          "ads",
+          "analytics"
+        ]
       }
     },
     {
@@ -9153,7 +11181,9 @@
       },
       "relationships": [],
       "services": [
-        "ads"
+        "ads",
+        "ads_direct",
+        "ads_google"
       ],
       "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
       "pdf": {
@@ -9197,6 +11227,11 @@
         "exclusion": "ads_spread_excluded",
         "insufficient": "ads_spread_missing",
         "boundary": "ads_spread_boundary"
+      },
+      "v0_1_4": {
+        "services": [
+          "ads"
+        ]
       }
     },
     {
@@ -9581,7 +11616,9 @@
       },
       "relationships": [],
       "services": [
-        "ads"
+        "ads",
+        "ads_direct",
+        "ads_google"
       ],
       "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
       "pdf": {
@@ -9625,6 +11662,11 @@
         "exclusion": "ads_creatives_excluded",
         "insufficient": "ads_creatives_missing",
         "boundary": "ads_creatives_boundary"
+      },
+      "v0_1_4": {
+        "services": [
+          "ads"
+        ]
       }
     },
     {
@@ -9788,9 +11830,16 @@
           "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
         ]
       },
-      "relationships": [],
+      "relationships": [
+        {
+          "block_id": "ads_management",
+          "relation": "related_but_distinct_work"
+        }
+      ],
       "services": [
-        "ads"
+        "ads",
+        "ads_direct",
+        "ads_google"
       ],
       "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
       "pdf": {
@@ -9834,7 +11883,678 @@
         "exclusion": "ads_restart_excluded",
         "insufficient": "ads_restart_missing",
         "boundary": "ads_restart_boundary"
+      },
+      "v0_1_4": {
+        "services": [
+          "ads"
+        ],
+        "relationships": []
       }
+    },
+    {
+      "id": "ads_social",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "domain": "advertising",
+      "title": "Реклама в соцсетях не приносит подходящих обращений",
+      "type": "hypothesis",
+      "context": "реклама в поиске, соцсетях и медиа и качество обращений",
+      "matrix": {
+        "required": [
+          "advertising.applicable",
+          "ads_social.signal",
+          "ads_social.details"
+        ],
+        "clarifying": [
+          "advertising.impact",
+          "advertising.history",
+          "context.goal",
+          "context.resources",
+          "context.constraints"
+        ],
+        "excluding": [
+          "advertising.applicable",
+          "ads_social.signal"
+        ]
+      },
+      "inclusion": {
+        "all": [
+          {
+            "fact": "advertising.applicable",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "fact": "ads_social.signal",
+            "op": "eq",
+            "value": "target"
+          },
+          {
+            "fact": "ads_social.details",
+            "op": "fields_known",
+            "fields": [
+              "object",
+              "observation",
+              "period",
+              "context"
+            ]
+          }
+        ]
+      },
+      "exclusion": {
+        "any": [
+          {
+            "fact": "advertising.applicable",
+            "op": "eq",
+            "value": false
+          },
+          {
+            "fact": "ads_social.signal",
+            "op": "eq",
+            "value": "alternative"
+          },
+          {
+            "fact": "ads_social.signal",
+            "op": "state",
+            "value": "not_applicable"
+          }
+        ]
+      },
+      "minimum_evidence": {
+        "meaning": "Наблюдение в конкретных условиях. В PDF допустима только гипотеза; причинность проверяется отдельной работой.",
+        "specific_condition": "Есть данные о расходах и обращениях из соцсетей, подходящих обращений мало или они дороже ориентира",
+        "detail_fields": [
+          "object",
+          "observation",
+          "period",
+          "context"
+        ],
+        "not_sufficient": [
+          "Реклама в соцсетях не запускалась либо её результат устраивает",
+          "Незнание посетителя без уточнения",
+          "Цель бизнеса сама по себе"
+        ]
+      },
+      "evidence": {
+        "level": "visitor_report",
+        "onsite_verification": false,
+        "causality": "unconfirmed",
+        "uncertainty": "Не судить о канале по одному месяцу или одной кампании."
+      },
+      "significance": {
+        "fact": "advertising.impact",
+        "rule": "Последствия и приоритет показываются отдельно от достаточности фактов; при unknown приоритет не объявлять высоким."
+      },
+      "previous_attempts": {
+        "fact": "advertising.history",
+        "required_before_recommendation": true,
+        "if_failed": "Уточнить различие нового подхода, условия и критерий проверки. Без различия — предложить разбор прежних данных, не повторный запуск.",
+        "if_unknown": "Сначала восстановить сведения о прежних попытках; не объявлять новый запуск подходящим."
+      },
+      "solution": {
+        "steps": [
+          {
+            "order": 1,
+            "text": "Собрать данные по кампаниям в соцсетях, доступы к рекламным кабинетам и аналитике",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Подтверждён объём проверки",
+              "Доступны разрешённые обезличенные примеры"
+            ]
+          },
+          {
+            "order": 2,
+            "text": "Согласовать, какое обращение считается подходящим, и сверить учёт обращений из соцсетей",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 3,
+            "text": "Сопоставить аудитории, объявления, посадочные страницы и стоимость обращений",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 4,
+            "text": "Составить план проверки гипотез с приоритетами по влиянию на стоимость подходящего обращения",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 5,
+            "text": "Запустить ограниченный тест изменённых настроек и объявлений",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 6,
+            "text": "Проверить стоимость и качество обращений и решить, масштабировать ли канал",
+            "owner": "Владелец процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          }
+        ],
+        "deliverable": "План проверки рекламы в соцсетях с исходными показателями",
+        "acceptance": "Результат «План проверки рекламы в соцсетях с исходными показателями» согласован владельцем процесса; перечислены исходные данные, ограничения и проверка результата.",
+        "prerequisites": [
+          "Уточнить цель и ограничения",
+          "Разобрать применимые прошлые попытки",
+          "Подтвердить доступность ресурсов и данных"
+        ],
+        "limitations": [
+          "Не судить о канале по одному месяцу или одной кампании.",
+          "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
+        ]
+      },
+      "relationships": [
+        {
+          "block_id": "social_quality",
+          "relation": "related_but_distinct_work"
+        }
+      ],
+      "services": [
+        "target",
+        "smm"
+      ],
+      "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
+      "pdf": {
+        "allowed_placeholders": [
+          "evidence_summary",
+          "history_summary",
+          "impact_summary"
+        ],
+        "heading": "Реклама в соцсетях не приносит подходящих обращений",
+        "basis": "По вашим ответам: {{evidence_summary}}.",
+        "interpretation": "Это основание для проверки гипотезы, а не установленная причина результата.",
+        "history": "Предыдущие действия: {{history_summary}}.",
+        "priority": "Последствия для бизнеса: {{impact_summary}}.",
+        "next_steps": [
+          "Собрать данные по кампаниям в соцсетях, доступы к рекламным кабинетам и аналитике",
+          "Согласовать, какое обращение считается подходящим, и сверить учёт обращений из соцсетей",
+          "Сопоставить аудитории, объявления, посадочные страницы и стоимость обращений",
+          "Составить план проверки гипотез с приоритетами по влиянию на стоимость подходящего обращения",
+          "Запустить ограниченный тест изменённых настроек и объявлений",
+          "Проверить стоимость и качество обращений и решить, масштабировать ли канал"
+        ],
+        "deliverable": "План проверки рекламы в соцсетях с исходными показателями",
+        "limitation": "Не судить о канале по одному месяцу или одной кампании.",
+        "missing_data": "Недостаточно сведений, чтобы включить содержательный вывод по теме «Реклама в соцсетях не приносит подходящих обращений». Нужно уточнить: object, observation, period, context.",
+        "blocked_recommendation": "Сначала уточнить прошлые попытки, доступные ресурсы и условия повторной проверки. Перезапуск работ пока не обоснован."
+      },
+      "sources": [
+        {
+          "source_id": "target",
+          "locator": "Содержание услуги; точные заголовки и строки — sources.json",
+          "supports": "Наличие направления и предмет работ; не экспертное утверждение диагностического правила"
+        }
+      ],
+      "editorial_basis": {
+        "source": "methodology",
+        "section": "Разделы 4–16",
+        "kind": "proposed_diagnostic_rule"
+      },
+      "checks": {
+        "positive": "ads_social_positive",
+        "exclusion": "ads_social_excluded",
+        "insufficient": "ads_social_missing",
+        "boundary": "ads_social_boundary"
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "ads_awareness",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "domain": "advertising",
+      "title": "Продукт мало ищут: поисковой рекламе не хватает спроса",
+      "type": "hypothesis",
+      "context": "реклама в поиске, соцсетях и медиа и качество обращений",
+      "matrix": {
+        "required": [
+          "advertising.applicable",
+          "ads_awareness.signal",
+          "ads_awareness.details"
+        ],
+        "clarifying": [
+          "advertising.impact",
+          "advertising.history",
+          "context.goal",
+          "context.resources",
+          "context.constraints"
+        ],
+        "excluding": [
+          "advertising.applicable",
+          "ads_awareness.signal"
+        ]
+      },
+      "inclusion": {
+        "all": [
+          {
+            "fact": "advertising.applicable",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "fact": "ads_awareness.signal",
+            "op": "eq",
+            "value": "target"
+          },
+          {
+            "fact": "ads_awareness.details",
+            "op": "fields_known",
+            "fields": [
+              "object",
+              "observation",
+              "period",
+              "context"
+            ]
+          }
+        ]
+      },
+      "exclusion": {
+        "any": [
+          {
+            "fact": "advertising.applicable",
+            "op": "eq",
+            "value": false
+          },
+          {
+            "fact": "ads_awareness.signal",
+            "op": "eq",
+            "value": "alternative"
+          },
+          {
+            "fact": "ads_awareness.signal",
+            "op": "state",
+            "value": "not_applicable"
+          }
+        ]
+      },
+      "minimum_evidence": {
+        "meaning": "Наблюдение в конкретных условиях. В PDF допустима только гипотеза; причинность проверяется отдельной работой.",
+        "specific_condition": "Поисковых запросов мало: кампании не набирают показов или бюджет не расходуется, продукт новый или малоизвестный",
+        "detail_fields": [
+          "object",
+          "observation",
+          "period",
+          "context"
+        ],
+        "not_sufficient": [
+          "Поискового спроса хватает для нужного объёма обращений",
+          "Незнание посетителя без уточнения",
+          "Цель бизнеса сама по себе"
+        ]
+      },
+      "evidence": {
+        "level": "visitor_report",
+        "onsite_verification": false,
+        "causality": "unconfirmed",
+        "uncertainty": "Охватная реклама формирует спрос постепенно, обращения в первые недели не обещать."
+      },
+      "significance": {
+        "fact": "advertising.impact",
+        "rule": "Последствия и приоритет показываются отдельно от достаточности фактов; при unknown приоритет не объявлять высоким."
+      },
+      "previous_attempts": {
+        "fact": "advertising.history",
+        "required_before_recommendation": true,
+        "if_failed": "Уточнить различие нового подхода, условия и критерий проверки. Без различия — предложить разбор прежних данных, не повторный запуск.",
+        "if_unknown": "Сначала восстановить сведения о прежних попытках; не объявлять новый запуск подходящим."
+      },
+      "solution": {
+        "steps": [
+          {
+            "order": 1,
+            "text": "Собрать данные о поисковом спросе, показах кампаний и текущих каналах",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Подтверждён объём проверки",
+              "Доступны разрешённые обезличенные примеры"
+            ]
+          },
+          {
+            "order": 2,
+            "text": "Оценить объём запросов по продукту и смежным темам в нужных регионах",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 3,
+            "text": "Определить аудиторию, которой нужно рассказать о продукте, и площадки, где она бывает",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 4,
+            "text": "Составить план охватной кампании с показателями узнаваемости и обращений",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 5,
+            "text": "Запустить ограниченный тест на одной-двух площадках",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 6,
+            "text": "Проверить рост поисковых запросов и обращений после теста и решить, продолжать ли",
+            "owner": "Владелец процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          }
+        ],
+        "deliverable": "План охватной кампании с исходными показателями спроса",
+        "acceptance": "Результат «План охватной кампании с исходными показателями спроса» согласован владельцем процесса; перечислены исходные данные, ограничения и проверка результата.",
+        "prerequisites": [
+          "Уточнить цель и ограничения",
+          "Разобрать применимые прошлые попытки",
+          "Подтвердить доступность ресурсов и данных"
+        ],
+        "limitations": [
+          "Охватная реклама формирует спрос постепенно, обращения в первые недели не обещать.",
+          "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
+        ]
+      },
+      "relationships": [
+        {
+          "block_id": "strategy_new_market",
+          "relation": "related_but_distinct_work"
+        }
+      ],
+      "services": [
+        "media",
+        "video",
+        "dzen",
+        "promo_pages",
+        "target"
+      ],
+      "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
+      "pdf": {
+        "allowed_placeholders": [
+          "evidence_summary",
+          "history_summary",
+          "impact_summary"
+        ],
+        "heading": "Продукт мало ищут: поисковой рекламе не хватает спроса",
+        "basis": "По вашим ответам: {{evidence_summary}}.",
+        "interpretation": "Это основание для проверки гипотезы, а не установленная причина результата.",
+        "history": "Предыдущие действия: {{history_summary}}.",
+        "priority": "Последствия для бизнеса: {{impact_summary}}.",
+        "next_steps": [
+          "Собрать данные о поисковом спросе, показах кампаний и текущих каналах",
+          "Оценить объём запросов по продукту и смежным темам в нужных регионах",
+          "Определить аудиторию, которой нужно рассказать о продукте, и площадки, где она бывает",
+          "Составить план охватной кампании с показателями узнаваемости и обращений",
+          "Запустить ограниченный тест на одной-двух площадках",
+          "Проверить рост поисковых запросов и обращений после теста и решить, продолжать ли"
+        ],
+        "deliverable": "План охватной кампании с исходными показателями спроса",
+        "limitation": "Охватная реклама формирует спрос постепенно, обращения в первые недели не обещать.",
+        "missing_data": "Недостаточно сведений, чтобы включить содержательный вывод по теме «Продукт мало ищут: поисковой рекламе не хватает спроса». Нужно уточнить: object, observation, period, context.",
+        "blocked_recommendation": "Сначала уточнить прошлые попытки, доступные ресурсы и условия повторной проверки. Перезапуск работ пока не обоснован."
+      },
+      "sources": [
+        {
+          "source_id": "media",
+          "locator": "Содержание услуги; точные заголовки и строки — sources.json",
+          "supports": "Наличие направления и предмет работ; не экспертное утверждение диагностического правила"
+        }
+      ],
+      "editorial_basis": {
+        "source": "methodology",
+        "section": "Разделы 4–16",
+        "kind": "proposed_diagnostic_rule"
+      },
+      "checks": {
+        "positive": "ads_awareness_positive",
+        "exclusion": "ads_awareness_excluded",
+        "insufficient": "ads_awareness_missing",
+        "boundary": "ads_awareness_boundary"
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "ads_management",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "domain": "advertising",
+      "title": "Кампании не оптимизируются регулярно",
+      "type": "data_gap",
+      "context": "реклама в поиске, соцсетях и медиа и качество обращений",
+      "matrix": {
+        "required": [
+          "advertising.applicable",
+          "ads_management.signal",
+          "ads_management.details"
+        ],
+        "clarifying": [
+          "advertising.impact",
+          "advertising.history",
+          "context.goal",
+          "context.resources",
+          "context.constraints"
+        ],
+        "excluding": [
+          "advertising.applicable",
+          "ads_management.signal"
+        ]
+      },
+      "inclusion": {
+        "all": [
+          {
+            "fact": "advertising.applicable",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "fact": "ads_management.signal",
+            "op": "eq",
+            "value": "target"
+          },
+          {
+            "fact": "ads_management.details",
+            "op": "fields_known",
+            "fields": [
+              "description"
+            ]
+          }
+        ]
+      },
+      "exclusion": {
+        "any": [
+          {
+            "fact": "advertising.applicable",
+            "op": "eq",
+            "value": false
+          },
+          {
+            "fact": "ads_management.signal",
+            "op": "eq",
+            "value": "alternative"
+          },
+          {
+            "fact": "ads_management.signal",
+            "op": "state",
+            "value": "not_applicable"
+          }
+        ]
+      },
+      "minimum_evidence": {
+        "meaning": "Явное сообщение об отсутствии конкретного учёта, критерия или процесса. Незнание посетителя не равно отсутствию в компании.",
+        "specific_condition": "Регулярной работы с кампаниями нет: настройки меняют редко или от случая к случаю",
+        "detail_fields": [
+          "description"
+        ],
+        "not_sufficient": [
+          "Кампании регулярно анализируют и корректируют",
+          "Незнание посетителя без уточнения",
+          "Цель бизнеса сама по себе"
+        ]
+      },
+      "evidence": {
+        "level": "visitor_report",
+        "onsite_verification": false,
+        "causality": "not_inferred",
+        "uncertainty": "Редкие изменения сами по себе не доказывают потерю бюджета."
+      },
+      "significance": {
+        "fact": "advertising.impact",
+        "rule": "Последствия и приоритет показываются отдельно от достаточности фактов; при unknown приоритет не объявлять высоким."
+      },
+      "previous_attempts": {
+        "fact": "advertising.history",
+        "required_before_recommendation": true,
+        "if_failed": "Уточнить различие нового подхода, условия и критерий проверки. Без различия — предложить разбор прежних данных, не повторный запуск.",
+        "if_unknown": "Сначала восстановить сведения о прежних попытках; не объявлять новый запуск подходящим."
+      },
+      "solution": {
+        "steps": [
+          {
+            "order": 1,
+            "text": "Собрать доступы к рекламным кабинетам и историю изменений кампаний",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Подтверждён объём проверки",
+              "Доступны разрешённые обезличенные примеры"
+            ]
+          },
+          {
+            "order": 2,
+            "text": "Проверить, что менялось за последние месяцы и как это сказалось на обращениях",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 3,
+            "text": "Определить регулярные работы: запросы, ставки, объявления, исключения, отчёты",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 4,
+            "text": "Согласовать порядок и частоту работ, ответственного и показатели отчёта",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 5,
+            "text": "Запустить регулярное ведение по согласованному порядку",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 6,
+            "text": "Через месяц проверить динамику стоимости и качества обращений",
+            "owner": "Владелец процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          }
+        ],
+        "deliverable": "Порядок регулярного ведения кампаний с ответственным и показателями",
+        "acceptance": "Результат «Порядок регулярного ведения кампаний с ответственным и показателями» согласован владельцем процесса; перечислены исходные данные, ограничения и проверка результата.",
+        "prerequisites": [
+          "Уточнить цель и ограничения",
+          "Разобрать применимые прошлые попытки",
+          "Подтвердить доступность ресурсов и данных"
+        ],
+        "limitations": [
+          "Редкие изменения сами по себе не доказывают потерю бюджета.",
+          "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
+        ]
+      },
+      "relationships": [
+        {
+          "block_id": "ads_restart",
+          "relation": "related_but_distinct_work"
+        }
+      ],
+      "services": [
+        "ads_direct",
+        "ads_google",
+        "ads_cpa",
+        "ads"
+      ],
+      "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
+      "pdf": {
+        "allowed_placeholders": [
+          "evidence_summary",
+          "history_summary",
+          "impact_summary"
+        ],
+        "heading": "Кампании не оптимизируются регулярно",
+        "basis": "По вашим ответам: {{evidence_summary}}.",
+        "interpretation": "Зафиксирован пробел в сведениях или процессе; его влияние пока не установлено.",
+        "history": "Предыдущие действия: {{history_summary}}.",
+        "priority": "Последствия для бизнеса: {{impact_summary}}.",
+        "next_steps": [
+          "Собрать доступы к рекламным кабинетам и историю изменений кампаний",
+          "Проверить, что менялось за последние месяцы и как это сказалось на обращениях",
+          "Определить регулярные работы: запросы, ставки, объявления, исключения, отчёты",
+          "Согласовать порядок и частоту работ, ответственного и показатели отчёта",
+          "Запустить регулярное ведение по согласованному порядку",
+          "Через месяц проверить динамику стоимости и качества обращений"
+        ],
+        "deliverable": "Порядок регулярного ведения кампаний с ответственным и показателями",
+        "limitation": "Редкие изменения сами по себе не доказывают потерю бюджета.",
+        "missing_data": "Недостаточно сведений, чтобы включить содержательный вывод по теме «Кампании не оптимизируются регулярно». Нужно уточнить: description.",
+        "blocked_recommendation": "Сначала уточнить прошлые попытки, доступные ресурсы и условия повторной проверки. Перезапуск работ пока не обоснован."
+      },
+      "sources": [
+        {
+          "source_id": "ads_direct",
+          "locator": "Содержание услуги; точные заголовки и строки — sources.json",
+          "supports": "Наличие направления и предмет работ; не экспертное утверждение диагностического правила"
+        }
+      ],
+      "editorial_basis": {
+        "source": "methodology",
+        "section": "Разделы 4–16",
+        "kind": "proposed_diagnostic_rule"
+      },
+      "checks": {
+        "positive": "ads_management_positive",
+        "exclusion": "ads_management_excluded",
+        "insufficient": "ads_management_missing",
+        "boundary": "ads_management_boundary"
+      },
+      "introduced_in": "0.2.0"
     },
     {
       "id": "ux_checkout",
@@ -11318,7 +14038,12 @@
           "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
         ]
       },
-      "relationships": [],
+      "relationships": [
+        {
+          "block_id": "seo_commercial",
+          "relation": "related_but_distinct_work"
+        }
+      ],
       "services": [
         "ux",
         "content"
@@ -11370,6 +14095,9 @@
         "exclusion": "ux_service_excluded",
         "insufficient": "ux_service_missing",
         "boundary": "ux_service_boundary"
+      },
+      "v0_1_4": {
+        "relationships": []
       }
     },
     {
@@ -12182,7 +14910,8 @@
       ],
       "services": [
         "web",
-        "strategy"
+        "strategy",
+        "express"
       ],
       "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
       "pdf": {
@@ -12230,6 +14959,12 @@
         "exclusion": "dev_launch_excluded",
         "insufficient": "dev_launch_missing",
         "boundary": "dev_launch_boundary"
+      },
+      "v0_1_4": {
+        "services": [
+          "web",
+          "strategy"
+        ]
       }
     },
     {
@@ -21063,6 +23798,444 @@
       }
     },
     {
+      "id": "avito_leads",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "domain": "marketplace",
+      "title": "Объявления на Авито дают мало обращений",
+      "type": "hypothesis",
+      "context": "карточки, объявления, заказы и экономика площадок",
+      "matrix": {
+        "required": [
+          "marketplace.applicable",
+          "avito_leads.signal",
+          "avito_leads.details"
+        ],
+        "clarifying": [
+          "marketplace.impact",
+          "marketplace.history",
+          "context.goal",
+          "context.resources",
+          "context.constraints"
+        ],
+        "excluding": [
+          "marketplace.applicable",
+          "avito_leads.signal"
+        ]
+      },
+      "inclusion": {
+        "all": [
+          {
+            "fact": "marketplace.applicable",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "fact": "avito_leads.signal",
+            "op": "eq",
+            "value": "target"
+          },
+          {
+            "fact": "avito_leads.details",
+            "op": "fields_known",
+            "fields": [
+              "object",
+              "observation",
+              "period",
+              "context"
+            ]
+          }
+        ]
+      },
+      "exclusion": {
+        "any": [
+          {
+            "fact": "marketplace.applicable",
+            "op": "eq",
+            "value": false
+          },
+          {
+            "fact": "avito_leads.signal",
+            "op": "eq",
+            "value": "alternative"
+          },
+          {
+            "fact": "avito_leads.signal",
+            "op": "state",
+            "value": "not_applicable"
+          }
+        ]
+      },
+      "minimum_evidence": {
+        "meaning": "Наблюдение в конкретных условиях. В PDF допустима только гипотеза; причинность проверяется отдельной работой.",
+        "specific_condition": "Объявления размещены, а обращений мало или стало меньше",
+        "detail_fields": [
+          "object",
+          "observation",
+          "period",
+          "context"
+        ],
+        "not_sufficient": [
+          "Обращений с Авито достаточно либо на Авито не продают",
+          "Незнание посетителя без уточнения",
+          "Цель бизнеса сама по себе"
+        ]
+      },
+      "evidence": {
+        "level": "visitor_report",
+        "onsite_verification": false,
+        "causality": "unconfirmed",
+        "uncertainty": "Не объяснять малое число обращений только текстом объявлений, влияют ещё цена, категория и конкуренция."
+      },
+      "significance": {
+        "fact": "marketplace.impact",
+        "rule": "Последствия и приоритет показываются отдельно от достаточности фактов; при unknown приоритет не объявлять высоким."
+      },
+      "previous_attempts": {
+        "fact": "marketplace.history",
+        "required_before_recommendation": true,
+        "if_failed": "Уточнить различие нового подхода, условия и критерий проверки. Без различия — предложить разбор прежних данных, не повторный запуск.",
+        "if_unknown": "Сначала восстановить сведения о прежних попытках; не объявлять новый запуск подходящим."
+      },
+      "solution": {
+        "steps": [
+          {
+            "order": 1,
+            "text": "Собрать данные по объявлениям, просмотрам и контактам, получить доступ к кабинету",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Подтверждён объём проверки",
+              "Доступны разрешённые обезличенные примеры"
+            ]
+          },
+          {
+            "order": 2,
+            "text": "Сравнить объявления с конкурентами по цене, фото, тексту и категории",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 3,
+            "text": "Проверить скорость ответа на сообщения и звонки",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 4,
+            "text": "Составить план изменений объявлений и ассортимента",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 5,
+            "text": "Внедрить изменения в приоритетных объявлениях",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 6,
+            "text": "Проверить динамику просмотров и обращений",
+            "owner": "Владелец процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          }
+        ],
+        "deliverable": "План изменения объявлений с исходными показателями",
+        "acceptance": "Результат «План изменения объявлений с исходными показателями» согласован владельцем процесса; перечислены исходные данные, ограничения и проверка результата.",
+        "prerequisites": [
+          "Уточнить цель и ограничения",
+          "Разобрать применимые прошлые попытки",
+          "Подтвердить доступность ресурсов и данных"
+        ],
+        "limitations": [
+          "Не объяснять малое число обращений только текстом объявлений, влияют ещё цена, категория и конкуренция.",
+          "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
+        ]
+      },
+      "relationships": [],
+      "services": [
+        "avito"
+      ],
+      "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
+      "pdf": {
+        "allowed_placeholders": [
+          "evidence_summary",
+          "history_summary",
+          "impact_summary"
+        ],
+        "heading": "Объявления на Авито дают мало обращений",
+        "basis": "По вашим ответам: {{evidence_summary}}.",
+        "interpretation": "Это основание для проверки гипотезы, а не установленная причина результата.",
+        "history": "Предыдущие действия: {{history_summary}}.",
+        "priority": "Последствия для бизнеса: {{impact_summary}}.",
+        "next_steps": [
+          "Собрать данные по объявлениям, просмотрам и контактам, получить доступ к кабинету",
+          "Сравнить объявления с конкурентами по цене, фото, тексту и категории",
+          "Проверить скорость ответа на сообщения и звонки",
+          "Составить план изменений объявлений и ассортимента",
+          "Внедрить изменения в приоритетных объявлениях",
+          "Проверить динамику просмотров и обращений"
+        ],
+        "deliverable": "План изменения объявлений с исходными показателями",
+        "limitation": "Не объяснять малое число обращений только текстом объявлений, влияют ещё цена, категория и конкуренция.",
+        "missing_data": "Недостаточно сведений, чтобы включить содержательный вывод по теме «Объявления на Авито дают мало обращений». Нужно уточнить: object, observation, period, context.",
+        "blocked_recommendation": "Сначала уточнить прошлые попытки, доступные ресурсы и условия повторной проверки. Перезапуск работ пока не обоснован."
+      },
+      "sources": [
+        {
+          "source_id": "avito",
+          "locator": "Содержание услуги; точные заголовки и строки — sources.json",
+          "supports": "Наличие направления и предмет работ; не экспертное утверждение диагностического правила"
+        }
+      ],
+      "editorial_basis": {
+        "source": "methodology",
+        "section": "Разделы 4–16",
+        "kind": "proposed_diagnostic_rule"
+      },
+      "checks": {
+        "positive": "avito_leads_positive",
+        "exclusion": "avito_leads_excluded",
+        "insufficient": "avito_leads_missing",
+        "boundary": "avito_leads_boundary"
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "avito_cost",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "domain": "marketplace",
+      "title": "Платное продвижение на Авито не окупается",
+      "type": "hypothesis",
+      "context": "карточки, объявления, заказы и экономика площадок",
+      "matrix": {
+        "required": [
+          "marketplace.applicable",
+          "avito_cost.signal",
+          "avito_cost.details"
+        ],
+        "clarifying": [
+          "marketplace.impact",
+          "marketplace.history",
+          "context.goal",
+          "context.resources",
+          "context.constraints"
+        ],
+        "excluding": [
+          "marketplace.applicable",
+          "avito_cost.signal"
+        ]
+      },
+      "inclusion": {
+        "all": [
+          {
+            "fact": "marketplace.applicable",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "fact": "avito_cost.signal",
+            "op": "eq",
+            "value": "target"
+          },
+          {
+            "fact": "avito_cost.details",
+            "op": "fields_known",
+            "fields": [
+              "object",
+              "observation",
+              "period",
+              "context"
+            ]
+          }
+        ]
+      },
+      "exclusion": {
+        "any": [
+          {
+            "fact": "marketplace.applicable",
+            "op": "eq",
+            "value": false
+          },
+          {
+            "fact": "avito_cost.signal",
+            "op": "eq",
+            "value": "alternative"
+          },
+          {
+            "fact": "avito_cost.signal",
+            "op": "state",
+            "value": "not_applicable"
+          }
+        ]
+      },
+      "minimum_evidence": {
+        "meaning": "Наблюдение в конкретных условиях. В PDF допустима только гипотеза; причинность проверяется отдельной работой.",
+        "specific_condition": "Есть расходы на продвижение на Авито, а продажи от него не окупают затраты",
+        "detail_fields": [
+          "object",
+          "observation",
+          "period",
+          "context"
+        ],
+        "not_sufficient": [
+          "Платное продвижение окупается либо не используется",
+          "Незнание посетителя без уточнения",
+          "Цель бизнеса сама по себе"
+        ]
+      },
+      "evidence": {
+        "level": "visitor_report",
+        "onsite_verification": false,
+        "causality": "unconfirmed",
+        "uncertainty": "Не судить об окупаемости без учёта продаж, пришедших позже первого контакта."
+      },
+      "significance": {
+        "fact": "marketplace.impact",
+        "rule": "Последствия и приоритет показываются отдельно от достаточности фактов; при unknown приоритет не объявлять высоким."
+      },
+      "previous_attempts": {
+        "fact": "marketplace.history",
+        "required_before_recommendation": true,
+        "if_failed": "Уточнить различие нового подхода, условия и критерий проверки. Без различия — предложить разбор прежних данных, не повторный запуск.",
+        "if_unknown": "Сначала восстановить сведения о прежних попытках; не объявлять новый запуск подходящим."
+      },
+      "solution": {
+        "steps": [
+          {
+            "order": 1,
+            "text": "Собрать данные по расходам на продвижение, просмотрам, контактам и продажам",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Подтверждён объём проверки",
+              "Доступны разрешённые обезличенные примеры"
+            ]
+          },
+          {
+            "order": 2,
+            "text": "Связать обращения с Авито с продажами",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 3,
+            "text": "Сравнить окупаемость по объявлениям и услугам продвижения",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 4,
+            "text": "Составить план перераспределения бюджета",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 5,
+            "text": "Внедрить изменения на ограниченной части объявлений",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 6,
+            "text": "Проверить стоимость продажи после изменений",
+            "owner": "Владелец процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          }
+        ],
+        "deliverable": "Расчёт окупаемости продвижения на Авито и план бюджета",
+        "acceptance": "Результат «Расчёт окупаемости продвижения на Авито и план бюджета» согласован владельцем процесса; перечислены исходные данные, ограничения и проверка результата.",
+        "prerequisites": [
+          "Уточнить цель и ограничения",
+          "Разобрать применимые прошлые попытки",
+          "Подтвердить доступность ресурсов и данных"
+        ],
+        "limitations": [
+          "Не судить об окупаемости без учёта продаж, пришедших позже первого контакта.",
+          "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
+        ]
+      },
+      "relationships": [
+        {
+          "block_id": "analytics_sales",
+          "relation": "measurement_before_optimization"
+        }
+      ],
+      "services": [
+        "avito_ads",
+        "analytics"
+      ],
+      "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
+      "pdf": {
+        "allowed_placeholders": [
+          "evidence_summary",
+          "history_summary",
+          "impact_summary"
+        ],
+        "heading": "Платное продвижение на Авито не окупается",
+        "basis": "По вашим ответам: {{evidence_summary}}.",
+        "interpretation": "Это основание для проверки гипотезы, а не установленная причина результата.",
+        "history": "Предыдущие действия: {{history_summary}}.",
+        "priority": "Последствия для бизнеса: {{impact_summary}}.",
+        "next_steps": [
+          "Собрать данные по расходам на продвижение, просмотрам, контактам и продажам",
+          "Связать обращения с Авито с продажами",
+          "Сравнить окупаемость по объявлениям и услугам продвижения",
+          "Составить план перераспределения бюджета",
+          "Внедрить изменения на ограниченной части объявлений",
+          "Проверить стоимость продажи после изменений"
+        ],
+        "deliverable": "Расчёт окупаемости продвижения на Авито и план бюджета",
+        "limitation": "Не судить об окупаемости без учёта продаж, пришедших позже первого контакта.",
+        "missing_data": "Недостаточно сведений, чтобы включить содержательный вывод по теме «Платное продвижение на Авито не окупается». Нужно уточнить: object, observation, period, context.",
+        "blocked_recommendation": "Сначала уточнить прошлые попытки, доступные ресурсы и условия повторной проверки. Перезапуск работ пока не обоснован."
+      },
+      "sources": [
+        {
+          "source_id": "avito_ads",
+          "locator": "Содержание услуги; точные заголовки и строки — sources.json",
+          "supports": "Наличие направления и предмет работ; не экспертное утверждение диагностического правила"
+        }
+      ],
+      "editorial_basis": {
+        "source": "methodology",
+        "section": "Разделы 4–16",
+        "kind": "proposed_diagnostic_rule"
+      },
+      "checks": {
+        "positive": "avito_cost_positive",
+        "exclusion": "avito_cost_excluded",
+        "insufficient": "avito_cost_missing",
+        "boundary": "avito_cost_boundary"
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
       "id": "rep_missing",
       "version": "0.1.2",
       "status": "approved",
@@ -21415,7 +24588,12 @@
           "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
         ]
       },
-      "relationships": [],
+      "relationships": [
+        {
+          "block_id": "rep_local_ads",
+          "relation": "restore_before_change"
+        }
+      ],
       "services": [
         "maps"
       ],
@@ -21459,6 +24637,9 @@
         "exclusion": "rep_details_excluded",
         "insufficient": "rep_details_missing",
         "boundary": "rep_details_boundary"
+      },
+      "v0_1_4": {
+        "relationships": []
       }
     },
     {
@@ -22682,7 +25863,12 @@
           "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
         ]
       },
-      "relationships": [],
+      "relationships": [
+        {
+          "block_id": "geo_negative",
+          "relation": "related_but_distinct_work"
+        }
+      ],
       "services": [
         "serm",
         "reputation"
@@ -22734,7 +25920,232 @@
         "exclusion": "rep_false_excluded",
         "insufficient": "rep_false_missing",
         "boundary": "rep_false_boundary"
+      },
+      "v0_1_4": {
+        "relationships": []
       }
+    },
+    {
+      "id": "rep_local_ads",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "domain": "reputation",
+      "title": "Карточка на картах есть, но рядом с точкой о компании мало знают",
+      "type": "hypothesis",
+      "context": "карты, отзывы и информация о компании",
+      "matrix": {
+        "required": [
+          "reputation.applicable",
+          "rep_local_ads.signal",
+          "rep_local_ads.details"
+        ],
+        "clarifying": [
+          "reputation.impact",
+          "reputation.history",
+          "context.goal",
+          "context.resources",
+          "context.constraints"
+        ],
+        "excluding": [
+          "reputation.applicable",
+          "rep_local_ads.signal"
+        ]
+      },
+      "inclusion": {
+        "all": [
+          {
+            "fact": "reputation.applicable",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "fact": "rep_local_ads.signal",
+            "op": "eq",
+            "value": "target"
+          },
+          {
+            "fact": "rep_local_ads.details",
+            "op": "fields_known",
+            "fields": [
+              "object",
+              "observation",
+              "period",
+              "context"
+            ]
+          }
+        ]
+      },
+      "exclusion": {
+        "any": [
+          {
+            "fact": "reputation.applicable",
+            "op": "eq",
+            "value": false
+          },
+          {
+            "fact": "rep_local_ads.signal",
+            "op": "eq",
+            "value": "alternative"
+          },
+          {
+            "fact": "rep_local_ads.signal",
+            "op": "state",
+            "value": "not_applicable"
+          }
+        ]
+      },
+      "minimum_evidence": {
+        "meaning": "Наблюдение в конкретных условиях. В PDF допустима только гипотеза; причинность проверяется отдельной работой.",
+        "specific_condition": "Карточка заполнена, но просмотров и маршрутов мало для нужного потока клиентов",
+        "detail_fields": [
+          "object",
+          "observation",
+          "period",
+          "context"
+        ],
+        "not_sufficient": [
+          "Потока с карт достаточно либо карточки нет",
+          "Незнание посетителя без уточнения",
+          "Цель бизнеса сама по себе"
+        ]
+      },
+      "evidence": {
+        "level": "visitor_report",
+        "onsite_verification": false,
+        "causality": "unconfirmed",
+        "uncertainty": "Не обещать поток клиентов, реклама на картах увеличивает показы, но не гарантирует визиты."
+      },
+      "significance": {
+        "fact": "reputation.impact",
+        "rule": "Последствия и приоритет показываются отдельно от достаточности фактов; при unknown приоритет не объявлять высоким."
+      },
+      "previous_attempts": {
+        "fact": "reputation.history",
+        "required_before_recommendation": true,
+        "if_failed": "Уточнить различие нового подхода, условия и критерий проверки. Без различия — предложить разбор прежних данных, не повторный запуск.",
+        "if_unknown": "Сначала восстановить сведения о прежних попытках; не объявлять новый запуск подходящим."
+      },
+      "solution": {
+        "steps": [
+          {
+            "order": 1,
+            "text": "Собрать статистику карточек: показы, маршруты, звонки",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Подтверждён объём проверки",
+              "Доступны разрешённые обезличенные примеры"
+            ]
+          },
+          {
+            "order": 2,
+            "text": "Сравнить с конкурентами рядом по рейтингу, отзывам и заполненности",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 3,
+            "text": "Определить районы и аудиторию для рекламы на картах",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 4,
+            "text": "Составить план рекламы на геосервисах с бюджетом и показателями",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 5,
+            "text": "Запустить рекламу на ограниченный период",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 6,
+            "text": "Проверить рост маршрутов, звонков и визитов",
+            "owner": "Владелец процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          }
+        ],
+        "deliverable": "План рекламы на геосервисах с исходной статистикой карточек",
+        "acceptance": "Результат «План рекламы на геосервисах с исходной статистикой карточек» согласован владельцем процесса; перечислены исходные данные, ограничения и проверка результата.",
+        "prerequisites": [
+          "Уточнить цель и ограничения",
+          "Разобрать применимые прошлые попытки",
+          "Подтвердить доступность ресурсов и данных"
+        ],
+        "limitations": [
+          "Не обещать поток клиентов, реклама на картах увеличивает показы, но не гарантирует визиты.",
+          "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
+        ]
+      },
+      "relationships": [
+        {
+          "block_id": "rep_details",
+          "relation": "restore_before_change"
+        }
+      ],
+      "services": [
+        "geomedia",
+        "maps"
+      ],
+      "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
+      "pdf": {
+        "allowed_placeholders": [
+          "evidence_summary",
+          "history_summary",
+          "impact_summary"
+        ],
+        "heading": "Карточка на картах есть, но рядом с точкой о компании мало знают",
+        "basis": "По вашим ответам: {{evidence_summary}}.",
+        "interpretation": "Это основание для проверки гипотезы, а не установленная причина результата.",
+        "history": "Предыдущие действия: {{history_summary}}.",
+        "priority": "Последствия для бизнеса: {{impact_summary}}.",
+        "next_steps": [
+          "Собрать статистику карточек: показы, маршруты, звонки",
+          "Сравнить с конкурентами рядом по рейтингу, отзывам и заполненности",
+          "Определить районы и аудиторию для рекламы на картах",
+          "Составить план рекламы на геосервисах с бюджетом и показателями",
+          "Запустить рекламу на ограниченный период",
+          "Проверить рост маршрутов, звонков и визитов"
+        ],
+        "deliverable": "План рекламы на геосервисах с исходной статистикой карточек",
+        "limitation": "Не обещать поток клиентов, реклама на картах увеличивает показы, но не гарантирует визиты.",
+        "missing_data": "Недостаточно сведений, чтобы включить содержательный вывод по теме «Карточка на картах есть, но рядом с точкой о компании мало знают». Нужно уточнить: object, observation, period, context.",
+        "blocked_recommendation": "Сначала уточнить прошлые попытки, доступные ресурсы и условия повторной проверки. Перезапуск работ пока не обоснован."
+      },
+      "sources": [
+        {
+          "source_id": "geomedia",
+          "locator": "Содержание услуги; точные заголовки и строки — sources.json",
+          "supports": "Наличие направления и предмет работ; не экспертное утверждение диагностического правила"
+        }
+      ],
+      "editorial_basis": {
+        "source": "methodology",
+        "section": "Разделы 4–16",
+        "kind": "proposed_diagnostic_rule"
+      },
+      "checks": {
+        "positive": "rep_local_ads_positive",
+        "exclusion": "rep_local_ads_excluded",
+        "insufficient": "rep_local_ads_missing",
+        "boundary": "rep_local_ads_boundary"
+      },
+      "introduced_in": "0.2.0"
     },
     {
       "id": "content_goal",
@@ -23969,9 +27380,15 @@
           "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
         ]
       },
-      "relationships": [],
+      "relationships": [
+        {
+          "block_id": "ads_social",
+          "relation": "related_but_distinct_work"
+        }
+      ],
       "services": [
-        "social"
+        "social",
+        "smm"
       ],
       "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
       "pdf": {
@@ -24015,6 +27432,12 @@
         "exclusion": "social_quality_excluded",
         "insufficient": "social_quality_missing",
         "boundary": "social_quality_boundary"
+      },
+      "v0_1_4": {
+        "services": [
+          "social"
+        ],
+        "relationships": []
       }
     },
     {
@@ -24177,7 +27600,8 @@
       "relationships": [],
       "services": [
         "social",
-        "telegram"
+        "telegram",
+        "smm"
       ],
       "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
       "pdf": {
@@ -24225,6 +27649,12 @@
         "exclusion": "social_moderation_excluded",
         "insufficient": "social_moderation_missing",
         "boundary": "social_moderation_boundary"
+      },
+      "v0_1_4": {
+        "services": [
+          "social",
+          "telegram"
+        ]
       }
     },
     {
@@ -24610,7 +28040,8 @@
       "relationships": [],
       "services": [
         "content",
-        "social"
+        "social",
+        "smm"
       ],
       "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
       "pdf": {
@@ -24659,6 +28090,12 @@
         "exclusion": "content_capacity_excluded",
         "insufficient": "content_capacity_missing",
         "boundary": "content_capacity_boundary"
+      },
+      "v0_1_4": {
+        "services": [
+          "content",
+          "social"
+        ]
       }
     },
     {
@@ -25460,7 +28897,12 @@
           "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
         ]
       },
-      "relationships": [],
+      "relationships": [
+        {
+          "block_id": "brand_trademark",
+          "relation": "related_but_distinct_work"
+        }
+      ],
       "services": [
         "naming",
         "serm"
@@ -25512,6 +28954,9 @@
         "exclusion": "brand_name_excluded",
         "insufficient": "brand_name_missing",
         "boundary": "brand_name_boundary"
+      },
+      "v0_1_4": {
+        "relationships": []
       }
     },
     {
@@ -25934,6 +29379,225 @@
       }
     },
     {
+      "id": "brand_trademark",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "domain": "brand",
+      "title": "Название не защищено товарным знаком",
+      "type": "opportunity",
+      "context": "идентичность бренда и презентация предложения",
+      "matrix": {
+        "required": [
+          "brand.applicable",
+          "brand_trademark.signal",
+          "brand_trademark.details"
+        ],
+        "clarifying": [
+          "brand.impact",
+          "brand.history",
+          "context.goal",
+          "context.resources",
+          "context.constraints"
+        ],
+        "excluding": [
+          "brand.applicable",
+          "brand_trademark.signal"
+        ]
+      },
+      "inclusion": {
+        "all": [
+          {
+            "fact": "brand.applicable",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "fact": "brand_trademark.signal",
+            "op": "eq",
+            "value": "target"
+          },
+          {
+            "fact": "brand_trademark.details",
+            "op": "fields_known",
+            "fields": [
+              "task",
+              "current_way",
+              "constraint"
+            ]
+          }
+        ]
+      },
+      "exclusion": {
+        "any": [
+          {
+            "fact": "brand.applicable",
+            "op": "eq",
+            "value": false
+          },
+          {
+            "fact": "brand_trademark.signal",
+            "op": "eq",
+            "value": "alternative"
+          },
+          {
+            "fact": "brand_trademark.signal",
+            "op": "state",
+            "value": "not_applicable"
+          }
+        ]
+      },
+      "minimum_evidence": {
+        "meaning": "Понятна нужная задача, текущий способ и его ограничение. Применимость внедрения ещё проверяется по ресурсам и прошлому опыту.",
+        "specific_condition": "Товарного знака нет, а площадка его требует или название уже используют другие",
+        "detail_fields": [
+          "task",
+          "current_way",
+          "constraint"
+        ],
+        "not_sufficient": [
+          "Товарный знак зарегистрирован либо такой потребности нет",
+          "Незнание посетителя без уточнения",
+          "Цель бизнеса сама по себе"
+        ]
+      },
+      "evidence": {
+        "level": "visitor_report",
+        "onsite_verification": false,
+        "causality": "not_inferred",
+        "uncertainty": "Не гарантировать регистрацию, решение принимает Роспатент."
+      },
+      "significance": {
+        "fact": "brand.impact",
+        "rule": "Последствия и приоритет показываются отдельно от достаточности фактов; при unknown приоритет не объявлять высоким."
+      },
+      "previous_attempts": {
+        "fact": "brand.history",
+        "required_before_recommendation": true,
+        "if_failed": "Уточнить различие нового подхода, условия и критерий проверки. Без различия — предложить разбор прежних данных, не повторный запуск.",
+        "if_unknown": "Сначала восстановить сведения о прежних попытках; не объявлять новый запуск подходящим."
+      },
+      "solution": {
+        "steps": [
+          {
+            "order": 1,
+            "text": "Собрать варианты обозначения, логотип и перечень товаров и услуг",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Подтверждён объём проверки",
+              "Доступны разрешённые обезличенные примеры"
+            ]
+          },
+          {
+            "order": 2,
+            "text": "Проверить сходство с зарегистрированными знаками",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 3,
+            "text": "Определить классы и вид регистрации",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 4,
+            "text": "Подготовить и подать заявку",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 5,
+            "text": "Сопровождать экспертизу и отвечать на запросы",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 6,
+            "text": "Получить свидетельство и подключить знак на нужных площадках",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          }
+        ],
+        "deliverable": "Поданная заявка на товарный знак с результатами проверки сходства",
+        "acceptance": "Результат «Поданная заявка на товарный знак с результатами проверки сходства» согласован владельцем процесса; перечислены исходные данные, ограничения и проверка результата.",
+        "prerequisites": [
+          "Уточнить цель и ограничения",
+          "Разобрать применимые прошлые попытки",
+          "Подтвердить доступность ресурсов и данных"
+        ],
+        "limitations": [
+          "Не гарантировать регистрацию, решение принимает Роспатент.",
+          "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
+        ]
+      },
+      "relationships": [
+        {
+          "block_id": "brand_name",
+          "relation": "related_but_distinct_work"
+        }
+      ],
+      "services": [
+        "trademark"
+      ],
+      "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
+      "pdf": {
+        "allowed_placeholders": [
+          "evidence_summary",
+          "history_summary",
+          "impact_summary"
+        ],
+        "heading": "Название не защищено товарным знаком",
+        "basis": "По вашим ответам: {{evidence_summary}}.",
+        "interpretation": "Есть задача для рассмотрения; полезность и объём внедрения нужно подтвердить.",
+        "history": "Предыдущие действия: {{history_summary}}.",
+        "priority": "Последствия для бизнеса: {{impact_summary}}.",
+        "next_steps": [
+          "Собрать варианты обозначения, логотип и перечень товаров и услуг",
+          "Проверить сходство с зарегистрированными знаками",
+          "Определить классы и вид регистрации",
+          "Подготовить и подать заявку",
+          "Сопровождать экспертизу и отвечать на запросы",
+          "Получить свидетельство и подключить знак на нужных площадках"
+        ],
+        "deliverable": "Поданная заявка на товарный знак с результатами проверки сходства",
+        "limitation": "Не гарантировать регистрацию, решение принимает Роспатент.",
+        "missing_data": "Недостаточно сведений, чтобы включить содержательный вывод по теме «Название не защищено товарным знаком». Нужно уточнить: task, current_way, constraint.",
+        "blocked_recommendation": "Сначала уточнить прошлые попытки, доступные ресурсы и условия повторной проверки. Перезапуск работ пока не обоснован."
+      },
+      "sources": [
+        {
+          "source_id": "trademark",
+          "locator": "Содержание услуги; точные заголовки и строки — sources.json",
+          "supports": "Наличие направления и предмет работ; не экспертное утверждение диагностического правила"
+        }
+      ],
+      "editorial_basis": {
+        "source": "methodology",
+        "section": "Разделы 4–16",
+        "kind": "proposed_diagnostic_rule"
+      },
+      "checks": {
+        "positive": "brand_trademark_positive",
+        "exclusion": "brand_trademark_excluded",
+        "insufficient": "brand_trademark_missing",
+        "boundary": "brand_trademark_boundary"
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
       "id": "ai_process",
       "version": "0.1.2",
       "status": "approved",
@@ -26307,11 +29971,16 @@
         {
           "block_id": "ai_handoff",
           "relation": "knowledge_and_fallback"
+        },
+        {
+          "block_id": "ai_doc_search",
+          "relation": "related_but_distinct_work"
         }
       ],
       "services": [
         "ai",
-        "ai_agents"
+        "ai_agents",
+        "knowledge_base"
       ],
       "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
       "pdf": {
@@ -26360,6 +30029,18 @@
         "exclusion": "ai_knowledge_excluded",
         "insufficient": "ai_knowledge_missing",
         "boundary": "ai_knowledge_boundary"
+      },
+      "v0_1_4": {
+        "services": [
+          "ai",
+          "ai_agents"
+        ],
+        "relationships": [
+          {
+            "block_id": "ai_handoff",
+            "relation": "knowledge_and_fallback"
+          }
+        ]
       }
     },
     {
@@ -26531,6 +30212,10 @@
         {
           "block_id": "ai_knowledge",
           "relation": "knowledge_and_fallback"
+        },
+        {
+          "block_id": "ai_repeat_questions",
+          "relation": "knowledge_and_fallback"
         }
       ],
       "services": [
@@ -26584,6 +30269,14 @@
         "exclusion": "ai_handoff_excluded",
         "insufficient": "ai_handoff_missing",
         "boundary": "ai_handoff_boundary"
+      },
+      "v0_1_4": {
+        "relationships": [
+          {
+            "block_id": "ai_knowledge",
+            "relation": "knowledge_and_fallback"
+          }
+        ]
       }
     },
     {
@@ -27656,6 +31349,669 @@
       }
     },
     {
+      "id": "ai_routine",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "domain": "ai",
+      "title": "Сотрудники вручную повторяют одни и те же операции",
+      "type": "opportunity",
+      "context": "повторяемые операции, знания и контроль AI",
+      "matrix": {
+        "required": [
+          "ai.applicable",
+          "ai_routine.signal",
+          "ai_routine.details"
+        ],
+        "clarifying": [
+          "ai.impact",
+          "ai.history",
+          "context.goal",
+          "context.resources",
+          "context.constraints"
+        ],
+        "excluding": [
+          "ai.applicable",
+          "ai_routine.signal"
+        ]
+      },
+      "inclusion": {
+        "all": [
+          {
+            "fact": "ai.applicable",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "fact": "ai_routine.signal",
+            "op": "eq",
+            "value": "target"
+          },
+          {
+            "fact": "ai_routine.details",
+            "op": "fields_known",
+            "fields": [
+              "task",
+              "frequency",
+              "effort",
+              "data_location"
+            ]
+          }
+        ]
+      },
+      "exclusion": {
+        "any": [
+          {
+            "fact": "ai.applicable",
+            "op": "eq",
+            "value": false
+          },
+          {
+            "fact": "ai_routine.signal",
+            "op": "eq",
+            "value": "alternative"
+          },
+          {
+            "fact": "ai_routine.signal",
+            "op": "state",
+            "value": "not_applicable"
+          }
+        ]
+      },
+      "minimum_evidence": {
+        "meaning": "Понятна нужная задача, текущий способ и его ограничение. Применимость внедрения ещё проверяется по ресурсам и прошлому опыту.",
+        "specific_condition": "Есть частая однотипная операция, которая занимает заметное время или даёт ошибки",
+        "detail_fields": [
+          "task",
+          "frequency",
+          "effort",
+          "data_location"
+        ],
+        "not_sufficient": [
+          "Существенных повторяющихся ручных операций нет",
+          "Незнание посетителя без уточнения",
+          "Цель бизнеса сама по себе"
+        ]
+      },
+      "evidence": {
+        "level": "visitor_report",
+        "onsite_verification": false,
+        "causality": "not_inferred",
+        "uncertainty": "Ручная операция не обязательно требует AI; сначала сравнить с обычной автоматизацией и изменением процесса."
+      },
+      "significance": {
+        "fact": "ai.impact",
+        "rule": "Последствия и приоритет показываются отдельно от достаточности фактов; при unknown приоритет не объявлять высоким."
+      },
+      "previous_attempts": {
+        "fact": "ai.history",
+        "required_before_recommendation": true,
+        "if_failed": "Уточнить различие нового подхода, условия и критерий проверки. Без различия — предложить разбор прежних данных, не повторный запуск.",
+        "if_unknown": "Сначала восстановить сведения о прежних попытках; не объявлять новый запуск подходящим."
+      },
+      "solution": {
+        "steps": [
+          {
+            "order": 1,
+            "text": "Описать операцию: шаги, частоту, исполнителей, данные и точки решения человека",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Подтверждён объём проверки",
+              "Доступны разрешённые обезличенные примеры"
+            ]
+          },
+          {
+            "order": 2,
+            "text": "Измерить время и ошибки на выборке операций",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 3,
+            "text": "Сравнить варианты: изменение процесса, обычная автоматизация, интеграция систем, AI",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 4,
+            "text": "Выбрать вариант и составить план пилота с критериями экономии",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 5,
+            "text": "Внедрить пилот на ограниченном участке",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 6,
+            "text": "Проверить экономию времени и долю ошибок на контрольной выборке",
+            "owner": "Владелец процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          }
+        ],
+        "deliverable": "Выбранный способ автоматизации с расчётом экономии на пилоте",
+        "acceptance": "Результат «Выбранный способ автоматизации с расчётом экономии на пилоте» согласован владельцем процесса; перечислены исходные данные, ограничения и проверка результата.",
+        "prerequisites": [
+          "Уточнить цель и ограничения",
+          "Разобрать применимые прошлые попытки",
+          "Подтвердить доступность ресурсов и данных"
+        ],
+        "limitations": [
+          "Ручная операция не обязательно требует AI; сначала сравнить с обычной автоматизацией и изменением процесса.",
+          "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
+        ]
+      },
+      "relationships": [
+        {
+          "block_id": "integration_manual",
+          "relation": "related_but_distinct_work"
+        }
+      ],
+      "services": [
+        "ai_automation",
+        "crm",
+        "one_c"
+      ],
+      "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
+      "pdf": {
+        "allowed_placeholders": [
+          "evidence_summary",
+          "history_summary",
+          "impact_summary"
+        ],
+        "heading": "Сотрудники вручную повторяют одни и те же операции",
+        "basis": "По вашим ответам: {{evidence_summary}}.",
+        "interpretation": "Есть задача для рассмотрения; полезность и объём внедрения нужно подтвердить.",
+        "history": "Предыдущие действия: {{history_summary}}.",
+        "priority": "Последствия для бизнеса: {{impact_summary}}.",
+        "next_steps": [
+          "Описать операцию: шаги, частоту, исполнителей, данные и точки решения человека",
+          "Измерить время и ошибки на выборке операций",
+          "Сравнить варианты: изменение процесса, обычная автоматизация, интеграция систем, AI",
+          "Выбрать вариант и составить план пилота с критериями экономии",
+          "Внедрить пилот на ограниченном участке",
+          "Проверить экономию времени и долю ошибок на контрольной выборке"
+        ],
+        "deliverable": "Выбранный способ автоматизации с расчётом экономии на пилоте",
+        "limitation": "Ручная операция не обязательно требует AI; сначала сравнить с обычной автоматизацией и изменением процесса.",
+        "missing_data": "Недостаточно сведений, чтобы включить содержательный вывод по теме «Сотрудники вручную повторяют одни и те же операции». Нужно уточнить: task, frequency, effort, data_location.",
+        "blocked_recommendation": "Сначала уточнить прошлые попытки, доступные ресурсы и условия повторной проверки. Перезапуск работ пока не обоснован."
+      },
+      "sources": [
+        {
+          "source_id": "ai_automation",
+          "locator": "Содержание услуги; точные заголовки и строки — sources.json",
+          "supports": "Наличие направления и предмет работ; не экспертное утверждение диагностического правила"
+        }
+      ],
+      "editorial_basis": {
+        "source": "methodology",
+        "section": "Разделы 4–16",
+        "kind": "proposed_diagnostic_rule"
+      },
+      "checks": {
+        "positive": "ai_routine_positive",
+        "exclusion": "ai_routine_excluded",
+        "insufficient": "ai_routine_missing",
+        "boundary": "ai_routine_boundary"
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "ai_repeat_questions",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "domain": "ai",
+      "title": "Сотрудники отвечают на одни и те же вопросы клиентов",
+      "type": "opportunity",
+      "context": "повторяемые операции, знания и контроль AI",
+      "matrix": {
+        "required": [
+          "ai.applicable",
+          "ai_repeat_questions.signal",
+          "ai_repeat_questions.details"
+        ],
+        "clarifying": [
+          "ai.impact",
+          "ai.history",
+          "context.goal",
+          "context.resources",
+          "context.constraints"
+        ],
+        "excluding": [
+          "ai.applicable",
+          "ai_repeat_questions.signal"
+        ]
+      },
+      "inclusion": {
+        "all": [
+          {
+            "fact": "ai.applicable",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "fact": "ai_repeat_questions.signal",
+            "op": "eq",
+            "value": "target"
+          },
+          {
+            "fact": "ai_repeat_questions.details",
+            "op": "fields_known",
+            "fields": [
+              "task",
+              "current_way",
+              "constraint"
+            ]
+          }
+        ]
+      },
+      "exclusion": {
+        "any": [
+          {
+            "fact": "ai.applicable",
+            "op": "eq",
+            "value": false
+          },
+          {
+            "fact": "ai_repeat_questions.signal",
+            "op": "eq",
+            "value": "alternative"
+          },
+          {
+            "fact": "ai_repeat_questions.signal",
+            "op": "state",
+            "value": "not_applicable"
+          }
+        ]
+      },
+      "minimum_evidence": {
+        "meaning": "Понятна нужная задача, текущий способ и его ограничение. Применимость внедрения ещё проверяется по ресурсам и прошлому опыту.",
+        "specific_condition": "Значимая часть обращений — повторяющиеся вопросы, ответы на которые занимают заметное время или задерживаются",
+        "detail_fields": [
+          "task",
+          "current_way",
+          "constraint"
+        ],
+        "not_sufficient": [
+          "Повторяющихся вопросов немного либо ответы не задерживаются",
+          "Незнание посетителя без уточнения",
+          "Цель бизнеса сама по себе"
+        ]
+      },
+      "evidence": {
+        "level": "visitor_report",
+        "onsite_verification": false,
+        "causality": "not_inferred",
+        "uncertainty": "Помощник отвечает только по проверенным материалам, сложные вопросы передаются сотруднику."
+      },
+      "significance": {
+        "fact": "ai.impact",
+        "rule": "Последствия и приоритет показываются отдельно от достаточности фактов; при unknown приоритет не объявлять высоким."
+      },
+      "previous_attempts": {
+        "fact": "ai.history",
+        "required_before_recommendation": true,
+        "if_failed": "Уточнить различие нового подхода, условия и критерий проверки. Без различия — предложить разбор прежних данных, не повторный запуск.",
+        "if_unknown": "Сначала восстановить сведения о прежних попытках; не объявлять новый запуск подходящим."
+      },
+      "solution": {
+        "steps": [
+          {
+            "order": 1,
+            "text": "Собрать выборку обращений и разделить её по типам вопросов",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Подтверждён объём проверки",
+              "Доступны разрешённые обезличенные примеры"
+            ]
+          },
+          {
+            "order": 2,
+            "text": "Выделить повторяющиеся вопросы с готовыми проверенными ответами",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 3,
+            "text": "Определить, какие вопросы помощник закрывает сам, а какие передаёт сотруднику",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 4,
+            "text": "Составить план внедрения помощника на сайте или в мессенджере с критериями качества",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 5,
+            "text": "Запустить помощника на ограниченной части обращений",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 6,
+            "text": "Проверить долю закрытых вопросов, качество ответов и время ответа",
+            "owner": "Владелец процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          }
+        ],
+        "deliverable": "Перечень вопросов для помощника и итоги пилота",
+        "acceptance": "Результат «Перечень вопросов для помощника и итоги пилота» согласован владельцем процесса; перечислены исходные данные, ограничения и проверка результата.",
+        "prerequisites": [
+          "Уточнить цель и ограничения",
+          "Разобрать применимые прошлые попытки",
+          "Подтвердить доступность ресурсов и данных"
+        ],
+        "limitations": [
+          "Помощник отвечает только по проверенным материалам, сложные вопросы передаются сотруднику.",
+          "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
+        ]
+      },
+      "relationships": [
+        {
+          "block_id": "ai_handoff",
+          "relation": "knowledge_and_fallback"
+        }
+      ],
+      "services": [
+        "ai_site",
+        "ai_agents"
+      ],
+      "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
+      "pdf": {
+        "allowed_placeholders": [
+          "evidence_summary",
+          "history_summary",
+          "impact_summary"
+        ],
+        "heading": "Сотрудники отвечают на одни и те же вопросы клиентов",
+        "basis": "По вашим ответам: {{evidence_summary}}.",
+        "interpretation": "Есть задача для рассмотрения; полезность и объём внедрения нужно подтвердить.",
+        "history": "Предыдущие действия: {{history_summary}}.",
+        "priority": "Последствия для бизнеса: {{impact_summary}}.",
+        "next_steps": [
+          "Собрать выборку обращений и разделить её по типам вопросов",
+          "Выделить повторяющиеся вопросы с готовыми проверенными ответами",
+          "Определить, какие вопросы помощник закрывает сам, а какие передаёт сотруднику",
+          "Составить план внедрения помощника на сайте или в мессенджере с критериями качества",
+          "Запустить помощника на ограниченной части обращений",
+          "Проверить долю закрытых вопросов, качество ответов и время ответа"
+        ],
+        "deliverable": "Перечень вопросов для помощника и итоги пилота",
+        "limitation": "Помощник отвечает только по проверенным материалам, сложные вопросы передаются сотруднику.",
+        "missing_data": "Недостаточно сведений, чтобы включить содержательный вывод по теме «Сотрудники отвечают на одни и те же вопросы клиентов». Нужно уточнить: task, current_way, constraint.",
+        "blocked_recommendation": "Сначала уточнить прошлые попытки, доступные ресурсы и условия повторной проверки. Перезапуск работ пока не обоснован."
+      },
+      "sources": [
+        {
+          "source_id": "ai_site",
+          "locator": "Содержание услуги; точные заголовки и строки — sources.json",
+          "supports": "Наличие направления и предмет работ; не экспертное утверждение диагностического правила"
+        }
+      ],
+      "editorial_basis": {
+        "source": "methodology",
+        "section": "Разделы 4–16",
+        "kind": "proposed_diagnostic_rule"
+      },
+      "checks": {
+        "positive": "ai_repeat_questions_positive",
+        "exclusion": "ai_repeat_questions_excluded",
+        "insufficient": "ai_repeat_questions_missing",
+        "boundary": "ai_repeat_questions_boundary"
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "ai_doc_search",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "domain": "ai",
+      "title": "Сотрудники долго ищут ответы во внутренних документах",
+      "type": "opportunity",
+      "context": "повторяемые операции, знания и контроль AI",
+      "matrix": {
+        "required": [
+          "ai.applicable",
+          "ai_doc_search.signal",
+          "ai_doc_search.details"
+        ],
+        "clarifying": [
+          "ai.impact",
+          "ai.history",
+          "context.goal",
+          "context.resources",
+          "context.constraints"
+        ],
+        "excluding": [
+          "ai.applicable",
+          "ai_doc_search.signal"
+        ]
+      },
+      "inclusion": {
+        "all": [
+          {
+            "fact": "ai.applicable",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "fact": "ai_doc_search.signal",
+            "op": "eq",
+            "value": "target"
+          },
+          {
+            "fact": "ai_doc_search.details",
+            "op": "fields_known",
+            "fields": [
+              "task",
+              "current_way",
+              "constraint"
+            ]
+          }
+        ]
+      },
+      "exclusion": {
+        "any": [
+          {
+            "fact": "ai.applicable",
+            "op": "eq",
+            "value": false
+          },
+          {
+            "fact": "ai_doc_search.signal",
+            "op": "eq",
+            "value": "alternative"
+          },
+          {
+            "fact": "ai_doc_search.signal",
+            "op": "state",
+            "value": "not_applicable"
+          }
+        ]
+      },
+      "minimum_evidence": {
+        "meaning": "Понятна нужная задача, текущий способ и его ограничение. Применимость внедрения ещё проверяется по ресурсам и прошлому опыту.",
+        "specific_condition": "Сотрудники регулярно тратят заметное время на поиск сведений в разрозненных документах",
+        "detail_fields": [
+          "task",
+          "current_way",
+          "constraint"
+        ],
+        "not_sufficient": [
+          "Нужные сведения находятся быстро",
+          "Незнание посетителя без уточнения",
+          "Цель бизнеса сама по себе"
+        ]
+      },
+      "evidence": {
+        "level": "visitor_report",
+        "onsite_verification": false,
+        "causality": "not_inferred",
+        "uncertainty": "База знаний не устранит противоречия в документах без их разбора владельцами."
+      },
+      "significance": {
+        "fact": "ai.impact",
+        "rule": "Последствия и приоритет показываются отдельно от достаточности фактов; при unknown приоритет не объявлять высоким."
+      },
+      "previous_attempts": {
+        "fact": "ai.history",
+        "required_before_recommendation": true,
+        "if_failed": "Уточнить различие нового подхода, условия и критерий проверки. Без различия — предложить разбор прежних данных, не повторный запуск.",
+        "if_unknown": "Сначала восстановить сведения о прежних попытках; не объявлять новый запуск подходящим."
+      },
+      "solution": {
+        "steps": [
+          {
+            "order": 1,
+            "text": "Собрать перечень документов, мест хранения и владельцев",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Подтверждён объём проверки",
+              "Доступны разрешённые обезличенные примеры"
+            ]
+          },
+          {
+            "order": 2,
+            "text": "Выделить частые вопросы сотрудников и время поиска ответа",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 3,
+            "text": "Разобрать противоречия и устаревшие материалы с владельцами",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 4,
+            "text": "Составить структуру базы знаний и правила обновления",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 5,
+            "text": "Внедрить базу знаний, при необходимости с AI-поиском по ней",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 6,
+            "text": "Проверить время поиска ответа на контрольных вопросах",
+            "owner": "Владелец процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          }
+        ],
+        "deliverable": "Структура базы знаний с правилами обновления и проверкой времени поиска",
+        "acceptance": "Результат «Структура базы знаний с правилами обновления и проверкой времени поиска» согласован владельцем процесса; перечислены исходные данные, ограничения и проверка результата.",
+        "prerequisites": [
+          "Уточнить цель и ограничения",
+          "Разобрать применимые прошлые попытки",
+          "Подтвердить доступность ресурсов и данных"
+        ],
+        "limitations": [
+          "База знаний не устранит противоречия в документах без их разбора владельцами.",
+          "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
+        ]
+      },
+      "relationships": [
+        {
+          "block_id": "ai_knowledge",
+          "relation": "related_but_distinct_work"
+        }
+      ],
+      "services": [
+        "knowledge_base",
+        "ai_agents"
+      ],
+      "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
+      "pdf": {
+        "allowed_placeholders": [
+          "evidence_summary",
+          "history_summary",
+          "impact_summary"
+        ],
+        "heading": "Сотрудники долго ищут ответы во внутренних документах",
+        "basis": "По вашим ответам: {{evidence_summary}}.",
+        "interpretation": "Есть задача для рассмотрения; полезность и объём внедрения нужно подтвердить.",
+        "history": "Предыдущие действия: {{history_summary}}.",
+        "priority": "Последствия для бизнеса: {{impact_summary}}.",
+        "next_steps": [
+          "Собрать перечень документов, мест хранения и владельцев",
+          "Выделить частые вопросы сотрудников и время поиска ответа",
+          "Разобрать противоречия и устаревшие материалы с владельцами",
+          "Составить структуру базы знаний и правила обновления",
+          "Внедрить базу знаний, при необходимости с AI-поиском по ней",
+          "Проверить время поиска ответа на контрольных вопросах"
+        ],
+        "deliverable": "Структура базы знаний с правилами обновления и проверкой времени поиска",
+        "limitation": "База знаний не устранит противоречия в документах без их разбора владельцами.",
+        "missing_data": "Недостаточно сведений, чтобы включить содержательный вывод по теме «Сотрудники долго ищут ответы во внутренних документах». Нужно уточнить: task, current_way, constraint.",
+        "blocked_recommendation": "Сначала уточнить прошлые попытки, доступные ресурсы и условия повторной проверки. Перезапуск работ пока не обоснован."
+      },
+      "sources": [
+        {
+          "source_id": "knowledge_base",
+          "locator": "Содержание услуги; точные заголовки и строки — sources.json",
+          "supports": "Наличие направления и предмет работ; не экспертное утверждение диагностического правила"
+        }
+      ],
+      "editorial_basis": {
+        "source": "methodology",
+        "section": "Разделы 4–16",
+        "kind": "proposed_diagnostic_rule"
+      },
+      "checks": {
+        "positive": "ai_doc_search_positive",
+        "exclusion": "ai_doc_search_excluded",
+        "insufficient": "ai_doc_search_missing",
+        "boundary": "ai_doc_search_boundary"
+      },
+      "introduced_in": "0.2.0"
+    },
+    {
       "id": "mobile_need",
       "version": "0.1.2",
       "status": "approved",
@@ -28470,7 +32826,12 @@
           "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
         ]
       },
-      "relationships": [],
+      "relationships": [
+        {
+          "block_id": "mobile_installs",
+          "relation": "measurement_before_optimization"
+        }
+      ],
       "services": [
         "aso"
       ],
@@ -28516,6 +32877,9 @@
         "exclusion": "mobile_store_excluded",
         "insufficient": "mobile_store_missing",
         "boundary": "mobile_store_boundary"
+      },
+      "v0_1_4": {
+        "relationships": []
       }
     },
     {
@@ -28738,6 +33102,228 @@
         "insufficient": "mobile_return_missing",
         "boundary": "mobile_return_boundary"
       }
+    },
+    {
+      "id": "mobile_installs",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — утверждённый план дополнений библиотеки, 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T03:08:12Z",
+      "domain": "mobile",
+      "title": "Установки приложения дорогие или их мало",
+      "type": "hypothesis",
+      "context": "сценарии приложения, установки и удержание",
+      "matrix": {
+        "required": [
+          "mobile.applicable",
+          "mobile_installs.signal",
+          "mobile_installs.details"
+        ],
+        "clarifying": [
+          "mobile.impact",
+          "mobile.history",
+          "context.goal",
+          "context.resources",
+          "context.constraints"
+        ],
+        "excluding": [
+          "mobile.applicable",
+          "mobile_installs.signal"
+        ]
+      },
+      "inclusion": {
+        "all": [
+          {
+            "fact": "mobile.applicable",
+            "op": "eq",
+            "value": true
+          },
+          {
+            "fact": "mobile_installs.signal",
+            "op": "eq",
+            "value": "target"
+          },
+          {
+            "fact": "mobile_installs.details",
+            "op": "fields_known",
+            "fields": [
+              "object",
+              "observation",
+              "period",
+              "context"
+            ]
+          }
+        ]
+      },
+      "exclusion": {
+        "any": [
+          {
+            "fact": "mobile.applicable",
+            "op": "eq",
+            "value": false
+          },
+          {
+            "fact": "mobile_installs.signal",
+            "op": "eq",
+            "value": "alternative"
+          },
+          {
+            "fact": "mobile_installs.signal",
+            "op": "state",
+            "value": "not_applicable"
+          }
+        ]
+      },
+      "minimum_evidence": {
+        "meaning": "Наблюдение в конкретных условиях. В PDF допустима только гипотеза; причинность проверяется отдельной работой.",
+        "specific_condition": "Установок меньше нужного или их стоимость выше ориентира",
+        "detail_fields": [
+          "object",
+          "observation",
+          "period",
+          "context"
+        ],
+        "not_sufficient": [
+          "Установок достаточно и их стоимость устраивает",
+          "Незнание посетителя без уточнения",
+          "Цель бизнеса сама по себе"
+        ]
+      },
+      "evidence": {
+        "level": "visitor_report",
+        "onsite_verification": false,
+        "causality": "unconfirmed",
+        "uncertainty": "Установка не равна активному пользователю, оценивать её вместе с возвратом в приложение."
+      },
+      "significance": {
+        "fact": "mobile.impact",
+        "rule": "Последствия и приоритет показываются отдельно от достаточности фактов; при unknown приоритет не объявлять высоким."
+      },
+      "previous_attempts": {
+        "fact": "mobile.history",
+        "required_before_recommendation": true,
+        "if_failed": "Уточнить различие нового подхода, условия и критерий проверки. Без различия — предложить разбор прежних данных, не повторный запуск.",
+        "if_unknown": "Сначала восстановить сведения о прежних попытках; не объявлять новый запуск подходящим."
+      },
+      "solution": {
+        "steps": [
+          {
+            "order": 1,
+            "text": "Собрать данные по установкам, источникам и расходам",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Подтверждён объём проверки",
+              "Доступны разрешённые обезличенные примеры"
+            ]
+          },
+          {
+            "order": 2,
+            "text": "Проверить страницу приложения в магазинах и долю переходов в установку",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 3,
+            "text": "Сравнить источники по стоимости установки и дальнейшей активности",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 4,
+            "text": "Составить план: страница в магазине, рекламные источники, бюджет",
+            "owner": "Профильный специалист совместно с владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 5,
+            "text": "Запустить изменения на ограниченном бюджете",
+            "owner": "Назначенный исполнитель с приёмкой владельцем процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          },
+          {
+            "order": 6,
+            "text": "Проверить стоимость установки и долю вернувшихся пользователей",
+            "owner": "Владелец процесса",
+            "prerequisites": [
+              "Зафиксирован результат предыдущего шага"
+            ]
+          }
+        ],
+        "deliverable": "План привлечения установок с исходной стоимостью и качеством",
+        "acceptance": "Результат «План привлечения установок с исходной стоимостью и качеством» согласован владельцем процесса; перечислены исходные данные, ограничения и проверка результата.",
+        "prerequisites": [
+          "Уточнить цель и ограничения",
+          "Разобрать применимые прошлые попытки",
+          "Подтвердить доступность ресурсов и данных"
+        ],
+        "limitations": [
+          "Установка не равна активному пользователю, оценивать её вместе с возвратом в приложение.",
+          "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
+        ]
+      },
+      "relationships": [
+        {
+          "block_id": "mobile_store",
+          "relation": "measurement_before_optimization"
+        }
+      ],
+      "services": [
+        "mobile_performance",
+        "aso"
+      ],
+      "tariff_selection": "По составу работ, условиям и подтверждённому объёму. Услуга — кандидат для проверки, не назначение тарифа.",
+      "pdf": {
+        "allowed_placeholders": [
+          "evidence_summary",
+          "history_summary",
+          "impact_summary"
+        ],
+        "heading": "Установки приложения дорогие или их мало",
+        "basis": "По вашим ответам: {{evidence_summary}}.",
+        "interpretation": "Это основание для проверки гипотезы, а не установленная причина результата.",
+        "history": "Предыдущие действия: {{history_summary}}.",
+        "priority": "Последствия для бизнеса: {{impact_summary}}.",
+        "next_steps": [
+          "Собрать данные по установкам, источникам и расходам",
+          "Проверить страницу приложения в магазинах и долю переходов в установку",
+          "Сравнить источники по стоимости установки и дальнейшей активности",
+          "Составить план: страница в магазине, рекламные источники, бюджет",
+          "Запустить изменения на ограниченном бюджете",
+          "Проверить стоимость установки и долю вернувшихся пользователей"
+        ],
+        "deliverable": "План привлечения установок с исходной стоимостью и качеством",
+        "limitation": "Установка не равна активному пользователю, оценивать её вместе с возвратом в приложение.",
+        "missing_data": "Недостаточно сведений, чтобы включить содержательный вывод по теме «Установки приложения дорогие или их мало». Нужно уточнить: object, observation, period, context.",
+        "blocked_recommendation": "Сначала уточнить прошлые попытки, доступные ресурсы и условия повторной проверки. Перезапуск работ пока не обоснован."
+      },
+      "sources": [
+        {
+          "source_id": "mobile_performance",
+          "locator": "Содержание услуги; точные заголовки и строки — sources.json",
+          "supports": "Наличие направления и предмет работ; не экспертное утверждение диагностического правила"
+        }
+      ],
+      "editorial_basis": {
+        "source": "methodology",
+        "section": "Разделы 4–16",
+        "kind": "proposed_diagnostic_rule"
+      },
+      "checks": {
+        "positive": "mobile_installs_positive",
+        "exclusion": "mobile_installs_excluded",
+        "insufficient": "mobile_installs_missing",
+        "boundary": "mobile_installs_boundary"
+      },
+      "introduced_in": "0.2.0"
     },
     {
       "id": "integration_catalog",
@@ -29782,7 +34368,12 @@
           "Предварительный вывод основан на ответах посетителя; сайт, кабинеты и системы в этой беседе не проверялись."
         ]
       },
-      "relationships": [],
+      "relationships": [
+        {
+          "block_id": "ai_routine",
+          "relation": "related_but_distinct_work"
+        }
+      ],
       "services": [
         "one_c",
         "crm_integration"
@@ -29834,6 +34425,9 @@
         "exclusion": "integration_manual_excluded",
         "insufficient": "integration_manual_missing",
         "boundary": "integration_manual_boundary"
+      },
+      "v0_1_4": {
+        "relationships": []
       }
     },
     {

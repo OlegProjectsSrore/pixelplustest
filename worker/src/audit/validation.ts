@@ -1,6 +1,7 @@
 import { INTERVIEW_BUDGET_MS, type AuditFact, type AuditResult, type AuditSnapshot, type AuditState } from './contracts.ts';
 import { library, isApproved, type AuditLibrary } from './library.ts';
 import { evaluateRule, isRecord } from './rules.ts';
+import { withImpliedTopics } from './topics.ts';
 
 const states = new Set(['known', 'unknown', 'not_measured', 'not_applicable', 'declined', 'ambiguous', 'other', 'not_asked', 'conflicting']);
 function fail(path: string): never { throw new Error(`Invalid audit data: ${path}`); }
@@ -41,9 +42,10 @@ const stateFields = ['library_version', 'revision', 'channel_revision', 'active_
 
 /** The Worker contract is separate from the content team's offline audit-state schema. */
 export function validateAuditState(value: unknown, lib: AuditLibrary = library): asserts value is AuditState {
-  record(value, 'state'); fields(value, stateFields, ['mode', 'questions_answered']);
+  record(value, 'state'); fields(value, stateFields, ['mode', 'questions_answered', 'cross_checked']);
   if (value.questions_answered !== undefined) integer(value.questions_answered, 'state.questions_answered');
   if (value.mode !== undefined && !['questions', 'diagnostic'].includes(String(value.mode))) fail('state.mode');
+  if (value.cross_checked !== undefined) { strings(value.cross_checked, 'state.cross_checked'); for (const id of value.cross_checked) if (!lib.solutions.some(block => block.id === id)) fail('state.cross_checked reference'); }
   if (value.library_version !== lib.version) fail('state.library_version');
   for (const key of ['revision', 'channel_revision', 'elapsed_ms', 'through_seq', 'extracted_through_seq']) integer(value[key], `state.${key}`);
   if ((value.elapsed_ms as number) > INTERVIEW_BUDGET_MS || (value.extracted_through_seq as number) > (value.through_seq as number)) fail('state timing/event boundary');
@@ -132,7 +134,9 @@ export function validateAuditResult(value: unknown, lib: AuditLibrary = library,
     if (JSON.stringify(item.details.tax) !== JSON.stringify(tariff.tax ?? null)) fail('tariff tax differs from catalog');
     for (const key of ['conditions', 'included', 'excluded', 'not_stated'] as const) if (JSON.stringify(item.details[key]) !== JSON.stringify(tariff[key])) fail(`tariff ${key} differs from catalog`);
     if (!value.solutions.some(solution => isRecord(solution) && Array.isArray(solution.service_ids) && solution.service_ids.includes(tariff.service_id))) fail('tariff service is not supported by a solution');
-    const ruleFacts = Object.fromEntries((value.facts as AuditFact[]).map(fact => [fact.fact_id, { state: fact.state, value: fact.value, confirmation: fact.confirmation, parameters: fact.parameters }]));
+    // A problem found while checking another cause implies its topic, as in the analysis.
+    const implied = withImpliedTopics(Object.fromEntries((value.facts as AuditFact[]).map(fact => [fact.fact_id, fact])), lib);
+    const ruleFacts = Object.fromEntries(Object.values(implied).map(fact => [fact.fact_id, { state: fact.state, value: fact.value, confirmation: fact.confirmation, parameters: fact.parameters }]));
     if (evaluateRule(tariff.selection_rule, ruleFacts) !== true) fail('tariff evidence rule does not match');
     const source = lib.sources.find(source => source.id === tariff.source.id);
     if (!source?.url || item.source_urls.length !== 1 || item.source_urls[0] !== source.url) fail('tariff source');

@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0.0",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "status": "draft",
   "prepared_at": "2026-10-22T20:13:25.939Z",
   "author": "Codex; automated preparation",
@@ -4808,6 +4808,1386 @@
         }
       ],
       "tables": []
+    },
+    {
+      "id": "ads_direct",
+      "url": "https://pixelplus.ru/context/yandex-direct/",
+      "title": "Контекстная реклама Яндекс Директ",
+      "local_path": "knowledge-base/kb/services/context/yandex-direct.md",
+      "section": "context",
+      "crawled_at": "2026-10-22T08:49:42+00:00",
+      "sha256": "e1a8d0219cadcd93b92fb670fe8b492f93e8f63085d426245a93c6fc1731c178",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 12,
+          "section": "# Контекстная реклама Яндекс Директ",
+          "text": "Ваш бизнес — наш приоритет: Яндекс Директ без забот — от 29 400 руб!"
+        },
+        {
+          "line": 87,
+          "section": "## Цены на настройку и ведение Яндекс Директ",
+          "text": "от 29 400 ₽ / мес."
+        },
+        {
+          "line": 100,
+          "section": "## Цены на настройку и ведение Яндекс Директ",
+          "text": "от 42 000 ₽ / мес."
+        },
+        {
+          "line": 111,
+          "section": "## Цены на настройку и ведение Яндекс Директ",
+          "text": "от 54 600 ₽ / мес."
+        },
+        {
+          "line": 122,
+          "section": "## Цены на настройку и ведение Яндекс Директ",
+          "text": "от 67 200 ₽ / мес."
+        },
+        {
+          "line": 140,
+          "section": "## Цены на настройку и ведение Яндекс Директ",
+          "text": "от 400 000 до 800 000 ₽ в месяц"
+        },
+        {
+          "line": 147,
+          "section": "## Цены на настройку и ведение Яндекс Директ",
+          "text": "Комиссия 15% от рекламного бюджета, но не менее 40 000 руб."
+        },
+        {
+          "line": 149,
+          "section": "## Цены на настройку и ведение Яндекс Директ",
+          "text": "Рекламный бюджет: 400 000–800 000 ₽ / мес."
+        },
+        {
+          "line": 154,
+          "section": "## Цены на настройку и ведение Яндекс Директ",
+          "text": "от 800 000 ₽ в месяц"
+        },
+        {
+          "line": 178,
+          "section": "## Яндекс Директ в «Пиксель Плюс» — это:",
+          "text": "Берёмся за проекты с бюджетом от 30 000 ₽ в месяц. Умеем масштабировать малый бизнес, запускать сложные ниши и делать это рентабельно."
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "ads_google",
+      "url": "https://pixelplus.ru/context/google-ads/",
+      "title": "Контекстная реклама в Google Ads",
+      "local_path": "knowledge-base/kb/services/context/google-ads.md",
+      "section": "context",
+      "crawled_at": "2026-10-22T09:00:26+00:00",
+      "sha256": "bd7ea34ba245a260f11478e7ac39ed39f3d14001349478a3962057a79e896ac3",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 24,
+          "section": "## Цены на контекстную рекламу в Google Adwords*",
+          "text": "от 15 000 руб"
+        },
+        {
+          "line": 32,
+          "section": "## Цены на контекстную рекламу в Google Adwords*",
+          "text": "от 20 000 руб."
+        },
+        {
+          "line": 40,
+          "section": "## Цены на контекстную рекламу в Google Adwords*",
+          "text": "от 30 000 руб."
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "ads_cpa",
+      "url": "https://pixelplus.ru/context/s-oplatoj-za-lidy/",
+      "title": "Контекстная реклама с оплатой за ЛИДЫ/CPA",
+      "local_path": "knowledge-base/kb/services/context/s-oplatoj-za-lidy.md",
+      "section": "context",
+      "crawled_at": "2026-10-22T08:49:45+00:00",
+      "sha256": "00cb55cfbe7151d2fcbd7f72ff4b63deaf20d2ed90f00e0799a59b465c656bd0",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 18,
+          "section": "# Контекстная реклама с оплатой за ЛИДЫ/CPA",
+          "text": "Стоимость складывается из доплаты за заявки (звонки, заказы) и фиксированной части — базового ежемесячного платежа, в рамках которого мы будем выполнять работы по росту показателей и тестировать неограниченное количество гипотез. Фиксированный платёж составляет не менее 29 400 рублей."
+        },
+        {
+          "line": 30,
+          "section": "## Тариф «ФИКС + CPA»",
+          "text": "29 400 ₽/мес."
+        },
+        {
+          "line": 33,
+          "section": "## Тариф «ФИКС + CPA»",
+          "text": "29 400 ₽ / мес — запуск и ведение кампаний, аналитика, автоматизация, тесты, креативы"
+        },
+        {
+          "line": 96,
+          "section": "## Не подходит тариф за лиды? Рассмотрите другие выгодные тарифы *",
+          "text": "от 29 400 ₽ / мес."
+        },
+        {
+          "line": 109,
+          "section": "## Не подходит тариф за лиды? Рассмотрите другие выгодные тарифы *",
+          "text": "от 42 000 ₽ / мес."
+        },
+        {
+          "line": 120,
+          "section": "## Не подходит тариф за лиды? Рассмотрите другие выгодные тарифы *",
+          "text": "от 54 600 ₽ / мес."
+        },
+        {
+          "line": 131,
+          "section": "## Не подходит тариф за лиды? Рассмотрите другие выгодные тарифы *",
+          "text": "от 67 200 ₽ / мес."
+        },
+        {
+          "line": 149,
+          "section": "## Не подходит тариф за лиды? Рассмотрите другие выгодные тарифы *",
+          "text": "от 400 000 до 800 000 ₽ в месяц"
+        },
+        {
+          "line": 156,
+          "section": "## Не подходит тариф за лиды? Рассмотрите другие выгодные тарифы *",
+          "text": "Комиссия 15% от рекламного бюджета, но не менее 40 000 руб."
+        },
+        {
+          "line": 158,
+          "section": "## Не подходит тариф за лиды? Рассмотрите другие выгодные тарифы *",
+          "text": "Рекламный бюджет: 400 000–800 000 ₽ / мес."
+        },
+        {
+          "line": 163,
+          "section": "## Не подходит тариф за лиды? Рассмотрите другие выгодные тарифы *",
+          "text": "от 800 000 ₽ в месяц"
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "target",
+      "url": "https://pixelplus.ru/smm/targetirovannaya-reklama/",
+      "title": "Таргетированная реклама в социальных сетях",
+      "local_path": "knowledge-base/kb/services/smm/targetirovannaya-reklama.md",
+      "section": "smm",
+      "crawled_at": "2026-10-22T08:51:02+00:00",
+      "sha256": "03c2d7c735a836debf6fb56dd71656cb2f0075ba33262a77d2eba9a9ff24402e",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 53,
+          "section": "## Тарифы на таргетированную рекламу в социальных сетях*",
+          "text": "от 43 000 руб. *"
+        },
+        {
+          "line": 63,
+          "section": "## Тарифы на таргетированную рекламу в социальных сетях*",
+          "text": "от 75 000 руб. *"
+        },
+        {
+          "line": 71,
+          "section": "## Тарифы на таргетированную рекламу в социальных сетях*",
+          "text": "от 112 000 руб. *"
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "smm",
+      "url": "https://pixelplus.ru/smm/sozdanie-vedenie-grupp/",
+      "title": "Создание и ведение групп в соц. сетях",
+      "local_path": "knowledge-base/kb/services/smm/sozdanie-vedenie-grupp.md",
+      "section": "smm",
+      "sha256": "f0fdd24ded1776d47ac32160676b43fb4c44411cedc66fad53072d14287dc302",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 31,
+          "section": "## Типы услуг и стоимость SMM*",
+          "text": "от 86 600 руб."
+        },
+        {
+          "line": 52,
+          "section": "## Типы услуг и стоимость SMM*",
+          "text": "от 134 600 руб."
+        },
+        {
+          "line": 78,
+          "section": "## Типы услуг и стоимость SMM*",
+          "text": "от 178 200 руб."
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "dzen",
+      "url": "https://pixelplus.ru/smm/dzen/",
+      "title": "Реклама в Дзене",
+      "local_path": "knowledge-base/kb/services/smm/dzen.md",
+      "section": "smm",
+      "crawled_at": "2026-10-22T08:59:02+00:00",
+      "sha256": "f1b21896369aa1b6d9a0b6aee223e903ad180c1c874e7dd05cf55348ea2640eb",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 19,
+          "section": "## Тарифы настройки и ведения кампании в Дзене*",
+          "text": "| | Мини 17 600 рублей | Оптима 30 400 рублей | Комплекс 51 200 рублей |"
+        },
+        {
+          "line": 31,
+          "section": "## Тарифы настройки и ведения кампании в Дзене*",
+          "text": "**Рекламный бюджет на включен в стоимость и его минимальный размер составляет 10 000 рублей без учёта НДС"
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "promo_pages",
+      "url": "https://pixelplus.ru/smm/yandex-promostranicy/",
+      "title": "Экспертное продвижение статей через сервис Яндекс ПромоСтраницы",
+      "local_path": "knowledge-base/kb/services/smm/yandex-promostranicy.md",
+      "section": "smm",
+      "crawled_at": "2026-10-22T09:10:14+00:00",
+      "sha256": "96193061ff3242a5f781870a31026dc4161ea188517cdd51b407d201cee0853d",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 40,
+          "section": "## Тарифы на продвижение в яндекс промостраницы",
+          "text": "от 43 000 руб. *"
+        },
+        {
+          "line": 50,
+          "section": "## Тарифы на продвижение в яндекс промостраницы",
+          "text": "от 75 000 руб. *"
+        },
+        {
+          "line": 58,
+          "section": "## Тарифы на продвижение в яндекс промостраницы",
+          "text": "от 112 000 руб. *"
+        },
+        {
+          "line": 64,
+          "section": "## Тарифы на продвижение в яндекс промостраницы",
+          "text": "* — без учёта рекламного бюджета. Минимальный рекламный бюджет в Яндекс ПромоСтраницы — 100 000 рублей без учёта НДС при первом пополнении кабинета."
+        },
+        {
+          "line": 118,
+          "section": "## Ответы на частые вопросы",
+          "text": "При первом пополнении кабинета ПромоСтраниц минимальный бюджет составит 100 000 рублей без учёта НДС. Лимит на дальнейшее пополнение составляет 5000 рублей без учёта НДС, однако для эффективной работы рекламных кампаний мы рекомендуем не менее 50 000 рублей без учёта НДС в месяц."
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "media",
+      "url": "https://pixelplus.ru/context/mediynaya-reklama/",
+      "title": "Медийная реклама: размещение, тарифы",
+      "local_path": "knowledge-base/kb/services/context/mediynaya-reklama.md",
+      "section": "context",
+      "crawled_at": "2026-10-22T08:50:06+00:00",
+      "sha256": "9cddc6cd90067ec1462d48c087de6f0f052113b22ce5c252ee02d84b3d261ace",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 19,
+          "section": "## Стоимость размещения",
+          "text": "- Минимальная стоимость размещение составляет 50 000 рублей."
+        },
+        {
+          "line": 20,
+          "section": "## Стоимость размещения",
+          "text": "- Стоимость отрисовки 1 рекламного баннера в агентстве 2 900 рублей."
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "video",
+      "url": "https://pixelplus.ru/context/videoreklama/",
+      "title": "Видеореклама в интернете",
+      "local_path": "knowledge-base/kb/services/context/videoreklama.md",
+      "section": "context",
+      "sha256": "85cfe4d5feece8178de2317b349ef969a3367fec61a2e85dbf53845e6e719044",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 61,
+          "section": "## Стоимость и бюджет*",
+          "text": "Минимальный бюджет для услуги видеорекламы — 46 300 рублей."
+        },
+        {
+          "line": 65,
+          "section": "## Стоимость и бюджет*",
+          "text": "| от 33 000 рублей | от 13 300 рублей | от 5 рабочих дней |"
+        },
+        {
+          "line": 84,
+          "section": "## Контекстная реклама в «Пиксель Плюс» — это:",
+          "text": "Берёмся за проекты с бюджетом от 30 000 ₽ в месяц. Умеем масштабировать малый бизнес, запускать сложные ниши и делать это рентабельно."
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "performance",
+      "url": "https://pixelplus.ru/performance/",
+      "title": "Performance-маркетинг",
+      "local_path": "knowledge-base/kb/services/performance/index.md",
+      "section": "performance",
+      "sha256": "423798384000f43ff9a585c9757b9757b65841576a72eb411f4877eda2602bab",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 11,
+          "section": "# Performance-маркетинг",
+          "text": "При сочетании нескольких каналом привлечения трафику удаётся охватить больший процент целевой аудитории и повысить ROI всей кампании. Эффективный бюджет — от 150 000 рублей в месяц. От простой контекстной рекламы, до решения задач бизнеса."
+        },
+        {
+          "line": 41,
+          "section": "## Тарифы на Performance-маркетинг*",
+          "text": "от 150 000 руб."
+        },
+        {
+          "line": 53,
+          "section": "## Тарифы на Performance-маркетинг*",
+          "text": "от 250 000 руб."
+        },
+        {
+          "line": 66,
+          "section": "## Тарифы на Performance-маркетинг*",
+          "text": "от 500 000 руб."
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "seo_promotion",
+      "url": "https://pixelplus.ru/prodvizhenie-sajtov/kompleksnoe-seo/",
+      "title": "Комплексное продвижение сайта",
+      "local_path": "knowledge-base/kb/services/prodvizhenie-sajtov/kompleksnoe-seo.md",
+      "section": "prodvizhenie-sajtov",
+      "crawled_at": "2026-10-22T08:53:23+00:00",
+      "sha256": "465a605136cce69da8cdeb4cd521dbf8597a510259b22df989205986a46fce3d",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 205,
+          "section": "## Наши кейсы",
+          "text": "Недостаточный приток небрендового трафика из поисковиков в B2B-нише. Доля органики по общим тематическим запросам составляла 44,86%, но общий объем трафика требовал роста. Поисковые системы приносили 72,57% посещений, стоимость посетителя достигала 107 рублей, CPA — 1125 рублей. Это ограничивало привлечение клиентов и масштабирование."
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "seo_commercial",
+      "url": "https://pixelplus.ru/prodvizhenie-sajtov/audit-sajta/kommercheskie-faktory/",
+      "title": "Аудит коммерческих факторов ранжирования",
+      "local_path": "knowledge-base/kb/services/prodvizhenie-sajtov/audit-sajta/kommercheskie-faktory.md",
+      "section": "prodvizhenie-sajtov",
+      "crawled_at": "2026-10-22T08:53:53+00:00",
+      "sha256": "f46ec2ccfcbf108377d7b8f50fd35c863c67e4c5c312074363bb61bfbf13072b",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 29,
+          "section": "## Стоимость проведения маркетингового аудита",
+          "text": "12 500 руб."
+        },
+        {
+          "line": 35,
+          "section": "## Стоимость проведения маркетингового аудита",
+          "text": "18 000 руб."
+        },
+        {
+          "line": 41,
+          "section": "## Стоимость проведения маркетингового аудита",
+          "text": "23 000 руб."
+        },
+        {
+          "line": 49,
+          "section": "## Стоимость, если ПОДПИСАН ДОГОВОР на SEO/Контекст",
+          "text": "10 000 руб."
+        },
+        {
+          "line": 55,
+          "section": "## Стоимость, если ПОДПИСАН ДОГОВОР на SEO/Контекст",
+          "text": "13 500 руб."
+        },
+        {
+          "line": 61,
+          "section": "## Стоимость, если ПОДПИСАН ДОГОВОР на SEO/Контекст",
+          "text": "17 500 руб."
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "seo_sanctions",
+      "url": "https://pixelplus.ru/prodvizhenie-sajtov/razovye-uslugi/snyatie-sanktsij/",
+      "title": "Вывод сайта из-под санкций",
+      "local_path": "knowledge-base/kb/services/prodvizhenie-sajtov/razovye-uslugi/snyatie-sanktsij.md",
+      "section": "prodvizhenie-sajtov",
+      "crawled_at": "2026-10-22T08:54:00+00:00",
+      "sha256": "eaceddd66a5f3af8266eb643b936bb551e777389ccdd7da3c44dc8404248abab",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 80,
+          "section": "## Стоимость работ и срок вывода сайта из-под фильтров",
+          "text": "Стоимость работ по проведению диагностики, базового технического аудита и снятию санкций с проекта может варьироваться в зависимости от типа санкций, объема анализа и необходимых корректировок на сайте. Цены начинаются от 20 000 рублей."
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "seo_contractor",
+      "url": "https://pixelplus.ru/prodvizhenie-sajtov/smena-podryadchika/",
+      "title": "Безопасная смена подрядчика по SEO",
+      "local_path": "knowledge-base/kb/services/prodvizhenie-sajtov/smena-podryadchika.md",
+      "section": "prodvizhenie-sajtov",
+      "crawled_at": "2026-10-22T08:53:45+00:00",
+      "sha256": "cf641329a9e9dd821bcb72c4df1a1e3a02ba69c03f2a074a17042766ed2edefd",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 52,
+          "section": "## Сильное решение",
+          "text": "Вычтем 12 000₽ из оплаты на первый месяц за решение сменить подрядчика."
+        },
+        {
+          "line": 65,
+          "section": "### Список работ",
+          "text": "| SEO-аудит сайта | от 7 раб. дней | от 22 000 рублей |"
+        },
+        {
+          "line": 66,
+          "section": "### Список работ",
+          "text": "| Работы по смене подрядчика и росту позиций, трафика и количества целевых действий для проекта | от 3 месяцев и далее | от 60 000 рублей |"
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "seo_ymyl",
+      "url": "https://pixelplus.ru/prodvizhenie-sajtov/audit-sajta/ymyl/",
+      "title": "Аудит E-E-A-T-факторов для YMYL-сайтов",
+      "local_path": "knowledge-base/kb/services/prodvizhenie-sajtov/audit-sajta/ymyl.md",
+      "section": "prodvizhenie-sajtov",
+      "crawled_at": "2026-10-22T08:53:56+00:00",
+      "sha256": "796cb4284eba156faef2a049d8527d2775a291f5b2795672451dea60e38bce7c",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 47,
+          "section": "## Стоимость анализа E-E-A-T-факторов сайта",
+          "text": "от 35 000 ₽"
+        },
+        {
+          "line": 86,
+          "section": "## Стоимость других SEO-аудитов",
+          "text": "от 37 500 руб."
+        },
+        {
+          "line": 108,
+          "section": "## Стоимость других SEO-аудитов",
+          "text": "от 85 000 руб."
+        },
+        {
+          "line": 130,
+          "section": "## Стоимость других SEO-аудитов",
+          "text": "от 150 000 руб."
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "seo_inhouse",
+      "url": "https://pixelplus.ru/prodvizhenie-sajtov/in-house/",
+      "title": "Инхаус-команда & агентство",
+      "local_path": "knowledge-base/kb/services/prodvizhenie-sajtov/in-house.md",
+      "section": "prodvizhenie-sajtov",
+      "crawled_at": "2026-10-22T08:53:24+00:00",
+      "sha256": "9e13d5ed6da925f31ad25b0b235eab8a37864425b907f5ca48481637d0a9851f",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 57,
+          "section": "## Регулярные работы",
+          "text": "от 127 900 ₽/мес."
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "seo_consult",
+      "url": "https://pixelplus.ru/prodvizhenie-sajtov/konsultacii/",
+      "title": "Частные консультации ведущего специалиста агентства",
+      "local_path": "knowledge-base/kb/services/prodvizhenie-sajtov/konsultacii.md",
+      "section": "prodvizhenie-sajtov",
+      "crawled_at": "2026-10-22T08:53:30+00:00",
+      "sha256": "49adbed73ef6afc01802cb3465ad02845f46973d21909a302d5f46c626758400",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 38,
+          "section": "## Стоимость консультаций",
+          "text": "6 500 руб."
+        },
+        {
+          "line": 40,
+          "section": "## Стоимость консультаций",
+          "text": "Консультации оказываются от 2 (двух) часов. Минимальный объем заказа: 13 000 рублей."
+        },
+        {
+          "line": 46,
+          "section": "## Стоимость консультаций",
+          "text": "10 000 руб."
+        },
+        {
+          "line": 48,
+          "section": "## Стоимость консультаций",
+          "text": "Консультации оказываются от 2 (двух) часов. Минимальный объем заказа: 20 000 рублей."
+        },
+        {
+          "line": 54,
+          "section": "## Все разовые услуги «Пиксель Плюс»",
+          "text": "| Составление эффективного семантического ядра | от 300 запросов | от 4 раб. дней | от 5 000 руб. |"
+        },
+        {
+          "line": 55,
+          "section": "## Все разовые услуги «Пиксель Плюс»",
+          "text": "| Формирование оптимизированной структуры | от 300 запросов | от 5 раб. дней | от 7 500 руб. |"
+        },
+        {
+          "line": 56,
+          "section": "## Все разовые услуги «Пиксель Плюс»",
+          "text": "| Технический аудит сайта | от 5 страниц | от 5 раб. дней | от 20 000 руб. |"
+        },
+        {
+          "line": 57,
+          "section": "## Все разовые услуги «Пиксель Плюс»",
+          "text": "| Комплексная оптимизация страниц под семантическое ядро | от 5 страниц | от 6 раб. дней | от 10 000 руб. |"
+        },
+        {
+          "line": 58,
+          "section": "## Все разовые услуги «Пиксель Плюс»",
+          "text": "| SEO-копирайтинг | от 15 тысяч символов | от 5 раб. дней | от 18 000 руб. |"
+        },
+        {
+          "line": 59,
+          "section": "## Все разовые услуги «Пиксель Плюс»",
+          "text": "| Отчетность и аналитика (Мониторинг представления сайта в результатах выдачи; мониторинг трафика на сайт; регулярная отчетность по позициям сайта по продвигаемым запросам) | от 100 запросов | еженедельно | от 5 000 руб. |"
+        },
+        {
+          "line": 60,
+          "section": "## Все разовые услуги «Пиксель Плюс»",
+          "text": "| SEO-аудит | от 15 часов | от 7 раб. дней | от 37 500 руб. |"
+        },
+        {
+          "line": 61,
+          "section": "## Все разовые услуги «Пиксель Плюс»",
+          "text": "| Коммерческий аудит сайта. Формирование рекомендаций для увеличения количества заказов и коммерческой эффективности | от 5 часов | от 3 раб. дней | от 12 500 руб. |"
+        },
+        {
+          "line": 62,
+          "section": "## Все разовые услуги «Пиксель Плюс»",
+          "text": "| Внутренняя оптимизация сайта | от 10 запросов | от 4 раб. дней | от 14 400 руб. |"
+        },
+        {
+          "line": 63,
+          "section": "## Все разовые услуги «Пиксель Плюс»",
+          "text": "| Линкбилдинг | от 10 ссылок | от 10 раб. дней | от 65 000 руб. |"
+        },
+        {
+          "line": 64,
+          "section": "## Все разовые услуги «Пиксель Плюс»",
+          "text": "| Комплексная работа по внешней оптимизации сайта | от 40 часов | от 25 раб. дней | от 100 000 руб. |"
+        },
+        {
+          "line": 65,
+          "section": "## Все разовые услуги «Пиксель Плюс»",
+          "text": "| Формирования стратегии поискового продвижения сайта | от 35 часов | от 20 раб. дней | от 87 500 руб. |"
+        },
+        {
+          "line": 66,
+          "section": "## Все разовые услуги «Пиксель Плюс»",
+          "text": "| Предложения по дальнейшему развитию проекта и расширению продвигаемых запросов | от 100 запросов | от 4 раб. дней | от 45 000 руб. |"
+        },
+        {
+          "line": 67,
+          "section": "## Все разовые услуги «Пиксель Плюс»",
+          "text": "| Комплексная диагностика сайта | от 34 часов | от 20 раб. дней | от 85 000 руб. |"
+        },
+        {
+          "line": 68,
+          "section": "## Все разовые услуги «Пиксель Плюс»",
+          "text": "| SEO-консалтинг | от 5 часов | от 1 раб. дня | от 20 000 руб. |"
+        },
+        {
+          "line": 69,
+          "section": "## Все разовые услуги «Пиксель Плюс»",
+          "text": "| Курирование инхаус-команды по SEO | от 5 часов | от 1 раб. дня | от 30 000 руб. |"
+        },
+        {
+          "line": 70,
+          "section": "## Все разовые услуги «Пиксель Плюс»",
+          "text": "| Оптимизация структуры на этапе создания | от 100 запросов | от 10 раб. дней | от 15 000 руб. |"
+        },
+        {
+          "line": 71,
+          "section": "## Все разовые услуги «Пиксель Плюс»",
+          "text": "| Настройка проекта в Пиксель Тулс | от 100 запросов | от 10 раб. дней | от 15 000 руб. |"
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "seo_training",
+      "url": "https://pixelplus.ru/internet-marketing/obuchenie-osnovam/",
+      "title": "Разберитесь в SEO и полюбите его за 3 дня!",
+      "local_path": "knowledge-base/kb/services/internet-marketing/obuchenie-osnovam.md",
+      "section": "internet-marketing",
+      "crawled_at": "2026-10-22T09:22:03+00:00",
+      "sha256": "1d58395dbf33a439c3038272ca64e71d08aaa057a7fdb9c10ea085678a201a33",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 17,
+          "section": "# Разберитесь в SEO и полюбите его за 3 дня!",
+          "text": "12490 руб. Полностью бесплатно!"
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "aeo",
+      "url": "https://pixelplus.ru/geo/aeo/",
+      "title": "AEO-продвижение сайтов",
+      "local_path": "knowledge-base/kb/services/geo/aeo.md",
+      "section": "geo",
+      "crawled_at": "2026-10-22T08:48:17+00:00",
+      "sha256": "14fa712041ac310357f911625c62ed271a659988845fba44a717f01df9fbc3a4",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "geo_promotion",
+      "url": "https://pixelplus.ru/geo/prodvizhenie-v-ai-poiske/",
+      "title": "Продвижение в AI-поиске",
+      "local_path": "knowledge-base/kb/services/geo/prodvizhenie-v-ai-poiske.md",
+      "section": "geo",
+      "crawled_at": "2026-10-22T08:53:42+00:00",
+      "sha256": "196efa136003d04922dc03e7ae18f1e5a9ed7d26699f08699c00939013db080c",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 41,
+          "section": "## Стоимость услуг продвижения в AI-поиске*",
+          "text": "от 139 900 руб./мес."
+        },
+        {
+          "line": 52,
+          "section": "## Стоимость услуг продвижения в AI-поиске*",
+          "text": "от 189 900 руб./мес."
+        },
+        {
+          "line": 64,
+          "section": "## Стоимость услуг продвижения в AI-поиске*",
+          "text": "от 500 000 руб./мес."
+        },
+        {
+          "line": 77,
+          "section": "## Стоимость услуг продвижения в AI-поиске*",
+          "text": "от 149 900 руб./меc."
+        },
+        {
+          "line": 91,
+          "section": "## Стоимость услуг продвижения в AI-поиске*",
+          "text": "от ~~260 000~~ 195 900 руб./меc."
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "geo_strategy",
+      "url": "https://pixelplus.ru/geo/geo-strategiya/",
+      "title": "GEO-стратегия для вашего бизнеса",
+      "local_path": "knowledge-base/kb/services/geo/geo-strategiya.md",
+      "section": "geo",
+      "crawled_at": "2026-10-22T08:48:19+00:00",
+      "sha256": "201a874b1b0b6685de5a3b6c4ea65bdc463e5708ac0a5b6b68d902156faeff5d",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 6,
+          "section": null,
+          "text": "description: \"GEO-стратегия: план развития присутствия бренда в ответах нейросетей. Тарифы: базовый — 99 500 ₽, расширенный — 149 500 ₽.\""
+        },
+        {
+          "line": 14,
+          "section": "# GEO-стратегия для вашего бизнеса",
+          "text": "Тарифы: базовый — 99 500 ₽, расширенный — 149 500 ₽. НДС в размере 7% не включен в стоимость услуги."
+        },
+        {
+          "line": 61,
+          "section": "## Стоимость GEO-стратегии",
+          "text": "99 500 ₽"
+        },
+        {
+          "line": 71,
+          "section": "## Стоимость GEO-стратегии",
+          "text": "149 500 ₽"
+        },
+        {
+          "line": 122,
+          "section": "## Предлагаем комплекс услуг GEO и AI SEO*",
+          "text": "от 139 900 руб./мес."
+        },
+        {
+          "line": 133,
+          "section": "## Предлагаем комплекс услуг GEO и AI SEO*",
+          "text": "от 189 900 руб./мес."
+        },
+        {
+          "line": 145,
+          "section": "## Предлагаем комплекс услуг GEO и AI SEO*",
+          "text": "от 500 000 руб./мес."
+        },
+        {
+          "line": 158,
+          "section": "## Предлагаем комплекс услуг GEO и AI SEO*",
+          "text": "от 149 900 руб./меc."
+        },
+        {
+          "line": 172,
+          "section": "## Предлагаем комплекс услуг GEO и AI SEO*",
+          "text": "от ~~260 000~~ 195 900 руб./меc."
+        },
+        {
+          "line": 186,
+          "section": "## Ответы на частые вопросы",
+          "text": "Базовый (99 500 ₽) — аудит бренда, стратегия присутствия, план развития, внешние публикации и план действий. Расширенный (149 500 ₽) — все из базового плюс детальная проработка сайта как источника в ИИ, AEO, контент, разметка и технические доработки."
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "alisa_ads",
+      "url": "https://pixelplus.ru/context/reklama-v-alisa-ai/",
+      "title": "Реклама в Алиса AI — промообъявления в чате нейросети",
+      "local_path": "knowledge-base/kb/services/context/reklama-v-alisa-ai.md",
+      "section": "context",
+      "crawled_at": "2026-10-22T08:48:24+00:00",
+      "sha256": "3f6250087afd3134d51b5156765be6d849b67ef796e6e40832011b763b973c29",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 82,
+          "section": "## Тарифы и цены на контекстную рекламу*",
+          "text": "от 29 400 ₽ / мес."
+        },
+        {
+          "line": 95,
+          "section": "## Тарифы и цены на контекстную рекламу*",
+          "text": "от 42 000 ₽ / мес."
+        },
+        {
+          "line": 106,
+          "section": "## Тарифы и цены на контекстную рекламу*",
+          "text": "от 54 600 ₽ / мес."
+        },
+        {
+          "line": 117,
+          "section": "## Тарифы и цены на контекстную рекламу*",
+          "text": "от 67 200 ₽ / мес."
+        },
+        {
+          "line": 135,
+          "section": "## Тарифы и цены на контекстную рекламу*",
+          "text": "от 400 000 до 800 000 ₽ в месяц"
+        },
+        {
+          "line": 142,
+          "section": "## Тарифы и цены на контекстную рекламу*",
+          "text": "Комиссия 15% от рекламного бюджета, но не менее 40 000 руб."
+        },
+        {
+          "line": 144,
+          "section": "## Тарифы и цены на контекстную рекламу*",
+          "text": "Рекламный бюджет: 400 000–800 000 ₽ / мес."
+        },
+        {
+          "line": 149,
+          "section": "## Тарифы и цены на контекстную рекламу*",
+          "text": "от 800 000 ₽ в месяц"
+        },
+        {
+          "line": 168,
+          "section": "## AI GEO™ | Базовый",
+          "text": "от 129 900 руб./мес."
+        },
+        {
+          "line": 202,
+          "section": "## AI GEO™ | Базовый",
+          "text": "от ~~260 000~~ 195 900 руб./меc."
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "chatgpt_ads",
+      "url": "https://pixelplus.ru/context/reklama-v-chatgpt/",
+      "title": "Реклама в ChatGPT с оплатой в рублях с российского юрлица",
+      "local_path": "knowledge-base/kb/services/context/reklama-v-chatgpt.md",
+      "section": "context",
+      "crawled_at": "2026-10-22T08:48:26+00:00",
+      "sha256": "38a9cc9246c0c1d8cb4b37653d537bdb26c2f1992c7337f1b16beca6221b850f",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 68,
+          "section": "## Услуги по запуску и ведению рекламы в ChatGPT",
+          "text": "от 39 000 ₽"
+        },
+        {
+          "line": 74,
+          "section": "## Услуги по запуску и ведению рекламы в ChatGPT",
+          "text": "от 49 000 ₽"
+        },
+        {
+          "line": 80,
+          "section": "## Услуги по запуску и ведению рекламы в ChatGPT",
+          "text": "от 59 000 ₽"
+        },
+        {
+          "line": 86,
+          "section": "## Услуги по запуску и ведению рекламы в ChatGPT",
+          "text": "от 44 000 ₽"
+        },
+        {
+          "line": 92,
+          "section": "## Услуги по запуску и ведению рекламы в ChatGPT",
+          "text": "от 54 000 ₽"
+        },
+        {
+          "line": 98,
+          "section": "## Услуги по запуску и ведению рекламы в ChatGPT",
+          "text": "от 99 000 ₽/мес"
+        },
+        {
+          "line": 104,
+          "section": "## Услуги по запуску и ведению рекламы в ChatGPT",
+          "text": "от 129 900 ₽/мес"
+        },
+        {
+          "line": 172,
+          "section": "## Тарифы на запуск и ведение рекламы в ChatGPT *",
+          "text": "99 000 ₽ единоразово"
+        },
+        {
+          "line": 187,
+          "section": "## Тарифы на запуск и ведение рекламы в ChatGPT *",
+          "text": "от 120 000 ₽ + от 99 000 ₽/мес"
+        },
+        {
+          "line": 201,
+          "section": "## Тарифы на запуск и ведение рекламы в ChatGPT *",
+          "text": "от 150 000 ₽ + от 199 000 ₽/мес"
+        },
+        {
+          "line": 216,
+          "section": "## Тарифы на запуск и ведение рекламы в ChatGPT *",
+          "text": "10–12% от бюджета, не менее 250 000 ₽/мес"
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "avito",
+      "url": "https://pixelplus.ru/marketplace/avito/",
+      "title": "Продвижение бизнеса на Авито",
+      "local_path": "knowledge-base/kb/services/marketplace/avito.md",
+      "section": "marketplace",
+      "crawled_at": "2026-10-22T09:18:38+00:00",
+      "sha256": "7d45e8c46ae5a8cd440a0c9ed6a7d2473740323c0144be4b7e9883acddf5cbe0",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 48,
+          "section": "## Тарифы продвижения бизнеса на Авито*",
+          "text": "32 000 ₽"
+        },
+        {
+          "line": 63,
+          "section": "## Тарифы продвижения бизнеса на Авито*",
+          "text": "49 000 ₽"
+        },
+        {
+          "line": 83,
+          "section": "## Тарифы продвижения бизнеса на Авито*",
+          "text": "68 500 ₽"
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "avito_ads",
+      "url": "https://pixelplus.ru/context/reklama-na-avito/",
+      "title": "Реклама на Авито для бизнеса",
+      "local_path": "knowledge-base/kb/services/context/reklama-na-avito.md",
+      "section": "context",
+      "crawled_at": "2026-10-22T09:00:30+00:00",
+      "sha256": "20c141c96e5bac86652b511c77b844085141ff1740d782d95d4356dc9a5a46f3",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 150,
+          "section": "## Тарифы и цены рекламы на Авито*",
+          "text": "**от 60 000 ₽ в месяц**."
+        },
+        {
+          "line": 163,
+          "section": "## Тарифы и цены рекламы на Авито*",
+          "text": "от 29 400 рублей"
+        },
+        {
+          "line": 174,
+          "section": "## Тарифы и цены рекламы на Авито*",
+          "text": "от 42 000 рублей"
+        },
+        {
+          "line": 186,
+          "section": "## Тарифы и цены рекламы на Авито*",
+          "text": "от 54 600 рублей"
+        },
+        {
+          "line": 197,
+          "section": "## Почему «Пиксель Плюс»?",
+          "text": "Берёмся за проекты с бюджетом от 30 000 ₽ в месяц. Умеем масштабировать малый бизнес, запускать сложные ниши и делать это рентабельно."
+        },
+        {
+          "line": 243,
+          "section": "## Ответы на частые вопросы",
+          "text": "Для получения корректной статистики и тестирования рекламных связок рекомендуемый минимальный бюджет на запуск — от 60 000 ₽ в месяц."
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "geomedia",
+      "url": "https://pixelplus.ru/context/geomediynaya-reklama/",
+      "title": "Реклама на геосервисах – нацеливайте вашу аудиторию по геолокации!",
+      "local_path": "knowledge-base/kb/services/context/geomediynaya-reklama.md",
+      "section": "context",
+      "sha256": "20403b66d30bf1cadbecef45a0d38381139197cbeafaaf1fc099dca6d611a9b1",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "trademark",
+      "url": "https://pixelplus.ru/brand/patent/",
+      "title": "Регистрация товарного знака",
+      "local_path": "knowledge-base/kb/services/brand/patent.md",
+      "section": "brand",
+      "crawled_at": "2026-10-22T09:06:26+00:00",
+      "sha256": "faaa77270fb22054828ba54d53213f3cc3ca90ae75b958213b57ee758fc7916e",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 30,
+          "section": "## Стоимость и сроки регистрации товарного знака",
+          "text": "Стоимость регистрации товарного знака у наших партнеров начинается от 45 000 руб. и зависит от количества классов товаров и услуг, которые производит/оказывает ваша компания. Сроки на регистрацию товарного знака составляют от 12 до 19 месяцев при успешном прохождении всех вышеуказанных этапов."
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "express",
+      "url": "https://pixelplus.ru/express/",
+      "title": "Экспресс-услуги",
+      "local_path": "knowledge-base/kb/services/express/index.md",
+      "section": "express",
+      "crawled_at": "2026-10-22T09:42:58+00:00",
+      "sha256": "8ba0e5ca06cceee75687e1aaafc26ed1db6ea67bd9208bc8c3890f093794ca4e",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 20,
+          "section": "# Экспресс-услуги",
+          "text": "Запуск сайта от 3 рабочих дней и от 30 000 рублей!"
+        },
+        {
+          "line": 28,
+          "section": "# Экспресс-услуги",
+          "text": "Экспресс-логотип за 5 рабочих дней и от 30 000 рублей"
+        },
+        {
+          "line": 32,
+          "section": "# Экспресс-услуги",
+          "text": "Нейминг за 4 рабочих дня и от 20 000 рублей"
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "knowledge_base",
+      "url": "https://pixelplus.ru/razrabotka-sajtov/bazy-znaniy/",
+      "title": "Разработка базы знаний под ключ для вашей компании",
+      "local_path": "knowledge-base/kb/services/razrabotka-sajtov/bazy-znaniy.md",
+      "section": "razrabotka-sajtov",
+      "crawled_at": "2026-10-22T08:51:52+00:00",
+      "sha256": "ab0cbca4253682c84cc44fe236b4a99429cf510b22cad0816319f5a6ef60f81f",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 6,
+          "section": null,
+          "text": "description: \"Профессиональная разработка корпоративных баз знаний под ключ в Москве на 1С-Битрикс, WordPress и Laravel. Создание систем управления знаниями с сокращением времени обучения сотрудников на 70%. Стоимость от 800 000 рублей. Консультация бесплатно.\""
+        },
+        {
+          "line": 111,
+          "section": "## Разработка на лучших CMS-платформах: 1С-Битрикс и WordPress",
+          "text": "от 800 000 ₽"
+        },
+        {
+          "line": 125,
+          "section": "## Разработка на лучших CMS-платформах: 1С-Битрикс и WordPress",
+          "text": "от 1 200 000 ₽"
+        },
+        {
+          "line": 135,
+          "section": "## Сравнение платформ для создания базы знаний",
+          "text": "| **Стоимость лицензий** | Бесплатно | От 55 000 ₽/год |"
+        },
+        {
+          "line": 312,
+          "section": "## Стоимость разработки корпоративной базы знаний",
+          "text": "от 800 000 ₽"
+        },
+        {
+          "line": 328,
+          "section": "## Стоимость разработки корпоративной базы знаний",
+          "text": "от 950 000 ₽"
+        },
+        {
+          "line": 343,
+          "section": "## Стоимость разработки корпоративной базы знаний",
+          "text": "от 1 200 000 ₽"
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "ai_automation",
+      "url": "https://pixelplus.ru/vnedrenie-ii/dlya-biznesa/avtomatizaciya/",
+      "title": "Автоматизация процессов с помощью ИИ",
+      "local_path": "knowledge-base/kb/services/vnedrenie-ii/dlya-biznesa/avtomatizaciya.md",
+      "section": "vnedrenie-ii",
+      "crawled_at": "2026-10-22T08:48:32+00:00",
+      "sha256": "897d6a0cb11c34b6a371e1d3a2c8016db4321eab869e4227e9790d1f1ba040f3",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 17,
+          "section": "# Автоматизация процессов с помощью ИИ",
+          "text": "- Тарифы от 180 000 ₽"
+        },
+        {
+          "line": 74,
+          "section": "## Тарифы автоматизации процессов с ИИ *",
+          "text": "от 180 000 ₽"
+        },
+        {
+          "line": 91,
+          "section": "## Тарифы автоматизации процессов с ИИ *",
+          "text": "от 390 000 ₽"
+        },
+        {
+          "line": 108,
+          "section": "## Тарифы автоматизации процессов с ИИ *",
+          "text": "от 1 020 000 ₽"
+        },
+        {
+          "line": 163,
+          "section": "## Ответы на частые вопросы",
+          "text": "От 180 000 ₽, от 390 000 ₽ и от 1 020 000 ₽ — по числу процессов и систем."
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "ai_site",
+      "url": "https://pixelplus.ru/vnedrenie-ii/dlya-sajta/",
+      "title": "Внедрение ИИ на сайт",
+      "local_path": "knowledge-base/kb/services/vnedrenie-ii/dlya-sajta.md",
+      "section": "vnedrenie-ii",
+      "crawled_at": "2026-10-22T08:48:41+00:00",
+      "sha256": "e6a869bdd6329c7402e8cf2ba98819732fd662b327b4485396407f721e0507cf",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 17,
+          "section": "# Внедрение ИИ на сайт",
+          "text": "- Три тарифа: от 108 000 ₽"
+        },
+        {
+          "line": 78,
+          "section": "## Тарифы внедрения ИИ на сайт *",
+          "text": "от 108 000 ₽"
+        },
+        {
+          "line": 97,
+          "section": "## Тарифы внедрения ИИ на сайт *",
+          "text": "от 252 000 ₽"
+        },
+        {
+          "line": 114,
+          "section": "## Тарифы внедрения ИИ на сайт *",
+          "text": "от 660 000 ₽"
+        },
+        {
+          "line": 185,
+          "section": "## Ответы на частые вопросы",
+          "text": "Три тарифа: от 108 000 ₽, от 252 000 ₽ и от 660 000 ₽. Точная вилка — после короткого разбора сценария."
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "mobile_performance",
+      "url": "https://pixelplus.ru/mobile/",
+      "title": "Мобильный performance-маркетинг",
+      "local_path": "knowledge-base/kb/services/mobile/index.md",
+      "section": "mobile",
+      "sha256": "3c1c8c9a0677a6909cca8723a768208c80960752374088f5cf7429a34ada44de",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 62,
+          "section": "## Стоимость мобильной интернет-рекламы*",
+          "text": "от 150 000 ₽"
+        },
+        {
+          "line": 67,
+          "section": "## Стоимость мобильной интернет-рекламы*",
+          "text": "Базовая стоимость часа работы специалиста — 1 750 рублей."
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "s_geomediynaya_reklama_v_yandeks",
+      "url": "https://pixelplus.ru/context/geomediynaya-reklama/v-yandeks/",
+      "title": "Продвигайте ваш бизнес с рекламой на Яндекс Картах: новые возможности для роста!",
+      "local_path": "knowledge-base/kb/services/context/geomediynaya-reklama/v-yandeks.md",
+      "section": "context",
+      "crawled_at": "2026-10-22T09:00:44+00:00",
+      "sha256": "7f6bf83d056ef493d1388efce35c7710d92291ee3c547476eb2404ad5f59ba2a",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 80,
+          "section": "## FAQ",
+          "text": "Для всех форматов предусмотрена фиксированная стоимость за реальные показы (CPM) или целевые действия (CPA). Окончательная стоимость определяется количеством показов или конверсий, которое вам необходимо достичь. Бюджет можно выбрать в рекламном кабинете при создании заказа, а минимальная стоимость составляет 17 500 рублей."
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
+    },
+    {
+      "id": "s_geomediynaya_reklama_v_2gis",
+      "url": "https://pixelplus.ru/context/geomediynaya-reklama/v-2gis/",
+      "title": "Максимальная видимость и успех вашего бизнеса с рекламой в 2ГИС!",
+      "local_path": "knowledge-base/kb/services/context/geomediynaya-reklama/v-2gis.md",
+      "section": "context",
+      "crawled_at": "2026-10-22T09:00:42+00:00",
+      "sha256": "f336a8256bdceb93f6f525c90fba44920fd508dc4e319d364437843eddcf21d4",
+      "review": {
+        "service_scope": "reviewed_for_draft",
+        "commercial": "approved_by_owner_2026-10-27",
+        "diagnostic_rules": "not_approved_by_source"
+      },
+      "price_observations": [
+        {
+          "line": 18,
+          "section": "# Максимальная видимость и успех вашего бизнеса с рекламой в 2ГИС!",
+          "text": "**От 45 000 руб.** (тариф: Базовый — «Старт в картах»)."
+        }
+      ],
+      "tables": [],
+      "introduced_in": "0.2.0"
     }
   ],
   "notes": [

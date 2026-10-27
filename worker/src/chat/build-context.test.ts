@@ -81,6 +81,34 @@ test('core supplied explicit field declarations support partials without invente
   assert.deepEqual(result.answers[0].value, { description: 'срок и показатель не выбрали' });
 });
 
+test('a typed answer to a screening question gets its option ID; a description drops parts it does not declare', () => {
+  const screen = questionFor('ads_quality.signal');
+  const screening = buildChatContext({ lib: library, state: state(), events: [], existingAnswers: [], currentQuestion: screen, sourceEvents: [event()] });
+  const typed = parseClassification(payload('ads_quality.signal', screen.id, 'alternative'), screening);
+  assert.equal(typed.answers[0].answer_id, 'alternative'); assert.equal(typed.answers[0].value, 'alternative');
+  assert.throws(() => parseClassification(payload('ads_quality.signal', screen.id, 'invented'), screening), ClassificationValidationError);
+  // crm_response.details declares object, observation and period; «context» from another description is dropped.
+  const detail = questionFor('crm_response.details');
+  const describing = buildChatContext({ lib: library, state: state(), events: [], existingAnswers: [], currentQuestion: detail, sourceEvents: [event()] });
+  const part = (value: string) => ({ state: 'known', value });
+  const sent = { object: part('Заявки с сайта'), observation: part('Первый звонок через 4–5 часов'), period: part('Сентябрь'), context: part('первый звонок клиенту') };
+  const parsed = parseClassification(payload('crm_response.details', detail.id, sent), describing);
+  assert.deepEqual(Object.keys(parsed.answers[0].value as object), ['object', 'observation', 'period']);
+  assert.equal(Object.hasOwn(sent, 'context'), true, 'the caller object is not changed');
+  assert.throws(() => parseClassification(payload('crm_response.details', detail.id, { context: part('только чужое поле') }), describing), ClassificationValidationError, 'nothing declared is left');
+});
+
+test('a button question joins the context only when asked or answered; free-text questions keep the external cause', () => {
+  const goal = questionFor('context.goal'), funnel = questionFor('context.funnel');
+  const asking = (current: typeof goal, existingAnswers: AuditAnswer[] = []) => buildChatContext({ lib: library, state: state(), events: [], existingAnswers, currentQuestion: current, sourceEvents: [event()] });
+  const atGoal = asking(goal);
+  assert.equal(atGoal.allowed_answers.length, 0, 'no options next to the goal question');
+  assert(atGoal.questions.some(q => q.id === 'context_external_cause'));
+  assert(asking(funnel).allowed_answers.some(a => a.question_id === 'context_funnel' && a.id === 'leads_not_converting'));
+  const answered: AuditAnswer = { id: 'f-1', question_id: 'context_funnel', fact_id: 'context.funnel', state: 'known', value: 'few_leads', event_ids: ['old'], channel: 'chat', method: 'selection', confirmation: 'explicit', library_version: library.version, created_at: 1 };
+  assert(asking(goal, [answered]).questions.some(q => q.id === 'context_funnel'), 'an answered button question can still be corrected');
+});
+
 test('only active same-version answers can be corrected', () => {
   const q = questionFor('strategy_goal.signal');
   const first: AuditAnswer = { id: 'old-1', question_id: q.id, fact_id: 'strategy_goal.signal', state: 'known', value: 'alternative', event_ids: ['old-event'], channel: 'chat', method: 'classification', confirmation: 'explicit', library_version: library.version, created_at: 0 };

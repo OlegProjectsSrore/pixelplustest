@@ -49,8 +49,10 @@ export function buildWriterInput(snapshot: AuditSnapshot, result: AuditResult, l
   };
 }
 
-// No markup, links, prices, promises, foreign scripts or lines about missing answers in the writer's texts.
-const FORBIDDEN = /https?:|www\.|[*_#`<>[\]{}|]|[₽$€]|тариф|стоимост|(?<!\p{L})цен(?:а|ы|у|е|ой)?(?!\p{L})|(?<!\p{L})руб|гарант|обещаем|[぀-ヿ㐀-鿿가-힯豈-﫿]/iu;
+// No markup, links, promises, foreign scripts or lines about missing answers in the writer's texts.
+const FORBIDDEN = /https?:|www\.|[*_#`<>[\]{}|]|гарант|обещаем|[぀-ヿ㐀-鿿가-힯豈-﫿]/iu;
+// Prices are not the writer's business: these words and signs pass only where a problem's name or the visitor's own words use them.
+const PRICE_WORDS = [/тариф/iu, /стоимост/iu, /(?<!\p{L})цен(?:а|ы|у|е|ой)?(?!\p{L})/iu, /(?<!\p{L})руб/iu, /₽/u, /\$/u, /€/u];
 export const NO_INFO = /(?<!\p{L})неизвестно(?!\p{L})|(?<!\p{L})не указан[оаы]?(?!\p{L})|нет сведений|сведений нет|не измерялось|требу\S* уточнения|недостаточно сведений|не выяснено|ответ не предоставлен|противоречивые сведения/iu;
 const numbers = (text: string) => (text.match(/\d[\d\s]*(?:[.,]\d+)?/g) ?? []).map(number => number.replace(/\s/g, "").replace(",", "."));
 const clean = (text: unknown) => typeof text === "string" ? text.replace(/\s+/g, " ").trim() : "";
@@ -72,7 +74,8 @@ export function checkWriter(content: string, input: WriterInput): WriterOutput |
   }
   const texts = [summary, planIntro, ...problems.flatMap(problem => [problem.situation, problem.why])];
   if (summary.length < 60 || summary.length > 900 || planIntro.length < 20 || planIntro.length > 500 || problems.some(problem => problem.situation.length < 30 || problem.situation.length > 700 || problem.why.length < 10 || problem.why.length > 300)) return null;
-  if (texts.some(text => FORBIDDEN.test(text) || NO_INFO.test(text))) return null;
+  const told = JSON.stringify(input), priced = (text: string) => PRICE_WORDS.some(word => word.test(text) && !word.test(told));
+  if (texts.some(text => FORBIDDEN.test(text) || priced(text) || NO_INFO.test(text))) return null;
   // Every number in the texts must come from the visitor's answers.
   const known = new Set(numbers(JSON.stringify(input)));
   if (texts.some(text => numbers(text).some(number => !known.has(number)))) return null;

@@ -17,10 +17,16 @@ import { runtimeSchemaForFact, type RuntimeValueSchema } from './value-schemas.t
 import { runtimeStateSchema, runtimeResultSchema } from './runtime-schemas.ts';
 import { INTERVIEW_BUDGET_MS, PRIOR_ATTEMPT_RESULTS, type PriorAttemptResult } from './contracts.ts';
 
-export interface Governed { id: string; version: string; status: string; reviewer: string | null; approved_at: string | null }
+export interface Governed { id: string; version: string; status: string; reviewer: string | null; approved_at: string | null;
+  /** Content added in this library version; sessions pinned to the previous version do not see it. */
+  introduced_in?: string;
+  /** Values of the fields this version changed, as sessions pinned to 0.1.4 keep them. */
+  v0_1_4?: Record<string, unknown>;
+}
 export interface FactDefinition extends Governed {
   label: string; value_type: string; states: string[]; values?: { id: string; label: string }[];
-  required_fields?: string[]; fields?: Record<string, unknown>; field_states?: boolean;
+  /** optional_fields: described parts of a structured answer that are welcome but not needed to include the problem. */
+  required_fields?: string[]; optional_fields?: string[]; fields?: Record<string, unknown>; field_states?: boolean;
   parameters?: string[];
   /** Formal server projection; independent of source JSON examples and editorial approval. */
   runtime_schema?: RuntimeValueSchema;
@@ -50,7 +56,8 @@ export interface Tariff extends Governed {
   tax?: Record<string, unknown>; conflicts: unknown[];
 }
 export interface Source { id: string; url: string | null; title: string; local_path: string; sha256: string; review?: { scope?: string } }
-export interface Service extends Governed { name: string; source_id: string; scope: string[]; tariff_ids: string[]; block_ids: string[] }
+/** engagement: an audit or ongoing work. A problem offering both shows the audit when its topic was already worked on, ongoing work otherwise. */
+export interface Service extends Governed { name: string; source_id: string; scope: string[]; tariff_ids: string[]; block_ids: string[]; engagement?: 'audit' | 'ongoing' }
 export interface Case { id: string; source_id: string; block_ids: string[]; status: string; visitor_forecast: boolean }
 export interface Scenario {
   entry_questions: string[];
@@ -60,6 +67,8 @@ export interface Scenario {
   routing: { max_clarifications_per_fact: number };
   /** Key questions without a usable answer are asked again with the reason, at most max_reasks times. */
   required_for_report?: { max_reasks: number; reasons: Record<string, string> };
+  /** Where the visitor feels clients are lost: some answers add a topic after the topics they named. */
+  funnel?: { fact: string; adds: Record<string, string> };
 }
 export interface PriorAttemptPath { id: PriorAttemptResult; label: string; intro: string; steps: string[] }
 export interface PriorAttemptPaths { version: string; status: string; reviewer: string | null; approved_at: string | null; items: PriorAttemptPath[] }
@@ -67,7 +76,9 @@ export interface PriorAttemptPaths { version: string; status: string; reviewer: 
 export interface ReportTemplate {
   version: string; status: string; reviewer: string | null; approved_at: string | null;
   sections: { id: string; title: string; content: string }[];
-  texts: { next_step: string; contact_url: string; no_website: string; summary_fallback: string; plan_fallback: string };
+  texts: { next_step: string; contact_url: string; no_website: string; summary_fallback: string; plan_fallback: string;
+    /** {{external_cause}}: a cause outside digital services the visitor named; {{complaint}}: the problem whose other possible cause was checked. */
+    external_cause?: string; cross_found?: string };
   priority: { levels: Record<'high' | 'medium' | 'low', string>; reasons: Record<'stops_operation' | 'loss_or_delay' | 'limited' | 'no_effect' | 'named' | 'bottleneck' | 'confirmed', string> };
 }
 export interface JokeCategory { id: string; selection_source: string; do_not_use_when: string; jokes: { id: string; text: string }[] }
@@ -80,8 +91,9 @@ export interface AuditLibrary {
   /** Recommendation openings for visitors who already worked on a topic; unapproved paths keep such recommendations blocked. */
   priorAttemptPaths: PriorAttemptPaths;
   answers: { id: string; fact_id: string; standard_values: { value: string; meaning: string }[] }[];
-  domains: { id: string; title: string }[];
-  relationships: { a: string; b: string; relation: string }[];
+  domains: (Partial<Governed> & { id: string; title: string; scope?: string })[];
+  /** alternative_cause: b is another possible cause of the complaint a, checked in list order. */
+  relationships: { a: string; b: string; relation: string; introduced_in?: string }[];
   jokes: JokeLibrary;
   report: ReportTemplate;
   scenario: Scenario; services: Service[]; cases: Case[];
@@ -91,7 +103,7 @@ export interface AuditLibrary {
 
 /** Version is intentionally pinned; a changed content release must receive a new version. */
 export const library: AuditLibrary = {
-  version: '0.1.4', rulesVersion: '1.0.0', tariffVersion: tariffsData.version, templateVersion: '1.3.0',
+  version: '0.2.0', rulesVersion: '1.0.0', tariffVersion: tariffsData.version, templateVersion: '1.3.0',
   status: solutionsData.status,
   facts: (factsData.items as FactDefinition[]).map(fact => ({ ...fact, runtime_schema: runtimeSchemaForFact(fact, solutionsData.items.map(block => block.id)) })), questions: questionsData.items as Question[],
   solutions: solutionsData.items as unknown as Solution[], tariffs: tariffsData.items as unknown as Tariff[],
@@ -102,23 +114,44 @@ export const library: AuditLibrary = {
   schemas: { state: stateSchemaData, result: resultSchemaData },
 };
 
+const versionSchemas = (version: string) => ({
+  state: { ...stateSchemaData, properties: { ...stateSchemaData.properties, library_version: { const: version } } },
+  result: { ...resultSchemaData, properties: { ...resultSchemaData.properties, library_version: { const: version } } },
+}) as AuditLibrary['schemas'];
+// 0.2.0 adds problems, services, a topic and the funnel question. Sessions and report snapshots pinned to 0.1.4
+// keep that content: without the additions and with the 0.1.4 values of the changed fields.
+const previous = <T extends { introduced_in?: string; v0_1_4?: Record<string, unknown> }>(items: readonly T[]): T[] =>
+  items.filter(item => item.introduced_in !== library.version).map(item => item.v0_1_4 ? { ...item, ...item.v0_1_4 } as T : item);
+const library014: AuditLibrary = {
+  ...library, version: '0.1.4',
+  facts: previous(factsData.items as FactDefinition[]).map(fact => ({ ...fact, runtime_schema: runtimeSchemaForFact(fact, previous(solutionsData.items as unknown as Solution[]).map(block => block.id)) })),
+  questions: previous(library.questions), solutions: previous(library.solutions), tariffs: previous(library.tariffs), sources: previous(library.sources as (Source & Governed)[]),
+  answers: previous(library.answers as (typeof library.answers[number] & { introduced_in?: string })[]), domains: previous(library.domains), relationships: previous(library.relationships),
+  services: previous(library.services), scenario: { ...scenarioData, ...scenarioData.v0_1_4, funnel: undefined } as Scenario,
+  schemas: versionSchemas('0.1.4'),
+};
+
 // 0.1.4 only adds the introductory block. Keep the previous projection available
 // for already-created sessions and report snapshots pinned to 0.1.3.
 const introductionIds = new Set(scenarioData.mandatory_entry_questions);
 const introductionFacts = new Set(questionsData.items.filter(question => introductionIds.has(question.id)).flatMap(question => question.fact_ids));
-const previousLibrary: AuditLibrary = {
-  ...library, version: '0.1.3',
-  facts: library.facts.filter(fact => !introductionFacts.has(fact.id)),
-  questions: library.questions.filter(question => !introductionIds.has(question.id)),
-  scenario: { ...library.scenario, entry_questions: library.scenario.entry_questions.filter(id => !introductionIds.has(id)), mandatory_entry_questions: [] },
-  schemas: {
-    state: { ...stateSchemaData, properties: { ...stateSchemaData.properties, library_version: { const: '0.1.3' } } },
-    result: { ...resultSchemaData, properties: { ...resultSchemaData.properties, library_version: { const: '0.1.3' } } },
-  } as AuditLibrary['schemas'],
+const library013: AuditLibrary = {
+  ...library014, version: '0.1.3',
+  facts: library014.facts.filter(fact => !introductionFacts.has(fact.id)),
+  questions: library014.questions.filter(question => !introductionIds.has(question.id)),
+  scenario: { ...library014.scenario, entry_questions: library014.scenario.entry_questions.filter(id => !introductionIds.has(id)), mandatory_entry_questions: [] },
+  schemas: versionSchemas('0.1.3'),
 };
 
+/** The editorial rule checks as a pinned version had them: the build validates each projection with its own checks. */
+export function ruleChecksForVersion(input: unknown, version: string): unknown {
+  if (version === library.version || !isRecord(input) || !Array.isArray(input.items)) return input;
+  return { ...input, items: previous(input.items as { introduced_in?: string; v0_1_4?: Record<string, unknown> }[]) };
+}
+
 export function getLibrary(version = library.version): AuditLibrary {
-  if (version === previousLibrary.version) return previousLibrary;
+  if (version === library014.version) return library014;
+  if (version === library013.version) return library013;
   if (version !== library.version) throw new Error(`Library version is unavailable: ${version}`);
   return library;
 }
@@ -214,7 +247,16 @@ export function validateLibrary(lib: AuditLibrary = library, options: { ruleChec
       }
     }
   }
-  for (const relationship of lib.relationships) { ref(relationship.a, solutionIds, 'relationship'); ref(relationship.b, solutionIds, 'relationship'); }
+  for (const relationship of lib.relationships) {
+    ref(relationship.a, solutionIds, 'relationship'); ref(relationship.b, solutionIds, 'relationship');
+    if (relationship.a === relationship.b) errors.push(`relationship ${relationship.a}: a problem cannot relate to itself`);
+  }
+  // The funnel answer adds known topics only, and only for answers the funnel fact offers.
+  const funnel = lib.scenario.funnel;
+  if (funnel) {
+    const values = lib.facts.find(fact => fact.id === funnel.fact)?.values?.map(value => value.id) ?? [];
+    if (!values.length || Object.entries(funnel.adds).some(([value, domain]) => !values.includes(value) || !domainIds.has(domain))) errors.push('Invalid funnel rule');
+  }
   for (const tariff of lib.tariffs) {
     ref(tariff.service_id, serviceIds, tariff.id); ref(tariff.source.id, sourceIds, tariff.id);
     if (tariff.selection_rule) rule(tariff.selection_rule, tariff.id);
@@ -232,7 +274,10 @@ export function validateLibrary(lib: AuditLibrary = library, options: { ruleChec
   const report = lib.report;
   const sectionIds = ['cover', 'summary', 'company', 'goal', 'problems', 'priorities', 'history', 'recommendations', 'plan', 'cost', 'next_step'];
   if (!report || !isApproved(report) || report.sections?.map(section => section.id).join() !== sectionIds.join() || report.sections.some(section => !section.title?.trim()) ||
-      Object.values(report.texts ?? {}).some(text => typeof text !== 'string' || !text.trim()) || Object.keys(report.texts ?? {}).length !== 5 ||
+      Object.values(report.texts ?? {}).some(text => typeof text !== 'string' || !text.trim()) ||
+      !['next_step', 'contact_url', 'no_website', 'summary_fallback', 'plan_fallback'].every(key => Object.hasOwn(report.texts ?? {}, key)) ||
+      Object.keys(report.texts ?? {}).some(key => !['next_step', 'contact_url', 'no_website', 'summary_fallback', 'plan_fallback', 'external_cause', 'cross_found'].includes(key)) ||
+      (report.texts?.external_cause !== undefined && !report.texts.external_cause.includes('{{external_cause}}')) || (report.texts?.cross_found !== undefined && !report.texts.cross_found.includes('{{complaint}}')) ||
       ['high', 'medium', 'low'].some(level => !report.priority?.levels?.[level as 'high']?.trim()) ||
       ['stops_operation', 'loss_or_delay', 'limited', 'no_effect', 'named', 'bottleneck', 'confirmed'].some(key => !report.priority?.reasons?.[key as 'named']?.trim()) ||
       !report.priority.reasons.bottleneck.includes('{title}')) errors.push('Invalid report template');

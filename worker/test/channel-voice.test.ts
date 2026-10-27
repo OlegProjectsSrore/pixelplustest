@@ -200,6 +200,16 @@ test('answers require delivered final user evidence; candidate confirmation is n
   assert.equal((await f.core.store.listEvents('session-1')).find(event => event.id === result[0].event_ids[0])!.role, 'user');
 });
 
+test('a spoken description keeps its declared parts and drops one brought over from another description', async t => {
+  const f = await fixture(); t.after(() => f.db.close()); const start = await f.start(), call = (await f.core.store.getCall(start.call_id))!;
+  await f.transcript(call.id, 'details', [{ text: 'Заявки с сайта ждут звонка по пять часов, весь сентябрь', order: 0 }]);
+  const part = (value: string) => ({ state: 'known', value });
+  const candidate = { question_id: 'crm_response_detail', fact_id: 'crm_response.details', state: 'known', source_quotes: ['Заявки с сайта ждут звонка по пять часов, весь сентябрь'],
+    value: { object: part('Заявки с сайта'), observation: part('Ждут звонка по пять часов'), period: part('Весь сентябрь'), context: part('звонок') } } as VoiceAnswerCandidate;
+  const [saved] = await normalizeVoiceAnswers(f.core, await f.core.store.requireSession('session-1'), call, [candidate]);
+  assert.deepEqual(Object.keys(saved!.value as object), ['object', 'observation', 'period']);
+});
+
 test('explicit voice confirmation requires an exact adjacent recap and rejects reversed negation', async t => {
   const f = await fixture(); t.after(() => f.db.close()); const start = await f.start(), call = (await f.core.store.getCall(start.call_id))!;
   await f.transcript(call.id, 'confirmations', [

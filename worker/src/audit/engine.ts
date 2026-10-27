@@ -1,7 +1,8 @@
-import { INTERVIEW_BUDGET_MS, MAX_VOICE_QUESTIONS, type AuditAnswer, type AuditEvent, type AuditFact, type AuditResult, type AuditSnapshot, type AuditState, type Contradiction, type Json, type QuestionView } from './contracts.ts';
+import { INTERVIEW_BUDGET_MS, MAX_CROSS_CHECKS, MAX_CROSS_PER_COMPLAINT, MAX_VOICE_QUESTIONS, type AuditAnswer, type AuditEvent, type AuditFact, type AuditResult, type AuditSnapshot, type AuditState, type Contradiction, type Json, type QuestionView } from './contracts.ts';
 import { assertLibraryReady, isApproved, library, type AuditLibrary, type FactDefinition, type PriorAttemptPath, type Question, type Solution } from './library.ts';
 import { codePriorities, formatPriority, orderPairs, problemFacts } from './priority.ts';
 import { evaluateRule, isRecord } from './rules.ts';
+import { withImpliedTopics } from './topics.ts';
 import { validateAuditResult, validateAuditState } from './validation.ts';
 import { mergeHistoryValue, mergeStructuredValues, validateRuntimeValue, withoutUnaskedBlanks } from './value-schemas.ts';
 
@@ -215,9 +216,37 @@ function needsQuestion(question: Question, state: AuditState, lib: AuditLibrary)
   });
 }
 function candidates(state: AuditState, lib: AuditLibrary, options: EngineOptions): Solution[] {
-  return lib.solutions.filter(block => permitted(block, options) && known(state.facts[`${block.domain}.applicable`]) && state.facts[`${block.domain}.applicable`].value === true && known(state.facts[`${block.id}.signal`]) && state.facts[`${block.id}.signal`].value === 'target' && evaluateRule(block.exclusion, state.facts) !== true);
+  const facts = withImpliedTopics(state.facts, lib);
+  return lib.solutions.filter(block => permitted(block, options) && known(facts[`${block.domain}.applicable`]) && facts[`${block.domain}.applicable`].value === true && known(facts[`${block.id}.signal`]) && facts[`${block.id}.signal`].value === 'target' && evaluateRule(block.exclusion, facts) !== true);
+}
+/** The screening question of another possible cause of a confirmed complaint: the complaint's links in order, at most
+ * MAX_CROSS_PER_COMPLAINT of them, and at most MAX_CROSS_CHECKS such questions per interview. Already answered causes count as checked. */
+function crossCheck(state: AuditState, facts: Record<string, AuditFact>, active: Solution[], lib: AuditLibrary, options: EngineOptions): { question: Question; cause: string } | undefined {
+  const asked = state.cross_checked ?? [], full = asked.length >= MAX_CROSS_CHECKS;
+  for (const complaint of active) {
+    let considered = 0;
+    for (const link of lib.relationships) {
+      if (link.relation !== 'alternative_cause' || link.a !== complaint.id) continue;
+      const cause = lib.solutions.find(block => block.id === link.b);
+      if (!cause || !permitted(cause, options)) continue;
+      if (considered >= MAX_CROSS_PER_COMPLAINT) break;
+      // A cause already answered counts as checked, whatever was said about its topic later.
+      if (collected(state.facts[`${cause.id}.signal`])) { considered++; continue; }
+      const topic = facts[`${cause.domain}.applicable`];
+      if (topic && (['not_applicable', 'declined'].includes(topic.state) || (known(topic) && topic.value === false))) continue;
+      considered++;
+      if (full && !asked.includes(cause.id)) continue;
+      const question = lib.questions.find(item => item.phase === 'screen' && item.fact_ids.includes(`${cause.id}.signal`) && permitted(item, options));
+      if (question) return { question, cause: cause.id };
+    }
+  }
+  return undefined;
 }
 export function nextQuestion(state: AuditState, now: number, lib: AuditLibrary = library, options: EngineOptions = {}): QuestionView | null {
+  return selectQuestion(state, now, lib, options)?.view ?? null;
+}
+/** The next question and, when it checks another possible cause of a complaint, that cause's problem. */
+function selectQuestion(state: AuditState, now: number, lib: AuditLibrary, options: EngineOptions): { view: QuestionView; cross?: string } | null {
   if (state.library_version !== lib.version) throw new Error('Pinned library mismatch');
   if (!options.allowDraft) assertLibraryReady(lib);
   const elapsed = elapsedInterviewMs(state, now);
@@ -231,18 +260,23 @@ export function nextQuestion(state: AuditState, now: number, lib: AuditLibrary =
   const mandatory = (lib.scenario.mandatory_entry_questions ?? [])
     .map(id => lib.questions.find(question => question.id === id))
     .find(question => question && permitted(question, options) && needsQuestion(question, state, lib));
-  if (mandatory) return { id: mandatory.id, text: mandatory[state.active_channel], fact_ids: mandatory.fact_ids, options: [] };
+  if (mandatory) return { view: { id: mandatory.id, text: mandatory[state.active_channel], fact_ids: mandatory.fact_ids, options: [] } };
   // A key question just answered with «don't know», a refusal or an unclear answer is asked again with its reason, a bounded number of times.
   const rules = lib.scenario.required_for_report, previous = lib.questions.find(question => question.id === state.current_question_id);
   if (rules && previous?.required_for_report && permitted(previous, options) && elapsed < lib.scenario.clock.closing_from * 1000 && elapsed + previous.estimated_seconds * 1000 <= INTERVIEW_BUDGET_MS) {
     const attempt = keyAnswerMissing(previous, state, lib);
-    if (attempt > 0 && attempt <= rules.max_reasks) return { ...questionView(previous, state, lib), reask: { attempt, reason: rules.reasons[previous.required_for_report]! } };
+    if (attempt > 0 && attempt <= rules.max_reasks) return { view: { ...questionView(previous, state, lib), reask: { attempt, reason: rules.reasons[previous.required_for_report]! } } };
   }
+  const facts = withImpliedTopics(state.facts, lib);
   const activeBlocks = candidates(state, lib, options), domains = new Set(activeBlocks.map(block => block.domain));
   const priority = state.facts['context.priority'];
   const namedTopics = known(priority) && Array.isArray(priority.value) ? priority.value.filter((value): value is string => typeof value === 'string') : [];
   const requestedDomains = lib.domains.filter(domain => namedTopics.includes(domain.id) || namedTopics.includes(domain.title)).map(domain => domain.id);
-  for (const domain of lib.domains) if (known(state.facts[`${domain.id}.applicable`]) && state.facts[`${domain.id}.applicable`].value === true && !requestedDomains.includes(domain.id)) requestedDomains.push(domain.id);
+  // Where the visitor feels clients are lost may add a topic after the named ones.
+  const funnel = lib.scenario.funnel, lost = funnel ? state.facts[funnel.fact] : undefined;
+  const added = funnel && lost && known(lost) && typeof lost.value === 'string' ? funnel.adds[lost.value] : undefined;
+  if (added && !requestedDomains.includes(added)) requestedDomains.push(added);
+  for (const domain of lib.domains) if (known(facts[`${domain.id}.applicable`]) && facts[`${domain.id}.applicable`].value === true && !requestedDomains.includes(domain.id)) requestedDomains.push(domain.id);
   const unresolved = elapsed < lib.scenario.clock.closing_from * 1000 ? state.contradictions.find(item => (state.facts[item.fact_id]?.answer_ids.length ?? 0) < 4) : undefined;
   const ambiguous = !unresolved && elapsed < lib.scenario.clock.closing_from * 1000 ? Object.values(state.facts).find(fact => (fact.state === 'ambiguous' || (fact.state === 'known' && fact.confirmation === 'unconfirmed')) && fact.answer_ids.length <= lib.scenario.routing.max_clarifications_per_fact) : undefined;
   let selected = unresolved || ambiguous ? lib.questions.find(question => permitted(question, options) && question.fact_ids.includes((unresolved ?? ambiguous)!.fact_id) && elapsed + question.estimated_seconds * 1000 <= INTERVIEW_BUDGET_MS) : undefined;
@@ -251,8 +285,10 @@ export function nextQuestion(state: AuditState, now: number, lib: AuditLibrary =
       if (!permitted(question, options) || !needsQuestion(question, state, lib) || (question.condition && evaluateRule(question.condition, state.facts) !== true)) return [];
       if (voiceCap && answeredCount >= MAX_VOICE_QUESTIONS - 1 && question.phase !== 'confirmation') return [];
       const domain = questionDomain(question);
-      const applicable = domain ? state.facts[`${domain}.applicable`] : undefined;
+      const applicable = domain ? facts[`${domain}.applicable`] : undefined;
       if (question.phase === 'routing' && (!domain || !requestedDomains.includes(domain))) return [];
+      // A topic opened by a confirmed sign of its problem needs no topic question.
+      if (question.phase === 'routing' && known(facts[`${domain}.applicable`]) && !known(state.facts[`${domain}.applicable`])) return [];
       if (domain && question.phase !== 'routing' && !(known(applicable) && applicable!.value === true)) return [];
       if (question.related_block && !activeBlocks.some(block => block.id === question.related_block) && question.phase !== 'screen') return [];
       if ((question.phase === 'history' || (question.phase === 'detail' && !question.related_block)) && (!domain || !domains.has(domain))) return [];
@@ -266,11 +302,16 @@ export function nextQuestion(state: AuditState, now: number, lib: AuditLibrary =
       const priorities: Record<string, number> = { orientation: entryIndex >= 0 ? 200 - entryIndex : 80, detail: question.related_block ? 100 : 80, history: 90, screen: 60, routing: 50, confirmation: 0 };
       const domainOrder = domain ? requestedDomains.indexOf(domain) : -1;
       return [{ question, score: (priorities[question.phase] ?? 0) + (question.priority ?? 0), order: domainOrder < 0 ? order : domainOrder * 1000 + order }];
-    }).sort((a, b) => b.score - a.score || a.order - b.order);
+    });
+    // Another possible cause of a confirmed complaint: after the complaint's own questions, before new topics.
+    const check = elapsed < lib.scenario.clock.no_new_deep_branch_after * 1000 && !(voiceCap && answeredCount >= MAX_VOICE_QUESTIONS - 1) ? crossCheck(state, facts, activeBlocks, lib, options) : undefined;
+    if (check && needsQuestion(check.question, state, lib) && elapsed + check.question.estimated_seconds * 1000 <= INTERVIEW_BUDGET_MS) weighted.push({ question: check.question, score: 70 + (check.question.priority ?? 0), order: -1 });
+    weighted.sort((a, b) => b.score - a.score || a.order - b.order);
     selected = weighted[0]?.question;
+    if (check && selected === check.question) return { view: questionView(selected, state, lib, 'Проверю ещё одну возможную причину. '), cross: check.cause };
   }
   if (!selected) return null;
-  return questionView(selected, state, lib, unresolved ? 'Уточните противоречащие друг другу сведения. ' : ambiguous ? 'Пожалуйста, уточните, верно ли записаны сведения. ' : '');
+  return { view: questionView(selected, state, lib, unresolved ? 'Уточните противоречащие друг другу сведения. ' : ambiguous ? 'Пожалуйста, уточните, верно ли записаны сведения. ' : '') };
 }
 function questionView(question: Question, state: AuditState, lib: AuditLibrary, prefix = ''): QuestionView {
   const options = question.id === 'context_priority' ? lib.domains.map(domain => ({ id: domain.id, text: domain.title })) : question.fact_ids.flatMap(id => lib.facts.find(fact => fact.id === id)?.values?.map(value => ({ id: value.id, text: value.label })) ?? []);
@@ -295,10 +336,12 @@ export function advanceAudit(state: AuditState, answers: AuditAnswer[], now: num
   const derived = deriveFacts(answers, lib);
   const updated: AuditState = { ...state, facts: derived.facts, contradictions: derived.contradictions,
     questions_answered: new Set(answers.filter(answer => answer.library_version === lib.version).map(answer => answer.question_id)).size };
-  const active = candidates(updated, lib, options);
+  const active = candidates(updated, lib, options), implied = withImpliedTopics(updated.facts, lib);
   updated.candidate_blocks = active.map(block => block.id);
-  updated.missing_facts = [...new Set(active.flatMap(block => [...block.matrix.required, block.previous_attempts.fact]).filter(id => !usableFact(updated.facts[id])))];
-  updated.current_question_id = nextQuestion(updated, now, lib, options)?.id ?? null;
+  updated.missing_facts = [...new Set(active.flatMap(block => [...block.matrix.required, block.previous_attempts.fact]).filter(id => !usableFact(implied[id])))];
+  const next = selectQuestion(updated, now, lib, options);
+  updated.current_question_id = next?.view.id ?? null;
+  if (next?.cross && !(updated.cross_checked ?? []).includes(next.cross)) updated.cross_checked = [...(updated.cross_checked ?? []), next.cross];
   validateAuditState(updated, lib);
   return updated;
 }
@@ -332,7 +375,13 @@ function priorAttemptPath(block: Solution, facts: Record<string, AuditFact>, lib
 export function analyzeAudit(snapshot: AuditSnapshot, lib: AuditLibrary = library, options: EngineOptions = {}): AuditResult {
   if (snapshot.library_version !== lib.version || snapshot.state.library_version !== lib.version) throw new Error('Snapshot library mismatch');
   if (!options.allowDraft) assertLibraryReady(lib);
-  const { facts, contradictions } = deriveFacts(snapshot.answers, lib);
+  const { facts, contradictions } = deriveFacts(snapshot.answers, lib), evaluation = withImpliedTopics(facts, lib);
+  const engagement = new Map(lib.services.map(service => [service.id, service.engagement]));
+  // A problem offering both an audit and ongoing work: the audit when the topic was already worked on, ongoing work otherwise.
+  const offered = (block: Solution, prior: 'direct' | PriorAttemptPath) => {
+    const kinds = new Set(block.services.map(id => engagement.get(id)));
+    return kinds.has('audit') && kinds.has('ongoing') ? block.services.filter(id => engagement.get(id) !== (prior === 'direct' ? 'audit' : 'ongoing')) : block.services;
+  };
   const result: AuditResult = {
     snapshot_id: snapshot.id, library_version: lib.version, rules_version: lib.rulesVersion, tariffs_version: lib.tariffVersion, template_version: lib.templateVersion,
     profile: Object.fromEntries(Object.values(facts).filter(fact => fact.fact_id.startsWith('context.') && fact.fact_id !== 'context.goal' && known(fact)).map(fact => [fact.fact_id, fact.value])),
@@ -343,11 +392,11 @@ export function analyzeAudit(snapshot: AuditSnapshot, lib: AuditLibrary = librar
   if (lib.status !== 'approved') result.limitations.push('Библиотека находится на экспертной проверке. Черновые диагностические правила, решения и тарифы не включены в заключение.');
   const selected = new Set<string>();
   for (const block of lib.solutions.filter(isApproved)) {
-    if (evaluateRule(block.exclusion, facts) === true) continue;
-    const inclusion = evaluateRule(block.inclusion, facts);
+    if (evaluateRule(block.exclusion, evaluation) === true) continue;
+    const inclusion = evaluateRule(block.inclusion, evaluation);
     const signal = facts[`${block.id}.signal`];
     if (inclusion !== true && !(known(signal) && signal.value === 'target')) continue;
-    const missing = block.matrix.required.filter(id => !known(facts[id]));
+    const missing = block.matrix.required.filter(id => !known(evaluation[id]));
     result.gaps.push(...missing);
     const status = inclusion === true && !missing.length ? 'supported' : block.type === 'hypothesis' ? 'hypothesis' : 'insufficient';
     const evidence = [...new Set(block.matrix.required.flatMap(id => facts[id]?.answer_ids ?? []))];
@@ -368,7 +417,7 @@ export function analyzeAudit(snapshot: AuditSnapshot, lib: AuditLibrary = librar
     }
     const actions = [...block.solution.steps].sort((a, b) => a.order - b.order).map((step, index, steps) => ({ id: `${block.id}:${step.order}`, text: step.text, after: index ? [`${block.id}:${steps[index - 1].order}`] : priorIds.slice(-1), parallel_with: [] as string[], deferred_reason: block.solution.prerequisites.length ? block.solution.prerequisites.join('; ') : null }));
     result.actions.push(...actions);
-    result.solutions.push({ id: block.id, title: block.title, text: block.solution.deliverable, service_ids: block.services, action_ids: [...priorIds, ...actions.map(action => action.id)], limitations: block.solution.limitations,
+    result.solutions.push({ id: block.id, title: block.title, text: block.solution.deliverable, service_ids: offered(block, prior), action_ids: [...priorIds, ...actions.map(action => action.id)], limitations: block.solution.limitations,
       ...(prior === 'direct' ? {} : { prior_attempts: { result: prior.id, intro: prior.intro } }) });
   }
   for (const relation of lib.relationships) {
@@ -387,7 +436,7 @@ export function analyzeAudit(snapshot: AuditSnapshot, lib: AuditLibrary = librar
   const services = new Set(result.solutions.flatMap(solution => solution.service_ids));
   for (const tariff of lib.tariffs) {
     // A matching rule makes a tariff a preliminary option, not a selected package.
-    if (!services.has(tariff.service_id) || !isApproved(tariff) || tariff.commercial_approval !== 'approved' || tariff.conflicts.length || !tariff.selection_rule || evaluateRule(tariff.selection_rule, facts) !== true) continue;
+    if (!services.has(tariff.service_id) || !isApproved(tariff) || tariff.commercial_approval !== 'approved' || tariff.conflicts.length || !tariff.selection_rule || evaluateRule(tariff.selection_rule, evaluation) !== true) continue;
     if (tariff.price.valid_until && Date.parse(tariff.price.valid_until) < snapshot.created_at) continue;
     const source = lib.sources.find(item => item.id === tariff.source.id);
     if (source?.url) result.tariffs.push({ id: tariff.id, title: tariff.name, details: {

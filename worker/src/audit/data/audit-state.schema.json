@@ -18,7 +18,7 @@
       "minLength": 1
     },
     "library_version": {
-      "const": "0.1.4"
+      "const": "0.2.0"
     },
     "channel": {
       "enum": [

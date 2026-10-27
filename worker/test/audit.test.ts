@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { initialAuditState, type AuditAnswer, type AuditEvent, type AuditSnapshot, type Json } from '../src/audit/contracts.ts';
 import { advanceAudit, analyzeAudit, deriveFacts, elapsedInterviewMs, interviewSufficiency, nextQuestion, validateAnswers } from '../src/audit/engine.ts';
-import { compileVoiceBlocks, getLibrary, library, validateLibrary, validateLibraryManifest, type AuditLibrary } from '../src/audit/library.ts';
+import { compileVoiceBlocks, getLibrary, library, ruleChecksForVersion, validateLibrary, validateLibraryManifest, type AuditLibrary } from '../src/audit/library.ts';
 import { evaluateRule, validateRule } from '../src/audit/rules.ts';
 import { selectHumorReply } from '../src/audit/humor.ts';
 import { validateAuditResult, validateAuditState } from '../src/audit/validation.ts';
@@ -31,7 +31,7 @@ test('a key question without a usable answer is asked again with its reason, at 
   const rules = library.scenario.required_for_report!;
   assert.equal(rules.max_reasks, 2);
   const keys = library.questions.filter(question => question.required_for_report);
-  assert.equal(keys.length, 317);
+  assert.equal(keys.length, 357);
   assert.deepEqual(['context_company_name', 'context_website'].map(id => library.questions.find(question => question.id === id)!.required_for_report), ['company', 'website']);
   assert.deepEqual(['context_business', 'context_goal', 'context_priority'].map(id => library.questions.find(question => question.id === id)!.required_for_report), ['business', 'goal', 'topics']);
   assert.equal(library.questions.find(question => question.id === 'context_name')!.required_for_report, undefined);
@@ -121,8 +121,21 @@ test('previously created sessions keep their pinned questions and report library
   const previous = getLibrary('0.1.3');
   assert.equal(nextQuestion(initialAuditState(previous.version, 'chat', now), now, previous)?.id, 'context_business');
   assert.equal(previous.questions.some(question => question.id === 'context_name'), false);
-  assert.deepEqual(validateLibrary(previous, { ruleChecks: ruleChecksData }).errors, []);
-  assert.equal(getLibrary().version, '0.1.4');
+  assert.deepEqual(validateLibrary(previous, { ruleChecks: ruleChecksForVersion(ruleChecksData, previous.version) }).errors, []);
+  // 0.1.4 keeps its sixteen topics, 140 problems and the services and texts it had.
+  const before = getLibrary('0.1.4');
+  assert.deepEqual(validateLibrary(before, { ruleChecks: ruleChecksForVersion(ruleChecksData, before.version) }).errors, []);
+  assert.equal(before.domains.length, 16); assert.equal(before.solutions.length, 140); assert.equal(before.services.length, 44);
+  assert.equal(before.domains.find(domain => domain.id === 'marketplace')!.title, 'Маркетплейсы');
+  assert.equal(before.solutions.find(block => block.id === 'seo_ai_visibility')!.domain, 'seo');
+  assert.deepEqual(before.solutions.find(block => block.id === 'ads_cost')!.services, ['ads', 'analytics']);
+  assert.equal(before.questions.find(question => question.id === 'seo_scope')!.chat, 'Относится ли к вашей задаче эта тема: обычный поиск и видимость в ответах AI?');
+  assert.equal(before.questions.some(question => question.id === 'context_funnel'), false);
+  assert.equal(before.relationships.some(relation => relation.relation === 'alternative_cause'), false);
+  assert.equal(before.scenario.funnel, undefined);
+  assert.equal(nextQuestion(initialAuditState(before.version, 'chat', now), now, before)?.id, 'context_name');
+  assert.equal(getLibrary().version, '0.2.0');
+  assert.equal(library.domains.length, 17); assert.equal(library.solutions.length, 159); assert.equal(library.services.length, 76);
 });
 function snapshot(answers: AuditAnswer[]): AuditSnapshot {
   const state = advanceAudit(initialAuditState(library.version, 'chat', now), answers, now, library, preview);
@@ -465,6 +478,9 @@ test('manifest validation covers exact bytes and missing/extra inputs', async ()
 test('the interview follows named topics and stops screening a domain after selecting a substantive branch', () => {
   const entries = [...introduction(), answer('context.business'), answer('context.goal', 'Улучшить измеримость', 'goal'), answer('context.assets', ['site'], 'assets'), answer('context.priority', ['strategy'], 'priority')];
   let state = advanceAudit(initialAuditState(library.version, 'chat', now), entries, now, library, preview);
+  assert.equal(nextQuestion(state, now, library, preview)?.id, 'context_funnel');
+  entries.push(answer('context.funnel', 'few_leads', 'funnel'));
+  state = advanceAudit(state, entries, now, library, preview);
   assert.equal(nextQuestion(state, now, library, preview)?.id, 'strategy_scope');
   entries.push(answer('strategy.applicable', true, 'applicable'), answer('strategy_goal.signal', 'target', 'signal'));
   state = advanceAudit(state, entries, now, library, preview);
