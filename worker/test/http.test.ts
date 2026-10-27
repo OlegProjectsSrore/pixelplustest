@@ -225,7 +225,12 @@ test('HTTP chat: a new session opens with the greeting only; the key phrase star
     let session = created.data.session;
     const send = async (text: string, questionId: string | null) => (await call('/api/chat', { api_version: '1', session_id: session.session_id, operation_id: randomToken(), expected_revision: session.revision,
       channel_revision: session.channel_revision, library_version: session.library_version, question_id: questionId, input: { kind: 'text', text } }, created.data.session_token)).json() as any;
-    const start = await send('Давайте экспресс-диагностику', null);
+    // Before the start the visitor hears what the audit is and agrees to it: no survey question yet.
+    const offer = await send('Давайте экспресс-диагностику', null);
+    assert.match(offer.data.operation.text, /^Предлагаю пройти экспресс-диагностику/); assert.equal(offer.data.operation.question_id, null);
+    assert.equal(offer.data.session.conversation_mode, 'questions'); assert.equal(offer.data.session.diagnostic_started, false);
+    session = offer.data.session;
+    const start = await send('Да, давайте экспресс-диагностику', null);
     assert.equal(start.data.operation.text, 'Начнём экспресс-диагностику.'); assert.equal(start.data.operation.question_text, 'Как к Вам можно обращаться?');
     assert.equal(start.data.operation.question_id, 'context_name'); assert.equal(start.data.session.question.id, 'context_name');
     assert.equal(start.data.session.conversation_mode, 'diagnostic'); assert.equal(start.data.session.diagnostic_started, true);

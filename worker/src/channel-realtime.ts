@@ -1,4 +1,4 @@
-import { INTERVIEW_BUDGET_MS, type Json } from './audit/contracts.ts';
+import { diagnosticStarted, INTERVIEW_BUDGET_MS, type Json } from './audit/contracts.ts';
 import { advanceAudit, nextQuestion, validateAnswers } from './audit/engine.ts';
 import { getLibrary } from './audit/library.ts';
 import type { CoreServices } from './core.ts';
@@ -42,7 +42,7 @@ export async function realtimeInstructions(core: CoreServices, session: StoredSe
   const history = latestEvents(await readEvents(core, session.id)).filter(e => ['user', 'assistant'].includes(e.role) && e.text && (e.source === 'chat' || record(e.data).is_final === true)).slice(-24).map(e => ({ role: e.role, text: e.text }));
   return buildInterviewPrompt({ library_version: lib.version, questions: question ? [question] : [], current_question_id: question?.id ?? null,
     accepted_facts: Object.values(session.state.facts), remaining_seconds: Math.max(1, Math.ceil((INTERVIEW_BUDGET_MS - elapsedMs(session.state, core.now())) / 1000)),
-    humor_enabled: session.state.humor.enabled, off_topic_categories: lib.jokes.categories, fact_formats: schemas, history, conversation_mode: session.state.mode ?? 'diagnostic' });
+    humor_enabled: session.state.humor.enabled, off_topic_categories: lib.jokes.categories, fact_formats: schemas, history, conversation_mode: session.state.mode ?? 'diagnostic', diagnostic_started: diagnosticStarted(session.state) });
 }
 
 /** Rejected voice saves are logged as structure only: IDs, states, lengths and match counts, never visitor words or values. */

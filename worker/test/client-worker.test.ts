@@ -59,6 +59,10 @@ test('real client/transport/Worker: creation, key phrase, text, multi-selection,
     // The greeting asks what the visitor needs; the survey starts on the key phrase.
     assert.equal(model.error, ''); assert.equal(client.session.question, null); assert.equal(model.diagnostic, false);
     await handlers.onText('Давайте экспресс-диагностику');
+    // The offer first: what the audit is and «Начинаем?»; the survey starts on the agreement.
+    assert.equal(model.error, ''); assert.equal(client.session.question, null); assert.equal(model.diagnostic, false);
+    assert.match(model.messages.at(-1).text, /^Предлагаю пройти экспресс-диагностику/);
+    await handlers.onText('Да, давайте экспресс-диагностику');
     assert.equal(model.error, ''); assert.equal(client.session.question.id, 'context_name'); assert.equal(model.diagnostic, true);
     assert.equal(stored.management_token.length, 43); assert.notEqual(stored.management_token, stored.report_token);
     now += 600000;
@@ -67,13 +71,13 @@ test('real client/transport/Worker: creation, key phrase, text, multi-selection,
     assert.equal(model.error, ''); assert.equal(client.session.question.id, 'context_priority');
     assert.equal(model.question.answer_mode, 'multiple');
     await handlers.onSelection(['strategy', 'analytics']);
-    assert.ok(stored.pending); assert.equal(providerCalls, 2);
+    assert.ok(stored.pending); assert.equal(providerCalls, 3);
     const core = new CoreServices(env, () => now);
     const revision = (await core.store.requireSession(client.session.session_id)).state.revision;
     await handlers.onRetry();
     assert.equal(model.error, ''); assert.equal(stored.pending, null);
     assert.equal(selectionBodies.length, 2); assert.equal(selectionBodies[0], selectionBodies[1]);
-    assert.equal(client.session.revision, revision); assert.equal(providerCalls, 2);
+    assert.equal(client.session.revision, revision); assert.equal(providerCalls, 3);
     const answers = await core.store.listAnswers(client.session.session_id);
     assert.equal(answers.length, 20);
     assert.deepEqual(answers.find(answer => answer.fact_id === 'context.priority')?.value, ['strategy', 'analytics']);

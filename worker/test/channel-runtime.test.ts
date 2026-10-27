@@ -410,6 +410,22 @@ test('the chat classifier thinks before it answers (reasoning low); the composer
   } finally { f.db.close(); }
 });
 
+test('when the classifier thinks past its limit, the message is classified again without thinking and the turn succeeds', async () => {
+  // The first (thinking) request answers after the limit; the second answers at once.
+  const f = await fixture(async (context, call) => {
+    if (call === 1) await new Promise(resolve => setTimeout(resolve, 300));
+    return 'next_question' in context ? worded : reportFromText(context);
+  });
+  const handler = createChatAdapter({ reasoningTimeoutMs: 50 });
+  try {
+    const response = await handler(f.request, f.context(f.body())) as { operation: Record<string, Json> };
+    assert.equal(response.operation.question_id, 'context_position', 'the answer was saved and the survey moved on');
+    const classifier = f.bodies().filter(request => String((request.messages as { content: string }[])[0].content).includes('Схема JSON: {"intent"'));
+    assert.deepEqual(classifier.map(request => [(request.thinking as { type: string }).type, request.reasoning_effort ?? null]), [['enabled', 'low'], ['disabled', null]]);
+    assert.deepEqual((await f.core.store.listAnswers(f.session.id)).map(answer => answer.value), ['Олег']);
+  } finally { f.db.close(); }
+});
+
 test('a question about the chat itself before the survey («Ты меня спрашиваешь?») gets what the assistant can do, not a joke', async () => {
   const f = await fixture((_context, call) => call === 1 ? intent('question') : intent('clarify'));
   try {
@@ -492,7 +508,7 @@ test('questions mode: help offer, joke without the survey, key phrase starts, a 
   const f = await fixture(context => {
     if ('fragments' in context) return { answer: 'Да, мы создаём сайты на Битрикс.', sources: [(context as never as { fragments: { url: string }[] }).fragments[0].url] };
     const text = context.source_events[0].text!;
-    if (/диагностик/.test(text)) return intent('start_diagnostic');
+    if (/диагностик|^Да$/.test(text)) return intent('start_diagnostic');
     if (/Битрикс/.test(text)) return intent('question');
     if (/погода/.test(text)) return { ...intent('off_topic'), joke_category_id: 'weather' };
     return text === 'Привет' ? intent('unknown') : reportFromText(context);
@@ -508,15 +524,47 @@ test('questions mode: help offer, joke without the survey, key phrase starts, a 
     const joke = await turn('t-2', 1, 'Какая сегодня погода?', null);
     assert.equal(joke.joke_id, 'weather_01'); assert.equal(joke.question_id, null);
     assert(library.jokes.questions_return_phrases!.some(phrase => String(joke.text).endsWith(` ${phrase}`)), String(joke.text));
-    const start = await turn('t-3', 2, 'Давайте экспресс-диагностику', null);
+    // Before the first start: what the audit is, why, how many questions, what the visitor gets — and «Начинаем?».
+    const offer = await turn('t-3', 2, 'Давайте экспресс-диагностику', null);
+    assert.match(String(offer.text), /^Предлагаю пройти экспресс-диагностику Вашего бизнеса/);
+    for (const part of [/Зачем: /, /Вопросов будет около 25–30/, /В конце Вы получите персональный PDF-отчёт/, /Начинаем\?$/]) assert.match(String(offer.text), part);
+    assert.equal(offer.question_id, null); assert.equal(await mode(), 'questions', 'nothing starts before the agreement');
+    const start = await turn('t-3b', 3, 'Да', null);
     assert.equal(start.text, 'Начинаем экспресс-диагностику.'); assert.equal(start.question_id, 'context_name'); assert.equal(await mode(), 'diagnostic');
-    const name = await turn('t-4', 3, 'Олег', 'context_name');
+    const name = await turn('t-4', 4, 'Олег', 'context_name');
     assert.equal(name.question_id, 'context_position');
-    const service = await turn('t-5', 4, 'Делаете сайты на Битриксе?', 'context_position');
+    const service = await turn('t-5', 5, 'Делаете сайты на Битриксе?', 'context_position');
     assert.match(String(service.text), /^Да, мы создаём сайты на Битрикс\./); assert.equal(service.question_id, null); assert.equal(await mode(), 'questions');
-    const resume = await turn('t-6', 5, 'Продолжим диагностику', null);
+    // Coming back to a started survey needs no new offer.
+    const resume = await turn('t-6', 6, 'Продолжим диагностику', null);
     assert.equal(resume.text, 'Продолжим экспресс-диагностику.'); assert.equal(resume.question_id, 'context_position', 'the survey continues where it stopped');
     assert.deepEqual((await f.core.store.listAnswers(f.session.id)).map(answer => answer.value), ['Олег']);
+  } finally { f.db.close(); }
+});
+
+test('a short agreement right after the offer starts the survey even when the classifier did not take it for one', async () => {
+  const f = await fixture(context => /диагностик/.test(context.source_events[0].text!) ? intent('start_diagnostic') : intent('unknown'));
+  f.db.sqlite.prepare(`UPDATE audit_sessions SET state_json=json_set(state_json,'$.mode','questions') WHERE id=?`).run(f.session.id);
+  try {
+    const offer = await f.handler(f.request, f.context(f.body('o-1', 0, asked('Хочу экспресс-диагностику'), null))) as { operation: Record<string, Json> };
+    assert.match(String(offer.operation.text), /Начинаем\?$/);
+    const agreed = await f.handler(f.request, f.context(f.body('o-2', 1, asked('Ок'), null))) as { operation: Record<string, Json> };
+    assert.deepEqual([agreed.operation.text, agreed.operation.question_id], ['Начинаем экспресс-диагностику.', 'context_name']);
+  } finally { f.db.close(); }
+});
+
+test('a refusal right after the offer gets a friendly reply and pauses nothing; the survey can still be asked for later', async () => {
+  const f = await fixture(context => /диагностик/.test(context.source_events[0].text!) ? intent('start_diagnostic') : intent('pause'));
+  f.db.sqlite.prepare(`UPDATE audit_sessions SET state_json=json_set(state_json,'$.mode','questions') WHERE id=?`).run(f.session.id);
+  try {
+    await f.handler(f.request, f.context(f.body('d-1', 0, asked('Хочу экспресс-диагностику'), null)));
+    const declined = await f.handler(f.request, f.context(f.body('d-2', 1, asked('Нет, давай позже'), null))) as { operation: Record<string, Json> };
+    assert.equal(declined.operation.text, 'Хорошо, начнём, когда Вам будет удобно: просто напишите «давайте диагностику». А пока могу ответить на вопросы об услугах Pixel Plus.');
+    const session = await f.core.store.requireSession(f.session.id);
+    assert.deepEqual([session.state.paused, session.state.mode], [false, 'questions']);
+    // The offer was made once: asking again later starts at once.
+    const started = await f.handler(f.request, f.context(f.body('d-3', session.state.revision, asked('Давайте диагностику'), null))) as { operation: Record<string, Json> };
+    assert.deepEqual([started.operation.text, started.operation.question_id], ['Начинаем экспресс-диагностику.', 'context_name']);
   } finally { f.db.close(); }
 });
 

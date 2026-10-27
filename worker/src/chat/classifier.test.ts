@@ -156,6 +156,9 @@ test('prompt file has only the intents mark; every intent is listed and visitor 
   assert(system.content.includes(`intent только из списка: ${INTENTS.join(', ')}.`));
   assert.match(system.content, /Схема JSON: \{"intent":"unknown","answers":\[\],"clarification_question_id":null,"faq_id":null,"joke_category_id":null,"humor_preference":null\}/);
   assert.equal(system.content.split('\n').length, 22);
+  // Before the first start the assistant offers the audit; the agreement starts it, a refusal pauses nothing that has not started.
+  assert.match(system.content, /согласие после этого предложения \(«да», «давайте», «ок», «конечно», «поехали», «начинаем»\) — тоже start_diagnostic\./);
+  assert.match(system.content, /отказ от этого предложения \(«нет», «давай позже»\) — pause\./);
   // Two kinds of questions: within the audit, or about Pixel Plus; when it cannot tell which, it does not guess.
   assert.match(system.content, /Вопросы посетителя бывают двух видов\. Первый — в рамках аудита, то есть экспресс-диагностики его бизнеса: .* — это clarify\. Второй — о деятельности Pixel Plus: .* — это question/);
   assert.match(system.content, /Если по реплике и разговору нельзя понять, о чём вопрос — об аудите или о деятельности Pixel Plus, не угадывай: выбирай clarify с clarification_question_id null/);

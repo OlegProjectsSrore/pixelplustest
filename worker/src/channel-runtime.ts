@@ -70,6 +70,17 @@ const HELP_EXPLAINED = 'Я помощник Pixel Plus: отвечу на воп
 // The classifier could not tell whether the visitor asks about the audit or about Pixel Plus: the visitor is asked. Shown as is: the
 // composer, asked to reword it, left its reply empty or put the request into the survey question.
 const ASK_WHICH = 'Уточните, пожалуйста, о чём Ваш вопрос: о текущем вопросе опроса или о работе Pixel Plus — её услугах, ценах и кейсах.';
+// Before the first start the visitor hears what the audit is, why, how many questions and what they get, and agrees to it. Shown as is:
+// every part must reach the visitor. 25–30 questions: finished surveys had 20–36, mostly 25–30; the interview limit is 25 minutes.
+const AUDIT_OFFER = 'Предлагаю пройти экспресс-диагностику Вашего бизнеса — короткий опрос здесь, в чате.\n' +
+  'Зачем: чтобы понять, как у Вас устроены продажи и маркетинг, найти, что сейчас мешает росту, и подобрать решения Pixel Plus под Вашу задачу.\n' +
+  'Вопросов будет около 25–30, на них отводится до 25 минут. Отвечайте своими словами; если вопрос непонятен — переспросите, если не хотите отвечать — так и скажите. Опрос можно поставить на паузу.\n' +
+  'В конце Вы получите персональный PDF-отчёт: главные проблемы, их приоритеты, план решения и рекомендации с ценами услуг Pixel Plus.\n' +
+  'Начинаем?';
+// «Нет, давай позже» right after the offer refuses it: the survey has not started, so there is nothing to pause. Shown as is.
+const OFFER_DECLINED = 'Хорошо, начнём, когда Вам будет удобно: просто напишите «давайте диагностику». А пока могу ответить на вопросы об услугах Pixel Plus.';
+// A short agreement right after the offer starts the survey even when the classifier did not take it for one («Ок», «Да, давайте»).
+const AGREEMENT = /^(?:да|ага|угу|ок|окей|конечно|хорошо|давай|давайте|поехали|начинаем|начн[её]м|согласен|согласна|го)(?:[\s,.!]+(?:да|давай|давайте|начинаем|начн[её]м|поехали|конечно))*[\s.!)]*$/iu;
 // Shown when the composer cannot word an explanation of the current question; the question itself stays below.
 const EXPLAIN_FALLBACK = 'Ответьте, как понимаете вопрос: подойдёт любой ответ своими словами.';
 // FAQ answers and jokes are approved texts shown verbatim; other notices are reworded by DeepSeek.
@@ -175,7 +186,8 @@ function humorIntent(turn: PreparedChatTurn, now: number): HumorIntent {
     safe_category_ids: classification?.joke_category_id ? [classification.joke_category_id] : [], now };
 }
 
-export async function commitChatTurn(request: Request, context: AdapterContext, _original: StoredSession, turn: PreparedChatTurn): Promise<Json> {
+export async function commitChatTurn(request: Request, context: AdapterContext, _original: StoredSession, prepared: PreparedChatTurn): Promise<Json> {
+  let turn = prepared;
   const { core } = context, now = core.now();
   const session = await core.authenticate(request, turn.input.session_id);
   const previous = await core.store.getOperation(session.id, turn.input.operation_id);
@@ -187,6 +199,13 @@ export async function commitChatTurn(request: Request, context: AdapterContext, 
   if (session.state.status !== 'in_progress') fail(409, 'interview_closed', 'Сбор сведений уже завершён.');
   const common = { sessionId: session.id, expectedRevision: turn.input.expected_revision, channelRevision: turn.input.channel_revision,
     operationId: turn.input.operation_id, requestHash: turn.request_hash, now };
+  // The audit starts only after the visitor agreed to the offer: the first request for it gets the offer (once), the agreement starts it.
+  // A visitor coming back from questions to a started survey continues at once.
+  const turns = await core.store.recentTurns(session.id);
+  const offered = turns.some(item => resultOf(item).diagnostic_offer === true);
+  const afterOffer = turns.length > 0 && resultOf(turns.at(-1)!).diagnostic_offer === true && !diagnosticStarted(session.state);
+  const declinedOffer = afterOffer && turn.action === 'pause';
+  if (declinedOffer) turn = { ...turn, action: 'answer', service_text: OFFER_DECLINED };
   if (turn.action === 'pause') return core.response(await core.store.pause(common));
   if (turn.action === 'resume') return core.response(await core.store.changeChannel({ ...common, channel: 'chat' }));
   const lib = getLibrary(session.state.library_version);
@@ -209,10 +228,13 @@ export async function commitChatTurn(request: Request, context: AdapterContext, 
   const state = advanceAudit(session.state, [...existing, ...answers], now, lib, core.engineOptions);
   if (turn.classification?.humor_preference === 'decline') state.humor.enabled = false;
   if (turn.classification?.humor_preference === 'allow') state.humor.enabled = true;
+  if (afterOffer && turn.action !== 'start_diagnostic' && !answers.length && AGREEMENT.test((turn.event.text ?? '').trim())) turn = { ...turn, action: 'start_diagnostic', service_text: null };
+  const offer = turn.action === 'start_diagnostic' && !diagnosticStarted(session.state) && !offered;
   let serviceText = turn.service_text;
   let jokeId: string | null = null;
   // The visitor asked for the diagnostic: it starts, or continues from the question where it stopped.
-  if (turn.action === 'start_diagnostic') {
+  if (offer) serviceText = AUDIT_OFFER;
+  else if (turn.action === 'start_diagnostic') {
     serviceText = diagnosticStarted(session.state) ? 'Продолжим экспресс-диагностику.' : 'Начинаем экспресс-диагностику.';
     state.mode = 'diagnostic';
   }
@@ -257,7 +279,7 @@ export async function commitChatTurn(request: Request, context: AdapterContext, 
   }
   // In questions mode a message that is not a question and got no library text (a greeting, a name, an unclear remark)
   // gets an offer to help, never a survey prompt and never an empty reply.
-  const offerHelp = state.mode === 'questions' && !asksKnowledge && turn.action !== 'sensitive' && (['answer', 'clarify'].includes(turn.action) || !serviceText);
+  const offerHelp = state.mode === 'questions' && !asksKnowledge && !declinedOffer && turn.action !== 'sensitive' && (['answer', 'clarify'].includes(turn.action) || !serviceText);
   if (offerHelp) serviceText = turn.classification?.intent === 'clarify' ? HELP_EXPLAINED : HELP_NOTICE;
   // A key question asked again: the visitor first hears why the answer is needed for the report.
   if (question?.reask && !serviceText && ['answer', 'clarify'].includes(turn.action)) serviceText = question.reask.reason;
@@ -265,9 +287,8 @@ export async function commitChatTurn(request: Request, context: AdapterContext, 
   let questionText: string | null = null;
   // The survey question does not change after a pure question, so its earlier wording stays.
   if (turn.action !== 'sensitive' && (turn.action !== 'question' || explain) && timeLeft() > 1_500) {
-    const approved = explain ? null : (APPROVED_TEXT_ACTIONS.includes(turn.action) && !offerHelp) || asksKnowledge || askWhich ? serviceText : null;
+    const approved = explain ? null : (APPROVED_TEXT_ACTIONS.includes(turn.action) && !offerHelp) || asksKnowledge || askWhich || offer || declinedOffer ? serviceText : null;
     // The composer sees the whole exchange and the question being answered, so its reaction is to this answer, not to an earlier one.
-    const turns = await context.core.store.recentTurns(session.id);
     const composed = await composeTurn(context, session, turn.input.operation_id, COMPOSE_ATTEMPT, Math.min(8_000, timeLeft()), { visitor_text: turn.event.text ?? null,
       answered_question: questionOnScreen(session.state.current_question_id, turns, lib), ...(explain ? { explain: true } : {}),
       // A clarification of the current question would only repeat it; ask for a clearer answer instead.
@@ -282,7 +303,7 @@ export async function commitChatTurn(request: Request, context: AdapterContext, 
     ...(libraryText ? { data: { intent: turn.classification?.intent ?? turn.action, assistant_text: serviceText ?? libraryText } } : {}) };
   validateAuditState(state, lib);
   const result: Json = { text: serviceText, joke_id: jokeId, question_id: turn.action === 'sensitive' ? null : question?.id ?? null, question_text: questionText,
-    operation_id: turn.input.operation_id, ...(turn.action === 'sensitive' ? { suppress_question: true } : {}) };
+    operation_id: turn.input.operation_id, ...(turn.action === 'sensitive' ? { suppress_question: true } : {}), ...(offer ? { diagnostic_offer: true } : {}) };
   return core.response(await core.store.commit({ ...common, event, answers, state, result }));
 }
 
@@ -301,9 +322,9 @@ export function chatAttemptIds(lib: AuditLibrary, state: AuditState, current: Qu
 }
 
 /** Wires the channel agent's parser/classifier into the shared authorization and state transaction. */
-export function createChatAdapter(): AdapterHandler {
+export function createChatAdapter(options: { reasoningTimeoutMs?: number } = {}): AdapterHandler {
   return createPreparedChatHandler({
-    runtime: createChatRuntime, commitTurn: commitChatTurn,
+    runtime: createChatRuntime, commitTurn: commitChatTurn, reasoningTimeoutMs: options.reasoningTimeoutMs,
     async context(context, session, lib) {
       const allowed = (entry: { status: string; reviewer?: string | null; approved_at?: string | null }) => isApproved(entry) || (context.core.engineOptions.allowDraft && entry.status === 'draft');
       const faqs = allowed(faqData) ? faqData.items.flatMap(faq => {

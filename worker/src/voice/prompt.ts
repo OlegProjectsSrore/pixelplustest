@@ -10,7 +10,8 @@ export function buildInterviewPrompt(input: VoicePromptInput): string {
   const seconds = remainingSeconds(input.remaining_seconds);
   if (input.current_question_id !== null && !input.questions.some(question => question.id === input.current_question_id)) throw new Error('Current question is outside the supplied block');
   const context = {
-    library_version: input.library_version, conversation_mode: input.conversation_mode ?? 'diagnostic', current_question_id: input.current_question_id,
+    library_version: input.library_version, conversation_mode: input.conversation_mode ?? 'diagnostic', diagnostic_started: input.diagnostic_started ?? input.conversation_mode !== 'questions',
+    current_question_id: input.current_question_id,
     remaining_seconds: seconds, humor_enabled: input.humor_enabled,
     questions: input.questions.map(question => ({ id: question.id, text: question.text, fact_ids: question.fact_ids, options: question.options })),
     facts: input.accepted_facts.map(fact => ({ fact_id: fact.fact_id, state: fact.state, value: fact.value, parameters: fact.parameters ?? null, confirmation: fact.confirmation })),

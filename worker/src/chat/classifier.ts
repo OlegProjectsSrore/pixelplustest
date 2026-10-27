@@ -51,6 +51,9 @@ export const CHAT_MODEL: DeepseekModel = 'deepseek-v4-pro';
  * so its limit is 25 s and a turn's 40 s. The composer, the name check and the voice paths stay without thinking: about 2 s each
  * (the composer with thinking took 15–28 s), and a live voice call cannot wait. */
 export const CLASSIFIER_REASONING = 'low' as const;
+/** Thinking now and then ran past 25 s and the turn failed. After 20 s the message is classified again without thinking (about 2 s),
+ * so the visitor gets a reply instead of an error and the turn stays within its 40 s. */
+export const CLASSIFIER_REASONING_TIMEOUT_MS = 20_000;
 
 /** One metered DeepSeek completion with a JSON object reply; the caller interprets the exchange.
  * reasoning switches thinking on at that effort (temperature is then ignored by the provider) and allows a longer wait and reply (the report writer's ten sections). */

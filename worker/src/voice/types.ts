@@ -49,6 +49,8 @@ export interface VoicePromptInput {
   fact_formats?: readonly unknown[]; history?: readonly unknown[];
   /** questions: answer only, no diagnostic questions until the visitor asks for the diagnostic. */
   conversation_mode?: 'questions' | 'diagnostic';
+  /** Whether the diagnostic was ever started: the warning before the start is given only before the first one. */
+  diagnostic_started?: boolean;
 }
 export interface VoiceAnswerCandidate {
   question_id: string; fact_id: string; answer_id?: string;

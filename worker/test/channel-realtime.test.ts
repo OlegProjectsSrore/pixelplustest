@@ -268,6 +268,10 @@ test('Voice questions mode: the greeting opens the call; startDiagnostic switche
   const call = await f.start();
   assert.equal(call.first_message, GREETING, 'the greeting asks what the visitor needs');
   assert.match(instructions, /"conversation_mode":"questions"/); assert.match(instructions, /"current_question_id":null/);
+  // Before the first start the voice warns what the audit is and starts only after the agreement, as the chat does.
+  assert.match(instructions, /"diagnostic_started":false/);
+  assert.match(instructions, /а diagnostic_started равно false, сначала коротко и своими словами предупреди его: что это экспресс-диагностика бизнеса/);
+  for (const part of [/вопросов будет около 25–30, на них отводится до 25 минут/, /в конце он получит персональный PDF-отчёт/, /Затем спроси, начинаем ли, и дождись ответа. Только после согласия/, /Если посетитель отказывается или просит позже, диагностику не начинай и паузу не ставь/]) assert.match(instructions, part);
   f.tick(2000);
   const line = (ordinal: number, role: string, text: string) => ({ source: 'voice', source_key: `${call.call_id}:${ordinal}`, source_revision: 0, local_order: ordinal,
     call_id: call.call_id, role, kind: 'utterance', text, occurred_at: NOW, data: { is_final: true, medium: 'voice' } });
@@ -275,6 +279,7 @@ test('Voice questions mode: the greeting opens the call; startDiagnostic switche
   const started = await f.invoke(f.adapters.voiceAnswers!, await f.body(undefined, { call_id: call.call_id, tool: 'startDiagnostic' }));
   assert.deepEqual(obj(started.operation), { status: 'diagnostic', question_id: 'context_name', question_text: 'Как Вас зовут?' });
   assert.match(started.realtime_instructions, /"conversation_mode":"diagnostic"/); assert.match(started.realtime_instructions, /Как Вас зовут/);
+  assert.match(started.realtime_instructions, /"diagnostic_started":true/, 'continuing later needs no new warning');
   const state = (await f.core.store.requireSession('s1')).state;
   assert.equal(state.mode, 'diagnostic'); assert.equal(state.current_question_id, 'context_name');
 });

@@ -234,12 +234,13 @@ test('network and HTTP provider failures never retry or commit fabricated result
   }
 });
 
-test('provider timeout does not retry and keeps uncertain spend in the metering callback', async () => {
+test('a thinking timeout is classified again once without thinking; a second timeout fails and keeps the uncertain spend of both', async () => {
   const harness = setup(() => new Response(new ReadableStream({ start(controller) { controller.enqueue(new TextEncoder().encode('\n')); } })));
   const original = harness.dependencies.runtime;
   harness.dependencies.runtime = async (...args) => ({ ...await original(...args), timeout_ms: 10 });
   await rejectsCode(harness.execute(), 'provider_timeout');
-  assert.deepEqual(harness.counters.runtime, [0]); assert.equal(harness.counters.commit, 0); assert.equal(harness.counters.meters[0].outcome, 'unknown'); assert.equal(harness.counters.meters[0].usage, null);
+  assert.deepEqual(harness.counters.runtime, [0, 1]); assert.equal(harness.counters.commit, 0);
+  assert.deepEqual(harness.counters.meters.map(meter => [meter.outcome, meter.usage]), [['unknown', null], ['unknown', null]]);
 });
 
 test('content filtering uses a safe clarification without a repeated provider attempt', async () => {

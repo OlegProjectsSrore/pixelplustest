@@ -6,7 +6,7 @@ import type { AdapterContext, AdapterHandler } from '../integration.ts';
 import type { StoredSession } from '../storage/types.ts';
 import { fail, mutation, object, requestHash, textField } from '../security.ts';
 import { buildChatContext, type ChatContextInput } from './build-context.ts';
-import { CLASSIFIER_REASONING, classifyTurn } from './classifier.ts';
+import { CLASSIFIER_REASONING, CLASSIFIER_REASONING_TIMEOUT_MS, classifyTurn } from './classifier.ts';
 import type { Classification, ClassifierRuntime } from './types.ts';
 
 export interface PreparedChatTurn {
@@ -30,6 +30,8 @@ export interface ChatHandlerDependencies {
    * It must recheck revision/channel/time after the external request. No partial commits.
    */
   commitTurn(request: Request, context: AdapterContext, session: StoredSession, turn: PreparedChatTurn): Promise<Response | Json>;
+  /** How long the classifier may think before the message is classified again without thinking; CLASSIFIER_REASONING_TIMEOUT_MS by default. */
+  reasoningTimeoutMs?: number;
   context?(context: AdapterContext, session: StoredSession, lib: AuditLibrary): Promise<Pick<ChatContextInput, 'allowedQuestionIds' | 'allowedAttemptIds' | 'dialog' | 'currentQuestionText'> & {
     faqs?: { id: string; question: string; answer: string }[];
     clarificationQuestions?: { id: string; text: string }[];
@@ -99,18 +101,21 @@ export function createChatHandler(dependencies: ChatHandlerDependencies): Adapte
       ]);
       const modelContext = buildChatContext({ lib, state: session.state, events, existingAnswers, currentQuestion: question,
         sourceEvents: [event], allowDraft: core.engineOptions.allowDraft, ...extras });
-      const runAttempt = async (current: StoredSession, attempt: number) => {
+      const runAttempt = async (current: StoredSession, attempt: number, reasoning?: typeof CLASSIFIER_REASONING) => {
         const remaining = () => INTERVIEW_BUDGET_MS - elapsedInterviewMs(current.state, core.now());
         if (remaining() <= 0) fail(409, 'time_limit', 'Время опроса закончилось. Завершите сбор сведений.');
         const runtime = await dependencies.runtime(context, current, input.operation_id, attempt);
         const timeLeft = remaining();
         if (timeLeft <= 0) fail(409, 'time_limit', 'Время опроса закончилось. Завершите сбор сведений.');
-        return classifyTurn(modelContext, { ...runtime, timeout_ms: Math.min(runtime.timeout_ms, timeLeft) }, CLASSIFIER_REASONING);
+        const limit = reasoning ? Math.min(runtime.timeout_ms, dependencies.reasoningTimeoutMs ?? CLASSIFIER_REASONING_TIMEOUT_MS) : runtime.timeout_ms;
+        return classifyTurn(modelContext, { ...runtime, timeout_ms: Math.min(limit, timeLeft) }, reasoning);
       };
-      let result = await runAttempt(session, 0);
-      // Only an invalid, completed response permits a second metered attempt here.
-      // Unknown/network outcomes are reconciled by the core; never blindly repeat them.
-      if (!result.ok && result.error.code === 'provider_output' && result.error.retryable) {
+      let result = await runAttempt(session, 0, CLASSIFIER_REASONING);
+      // Only an invalid, completed response permits a second metered attempt here, with thinking as before. Thinking that ran past its
+      // limit is the one unknown outcome repeated: a classification changes nothing outside, and without thinking it takes about 2 s.
+      // Other unknown/network outcomes are reconciled by the core; never blindly repeat them.
+      const thoughtTooLong = !result.ok && result.error.code === 'provider_timeout';
+      if (!result.ok && ((result.error.code === 'provider_output' && result.error.retryable) || thoughtTooLong)) {
         const refreshed = await core.authenticate(request, input.session_id);
         const completed = await core.store.getOperation(session.id, input.operation_id);
         if (completed) {
@@ -120,7 +125,7 @@ export function createChatHandler(dependencies: ChatHandlerDependencies): Adapte
         if (refreshed.state.revision !== input.expected_revision || refreshed.state.channel_revision !== input.channel_revision) fail(409, 'revision_conflict', 'Состояние изменилось. Обновите опрос.');
         if (refreshed.state.library_version !== input.library_version || refreshed.state.active_channel !== 'chat' || refreshed.state.status !== 'in_progress' || refreshed.state.paused !== session.state.paused) fail(409, 'channel_conflict', 'Состояние общения изменилось.');
         if (elapsedInterviewMs(refreshed.state, core.now()) >= INTERVIEW_BUDGET_MS) fail(409, 'time_limit', 'Время опроса закончилось. Завершите сбор сведений.');
-        result = await runAttempt(refreshed, 1);
+        result = await runAttempt(refreshed, 1, thoughtTooLong ? undefined : CLASSIFIER_REASONING);
       }
       if (!result.ok && result.error.code !== 'provider_output') fail(503, result.error.code, 'Не удалось обработать ответ. Ваш текст сохранён в браузере.', result.error.retryable);
       classification = result.ok ? result.classification : empty();
