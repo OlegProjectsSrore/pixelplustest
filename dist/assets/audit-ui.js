@@ -120,8 +120,11 @@ export function createAuditView(handlers = {}) {
 
   const questionSection = element('section', 'audit-question');
   questionSection.setAttribute('aria-labelledby', `${prefix}-question`);
-  const questionTitle = element('h3', 'audit-question-title');
+  // The current question looks like every other assistant message: the same grey card with «Ассистент» above the text.
+  const questionCard = element('div', 'audit-message audit-question-card');
+  const questionTitle = element('h3', 'audit-question-title audit-message-text');
   questionTitle.id = `${prefix}-question`;
+  questionCard.append(element('span', 'audit-message-role', 'Ассистент'), questionTitle);
   const selectionForm = element('form', 'audit-selection-form');
   const optionFieldset = element('fieldset', 'audit-options');
   const optionLegend = element('legend', 'audit-option-legend');
@@ -132,7 +135,7 @@ export function createAuditView(handlers = {}) {
   selectionSubmit.type = 'submit';
   selectionActions.append(selectionSubmit);
   selectionForm.append(optionFieldset, selectionActions);
-  questionSection.append(questionTitle, selectionForm);
+  questionSection.append(questionCard, selectionForm);
 
   const textForm = element('form', 'audit-text-form');
   const textLabel = element('label', 'audit-label', 'Ваш ответ');

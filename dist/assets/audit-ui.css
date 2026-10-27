@@ -91,8 +91,9 @@
 .audit-dialog .audit-message-role { display: block; margin-bottom: 3px; color: var(--audit-muted); font-size: 12px; }
 .audit-dialog .audit-message-text { overflow-wrap: anywhere; white-space: pre-wrap; }
 .audit-dialog .audit-message-link { color: var(--audit-red); text-decoration: underline; }
-.audit-dialog .audit-question { margin-top: 24px; }
-.audit-dialog .audit-question-title { font-size: 17px; line-height: 1.5; font-weight: 700; overflow-wrap: anywhere; }
+.audit-dialog .audit-question { margin-top: 16px; }
+.audit-dialog .audit-messages:not([hidden]) + .audit-question { margin-top: -2px; }
+.audit-dialog .audit-question-title { margin: 0; font: inherit; }
 .audit-dialog .audit-selection-form { margin: 16px 0 0; padding: 0; }
 .audit-dialog .audit-options { display: block; min-width: 0; margin: 0; padding: 0; border: 0; }
 .audit-dialog .audit-option-legend { display: block; width: 100%; padding: 0; margin: 0 0 10px; font-size: 14px; color: var(--audit-muted); }
@@ -134,7 +135,6 @@
   .audit-dialog .audit-body { padding: 16px; }
   .audit-dialog .audit-footer { padding: 12px 16px; }
   .audit-dialog .audit-message { max-width: 96%; }
-  .audit-dialog .audit-question-title { font-size: 18px; }
   .audit-dialog .audit-text-actions { align-items: flex-end; gap: 10px; }
   .audit-dialog .audit-hint { max-width: 150px; }
   .audit-dialog .audit-email-row { flex-direction: column; }
