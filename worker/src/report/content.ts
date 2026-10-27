@@ -5,7 +5,7 @@ import { coverPngBase64 } from "./cover-image.ts";
 import { regularFont, boldFont } from "./fonts.ts";
 import { ReportFailure } from "./pdf.ts";
 import { reportOutline, toldText, type WriterOutput } from "./report-writer.ts";
-import { object, strings, textValue } from "./told.ts";
+import { nonAnswer, object, strings, textValue } from "./told.ts";
 
 export const TEMPLATE_VERSION = "2.0.0";
 // A result analysed with the previous template has the same shape: a report in flight at a release still renders.
@@ -111,7 +111,9 @@ export function buildReportContent(result: AuditResult, snapshot: AuditSnapshot,
       esc(textOf(id)?.impact ?? (consequence(id) || sentence(reasons.confirmed))), esc(textOf(id)?.action ?? services(id))]), "top")));
 
   // 2. About the company: only what the visitor said; a cause outside digital services is named once below the table.
-  const goalText = [sentence(told("context.goal")), told("context.goal_period") && `Срок: ${lowerFirst(told("context.goal_period")).replace(/[.!?]+$/, "")}.`].filter(Boolean).join(" ");
+  // A non-answer saved as the visitor's words («не знаю», «не скажу», «нет данных») leaves its row out like a missing answer.
+  const said = (id: string) => { const text = told(id); return nonAnswer(text) ? "" : text; };
+  const goalText = [sentence(said("context.goal")), said("context.goal_period") && `Срок: ${lowerFirst(said("context.goal_period")).replace(/[.!?]+$/, "")}.`].filter(Boolean).join(" ");
   const priorityFact = facts["context.priority"];
   const named = priorityFact?.state === "known" && priorityFact.confirmation === "explicit" && Array.isArray(priorityFact.value) ? priorityFact.value.filter((value): value is string => typeof value === "string")
     .map(value => library.domains.find(domain => domain.id === value || domain.title === value)?.title ?? "").filter(Boolean) : [];
@@ -119,14 +121,14 @@ export function buildReportContent(result: AuditResult, snapshot: AuditSnapshot,
   const funnelOption = funnelValue && funnelValue !== "unclear" ? library.facts.find(fact => fact.id === "context.funnel")?.values?.find(value => typeof value === "object" && value.id === funnelValue) : undefined;
   const funnel = funnelOption && typeof funnelOption === "object" && typeof funnelOption.label === "string" ? funnelOption.label : "";
   const complaint = [named.length === 1 ? `Главным Вы назвали направление «${named[0]}».` : named.length ? `Главными Вы назвали направления ${named.map(item => `«${item}»`).join(", ")}.` : "", funnel ? `Больше всего клиентов теряется так: ${lowerFirst(funnel)}.` : ""].filter(Boolean).join(" ");
-  const businessText = [sentence(told("context.business")), told("context.model") && `Модель продаж: ${lowerFirst(told("context.model")).replace(/[.!?]+$/, "")}.`].filter(Boolean).join(" ");
+  const businessText = [sentence(said("context.business")), said("context.model") && `Модель продаж: ${lowerFirst(said("context.model")).replace(/[.!?]+$/, "")}.`].filter(Boolean).join(" ");
   // The rows of the kit's «О компании» in its order; the main problem in the visitor's words, otherwise the named topics and where clients are lost.
-  const companyRows: [string, string][] = [["Компания", told("context.company_name")], ["Сайт", website], ["Чем занимается компания", businessText], ["Продукты / услуги", sentence(told("context.products"))],
-    ["Целевая аудитория", sentence(told("context.audience"))], ["Основные каналы продаж", sentence(told("context.channels"))], ["География / регионы", sentence(told("context.geography"))],
-    ["Количество сотрудников", sentence(told("context.company_size"))], ["Выручка за 3 года", sentence(told("context.revenue_3y"))], ["Выручка за последний год", sentence(told("context.revenue_year"))],
-    ["Средний чек", sentence(told("context.average_check"))], ["Типичный цикл сделки", sentence(told("context.deal_cycle"))], ["Площадки и системы", sentence(told("context.assets"))],
-    ["Целевой бизнес-результат", goalText], ["Главная проблема, озвученная клиентом", sentence(told("context.main_problem")) || complaint]];
-  const externalCause = told("context.external_cause").replace(/[.!?]+$/, "");
+  const companyRows: [string, string][] = [["Компания", said("context.company_name")], ["Сайт", website], ["Чем занимается компания", businessText], ["Продукты / услуги", sentence(said("context.products"))],
+    ["Целевая аудитория", sentence(said("context.audience"))], ["Основные каналы продаж", sentence(said("context.channels"))], ["География / регионы", sentence(said("context.geography"))],
+    ["Количество сотрудников", sentence(said("context.company_size"))], ["Выручка за 3 года", sentence(said("context.revenue_3y"))], ["Выручка за последний год", sentence(said("context.revenue_year"))],
+    ["Средний чек", sentence(said("context.average_check"))], ["Типичный цикл сделки", sentence(said("context.deal_cycle"))], ["Площадки и системы", sentence(said("context.assets"))],
+    ["Целевой бизнес-результат", goalText], ["Главная проблема, озвученная клиентом", sentence(said("context.main_problem")) || complaint]];
+  const externalCause = said("context.external_cause").replace(/[.!?]+$/, "");
   const external = texts.external_cause && externalCause ? texts.external_cause.replace("{{external_cause}}", externalCause) : "";
   const shownCompany = companyRows.filter(([, value]) => value);
   if (shownCompany.length || external) pages.push(section(`${next()} / РЕЗУЛЬТАТ АУДИТА`, titles.company!,

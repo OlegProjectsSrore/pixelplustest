@@ -4,6 +4,7 @@ import { renderPdf, sha256, randomReadToken, ReportFailure } from "../src/report
 import { buildMime, SmtpTransport } from "../src/report/smtp.ts";
 import type { SmtpSocket } from "../src/report/smtp.ts";
 import { buildReportContent } from "../src/report/content.ts";
+import { nonAnswer } from "../src/report/told.ts";
 import { buildWriterInput } from "../src/report/report-writer.ts";
 import { getReportResponse } from "../src/report/download.ts";
 import type { ReportRecord } from "../src/storage/types.ts";
@@ -128,6 +129,26 @@ test("the report never says «unknown», «not stated» or «needs clarification
     const html = buildReportContent(analyzeAudit(snapshot, library), snapshot, library).html.replace(/<style>[\s\S]*?<\/style>|data:[^"')]+/g, '');
     assert.doesNotMatch(html, forbidden, `${block.id} / ${index}: ${html.match(forbidden)?.[0]}`);
   }
+});
+
+test("a non-answer is told apart from an answer that only mentions not knowing", () => {
+  for (const text of ["Не знаю", "Не знаю.", "Точно не скажу", "не скажем", "Нет данных", "Данных нет", "Это коммерческая тайна", "Затрудняюсь ответить", "Не хочу говорить",
+    "Пока не считали", "У меня нет информации", "Н/Д", "Не знаю, это коммерческая тайна!", "Честно — не помню", "Неизвестно"]) assert.equal(nonAnswer(text), true, text);
+  for (const text of ["", "47 сотрудников", "Около 50, точно не знаю", "Нет", "Пока нет", "Частные покупатели", "не знаю как считать, примерно 10 млн ₽", "Знаю, но не помню точную сумму: около 3 млн"])
+    assert.equal(nonAnswer(text), false, text);
+});
+
+test("«О компании» leaves out the rows where the visitor only said that they do not know or will not tell", () => {
+  const answer = (fact: string, value: string): AuditAnswer => ({ id: fact, question_id: library.questions.find(question => question.fact_ids.includes(fact))!.id, fact_id: fact,
+    state: "known", value, event_ids: ["visitor-1"], channel: "chat", method: "classification", confirmation: "explicit", library_version: library.version, created_at: date });
+  const snapshot: AuditSnapshot = { id: "snap-non-answers", session_id: "session", library_version: library.version, created_at: date, through_seq: 1,
+    answers: [answer("context.company_name", "Дуб"), answer("context.company_size", "Не знаю"), answer("context.revenue_3y", "Точно не скажу"), answer("context.revenue_year", "Нет данных"),
+      answer("context.average_check", "Около 50 тысяч, точно не знаю"), answer("context.audience", "Частные покупатели")],
+    state: initialAuditState(library.version, "chat", date), limitations: [] };
+  const html = buildReportContent(analyzeAudit(snapshot, library, { allowDraft: true }), snapshot, library).html;
+  for (const label of ["Количество сотрудников", "Выручка за 3 года", "Выручка за последний год"]) assert.ok(!html.includes(label), label);
+  for (const text of ["Не знаю", "Точно не скажу", "Нет данных"]) assert.ok(!html.includes(text), text);
+  for (const text of ["Средний чек", "Около 50 тысяч, точно не знаю.", "Целевая аудитория", "Частные покупатели."]) assert.ok(html.includes(text), text);
 });
 
 test("KV cache misses only return waiting and never invoke rendering; expired report returns 410", async () => {
