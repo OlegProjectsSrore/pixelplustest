@@ -168,3 +168,28 @@ test('startDiagnostic goes through the save barrier and its new instructions rep
   assert(sent.some(event => event.type === 'conversation.item.create' && event.item.type === 'function_call_output' && event.item.call_id === 'd1'));
   assert.equal(f.errors.length, 0);
 });
+
+test('A reply OpenAI failed to produce is reported and asked again; the third failure in a row and a quota failure are shown', async t => {
+  const f = fixture(t); await f.start();
+  const sent = f.peers.at(-1).dc.sent, creates = () => sent.filter(e => e.type === 'response.create').length, before = creates();
+  f.emit({ type: 'rate_limits.updated', rate_limits: [{ name: 'tokens', limit: 40000, remaining: 0, reset_seconds: 0.2 }] });
+  f.emit({ type: 'response.created' });
+  f.emit({ type: 'response.done', response: { status: 'failed', status_details: { type: 'failed', error: { type: 'tokens', code: 'rate_limit_exceeded', message: 'Rate limit reached' } } } });
+  assert.equal(f.errors.length, 0, 'a rate limit is not shown');
+  const report = f.controls.at(-1);
+  assert.deepEqual([report[0], report[1], report[3].code, report[3].reset_seconds, report[3].attempt], ['diagnostic', 'call1', 'rate_limit_exceeded', 0.2, 1]);
+  await new Promise(resolve => setTimeout(resolve, 1300));
+  assert.equal(creates(), before + 1, 'the reply is asked again once the token window resets');
+  f.emit({ type: 'response.created' });
+  f.emit({ type: 'response.done', response: { status: 'failed', status_details: { type: 'failed', error: { type: 'server_error' } } } });
+  await new Promise(resolve => setTimeout(resolve, 1600));
+  assert.equal(creates(), before + 2);
+  f.emit({ type: 'response.created' });
+  f.emit({ type: 'response.done', response: { status: 'failed', status_details: { type: 'failed', error: { type: 'server_error' } } } });
+  assert.equal(f.errors.length, 1, 'the third failure in a row is shown');
+  // A completed reply resets the count; a quota failure is final at once.
+  f.emit({ type: 'response.created' }); f.emit({ type: 'response.done', response: { status: 'completed', output: [] } });
+  f.emit({ type: 'response.created' });
+  f.emit({ type: 'response.done', response: { status: 'failed', status_details: { type: 'failed', error: { type: 'insufficient_quota', code: 'insufficient_quota' } } } });
+  assert.equal(f.errors.length, 2);
+});

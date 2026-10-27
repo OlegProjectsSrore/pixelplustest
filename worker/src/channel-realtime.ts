@@ -211,6 +211,15 @@ export function createRealtimeAdapters(options: VoiceBridgeOptions = {}): Partia
       await core.store.db.prepare('UPDATE realtime_calls SET last_seen_at=? WHERE call_id=?').bind(core.now(), call!.id).run();
       return { accepted: true };
     }
+    if (body.action === 'diagnostic') {
+      // A reply OpenAI failed to produce, reported by the browser: provider codes and limits only, never visitor words.
+      const details = body.details && typeof body.details === 'object' && !Array.isArray(body.details) ? body.details as Record<string, unknown> : {};
+      const text = (value: unknown, max: number) => typeof value === 'string' ? value.slice(0, max) : null;
+      const number = (value: unknown) => typeof value === 'number' && Number.isFinite(value) ? value : null;
+      console.warn(JSON.stringify({ event: 'realtime_response_failed', call_id: call!.id, type: text(details.type, 64), code: text(details.code, 64), message: text(details.message, 300),
+        attempt: number(details.attempt), tokens_remaining: number(details.tokens_remaining), reset_seconds: number(details.reset_seconds) }));
+      return { accepted: true };
+    }
     if (body.action !== 'stop') fail(400, 'invalid_action', 'Неизвестное действие звонка.');
     if (!await stopCall(core, call!)) fail(503, 'voice_stop_pending', 'Остановка звонка ещё не подтверждена. Повторите попытку.');
     if (body.delivery_complete === true) await core.store.db.prepare('UPDATE realtime_calls SET delivery_complete=1 WHERE call_id=?').bind(call!.id).run();

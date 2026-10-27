@@ -3,7 +3,7 @@ import { createAuditTransport, createAuditStorage, AuditRequestError } from './a
 import { getTurnstileToken } from './audit-turnstile.js';
 import { checkMicrophone, createVoiceAdapter, loadVoiceSdk } from './audit-voice.js?v=7f69e524a9';
 
-import { createRealtimeVoiceAdapter } from './audit-realtime.js?v=832b0b4a01';
+import { createRealtimeVoiceAdapter } from './audit-realtime.js?v=178d432e70';
 
 const THANKS = 'Спасибо за предоставленную информацию, сейчас подготовим результат предварительного аудита.';
 const VOICE_STATUS = { connecting: 'Соединяемся…', listening: 'Слушаю Вас', thinking: 'Обрабатываю ответ…', speaking: 'Помощник говорит', idle: 'Соединение установлено', disconnected: 'Голосовой разговор отключён', disconnecting: 'Завершаем соединение…' };
@@ -276,10 +276,10 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
     const realtime = config?.voiceProvider === 'openai';
     const sdk = realtime ? undefined : await sdkLoader(config?.ultravoxSdkUrl);
     const factory = realtime && voiceFactory === createVoiceAdapter ? createRealtimeVoiceAdapter : voiceFactory;
-    voice = factory({ sdk, onControl(action, callId, complete) {
+    voice = factory({ sdk, onControl(action, callId, complete, details) {
       const task = async () => {
         const data = await ensureApi().request('/api/voice/control', { method: 'POST', token: saved.management_token,
-          body: { session_id: saved.session.session_id, call_id: callId, action, delivery_complete: complete === true } });
+          body: { session_id: saved.session.session_id, call_id: callId, action, delivery_complete: complete === true, ...(details ? { details } : {}) } });
         if (action === 'stop') { accept(data); saved.voice_call = null; persist(); render(); }
         return data;
       };
