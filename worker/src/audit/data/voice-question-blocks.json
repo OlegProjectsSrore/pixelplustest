@@ -3504,16 +3504,51 @@
     },
     {
       "id": "context_company_size",
-      "text": "Какой размер компании?",
+      "text": "Сколько сотрудников работает в компании?",
       "fact_ids": [
         "context.company_size"
       ]
     },
     {
       "id": "context_business",
-      "text": "Что вы предлагаете и кто обычно это покупает?",
+      "text": "Чем занимается Ваша компания и как в общих чертах проходит продажа?",
       "fact_ids": [
         "context.business"
+      ]
+    },
+    {
+      "id": "context_products",
+      "text": "Какие товары или услуги Вы продаёте? Назовите основные.",
+      "fact_ids": [
+        "context.products"
+      ]
+    },
+    {
+      "id": "context_revenue_year",
+      "text": "Какая выручка компании за последний год? Достаточно примерной суммы.",
+      "fact_ids": [
+        "context.revenue_year"
+      ]
+    },
+    {
+      "id": "context_revenue_3y",
+      "text": "Какая суммарная выручка компании за последние три года? Достаточно примерной суммы.",
+      "fact_ids": [
+        "context.revenue_3y"
+      ]
+    },
+    {
+      "id": "context_average_check",
+      "text": "Какой у Вас средний чек — средняя сумма одной покупки или сделки?",
+      "fact_ids": [
+        "context.average_check"
+      ]
+    },
+    {
+      "id": "context_deal_cycle",
+      "text": "Сколько обычно проходит от первого обращения клиента до оплаты?",
+      "fact_ids": [
+        "context.deal_cycle"
       ]
     },
     {
@@ -3573,6 +3608,13 @@
       ]
     },
     {
+      "id": "context_main_problem",
+      "text": "Что сейчас главная проблема Вашего бизнеса? Опишите своими словами.",
+      "fact_ids": [
+        "context.main_problem"
+      ]
+    },
+    {
       "id": "context_priority",
       "text": "В какой части работы сейчас больше всего неопределённости или затруднений? Можно назвать несколько.",
       "fact_ids": [
@@ -3609,7 +3651,7 @@
     },
     {
       "id": "context_audience",
-      "text": "Ваши покупатели — компании, частные лица или обе группы?",
+      "text": "Кто Ваши основные покупатели?",
       "fact_ids": [
         "context.audience"
       ]

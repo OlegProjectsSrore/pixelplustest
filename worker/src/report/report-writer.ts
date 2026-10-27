@@ -44,10 +44,18 @@ export interface WriterOutput {
   final: { constraint: string; first: string; why: string; next: string };
 }
 
+// Answers saved as codes (audience in 0.1.4, sales model, stage) are shown in words.
+const CODE_LABELS: Record<string, Record<string, string>> = {
+  "context.audience": { b2b: "компании", b2c: "частные лица", mixed: "компании и частные лица" },
+  "context.model": { online_order: "онлайн-покупка", manager_request: "заявка и общение с сотрудником", appointment: "запись на встречу или услугу", offline: "офлайн",
+    marketplace: "через маркетплейсы", digital_product: "цифровой продукт", mixed: "сочетание способов" },
+  "context.stage": { launch: "запуск", operating: "работает", expanding: "расширяется", changing: "меняет модель" },
+};
 /** A told fact as text; empty when the visitor did not say it. */
 export function toldText(facts: Record<string, AuditFact>, id: string): string {
   const fact = facts[id];
-  return fact && ["known", "other"].includes(fact.state) && fact.confirmation !== "disputed" ? textValue(fact.value) : "";
+  const text = fact && ["known", "other"].includes(fact.state) && fact.confirmation !== "disputed" ? textValue(fact.value) : "";
+  return CODE_LABELS[id]?.[text] ?? text;
 }
 const filled = (entries: [string, string][]) => Object.fromEntries(entries.filter(([, value]) => value));
 const explicit = (fact: AuditFact | undefined) => fact?.state === "known" && fact.confirmation === "explicit";
@@ -100,9 +108,11 @@ export function buildWriterInput(snapshot: AuditSnapshot, result: AuditResult, l
   const serviceName = (id: string) => lib.services.find(service => service.id === id)?.name ?? id;
   const tariffsOf = (id: string) => result.tariffs.filter(tariff => result.solutions.find(solution => solution.id === id)!.service_ids.includes(String(tariff.details.service_id)));
   return {
-    company: filled([["name", told("context.company_name")], ["website", website], ["business", told("context.business")], ["audience", told("context.audience")],
-      ["size", told("context.company_size")], ["geography", told("context.geography")], ["sales_model", told("context.model")], ["channels", told("context.channels")],
-      ["platforms_and_systems", told("context.assets")], ["stage", told("context.stage")]]),
+    company: filled([["name", told("context.company_name")], ["website", website], ["business", told("context.business")], ["products_and_services", told("context.products")],
+      ["audience", told("context.audience")], ["employees", told("context.company_size")], ["geography", told("context.geography")], ["sales_model", told("context.model")],
+      ["channels", told("context.channels")], ["revenue_last_year", told("context.revenue_year")], ["revenue_last_3_years", told("context.revenue_3y")],
+      ["average_check", told("context.average_check")], ["deal_cycle", told("context.deal_cycle")], ["platforms_and_systems", told("context.assets")], ["stage", told("context.stage")],
+      ["main_problem_in_visitor_words", told("context.main_problem")]]),
     contact: filled([["name", told("context.name")], ["position", told("context.position")]]),
     goal: filled([["result", told("context.goal")], ["period", told("context.goal_period")], ["resources", told("context.resources")], ["constraints", told("context.constraints")], ["budget", told("context.budget")]]),
     named_directions: problems.filter(problem => problem.named >= 0).sort((a, b) => a.named - b.named).map(problem => problem.domainTitle).filter((title, index, all) => all.indexOf(title) === index),

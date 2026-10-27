@@ -119,7 +119,7 @@
     },
     {
       "id": "context.company_size",
-      "label": "Размер компании",
+      "label": "Количество сотрудников",
       "value_type": "text",
       "states": [
         "known",
@@ -137,7 +137,10 @@
       "author": "Codex — по запросу владельца проекта",
       "reviewer": "project_owner_chat_approval",
       "approved_at": "2026-10-26T11:14:36.181Z",
-      "purpose": "Обязательное знакомство перед основным опросом"
+      "purpose": "Обязательное знакомство перед основным опросом",
+      "v0_1_4": {
+        "label": "Размер компании"
+      }
     },
     {
       "id": "context.business",
@@ -160,6 +163,144 @@
       "reviewer": "project_owner_chat_approval",
       "approved_at": "2026-10-23T06:01:25.796Z",
       "purpose": "Контекст, значимость, применимость и ограничения выбранных блоков"
+    },
+    {
+      "id": "context.products",
+      "label": "Продукты и услуги",
+      "value_type": "text",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — по команде владельца 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T07:44:20Z",
+      "introduced_in": "0.2.0",
+      "purpose": "Раздел «О компании» отчёта: только то, что посетитель назвал сам"
+    },
+    {
+      "id": "context.revenue_year",
+      "label": "Выручка за последний год",
+      "value_type": "text",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — по команде владельца 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T07:44:20Z",
+      "introduced_in": "0.2.0",
+      "purpose": "Раздел «О компании» отчёта: только то, что посетитель назвал сам"
+    },
+    {
+      "id": "context.revenue_3y",
+      "label": "Выручка за 3 года",
+      "value_type": "text",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — по команде владельца 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T07:44:20Z",
+      "introduced_in": "0.2.0",
+      "purpose": "Раздел «О компании» отчёта: только то, что посетитель назвал сам"
+    },
+    {
+      "id": "context.average_check",
+      "label": "Средний чек",
+      "value_type": "text",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — по команде владельца 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T07:44:20Z",
+      "introduced_in": "0.2.0",
+      "purpose": "Раздел «О компании» отчёта: только то, что посетитель назвал сам"
+    },
+    {
+      "id": "context.deal_cycle",
+      "label": "Типичный цикл сделки",
+      "value_type": "text",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — по команде владельца 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T07:44:20Z",
+      "introduced_in": "0.2.0",
+      "purpose": "Раздел «О компании» отчёта: только то, что посетитель назвал сам"
+    },
+    {
+      "id": "context.main_problem",
+      "label": "Главная проблема своими словами",
+      "value_type": "text",
+      "states": [
+        "known",
+        "unknown",
+        "not_measured",
+        "not_applicable",
+        "declined",
+        "ambiguous",
+        "other",
+        "not_asked",
+        "conflicting"
+      ],
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — по команде владельца 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T07:44:20Z",
+      "introduced_in": "0.2.0",
+      "purpose": "Раздел «О компании» отчёта: только то, что посетитель назвал сам"
     },
     {
       "id": "context.model",
@@ -12860,8 +13001,8 @@
     },
     {
       "id": "context.audience",
-      "label": "Кто покупает",
-      "value_type": "enum",
+      "label": "Целевая аудитория",
+      "value_type": "text",
       "states": [
         "known",
         "unknown",
@@ -12874,16 +13015,20 @@
         "conflicting"
       ],
       "purpose": "Применимость, объём и формат решения; B2B/B2C не подменяют механизм продажи",
-      "values": [
-        "b2b",
-        "b2c",
-        "mixed"
-      ],
       "version": "0.1.1",
       "status": "approved",
       "author": "Codex — подготовка по методике",
       "reviewer": "project_owner_chat_approval",
-      "approved_at": "2026-10-23T06:01:25.796Z"
+      "approved_at": "2026-10-23T06:01:25.796Z",
+      "v0_1_4": {
+        "value_type": "enum",
+        "values": [
+          "b2b",
+          "b2c",
+          "mixed"
+        ],
+        "label": "Кто покупает"
+      }
     },
     {
       "id": "context.stage",

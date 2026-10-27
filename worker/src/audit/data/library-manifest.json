@@ -4,7 +4,7 @@
   "status": "approved",
   "language": "ru",
   "reviewer": "project_owner_chat_approval",
-  "approved_at": "2026-10-27T03:08:12Z",
+  "approved_at": "2026-10-27T07:44:20Z",
   "storage": {
     "library": "Project JSON imported into the server bundle; not D1",
     "visitor_data": "D1 per architecture; no database writes performed by these tools"
@@ -76,8 +76,8 @@
     },
     {
       "name": "facts.json",
-      "sha256": "986f671d018b2837447d96b14f6ef7d8b456c8afb804a3bb7890b05b780b3c47",
-      "bytes": 563442,
+      "sha256": "c3a1c19bc658a09529f9edacbfbf3db2bdd9f1467dc923e5d95f8d3afeb58485",
+      "bytes": 568112,
       "role": "runtime_candidate"
     },
     {
@@ -106,8 +106,8 @@
     },
     {
       "name": "question-bank.json",
-      "sha256": "75857eb06d8d2dae3e6522bc385874b73b4a1e86d595c71efa7605a4f4c709af",
-      "bytes": 951646,
+      "sha256": "81965db0938cd5bd2858cdc343e5d7e29d87a8e86eec3ee5de83830f2f48c8ee",
+      "bytes": 959545,
       "role": "runtime_candidate"
     },
     {
@@ -130,8 +130,8 @@
     },
     {
       "name": "scenario.json",
-      "sha256": "97ca3abced33d47f2caaff1cd26bf71481a5ec70bbf529ab29f28f6ef26d1aaf",
-      "bytes": 8063,
+      "sha256": "512ea5513213cfd930a935427f7563378162fa755ba7275274caaf544b96bee0",
+      "bytes": 8324,
       "role": "runtime_candidate"
     },
     {
@@ -160,16 +160,16 @@
     },
     {
       "name": "voice-question-blocks.json",
-      "sha256": "370d4c2e78b721ce7ef1f0089f45f0da4e78afe76ad8a922e6638b5fb6ae8db7",
-      "bytes": 141633,
+      "sha256": "deac93a1a236a857c5ab5de163c3dbf9431c68ba08cee007ef8a630f6673ef04",
+      "bytes": 143142,
       "role": "runtime_candidate"
     }
   ],
   "counts": {
     "situations": 159,
     "domains": 17,
-    "facts": 396,
-    "questions": 447,
+    "facts": 402,
+    "questions": 453,
     "answer_sets": 159,
     "services": 76,
     "normalized_tariffs": 184,

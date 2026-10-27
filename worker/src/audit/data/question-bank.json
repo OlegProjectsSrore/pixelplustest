@@ -123,8 +123,8 @@
       "fact_ids": [
         "context.company_size"
       ],
-      "chat": "Какой размер компании?",
-      "voice": "Какой размер компании?",
+      "chat": "Сколько сотрудников работает в компании?",
+      "voice": "Сколько сотрудников работает в компании?",
       "skip_if": "Ответ уже явно сообщён посетителем; не повторять при смене канала.",
       "version": "0.1.4",
       "status": "approved",
@@ -138,15 +138,19 @@
       "duration_status": "author_estimate_not_measured",
       "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
       "max_clarifications": 1,
-      "answer_mode": "structured_fact"
+      "answer_mode": "structured_fact",
+      "v0_1_4": {
+        "chat": "Какой размер компании?",
+        "voice": "Какой размер компании?"
+      }
     },
     {
       "id": "context_business",
       "fact_ids": [
         "context.business"
       ],
-      "chat": "Что вы предлагаете и кто обычно это покупает?",
-      "voice": "Что вы предлагаете и кто обычно это покупает?",
+      "chat": "Чем занимается Ваша компания и как в общих чертах проходит продажа?",
+      "voice": "Чем занимается Ваша компания и как в общих чертах проходит продажа?",
       "skip_if": "Все запрашиваемые сведения уже известны и не противоречат друг другу; не переспрашивать ради шаблона.",
       "version": "0.1.1",
       "status": "approved",
@@ -464,8 +468,125 @@
           "integration_migration",
           "integration_manual",
           "integration_reports"
-        ]
+        ],
+        "chat": "Что вы предлагаете и кто обычно это покупает?",
+        "voice": "Что вы предлагаете и кто обычно это покупает?"
       }
+    },
+    {
+      "id": "context_products",
+      "fact_ids": [
+        "context.products"
+      ],
+      "chat": "Какие товары или услуги Вы продаёте? Назовите основные.",
+      "voice": "Какие товары или услуги Вы продаёте? Назовите основные.",
+      "skip_if": "Ответ уже явно сообщён посетителем; не повторять при смене канала.",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — по команде владельца 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T07:44:20Z",
+      "introduced_in": "0.2.0",
+      "phase": "orientation",
+      "estimated_seconds": 20,
+      "related_blocks": [],
+      "time_importance": "context_or_routing",
+      "duration_status": "author_estimate_not_measured",
+      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
+      "max_clarifications": 1,
+      "answer_mode": "structured_fact"
+    },
+    {
+      "id": "context_revenue_year",
+      "fact_ids": [
+        "context.revenue_year"
+      ],
+      "chat": "Какая выручка компании за последний год? Достаточно примерной суммы.",
+      "voice": "Какая выручка компании за последний год? Достаточно примерной суммы.",
+      "skip_if": "Ответ уже явно сообщён посетителем; не повторять при смене канала.",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — по команде владельца 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T07:44:20Z",
+      "introduced_in": "0.2.0",
+      "phase": "orientation",
+      "estimated_seconds": 20,
+      "related_blocks": [],
+      "time_importance": "context_or_routing",
+      "duration_status": "author_estimate_not_measured",
+      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
+      "max_clarifications": 1,
+      "answer_mode": "structured_fact"
+    },
+    {
+      "id": "context_revenue_3y",
+      "fact_ids": [
+        "context.revenue_3y"
+      ],
+      "chat": "Какая суммарная выручка компании за последние три года? Достаточно примерной суммы.",
+      "voice": "Какая суммарная выручка компании за последние три года? Достаточно примерной суммы.",
+      "skip_if": "Ответ уже явно сообщён посетителем; не повторять при смене канала.",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — по команде владельца 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T07:44:20Z",
+      "introduced_in": "0.2.0",
+      "phase": "orientation",
+      "estimated_seconds": 20,
+      "related_blocks": [],
+      "time_importance": "context_or_routing",
+      "duration_status": "author_estimate_not_measured",
+      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
+      "max_clarifications": 1,
+      "answer_mode": "structured_fact"
+    },
+    {
+      "id": "context_average_check",
+      "fact_ids": [
+        "context.average_check"
+      ],
+      "chat": "Какой у Вас средний чек — средняя сумма одной покупки или сделки?",
+      "voice": "Какой у Вас средний чек — средняя сумма одной покупки или сделки?",
+      "skip_if": "Ответ уже явно сообщён посетителем; не повторять при смене канала.",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — по команде владельца 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T07:44:20Z",
+      "introduced_in": "0.2.0",
+      "phase": "orientation",
+      "estimated_seconds": 20,
+      "related_blocks": [],
+      "time_importance": "context_or_routing",
+      "duration_status": "author_estimate_not_measured",
+      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
+      "max_clarifications": 1,
+      "answer_mode": "structured_fact"
+    },
+    {
+      "id": "context_deal_cycle",
+      "fact_ids": [
+        "context.deal_cycle"
+      ],
+      "chat": "Сколько обычно проходит от первого обращения клиента до оплаты?",
+      "voice": "Сколько обычно проходит от первого обращения клиента до оплаты?",
+      "skip_if": "Ответ уже явно сообщён посетителем; не повторять при смене канала.",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — по команде владельца 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T07:44:20Z",
+      "introduced_in": "0.2.0",
+      "phase": "orientation",
+      "estimated_seconds": 20,
+      "related_blocks": [],
+      "time_importance": "context_or_routing",
+      "duration_status": "author_estimate_not_measured",
+      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
+      "max_clarifications": 1,
+      "answer_mode": "structured_fact"
     },
     {
       "id": "context_model",
@@ -3075,6 +3196,29 @@
           "integration_reports"
         ]
       }
+    },
+    {
+      "id": "context_main_problem",
+      "fact_ids": [
+        "context.main_problem"
+      ],
+      "chat": "Что сейчас главная проблема Вашего бизнеса? Опишите своими словами.",
+      "voice": "Что сейчас главная проблема Вашего бизнеса? Опишите своими словами.",
+      "skip_if": "Ответ уже явно сообщён посетителем; не повторять при смене канала.",
+      "version": "0.2.0",
+      "status": "approved",
+      "author": "Claude — по команде владельца 27.10.2026",
+      "reviewer": "project_owner_chat_approval",
+      "approved_at": "2026-10-27T07:44:20Z",
+      "introduced_in": "0.2.0",
+      "phase": "orientation",
+      "estimated_seconds": 20,
+      "related_blocks": [],
+      "time_importance": "context_or_routing",
+      "duration_status": "author_estimate_not_measured",
+      "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
+      "max_clarifications": 1,
+      "answer_mode": "structured_fact"
     },
     {
       "id": "context_priority",
@@ -19495,8 +19639,8 @@
       "fact_ids": [
         "context.audience"
       ],
-      "chat": "Ваши покупатели — компании, частные лица или обе группы?",
-      "voice": "Ваши покупатели — компании, частные лица или обе группы?",
+      "chat": "Кто Ваши основные покупатели?",
+      "voice": "Кто Ваши основные покупатели?",
       "phase": "orientation",
       "estimated_seconds": 25,
       "skip_if": "Сведения уже сообщены и непротиворечивы",
@@ -19813,7 +19957,9 @@
           "integration_migration",
           "integration_manual",
           "integration_reports"
-        ]
+        ],
+        "chat": "Ваши покупатели — компании, частные лица или обе группы?",
+        "voice": "Ваши покупатели — компании, частные лица или обе группы?"
       }
     },
     {

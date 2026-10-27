@@ -120,9 +120,12 @@ export function buildReportContent(result: AuditResult, snapshot: AuditSnapshot,
   const funnel = funnelOption && typeof funnelOption === "object" && typeof funnelOption.label === "string" ? funnelOption.label : "";
   const complaint = [named.length === 1 ? `Главным Вы назвали направление «${named[0]}».` : named.length ? `Главными Вы назвали направления ${named.map(item => `«${item}»`).join(", ")}.` : "", funnel ? `Больше всего клиентов теряется так: ${lowerFirst(funnel)}.` : ""].filter(Boolean).join(" ");
   const businessText = [sentence(told("context.business")), told("context.model") && `Модель продаж: ${lowerFirst(told("context.model")).replace(/[.!?]+$/, "")}.`].filter(Boolean).join(" ");
-  const companyRows: [string, string][] = [["Компания", told("context.company_name")], ["Сайт", website], ["Чем занимается компания", businessText], ["Целевая аудитория", sentence(told("context.audience"))],
-    ["Основные каналы продаж", sentence(told("context.channels"))], ["География / регионы", sentence(told("context.geography"))], ["Количество сотрудников", sentence(told("context.company_size"))],
-    ["Площадки и системы", sentence(told("context.assets"))], ["Целевой бизнес-результат", goalText], ["Главная проблема, озвученная клиентом", complaint]];
+  // The rows of the kit's «О компании» in its order; the main problem in the visitor's words, otherwise the named topics and where clients are lost.
+  const companyRows: [string, string][] = [["Компания", told("context.company_name")], ["Сайт", website], ["Чем занимается компания", businessText], ["Продукты / услуги", sentence(told("context.products"))],
+    ["Целевая аудитория", sentence(told("context.audience"))], ["Основные каналы продаж", sentence(told("context.channels"))], ["География / регионы", sentence(told("context.geography"))],
+    ["Количество сотрудников", sentence(told("context.company_size"))], ["Выручка за 3 года", sentence(told("context.revenue_3y"))], ["Выручка за последний год", sentence(told("context.revenue_year"))],
+    ["Средний чек", sentence(told("context.average_check"))], ["Типичный цикл сделки", sentence(told("context.deal_cycle"))], ["Площадки и системы", sentence(told("context.assets"))],
+    ["Целевой бизнес-результат", goalText], ["Главная проблема, озвученная клиентом", sentence(told("context.main_problem")) || complaint]];
   const externalCause = told("context.external_cause").replace(/[.!?]+$/, "");
   const external = texts.external_cause && externalCause ? texts.external_cause.replace("{{external_cause}}", externalCause) : "";
   const shownCompany = companyRows.filter(([, value]) => value);
