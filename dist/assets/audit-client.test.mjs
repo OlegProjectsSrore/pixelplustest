@@ -7,7 +7,7 @@ globalThis.document = {
   addEventListener() {}, body: { append() {} },
   createElement() { return { click() {}, remove() {} }; },
 };
-const { createAuditClient } = await import('./audit-client.js');
+const { createAuditClient, placeMessage } = await import('./audit-client.js');
 
 const state = (patch = {}) => ({ session_id: 's1', status: 'in_progress', revision: 0,
   channel_revision: 0, library_version: 'test', active_channel: 'chat', paused: false,
@@ -576,10 +576,10 @@ test('the visitor\'s message is shown as soon as it is sent and stays above the 
   } });
   await f.client.open(); f.draft = 'А Пиксель плюс занимается созданием игр?';
   await f.handlers.onText(f.draft);
-  assert.deepEqual(during, [['user', 'А Пиксель плюс занимается созданием игр?']], 'the message is on screen before the reply');
-  assert.deepEqual(f.model.messages.map(message => [message.role, message.text]), [['user', 'А Пиксель плюс занимается созданием игр?'], ['assistant', 'Нет, созданием игр мы не занимаемся.']]);
-  assert.deepEqual(f.stored.messages.map(message => message.role), ['user', 'assistant']);
-  assert.equal(f.model.messages[0].id, `user:${f.calls.find(call => call.path === '/api/chat').body.operation_id}`, 'the shown message keeps its place when confirmed');
+  assert.deepEqual(during, [['assistant', 'Вопрос'], ['user', 'А Пиксель плюс занимается созданием игр?']], 'the message is on screen before the reply, after the question it answers');
+  assert.deepEqual(f.model.messages.map(message => [message.role, message.text]), [['assistant', 'Вопрос'], ['user', 'А Пиксель плюс занимается созданием игр?'], ['assistant', 'Нет, созданием игр мы не занимаемся.']]);
+  assert.deepEqual(f.stored.messages.map(message => message.role), ['assistant', 'user', 'assistant']);
+  assert.equal(f.model.messages[1].id, `user:${f.calls.find(call => call.path === '/api/chat').body.operation_id}`, 'the shown message keeps its place when confirmed');
 });
 
 test('a refused message is taken off the screen and its text stays in the draft', async t => {
@@ -591,4 +591,29 @@ test('a refused message is taken off the screen and its text stays in the draft'
   await f.handlers.onText(f.draft);
   assert.deepEqual(f.model.messages, []);
   assert.equal(f.draft, 'Ответ');
+});
+
+test('the chat reads question → answer → reaction: the answered question stays in the history, the next one is asked below', async t => {
+  let during;
+  const f = fixture(t, { request: async (path, options, context) => {
+    if (path !== '/api/chat') return undefined;
+    during = { messages: f.model.messages.map(message => [message.role, message.text]), question: f.model.question };
+    context.server.revision++;
+    context.server.question = { id: 'q2', text: 'Какая у Вас должность?', options: [] };
+    return { session: structuredClone(context.server), operation: { operation_id: options.body.operation_id, text: 'Рады знакомству, Вася.', question_id: 'q2', question_text: 'Кем Вы работаете в компании?' } };
+  } });
+  await f.client.open(); f.draft = 'Вася';
+  await f.handlers.onText(f.draft);
+  assert.deepEqual(during.messages, [['assistant', 'Вопрос'], ['user', 'Вася']], 'the question moves into the history as soon as the answer is sent');
+  assert.equal(during.question, null, 'and is not repeated below while the reply is awaited');
+  assert.deepEqual(f.model.messages.map(message => [message.role, message.text]), [['assistant', 'Вопрос'], ['user', 'Вася'], ['assistant', 'Рады знакомству, Вася.']]);
+  assert.equal(f.model.question.text, 'Кем Вы работаете в компании?');
+  assert.deepEqual(f.stored.messages.map(message => message.id.split(':')[0]), ['question', 'user', 'reply']);
+});
+
+test('a reply is placed right after the message of its own operation, whenever it arrives', () => {
+  const messages = [{ id: 'question:a', role: 'assistant', text: 'Вопрос 1' }, { id: 'user:a', role: 'user', text: 'Ответ 1' }, { id: 'question:b', role: 'assistant', text: 'Вопрос 2' }, { id: 'user:b', role: 'user', text: 'Ответ 2' }];
+  placeMessage(messages, { id: 'reply:a', role: 'assistant', text: 'Реакция 1' }, 'user:a');
+  placeMessage(messages, { id: 'note', role: 'assistant', text: 'Без пары' }, 'user:missing');
+  assert.deepEqual(messages.map(message => message.id), ['question:a', 'user:a', 'reply:a', 'question:b', 'user:b', 'note']);
 });

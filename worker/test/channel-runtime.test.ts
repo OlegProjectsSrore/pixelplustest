@@ -325,6 +325,24 @@ test('the next wording sees the reactions already shown in this session', async 
   } finally { f.db.close(); }
 });
 
+test('the composer sees the dialog as the visitor saw it and the question being answered', async () => {
+  const seen: Record<string, Json>[] = [];
+  const f = await fixture((context, call) => {
+    if ('next_question' in context) { seen.push(context as unknown as Record<string, Json>); return worded; }
+    return call === 1 ? reportFromText(context) : intent('unknown');
+  });
+  f.env.CHAT_COMPOSER_ENABLED = 'true';
+  try {
+    await f.handler(f.request, f.context(f.body()));
+    await f.handler(f.request, f.context(f.body('turn-2', 1, { kind: 'text', text: 'Циркач' }, 'context_position')));
+    assert.equal(seen[1].visitor_message, 'Циркач');
+    assert.equal(seen[1].answered_question, worded.question, 'the question on screen, as it was worded');
+    // Before, only the visitor's messages were sent: the model could not tell which answer was the latest one.
+    assert.deepEqual(seen[1].recent_dialog, [{ role: 'user', text: 'Олег' }, { role: 'assistant', text: worded.reply }, { role: 'assistant', text: worded.question }]);
+    assert.deepEqual((await f.core.store.recentTurns(f.session.id)).map(turn => turn.text), ['Олег', 'Циркач']);
+  } finally { f.db.close(); }
+});
+
 function enableKnowledge(f: Awaited<ReturnType<typeof fixture>>) {
   f.env.KNOWLEDGE_ANSWERS_ENABLED = 'true';
   f.env.BUDGETS_JSON = JSON.stringify({ ...JSON.parse(f.env.BUDGETS_JSON!), knowledge_searches: 10 });

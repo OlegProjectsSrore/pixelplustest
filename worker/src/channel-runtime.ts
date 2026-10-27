@@ -79,6 +79,30 @@ async function composeTurn(context: AdapterContext, session: StoredSession, oper
     return null;
   }
 }
+/** The chat as the visitor saw it, for the composer: each message, the reaction to it and the question asked next, oldest first.
+ * Only the visitor's messages are events; the reactions and questions live in the turn results. */
+type Turn = { text: string; result: Json };
+const resultOf = (turn: Turn): Record<string, Json> => turn.result && typeof turn.result === 'object' && !Array.isArray(turn.result) ? turn.result : {};
+function shownQuestion(turn: Turn, lib: AuditLibrary): string {
+  const result = resultOf(turn);
+  if (typeof result.question_text === 'string' && result.question_text.trim()) return result.question_text;
+  return typeof result.question_id === 'string' ? lib.questions.find(question => question.id === result.question_id)?.chat ?? '' : '';
+}
+function chatDialog(turns: Turn[], lib: AuditLibrary): { role: string; text: string }[] {
+  return turns.flatMap(turn => {
+    const reply = resultOf(turn).text;
+    return [{ role: 'user', text: turn.text }, { role: 'assistant', text: typeof reply === 'string' ? reply : '' }, { role: 'assistant', text: shownQuestion(turn, lib) }];
+  }).filter(item => item.text.trim()).map(item => ({ role: item.role, text: item.text.slice(0, 400) })).slice(-12);
+}
+/** The survey question on screen when the visitor wrote: the wording of the latest turn when it asked this question, else the library text. */
+function answeredQuestion(state: AuditState, turns: Turn[], lib: AuditLibrary): { id: string; text: string } | null {
+  const id = state.current_question_id;
+  if (!id) return null;
+  const last = turns.at(-1);
+  const text = last && resultOf(last).question_id === id ? shownQuestion(last, lib) : lib.questions.find(question => question.id === id)?.chat ?? '';
+  return text ? { id, text } : null;
+}
+
 /** Answers a visitor question from the knowledge base; null when the feature is off or fails, so the turn is never blocked.
  * answered is false for the honest fallbacks (nothing found or no answer in the materials, or only the closest page). */
 async function answerFromKnowledge(context: AdapterContext, session: StoredSession, operationId: string, question: string, history: { role: string; text: string }[], timeoutMs: number): Promise<{ text: string; answered: boolean } | null> {
@@ -217,10 +241,13 @@ export async function commitChatTurn(request: Request, context: AdapterContext, 
   // The survey question does not change after a pure question, so its earlier wording stays.
   if (turn.action !== 'sensitive' && turn.action !== 'question' && timeLeft() > 1_500) {
     const approved = (APPROVED_TEXT_ACTIONS.includes(turn.action) && !offerHelp) || asksKnowledge ? serviceText : null;
+    // The composer sees the whole exchange and the question being answered, so its reaction is to this answer, not to an earlier one.
+    const turns = await context.core.store.recentTurns(session.id);
     const composed = await composeTurn(context, session, turn.input.operation_id, COMPOSE_ATTEMPT, Math.min(8_000, timeLeft()), { visitor_text: turn.event.text ?? null,
+      answered_question: answeredQuestion(session.state, turns, lib),
       // A clarification of the current question would only repeat it; ask for a clearer answer instead.
       approved_text: approved, notice_to_rephrase: approved ? null : serviceText && serviceText === question?.text ? 'Ответ не удалось однозначно понять: попросите уточнить его.' : serviceText,
-      question: question ? { text: question.text, options: question.options.map(option => option.text), ...(question.reask ? { reask: true } : {}) } : null, history: dialog(evidence),
+      question: question ? { text: question.text, options: question.options.map(option => option.text), ...(question.reask ? { reask: true } : {}) } : null, history: chatDialog(turns, lib),
       previous_replies: await context.core.store.recentReplies(session.id) });
     // An empty reworded reply keeps the notice it was meant to convey.
     if (composed) { questionText = composed.question_text; if (!approved) serviceText = composed.reply || serviceText; }

@@ -77,6 +77,11 @@ export class D1Store {
     const result = await this.stmt(`SELECT payload_json,seq FROM audit_events WHERE session_id=? AND seq>? ORDER BY seq LIMIT ?`, sessionId, afterSeq, Math.max(1, Math.min(limit, 1000))).all<Row>();
     return result.results.map(row => ({ ...parse<AuditEvent>(row.payload_json), seq: Number(row.seq) }));
   }
+  /** The latest committed chat turns, oldest first: what the visitor wrote and the turn's result (the reaction and the next question). */
+  async recentTurns(sessionId: string, limit = 6): Promise<{ text: string; result: Json }[]> {
+    const result = await this.stmt(`SELECT payload_json,result_json FROM audit_events WHERE session_id=? AND source='chat' AND result_json IS NOT NULL ORDER BY seq DESC LIMIT ?`, sessionId, Math.max(1, Math.min(limit, 20))).all<Row>();
+    return result.results.map(row => ({ text: String(parse<AuditEvent>(row.payload_json).text ?? ''), result: parse<Json>(row.result_json) })).reverse();
+  }
   /** Assistant texts of the latest committed chat turns, oldest first; only used so wording does not repeat itself. */
   async recentReplies(sessionId: string, limit = 4): Promise<string[]> {
     const result = await this.stmt(`SELECT result_json FROM audit_events WHERE session_id=? AND source='chat' AND result_json IS NOT NULL ORDER BY seq DESC LIMIT ?`, sessionId, Math.max(1, Math.min(limit, 20))).all<Row>();

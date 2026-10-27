@@ -5,12 +5,15 @@ import type { ClassifierRuntime } from './types.ts';
 export interface ComposeInput {
   /** What the visitor just wrote or selected; null before the first question. */
   visitor_text: string | null;
+  /** The question the visitor was answering, as it was shown; null when no survey question was on screen. */
+  answered_question?: { id: string; text: string } | null;
   /** Approved text (FAQ answer, joke) shown verbatim in its own message; the reply must not repeat it. */
   approved_text: string | null;
   /** Library notice (clarification, decline) that the reply conveys in its own words. */
   notice_to_rephrase: string | null;
   /** The engine's next question; the model only rewords it. reask: a key question asked again after no usable answer. */
   question: { text: string; options: string[]; reask?: boolean } | null;
+  /** The conversation as the visitor saw it, oldest first: the visitor's messages (user), the reactions and questions (assistant). */
   history: { role: string; text: string }[];
   /** Reactions already shown in this session, so the next one starts differently. */
   previous_replies: string[];
@@ -19,7 +22,8 @@ export interface Composed { reply: string | null; question_text: string | null }
 
 // The output format is a contract with checkComposed, so it stays here rather than in the editable style.
 const CONTRACT = `Верни только JSON-объект {"reply":"...","question":"..."}: оба поля обязательны, других полей нет.
-reply — реакция на последнее сообщение посетителя по правилам выше или пустая строка. В reply нет вопросительного знака.
+answered_question — вопрос, на который посетитель сейчас отвечал; visitor_message — его ответ на этот вопрос. recent_dialog — разговор по порядку: сообщения посетителя (user), твои реакции и вопросы (assistant).
+reply — реакция только на visitor_message как на ответ на answered_question, по правилам выше, или пустая строка. Не возвращайся к прежним сообщениям из recent_dialog: на них ты уже отреагировал. В reply нет вопросительного знака.
 Если передан notice_to_rephrase, reply обязательно передаёт его смысл своими словами вместо реакции.
 Если передан approved_text, посетитель увидит его дословно отдельным сообщением: не повторяй и не пересказывай его, reply оставь пустым.
 question — next_question.text своими словами по правилам выше; заканчивается вопросительным знаком. Если next_question равен null, question — пустая строка.
@@ -30,7 +34,7 @@ previous_replies — твои прошлые реакции в этом разг
 export function buildComposerPrompt(input: ComposeInput): { role: 'system' | 'user'; content: string }[] {
   return [
     { role: 'system', content: `${CHAT_STYLE}\n\n${CONTRACT}` },
-    { role: 'user', content: JSON.stringify({ visitor_message: input.visitor_text, approved_text: input.approved_text, notice_to_rephrase: input.notice_to_rephrase,
+    { role: 'user', content: JSON.stringify({ visitor_message: input.visitor_text, answered_question: input.answered_question?.text ?? null, approved_text: input.approved_text, notice_to_rephrase: input.notice_to_rephrase,
       next_question: input.question ? { text: input.question.text, answer_options: input.question.options, ...(input.question.reask ? { reask: true } : {}) } : null, recent_dialog: input.history, previous_replies: input.previous_replies }) },
   ];
 }
@@ -62,9 +66,12 @@ export function checkComposed(content: string, input: ComposeInput): Composed | 
     if (question.length < 8 || question.length > 240 || !question.endsWith('?') || question.split('?').length > 2 || FORBIDDEN.test(question)) return null;
   } else if (question) return null;
   const monotonous = !input.notice_to_rephrase && repetitive(reply, input.previous_replies);
-  return { reply: input.approved_text || !reply || monotonous ? null : reply, question_text: input.question ? question : null };
+  // Acquaintance belongs to the answer with the name: «Приятно познакомиться, Василий» after the company size reads as a reply to another message.
+  const misplaced = !!input.answered_question && input.answered_question.id !== 'context_name' && ACQUAINTANCE.test(reply);
+  return { reply: input.approved_text || !reply || monotonous || misplaced ? null : reply, question_text: input.question ? question : null };
 }
 
+const ACQUAINTANCE = /знакомств|познаком/iu;
 // A stock opener or an opening already used in this session makes the chat monotonous: such a reaction is dropped, the question stays.
 const STOCK_OPENERS = ['понял', 'поняла', 'понятно', 'ясно', 'хорошо', 'отлично', 'принято'];
 const firstWord = (text: string) => text.toLocaleLowerCase('ru').replace(/ё/g, 'е').match(/\p{L}+/u)?.[0] ?? '';

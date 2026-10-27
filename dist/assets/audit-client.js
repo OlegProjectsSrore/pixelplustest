@@ -16,6 +16,14 @@ function creationNonce() {
   return btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
+/** Puts a message into the history: right after the message with the id after (a reply after the visitor's message of the same
+ * operation), otherwise at the end. The order of an exchange never depends on when its parts arrive. */
+export function placeMessage(messages, message, after) {
+  const index = after ? messages.findIndex(item => item.id === after) : -1;
+  if (index < 0) messages.push(message);
+  else messages.splice(index + 1, 0, message);
+}
+
 export function createAuditClient({ config, viewFactory = createAuditView, transport, persistence,
   challenge = getTurnstileToken, microphone = checkMicrophone, sdkLoader = loadVoiceSdk,
   voiceFactory = createVoiceAdapter, now = Date.now } = {}) {
@@ -71,13 +79,19 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
     if (session.status !== 'in_progress') return session.status;
     return session.paused ? 'paused' : 'interview';
   }
-  function render() {
+  // The survey question as it is on screen.
+  function shownQuestion() {
     const session = saved.session;
     const phrasing = saved.question_phrasing;
     // DeepSeek's wording replaces the library text only for the question it was written for.
     const serverQuestion = session?.question && phrasing?.question_id === session.question.id ? { ...session.question, text: phrasing.text } : session?.question;
-    const question = serverQuestion?.id === 'context_priority' && Array.isArray(serverQuestion.fact_ids) && serverQuestion.fact_ids.includes('context.priority')
+    return serverQuestion?.id === 'context_priority' && Array.isArray(serverQuestion.fact_ids) && serverQuestion.fact_ids.includes('context.priority')
       ? { ...serverQuestion, answer_mode: 'multiple' } : serverQuestion ?? null;
+  }
+  function render() {
+    const session = saved.session;
+    // While an answer is being sent, the question it answers already stands in the history above it.
+    const question = saved.pending?.question_text ? null : shownQuestion();
     const active = session?.status === 'in_progress';
     const canManage = !!saved.management_token && session?.access_expires_at > now();
     const allowed = active && canManage && !busy && !saved.pending;
@@ -96,12 +110,14 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
   // The visitor's message is shown as soon as it is sent, while the reply is awaited; a refused request takes it away again.
   function shownMessages() {
     const messages = saved.messages || [], pending = saved.pending;
-    const id = pending?.user_text && pending.body?.operation_id ? `user:${pending.body.operation_id}` : null;
-    return id && !messages.some(message => message.id === id) ? [...messages, { id, role: 'user', text: pending.user_text }] : messages;
+    const operation = pending?.user_text && pending.body?.operation_id;
+    if (!operation || messages.some(message => message.id === `user:${operation}`)) return messages;
+    return [...messages, ...(pending.question_text ? [{ id: `question:${operation}`, role: 'assistant', text: pending.question_text }] : []),
+      { id: `user:${operation}`, role: 'user', text: pending.user_text }];
   }
-  function addMessage(id, role, text) {
+  function addMessage(id, role, text, after) {
     if (!text || saved.messages.some(message => message.id === id)) return;
-    saved.messages.push({ id, role, text });
+    placeMessage(saved.messages, { id, role, text }, after);
   }
   function showVoiceTranscript(event) {
     if (event.data?.medium !== 'voice' || !event.text?.trim()) return;
@@ -128,7 +144,7 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
     if (typeof phrasing?.question_id === 'string' && typeof phrasing.text === 'string' && phrasing.text.trim()) saved.question_phrasing = { question_id: phrasing.question_id, text: phrasing.text };
     const reply = data?.reply?.text || data?.operation?.text;
     const replyId = data?.reply?.id || data?.operation?.operation_id || saved.pending?.body?.operation_id;
-    if (reply && replyId) addMessage(`reply:${replyId}`, 'assistant', reply);
+    if (reply && replyId) addMessage(`reply:${replyId}`, 'assistant', reply, `user:${replyId}`);
     // The address asked for after a voice call is in: the interview can go back to voice.
     if (saved.voice_hint && saved.session?.active_channel === 'chat' && saved.session.question?.id !== 'context_website') { saved.voice_hint = false; addMessage(`voice-again:${now()}`, 'assistant', VOICE_AGAIN); }
     if (saved.session && ['closing', 'preparing', 'ready'].includes(saved.session.status)) addMessage('closing-message', 'assistant', THANKS);
@@ -204,7 +220,8 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
     const previous = structuredClone(saved);
     const clearDraft = pending.clear_draft && (view?.getDraft?.() ?? saved.draft).trim() === pending.user_text;
     try {
-      // The visitor's message precedes the reply to it.
+      // The chat reads question → answer → reaction: the question the visitor answered stays in the history, the reply follows the answer.
+      if (pending.user_text && pending.question_text) addMessage(`question:${pending.body.operation_id}`, 'assistant', pending.question_text);
       if (pending.user_text) addMessage(`user:${pending.body.operation_id}`, 'user', pending.user_text);
       accept(data);
       if (pending.path === '/api/voice/transcript') {
@@ -238,9 +255,9 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
     render();
     return saved.pending ? sendPending() : data;
   }
-  async function mutate(path, extra, { userText, clearDraft = false, followup } = {}) {
+  async function mutate(path, extra, { userText, questionText, clearDraft = false, followup } = {}) {
     if (saved.pending) throw new Error('Сначала повторите неподтверждённую отправку.');
-    saved.pending = { path, body: mutationBody(extra), user_text: userText, clear_draft: clearDraft, followup };
+    saved.pending = { path, body: mutationBody(extra), user_text: userText, ...(userText && questionText ? { question_text: questionText } : {}), clear_draft: clearDraft, followup };
     persist();
     if (userText) render();
     return sendPending();
@@ -474,8 +491,8 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
   function ensureView() {
     if (view) return;
     view = viewFactory({
-      onText: text => action(() => enqueue(() => mutate('/api/chat', { question_id: saved.session?.question?.id ?? null, input: { kind: 'text', text } }, { userText: text, clearDraft: true }))),
-      onSelection: ids => action(() => enqueue(() => mutate('/api/chat', { question_id: saved.session?.question?.id ?? null, input: { kind: 'selection', option_ids: ids } }, { userText: ids.map(id => saved.session.question.options.find(option => option.id === id)?.text || id).join(', ') }))),
+      onText: text => action(() => enqueue(() => mutate('/api/chat', { question_id: saved.session?.question?.id ?? null, input: { kind: 'text', text } }, { userText: text, questionText: shownQuestion()?.text, clearDraft: true }))),
+      onSelection: ids => action(() => enqueue(() => mutate('/api/chat', { question_id: saved.session?.question?.id ?? null, input: { kind: 'selection', option_ids: ids } }, { userText: ids.map(id => saved.session.question.options.find(option => option.id === id)?.text || id).join(', '), questionText: shownQuestion()?.text }))),
       onSkip: () => action(() => enqueue(() => mutate('/api/chat', { question_id: saved.session?.question?.id ?? null, input: { kind: 'text', text: 'Предпочитаю не отвечать на этот вопрос.' } }))),
       onChannel: channel => action(() => switchChannel(channel)),
       onPause: () => action(() => control({ action: 'pause' })),
