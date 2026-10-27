@@ -2,6 +2,18 @@
 
 ---
 
+- Date/time: 2026-10-27 06:36
+- Scope: S:\PROJECTS\pixelplustest
+- Summary: ветка `codex/expert-chat-panel` (рабочая копия `.deployment\expert-chat-panel`) перемотана вперёд на `main` до коммита с этой записью.
+  - Ветка была чистой, своих коммитов не имела и отставала на два коммита (363070c → acb6dc2: вопрос о стадии AI и приветствие с жирной фразой в две строки).
+  - Перемотка с `core.autocrlf=false`, чтобы файлы в этой рабочей копии остались с LF.
+- Files changed:
+  - project_log.md
+  - вне репозитория: рабочая копия `.deployment/expert-chat-panel`
+- Reference: «Да, перемотай ветку Codex (codex/expert-chat-panel) на main.»
+
+---
+
 - Date/time: 2026-10-27 06:33
 - Scope: S:\PROJECTS\pixelplustest
 - Summary: приветствие чата с жирной фразой в две строки (запись 06:30) закоммичено и отправлено на GitHub по просьбе владельца одним коммитом вместе с этой записью; изменение `dist/**` запускает публикацию сайта на GitHub Pages.
