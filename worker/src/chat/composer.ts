@@ -39,6 +39,8 @@ export function buildComposerPrompt(input: ComposeInput): { role: 'system' | 'us
 const FORBIDDEN = /https?:|www\.|[*_#`<>[\]{}|]|[₽$€]|тариф|стоимост|(?<!\p{L})цен(?:а|ы|у|е|ой)?(?!\p{L})|(?<!\p{L})руб|гарант|рекоменд|диагноз|советую|советуем|скидк/iu;
 // Why a key answer is needed may speak of the report's recommendations and the cost of work, never of prices or advice.
 const FORBIDDEN_REASK = /https?:|www\.|[*_#`<>[\]{}|]|[₽$€]|тариф|(?<!\p{L})цен(?:а|ы|у|е|ой)?(?!\p{L})|(?<!\p{L})руб|гарант|диагноз|советую|советуем|скидк/iu;
+// Service talk the visitor must never see: the answer format, the question bank and its wording, the data and fields the model was given.
+const SERVICE = /формат\S*\s+ответ|фиксированн\S*\s+формат|формат\S*\s+фиксированн|вопрос\S*\s+из\s+баз|баз\S*\s+вопрос|библиотек\S*\s+вопрос|вопрос\S*\s+из\s+библиотек|сформулирован\S*\s+так|формулировк\S*\s+вопрос|(?:исходн|подготовленн|заготовленн)\S*\s+(?:вопрос|формулировк)|служебн|промпт|(?<!\p{L})json(?!\p{L})|next_question|answer_options|notice_to_rephrase|approved_text|previous_replies|visitor_message|recent_dialog|(?<!\p{L})(?:reply|question|reask)(?!\p{L})/iu;
 // Higher than the classifier's 0 so repeated questions get different wording; checkComposed still gates every output.
 export const COMPOSE_TEMPERATURE = 1.3;
 const clean = (text: string) => text.replace(/\s+/g, ' ').trim();
@@ -53,7 +55,7 @@ export function checkComposed(content: string, input: ComposeInput): Composed | 
   const value = raw as Record<string, unknown>;
   if (Object.keys(value).sort().join(',') !== 'question,reply' || typeof value.reply !== 'string' || typeof value.question !== 'string') return null;
   const reply = clean(value.reply), question = clean(value.question);
-  if (FOREIGN_SCRIPT.test(reply + question)) return null;
+  if (FOREIGN_SCRIPT.test(reply + question) || SERVICE.test(reply) || SERVICE.test(question)) return null;
   if (reply.length > 280 || reply.includes('?') || (input.question?.reask ? FORBIDDEN_REASK : FORBIDDEN).test(reply)) return null;
   if (input.notice_to_rephrase && !reply) return null;
   if (input.question) {

@@ -26,6 +26,19 @@ test('code checks send unsafe or malformed wording back to the library texts', (
   assert.equal(checkComposed(out('', 'Кем Вы работаете?'), input({ notice_to_rephrase: 'Уточните ответ.' })), null, 'a notice must be conveyed');
 });
 
+test('service talk about the answer format, the question bank or the given data goes back to the library texts', () => {
+  for (const [reply, question] of [
+    ['Формат ответа фиксированный. Вопрос из базы сформулирован так:', 'Что Вы предлагаете и кто обычно это покупает?'],
+    ['', 'Вопрос из базы: что Вы предлагаете и кто это покупает?'], ['Исходная формулировка звучит иначе.', 'Кем Вы работаете?'],
+    ['Подготовленный вопрос такой.', 'Кем Вы работаете?'], ['Поле reply оставляю пустым.', 'Кем Вы работаете?'], ['', 'Кем Вы работаете (next_question)?'],
+    ['Отвечаю в формате JSON.', 'Кем Вы работаете?'], ['Это служебная пометка.', 'Кем Вы работаете?'],
+  ]) assert.equal(checkComposed(out(reply, question), input()), null, `${reply} / ${question}`);
+  // Ordinary words about a client base, a work format or instructions in the business stay allowed.
+  assert.notEqual(checkComposed(out('Работа с базой клиентов важна.', 'В каком формате Вы работаете с клиентами?'), input()), null);
+  assert.notEqual(checkComposed(out('', 'Сколько времени сотрудники ищут сведения в документах и инструкциях?'), input()), null);
+  assert.match(CHAT_STYLE, /Не говори о формате ответа, о «вопросе из базы», о формулировке вопроса и о данных, которые тебе переданы/);
+});
+
 test('words like оценка or ценности are not mistaken for prices; approved texts suppress the reply', () => {
   assert.notEqual(checkComposed(out('Понимаю, оценка важна.', 'Какие ценности важны для Вашей компании?'), input()), null);
   assert.deepEqual(checkComposed(out('Повтор шутки.', 'Кем Вы работаете?'), input({ approved_text: 'Шутка из библиотеки.' })), { reply: null, question_text: 'Кем Вы работаете?' });
