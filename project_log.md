@@ -2,6 +2,24 @@
 
 ---
 
+- Date/time: 2026-10-27 01:04
+- Scope: S:\PROJECTS\pixelplustest
+- Summary: в приветствии чата и первой реплике голоса — только два изменения по указанию владельца. Остальной текст не менялся.
+  - «Вашего» и «Вы» теперь с заглавной.
+  - Убрано слово «небольшую».
+  - Новый текст: «Здравствуйте! Я могу ответить на вопросы об услугах Pixel Plus, помочь подобрать подходящее решение или провести экспресс-диагностику Вашего бизнеса. По её итогам Вы получите персональный PDF-отчёт с основными проблемами, приоритетами и рекомендациями.»
+  - Метки версий сайта: audit-ui 4687fa4f81, audit-client 410d2e93f8, site.js 4cd72ac329.
+  - Worker опубликован (версия 17d7c2c1-bd24-4db9-9625-4d1586fe4168, после публикации `smoke-deployed-worker.mjs --open` — PASS). Закоммичено и отправлено на GitHub по просьбе владельца — это публикует сайт.
+- Validation: тесты — 406 из 406.
+- Files changed:
+  - worker/src/channel-realtime.ts (`GREETING`)
+  - dist/assets/audit-ui.js, audit-client.js, site.js; dist/main/index.html
+  - project_log.md
+  - вне репозитория: Cloudflare Worker `pixelplus-ai`, версия 17d7c2c1-bd24-4db9-9625-4d1586fe4168
+- Reference: «Только эти два изменения внеси» («Вы»/«Ваш» с заглавной; «небольшую») и «Да: опубликуй Worker, закоммить приветствие и отправь на GitHub, чтобы опубликовать сайт.»
+
+---
+
 - Date/time: 2026-10-27 01:01
 - Scope: S:\PROJECTS\pixelplustest
 - Summary: ветка `codex/expert-chat-panel` (рабочая копия `.deployment\expert-chat-panel`) перемотана вперёд на `main` до коммита с этой записью.

@@ -1,4 +1,4 @@
-import { createAuditView } from './audit-ui.js?v=f01426c4fa';
+import { createAuditView } from './audit-ui.js?v=4687fa4f81';
 import { createAuditTransport, createAuditStorage, AuditRequestError } from './audit-http.js';
 import { getTurnstileToken } from './audit-turnstile.js';
 import { checkMicrophone, createVoiceAdapter, loadVoiceSdk } from './audit-voice.js?v=7f69e524a9';

@@ -197,7 +197,7 @@ export function createAuditView(handlers = {}) {
   const footerNote = element('p', 'audit-footer-note', 'Рекомендации будут в PDF после опроса.');
   footer.append(textForm, sessionActions, footerNote);
 
-  const greeting = element('p', 'audit-greeting', 'Здравствуйте! Я могу ответить на вопросы об услугах Pixel Plus, помочь подобрать подходящее решение или провести небольшую экспресс-диагностику вашего бизнеса. По её итогам вы получите персональный PDF-отчёт с основными проблемами, приоритетами и рекомендациями.');
+  const greeting = element('p', 'audit-greeting', 'Здравствуйте! Я могу ответить на вопросы об услугах Pixel Plus, помочь подобрать подходящее решение или провести экспресс-диагностику Вашего бизнеса. По её итогам Вы получите персональный PDF-отчёт с основными проблемами, приоритетами и рекомендациями.');
   body.append(greeting, status, voiceStatus, notice, error, challengeElement,
     messages, questionSection, readySection, recovery);
   dialog.append(header, body, footer);

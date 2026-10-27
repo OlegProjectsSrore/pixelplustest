@@ -12,7 +12,7 @@ import { createVoiceAdapters, decryptJoinUrl, encryptJoinUrl, latestEvents, prep
 const API = 'https://api.openai.com/v1/realtime/calls';
 const HEARTBEAT_TIMEOUT = 60_000;
 // The same greeting the chat window shows; the voice model says it in its own words.
-export const GREETING = 'Здравствуйте! Я могу ответить на вопросы об услугах Pixel Plus, помочь подобрать подходящее решение или провести небольшую экспресс-диагностику вашего бизнеса. По её итогам вы получите персональный PDF-отчёт с основными проблемами, приоритетами и рекомендациями.';
+export const GREETING = 'Здравствуйте! Я могу ответить на вопросы об услугах Pixel Plus, помочь подобрать подходящее решение или провести экспресс-диагностику Вашего бизнеса. По её итогам Вы получите персональный PDF-отчёт с основными проблемами, приоритетами и рекомендациями.';
 const record = (v: unknown): Record<string, Json> => v && typeof v === 'object' && !Array.isArray(v) ? v as Record<string, Json> : {};
 function key(core: CoreServices): string { return core.env.OPENAI_API_KEY?.trim() || fail(503, 'not_configured', 'Ключ OpenAI не настроен.'); }
 
