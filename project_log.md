@@ -2,6 +2,18 @@
 
 ---
 
+- Date/time: 2026-10-27 08:30
+- Scope: S:\PROJECTS\pixelplustest
+- Summary: ветка `codex/expert-chat-panel` (рабочая копия `.deployment\expert-chat-panel`) перемотана вперёд на `main` до коммита с этой записью.
+  - Ветка была чистой, своих коммитов не имела и отставала на один коммит (2df6264: PDF по комплекту PixelPlus_Report_Kit).
+  - Перемотка с `core.autocrlf=false`, чтобы файлы в этой рабочей копии остались с LF.
+- Files changed:
+  - project_log.md
+  - вне репозитория: рабочая копия `.deployment/expert-chat-panel`
+- Reference: «Да, перемотай ветку Codex (codex/expert-chat-panel) на main.»
+
+---
+
 - Date/time: 2026-10-27 08:29
 - Scope: S:\PROJECTS\pixelplustest
 - Summary: PDF по комплекту PixelPlus_Report_Kit (записи 07:49 и 08:27) закоммичен и отправлен на GitHub по просьбе владельца одним коммитом вместе с этой записью. Опубликованный Worker (версия 48d2d189) собран из этого же кода. Сайт (`dist/**`) не менялся, публикация GitHub Pages не запускается.
