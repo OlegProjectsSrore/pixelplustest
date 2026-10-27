@@ -4,6 +4,18 @@
 
 - Date/time: 2026-10-27 06:15
 - Scope: S:\PROJECTS\pixelplustest
+- Summary: ветка `codex/expert-chat-panel` (рабочая копия `.deployment\expert-chat-panel`) перемотана вперёд на `main` до коммита с этой записью.
+  - Ветка была чистой, своих коммитов не имела и отставала на два коммита (7c550b1 → 6808d66: библиотека 0.2.0 с исправлениями и проверка служебных фраз автора реплик).
+  - Перемотка с `core.autocrlf=false`, чтобы файлы в этой рабочей копии остались с LF.
+- Files changed:
+  - project_log.md
+  - вне репозитория: рабочая копия `.deployment/expert-chat-panel`
+- Reference: «Да, перемотай ветку Codex (codex/expert-chat-panel) на main.»
+
+---
+
+- Date/time: 2026-10-27 06:15
+- Scope: S:\PROJECTS\pixelplustest
 - Summary: проверка служебных фраз автора реплик (запись 06:14) закоммичена и отправлена на GitHub по просьбе владельца одним коммитом вместе с этой записью. Worker уже опубликован (aa89ea78).
 - Files changed:
   - project_log.md
