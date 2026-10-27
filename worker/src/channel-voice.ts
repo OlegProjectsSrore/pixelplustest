@@ -18,6 +18,8 @@ export interface VoiceBridgeOptions {
   /** Optional metered recovery classifier. Its candidates are still validated against delivered user events. */
   recoverAnswers?: (input: { core: CoreServices; session: StoredSession; events: AuditEvent[]; existingAnswers: AuditAnswer[]; call: VoiceCall }) => Promise<AuditAnswer[]>;
   assessIntent?: (input: { core: CoreServices; session: StoredSession; events: AuditEvent[]; existingAnswers: AuditAnswer[]; call: VoiceCall }) => Promise<HumorIntent>;
+  /** Optional metered check of the answers before they are committed: a word that is not a person's name is kept as ambiguous. */
+  screenAnswers?: (input: { core: CoreServices; session: StoredSession; answers: AuditAnswer[] }) => Promise<AuditAnswer[]>;
   slotMaxAgeMs?: number;
 }
 export interface VoicePollResult { status: 'idle' | 'pending' | 'stopped' | 'conflict'; session: StoredSession; stoppedFromRevision?: number }
@@ -587,7 +589,8 @@ export function createVoiceAdapters(options: VoiceBridgeOptions = {}): Partial<C
       }
       const parsed = modelArguments(() => parseVoiceAnswerPayload({ answers: body.answers }));
       if (body.through_event_id !== undefined && !(await readEvents(core, session.id)).some(event => event.id === body.through_event_id && event.call_id === call.id)) fail(409, 'pending_evidence', 'Граница голосовой истории ещё не сохранена.');
-      const answers = await normalizeVoiceAnswers(core, session, call, parsed.answers);
+      const normalized = await normalizeVoiceAnswers(core, session, call, parsed.answers);
+      const answers = options.screenAnswers ? await options.screenAnswers({ core, session, answers: normalized }) : normalized;
       const event: AuditEvent = { ...core.serviceEvent(input.operation_id, 'answer', { type: 'voice_packet' }), source: 'voice', call_id: call.id };
       return core.accept(request, body, event, answers);
     },

@@ -26,7 +26,8 @@
       "duration_status": "author_estimate_not_measured",
       "no_answer_action": "Сохранить unknown либо declined по смыслу; не повторять без необходимости.",
       "max_clarifications": 1,
-      "answer_mode": "structured_fact"
+      "answer_mode": "structured_fact",
+      "required_for_report": "name"
     },
     {
       "id": "context_position",

@@ -27,14 +27,20 @@ const introduction = () => [
   answer('context.company_size', '50 сотрудников', 'intro-size'),
 ];
 
+/** The introduction's «About the company» answers after the activity question; the goal's deadline is declined. */
+const companyAnswers = (): AuditAnswer[] => [
+  answer('context.products', 'Кухни на заказ', 'products'), answer('context.audience', 'Частные покупатели', 'audience'), answer('context.channels', ['Яндекс Директ'], 'channels'),
+  answer('context.geography', ['Москва'], 'geography'), answer('context.revenue_year', 'Около 100 млн рублей', 'revenue-year'), answer('context.revenue_3y', 'Около 250 млн рублей', 'revenue-3y'),
+  answer('context.average_check', 'Около 200 тысяч рублей', 'check'), answer('context.deal_cycle', 'Две недели', 'cycle'), { ...answer('context.goal_period', null, 'goal-period'), state: 'declined' },
+  answer('context.main_problem', 'Мало заказов', 'main-problem')];
+
 test('a key question without a usable answer is asked again with its reason, at most twice; other questions move on', () => {
   const rules = library.scenario.required_for_report!;
   assert.equal(rules.max_reasks, 2);
   const keys = library.questions.filter(question => question.required_for_report);
-  assert.equal(keys.length, 357);
-  assert.deepEqual(['context_company_name', 'context_website'].map(id => library.questions.find(question => question.id === id)!.required_for_report), ['company', 'website']);
+  assert.equal(keys.length, 358);
+  assert.deepEqual(['context_name', 'context_company_name', 'context_website'].map(id => library.questions.find(question => question.id === id)!.required_for_report), ['name', 'company', 'website']);
   assert.deepEqual(['context_business', 'context_goal', 'context_priority'].map(id => library.questions.find(question => question.id === id)!.required_for_report), ['business', 'goal', 'topics']);
-  assert.equal(library.questions.find(question => question.id === 'context_name')!.required_for_report, undefined);
   const uncertain = (fact: string, state: AuditAnswer['state'], id: string): AuditAnswer => ({ ...answer(fact, null, id), state });
   let answers = [...introduction()];
   let state = advanceAudit(initialAuditState(library.version, 'chat', now), answers, now, library);
@@ -64,7 +70,7 @@ test('mandatory introduction has the same order and saved progress across repeat
     ['context_company_name', 'Как называется Ваша компания?'],
     ['context_website', 'Какой адрес сайта Вашей компании? Если сайта пока нет, так и напишите.'],
     ['context_responsibilities', 'Какой у Вас функционал в компании, за что Вы отвечаете?'],
-    ['context_company_size', 'Какой размер компании?'],
+    ['context_company_size', 'Сколько сотрудников работает в компании?'],
   ];
   for (const start of ['chat', 'voice'] as const) {
     let state = { ...initialAuditState(library.version, start, now), paused: false };
@@ -91,11 +97,18 @@ test('mandatory introduction has the same order and saved progress across repeat
 test('mandatory questions precede adaptive clarification and accept explicit refusals without loops', () => {
   const business = { ...answer(), confirmation: 'unconfirmed' as const };
   const accepted: AuditAnswer[] = [business];
+  const rules = library.scenario.required_for_report!;
   let state = advanceAudit(initialAuditState(library.version, 'chat', now), accepted, now);
   for (const [index, reply] of introduction().entries()) {
-    assert.equal(nextQuestion(state, now)?.id, reply.question_id);
-    accepted.push({ ...reply, state: index % 2 ? 'unknown' : 'declined', value: null });
-    state = advanceAudit(state, accepted, now);
+    // A key question of the introduction (name, company, website) is asked again with its reason at most twice; the others move on.
+    const key = library.questions.find(question => question.id === reply.question_id)!.required_for_report;
+    for (let attempt = 0; attempt <= (key ? rules.max_reasks : 0); attempt++) {
+      const question = nextQuestion(state, now);
+      assert.equal(question?.id, reply.question_id);
+      assert.deepEqual(question?.reask, attempt ? { attempt, reason: rules.reasons[key!] } : undefined);
+      accepted.push({ ...reply, id: `${reply.id}-${attempt}`, state: index % 2 ? 'unknown' : 'declined', value: null });
+      state = advanceAudit(state, accepted, now);
+    }
   }
   assert.equal(nextQuestion(state, now)?.id, 'context_business');
   assert.match(nextQuestion(state, now)!.text, /верно ли записаны сведения/);
@@ -476,7 +489,7 @@ test('manifest validation covers exact bytes and missing/extra inputs', async ()
 });
 
 test('the interview follows named topics and stops screening a domain after selecting a substantive branch', () => {
-  const entries = [...introduction(), answer('context.business'), answer('context.goal', 'Улучшить измеримость', 'goal'), answer('context.assets', ['site'], 'assets'), answer('context.priority', ['strategy'], 'priority')];
+  const entries = [...introduction(), answer('context.business'), ...companyAnswers(), answer('context.goal', 'Улучшить измеримость', 'goal'), answer('context.assets', ['site'], 'assets'), answer('context.priority', ['strategy'], 'priority')];
   let state = advanceAudit(initialAuditState(library.version, 'chat', now), entries, now, library, preview);
   assert.equal(nextQuestion(state, now, library, preview)?.id, 'context_funnel');
   entries.push(answer('context.funnel', 'few_leads', 'funnel'));

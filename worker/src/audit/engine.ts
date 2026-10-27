@@ -255,18 +255,19 @@ function selectQuestion(state: AuditState, now: number, lib: AuditLibrary, optio
   // A voice interview asks at most MAX_VOICE_QUESTIONS distinct questions; the last place is kept for the confirmation.
   const answeredCount = state.questions_answered ?? 0, voiceCap = state.active_channel === 'voice';
   if (voiceCap && answeredCount >= MAX_VOICE_QUESTIONS) return null;
+  // A key question just answered with «don't know», a refusal or an unclear answer is asked again with its reason, a bounded number of times,
+  // before the next question — also inside the introductory block (name, company, website).
+  const rules = lib.scenario.required_for_report, previous = lib.questions.find(question => question.id === state.current_question_id);
+  if (rules && previous?.required_for_report && permitted(previous, options) && elapsed < lib.scenario.clock.closing_from * 1000 && elapsed + previous.estimated_seconds * 1000 <= INTERVIEW_BUDGET_MS) {
+    const attempt = keyAnswerMissing(previous, state, lib);
+    if (attempt > 0 && attempt <= rules.max_reasks) return { view: { ...questionView(previous, state, lib), reask: { attempt, reason: rules.reasons[previous.required_for_report]! } } };
+  }
   // The introductory block precedes adaptive branches in both channels. Explicit
   // unknown/declined answers count as collected; they must not trap the visitor.
   const mandatory = (lib.scenario.mandatory_entry_questions ?? [])
     .map(id => lib.questions.find(question => question.id === id))
     .find(question => question && permitted(question, options) && needsQuestion(question, state, lib));
   if (mandatory) return { view: { id: mandatory.id, text: mandatory[state.active_channel], fact_ids: mandatory.fact_ids, options: [] } };
-  // A key question just answered with «don't know», a refusal or an unclear answer is asked again with its reason, a bounded number of times.
-  const rules = lib.scenario.required_for_report, previous = lib.questions.find(question => question.id === state.current_question_id);
-  if (rules && previous?.required_for_report && permitted(previous, options) && elapsed < lib.scenario.clock.closing_from * 1000 && elapsed + previous.estimated_seconds * 1000 <= INTERVIEW_BUDGET_MS) {
-    const attempt = keyAnswerMissing(previous, state, lib);
-    if (attempt > 0 && attempt <= rules.max_reasks) return { view: { ...questionView(previous, state, lib), reask: { attempt, reason: rules.reasons[previous.required_for_report]! } } };
-  }
   const facts = withImpliedTopics(state.facts, lib);
   const activeBlocks = candidates(state, lib, options), domains = new Set(activeBlocks.map(block => block.domain));
   const priority = state.facts['context.priority'];

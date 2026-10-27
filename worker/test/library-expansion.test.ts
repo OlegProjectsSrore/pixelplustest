@@ -19,6 +19,9 @@ const notTried = { attempts_status: 'not_tried', attempts: [] } as Json;
 const intro = (topics: string[], funnel = 'few_leads') => [
   answer('context.name', 'Алексей'), answer('context.position', 'Директор'), answer('context.company_name', 'Кухни «Дуб»'), answer('context.website', 'dub.ru'),
   answer('context.responsibilities', 'Продажи'), answer('context.company_size', '40 сотрудников'), answer('context.business', 'Кухни на заказ'), answer('context.goal', 'Больше заказов'),
+  answer('context.products', 'Кухни на заказ'), answer('context.audience', 'Частные покупатели'), answer('context.channels', ['Яндекс Директ']), answer('context.geography', ['Москва']),
+  answer('context.revenue_year', 'Около 100 млн рублей'), answer('context.revenue_3y', 'Около 250 млн рублей'), answer('context.average_check', 'Около 200 тысяч рублей'),
+  answer('context.deal_cycle', 'Две недели'), answer('context.goal_period', null, 'declined'), answer('context.main_problem', 'Мало заказов'),
   answer('context.assets', 'Сайт и amoCRM'), answer('context.priority', topics), answer('context.funnel', funnel), answer('context.resources', 'Маркетолог'), answer('context.constraints', 'Нет'),
 ];
 // A confirmed complaint «the right request costs more than agreed», with its own questions answered.

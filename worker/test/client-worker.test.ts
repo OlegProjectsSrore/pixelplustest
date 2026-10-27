@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { SqliteD1 } from './helpers/d1.ts';
+import { NAME_CHECK_PROMPT } from '../src/chat/name-check.ts';
 import { createWorker } from '../src/index.ts';
 import { CoreServices } from '../src/core.ts';
 import type { Env } from '../src/env.ts';
@@ -25,9 +26,11 @@ test('real client/transport/Worker: creation, key phrase, text, multi-selection,
     BUDGETS_JSON: JSON.stringify({ new_sessions: 10, sessions_per_ip: 10, deepseek_usd_micros: 20_000_000, deepseek_calls: 10, deepseek_tokens: 1_000_000 }) };
   const provider: typeof fetch = async (url, init) => {
     if (String(url).includes('turnstile')) return Response.json({ success: true, hostname: 'olegprojectssrore.github.io', action: 'session' });
+    // The name check answers apart from the classifier.
+    if (JSON.parse(String(init?.body)).messages[0].content === NAME_CHECK_PROMPT) return Response.json({ usage: { prompt_tokens: 60, completion_tokens: 5, total_tokens: 65 }, choices: [{ finish_reason: 'stop', message: { content: '{"is_name":true}' } }] });
     providerCalls++;
     const context = JSON.parse(JSON.parse(String(init?.body)).messages[1].content), event = context.source_events[0];
-    const answers = [ ['context_name', 'context.name', 'Олег'], ['context_position', 'context.position', 'Директор'], ['context_company_name', 'context.company_name', 'Магазин «Дом»'], ['context_website', 'context.website', 'dom-shop.ru'], ['context_responsibilities', 'context.responsibilities', 'Продажи'], ['context_company_size', 'context.company_size', '50 сотрудников'], ['context_business', 'context.business', 'Магазин'], ['context_goal', 'context.goal', 'Рост продаж'], ['context_assets', 'context.assets', ['Сайт']] ]
+    const answers = [ ['context_name', 'context.name', 'Олег'], ['context_position', 'context.position', 'Директор'], ['context_company_name', 'context.company_name', 'Магазин «Дом»'], ['context_website', 'context.website', 'dom-shop.ru'], ['context_responsibilities', 'context.responsibilities', 'Продажи'], ['context_company_size', 'context.company_size', '50 сотрудников'], ['context_business', 'context.business', 'Магазин'], ['context_goal', 'context.goal', 'Рост продаж'], ['context_assets', 'context.assets', ['Сайт']], ['context_products', 'context.products', 'Товары для дома'], ['context_audience', 'context.audience', 'Частные покупатели'], ['context_channels', 'context.channels', ['Сайт']], ['context_geography', 'context.geography', ['Москва']], ['context_revenue_year', 'context.revenue_year', '10 млн рублей'], ['context_revenue_3y', 'context.revenue_3y', '25 млн рублей'], ['context_average_check', 'context.average_check', '5 тысяч рублей'], ['context_deal_cycle', 'context.deal_cycle', 'Один день'], ['context_goal_period', 'context.goal_period', 'К весне'], ['context_main_problem', 'context.main_problem', 'Мало продаж'] ]
       .map(([question_id, fact_id, value]) => ({ question_id, fact_id, value, state: 'known', event_ids: [event.id], evidence: [{ event_id: event.id, text: event.text }] }));
     const start = event.text.includes('диагностик');
     return Response.json({ usage: { prompt_tokens: 80, completion_tokens: 20, total_tokens: 100 }, choices: [{ finish_reason: 'stop', message: { content: JSON.stringify({
@@ -71,7 +74,7 @@ test('real client/transport/Worker: creation, key phrase, text, multi-selection,
     assert.equal(selectionBodies.length, 2); assert.equal(selectionBodies[0], selectionBodies[1]);
     assert.equal(client.session.revision, revision); assert.equal(providerCalls, 2);
     const answers = await core.store.listAnswers(client.session.session_id);
-    assert.equal(answers.length, 10);
+    assert.equal(answers.length, 20);
     assert.deepEqual(answers.find(answer => answer.fact_id === 'context.priority')?.value, ['strategy', 'analytics']);
     await handlers.onPause(); assert.equal(client.session.paused, true);
     await handlers.onResume(); assert.equal(client.session.paused, false);

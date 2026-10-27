@@ -2,10 +2,11 @@ import { createChatHandler as createPreparedChatHandler, type PreparedChatTurn }
 import type { ClassifierRuntime } from './chat/types.ts';
 import { composeChatMessage, type ComposeInput, type Composed } from './chat/composer.ts';
 import { answerQuestion, formatAnswer } from './chat/answerer.ts';
+import { checkPersonalName, screenNameAnswers } from './chat/name-check.ts';
 import { searchKnowledge } from './search/service.ts';
 import type { AdapterContext, AdapterHandler, ChannelAdapters } from './integration.ts';
 import type { StoredSession, UsageReservation } from './storage/types.ts';
-import { diagnosticStarted, INTERVIEW_BUDGET_MS, type AuditEvent, type AuditState, type Json, type QuestionView } from './audit/contracts.ts';
+import { diagnosticStarted, INTERVIEW_BUDGET_MS, type AuditAnswer, type AuditEvent, type AuditState, type Json, type QuestionView } from './audit/contracts.ts';
 import { advanceAudit, elapsedInterviewMs, nextQuestion, validateAnswers } from './audit/engine.ts';
 import { getLibrary, isApproved, type AuditLibrary } from './audit/library.ts';
 import { selectHumorReply, type HumorIntent } from './audit/humor.ts';
@@ -108,6 +109,16 @@ export async function voiceKnowledgeAnswer(context: AdapterContext, session: Sto
 const dialog = (events: AuditEvent[]) => events.filter(event => (event.role === 'user' || event.role === 'assistant') && typeof event.text === 'string' && event.text.trim())
   .slice(-8).map(event => ({ role: event.role, text: event.text!.slice(0, 400) }));
 
+/** Whether the visitor's answer to «Как Вас зовут?» is a person's name; null when the check is unavailable. */
+async function checkNameWith(context: AdapterContext, session: StoredSession, operationId: string, text: string): Promise<boolean | null> {
+  try { return await checkPersonalName(text, { ...await createChatRuntime(context, session, operationId, 0), max_tokens: 32, timeout_ms: 8_000 }); }
+  catch { return null; }
+}
+/** The name check for voice packets: the same rule as in the chat. */
+export async function screenVoiceNameAnswers(input: { core: AdapterContext['core']; session: StoredSession; answers: AuditAnswer[] }): Promise<AuditAnswer[]> {
+  return screenNameAnswers(input.answers, text => checkNameWith({ core: input.core, env: input.core.env, execution: {} as ExecutionContext }, input.session, `name-check:${crypto.randomUUID()}`, text));
+}
+
 /** The first chat question is worded when the session is created; null keeps the library text. */
 export async function composeFirstQuestion(context: AdapterContext, sessionId: string): Promise<{ question_id: string; text: string } | null> {
   try {
@@ -152,8 +163,10 @@ export async function commitChatTurn(request: Request, context: AdapterContext, 
   const [existing, evidence] = await Promise.all([core.store.listAnswers(session.id), core.events(session.id)]);
   // Architecture 4.1: a validated written visitor answer is explicit reported evidence.
   // Voice packets and history recovery keep their separate confirmation requirements.
-  const answers = turn.answers.map(answer => ({ ...answer, confirmation: 'explicit' as const }));
-  if (answers.some(answer => answer.channel !== 'chat' || !['selection', 'classification'].includes(answer.method))) fail(400, 'invalid_answers', 'Недопустимое происхождение ответа чата.');
+  const given = turn.answers.map(answer => ({ ...answer, confirmation: 'explicit' as const }));
+  if (given.some(answer => answer.channel !== 'chat' || !['selection', 'classification'].includes(answer.method))) fail(400, 'invalid_answers', 'Недопустимое происхождение ответа чата.');
+  // A word that is not a person's name («Собака») is not taken as the visitor's name: the key question is asked again.
+  const answers = await screenNameAnswers(given, text => checkNameWith(context, session, `name-check:${turn.input.operation_id}`, text));
   try { validateAnswers(answers, [...evidence, turn.event], existing, lib, core.engineOptions); }
   catch { fail(400, 'invalid_answers', 'Ответ не прошёл проверку словаря или исходного сообщения.'); }
   const state = advanceAudit(session.state, [...existing, ...answers], now, lib, core.engineOptions);

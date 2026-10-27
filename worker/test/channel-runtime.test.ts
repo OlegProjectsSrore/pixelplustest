@@ -11,6 +11,7 @@ import type { Env } from '../src/env.ts';
 import type { AdapterContext } from '../src/integration.ts';
 import type { Classification, ClassifierContext } from '../src/chat/types.ts';
 import { reserveDeepseekMicros } from '../src/deepseek-cost.ts';
+import { NAME_CHECK_PROMPT } from '../src/chat/name-check.ts';
 import knowledgeIndex from '../src/search/kb-index.mjs';
 
 const now = Date.parse('2026-10-22T20:00:00Z');
@@ -22,11 +23,15 @@ function reportFromText(context: ClassifierContext, kind: 'answer' | 'mixed' = '
   return { ...intent(kind), answers: [{ question_id: 'context_name', fact_id: 'context.name', state: 'known', value: source.text!, event_ids: [source.id], evidence: [{ event_id: source.id, text: source.text! }] }] };
 }
 async function fixture(respond: (context: ClassifierContext, call: number) => unknown | Promise<unknown> = context => reportFromText(context)) {
-  const db = new SqliteD1(); let calls = 0;
+  const db = new SqliteD1(); let calls = 0; const nameChecks: string[] = [];
   const env: Env = { DB: db.binding(), REPORTS_KV: {} as KVNamespace, ALLOW_DRAFT_LIBRARY: 'true', DEEPSEEK_API_KEY: 'test-key', BUDGETS_JSON: JSON.stringify({ deepseek_usd_micros: 20_000_000, deepseek_calls: 20, deepseek_tokens: 2_000_000 }) };
   const core = new CoreServices(env, () => now, (async (_url, init) => {
-    calls++;
     const request = JSON.parse(String(init?.body));
+    if (request.messages[0].content === NAME_CHECK_PROMPT) {
+      const name = String(JSON.parse(request.messages[1].content).answer); nameChecks.push(name);
+      return Response.json({ id: `name-check-${nameChecks.length}`, usage: { prompt_tokens: 60, completion_tokens: 5, total_tokens: 65 }, choices: [{ finish_reason: 'stop', message: { content: JSON.stringify({ is_name: name !== 'Собака' }) } }] });
+    }
+    calls++;
     const context = JSON.parse(request.messages[1].content) as ClassifierContext;
     const content = await respond(context, calls);
     return Response.json({ id: `provider-${calls}`, usage: { prompt_tokens: 80, completion_tokens: 20, total_tokens: 100 }, choices: [{ finish_reason: 'stop', message: { content: JSON.stringify(content) } }] });
@@ -36,7 +41,7 @@ async function fixture(respond: (context: ClassifierContext, call: number) => un
   const request = new Request('https://example.test/api/chat', { method: 'POST', headers: { Authorization: `Bearer ${bearer}` } });
   const body = (operation = 'turn-1', revision = 0, input: Record<string, unknown> = { kind: 'text', text: 'Олег' }, question: string | null = 'context_name') => ({ api_version: '1', session_id: session.id, operation_id: operation, expected_revision: revision, channel_revision: 0, library_version: library.version, question_id: question, input });
   const context = (value: Record<string, unknown>): AdapterContext => ({ core, env, execution, body: value });
-  return { db, core, env, session, request, body, context, handler, calls: () => calls };
+  return { db, core, env, session, request, body, context, handler, calls: () => calls, nameChecks: () => nameChecks };
 }
 
 test('chat text uses delivered evidence, becomes explicit written evidence and advances once', async () => {
@@ -56,11 +61,32 @@ test('chat text uses delivered evidence, becomes explicit written evidence and a
   } finally { f.db.close(); }
 });
 
+test('a word that is not a person\'s name is not taken as the name: the name is asked again with its reason', async () => {
+  const f = await fixture();
+  try {
+    // The diagnostic has started: the name is the current question.
+    const event: AuditEvent = { id: 'start-event', source: 'chat', source_key: 'start', source_revision: 0, local_order: 0, role: 'user', kind: 'utterance', text: 'Давайте диагностику', occurred_at: now, received_at: now };
+    await f.core.store.commit({ sessionId: f.session.id, operationId: 'start', expectedRevision: 0, channelRevision: 0, event, answers: [], state: { ...f.session.state, current_question_id: 'context_name' }, now });
+    await f.handler(f.request, f.context(f.body('turn-1', 1, { kind: 'text', text: 'Собака' })));
+    const [answer] = await f.core.store.listAnswers(f.session.id);
+    assert.deepEqual([answer!.state, answer!.value], ['ambiguous', null]);
+    let session = await f.core.store.requireSession(f.session.id);
+    const view = await f.core.view(session) as { question: { id: string; reask?: { attempt: number; reason: string } } };
+    assert.deepEqual([view.question.id, view.question.reask], ['context_name', { attempt: 1, reason: library.scenario.required_for_report!.reasons.name }]);
+    // A real name is accepted and the interview moves on.
+    await f.handler(f.request, f.context(f.body('turn-2', session.state.revision, { kind: 'text', text: 'Олег' })));
+    session = await f.core.store.requireSession(f.session.id);
+    assert.equal(session.state.facts['context.name']!.value, 'Олег');
+    assert.equal(session.state.current_question_id, 'context_position');
+    assert.deepEqual(f.nameChecks(), ['Собака', 'Олег']);
+  } finally { f.db.close(); }
+});
+
 test('standard selection never calls the model and only accepts offered options', async () => {
   const f = await fixture();
   try {
     const event: AuditEvent = { id: 'seed-event', source: 'chat', source_key: 'seed', source_revision: 0, local_order: 0, role: 'user', kind: 'utterance', text: 'Сообщённый контекст', occurred_at: now, received_at: now };
-    const seed: AuditAnswer[] = [ ['context.name', 'Олег'], ['context.position', 'Директор'], ['context.company_name', 'Магазин «Дом»'], ['context.website', 'dom-shop.ru'], ['context.responsibilities', 'Продажи'], ['context.company_size', '50 сотрудников'], ['context.business', 'Магазин'], ['context.goal', 'Развитие'], ['context.assets', ['Сайт']] ].map(([id, value], i) => ({ id: `seed-${i}`, question_id: library.questions.find(question => question.fact_ids.includes(id as string))!.id, fact_id: id as string, state: 'known', value: value as Json, event_ids: [event.id], channel: 'chat', method: 'selection', confirmation: 'explicit', library_version: library.version, created_at: now }));
+    const seed: AuditAnswer[] = [ ['context.name', 'Олег'], ['context.position', 'Директор'], ['context.company_name', 'Магазин «Дом»'], ['context.website', 'dom-shop.ru'], ['context.responsibilities', 'Продажи'], ['context.company_size', '50 сотрудников'], ['context.business', 'Магазин'], ['context.goal', 'Развитие'], ['context.assets', ['Сайт']], ['context.products', 'Товары для дома'], ['context.audience', 'Частные покупатели'], ['context.channels', ['Сайт']], ['context.geography', ['Москва']], ['context.revenue_year', '10 млн рублей'], ['context.revenue_3y', '25 млн рублей'], ['context.average_check', '5 тысяч рублей'], ['context.deal_cycle', 'Один день'], ['context.goal_period', 'К весне'], ['context.main_problem', 'Мало продаж'] ].map(([id, value], i) => ({ id: `seed-${i}`, question_id: library.questions.find(question => question.fact_ids.includes(id as string))!.id, fact_id: id as string, state: 'known', value: value as Json, event_ids: [event.id], channel: 'chat', method: 'selection', confirmation: 'explicit', library_version: library.version, created_at: now }));
     await f.core.store.commit({ sessionId: f.session.id, operationId: 'seed', expectedRevision: 0, channelRevision: 0, event, answers: seed, state: advanceAudit(f.session.state, seed, now, library, { allowDraft: true }), now });
     const selected = f.body('selection-1', 1, { kind: 'selection', option_ids: ['strategy'] }, 'context_priority');
     await f.handler(f.request, f.context(selected));
@@ -251,7 +277,7 @@ test('a selected option gets a worded next question with exactly one model call'
   f.env.CHAT_COMPOSER_ENABLED = 'true';
   try {
     const event: AuditEvent = { id: 'seed-event', source: 'chat', source_key: 'seed', source_revision: 0, local_order: 0, role: 'user', kind: 'utterance', text: 'Сообщённый контекст', occurred_at: now, received_at: now };
-    const seed: AuditAnswer[] = [ ['context.name', 'Олег'], ['context.position', 'Директор'], ['context.company_name', 'Магазин «Дом»'], ['context.website', 'dom-shop.ru'], ['context.responsibilities', 'Продажи'], ['context.company_size', '50 сотрудников'], ['context.business', 'Магазин'], ['context.goal', 'Развитие'], ['context.assets', ['Сайт']] ].map(([id, value], i) => ({ id: `seed-${i}`, question_id: library.questions.find(question => question.fact_ids.includes(id as string))!.id, fact_id: id as string, state: 'known', value: value as Json, event_ids: [event.id], channel: 'chat', method: 'selection', confirmation: 'explicit', library_version: library.version, created_at: now }));
+    const seed: AuditAnswer[] = [ ['context.name', 'Олег'], ['context.position', 'Директор'], ['context.company_name', 'Магазин «Дом»'], ['context.website', 'dom-shop.ru'], ['context.responsibilities', 'Продажи'], ['context.company_size', '50 сотрудников'], ['context.business', 'Магазин'], ['context.goal', 'Развитие'], ['context.assets', ['Сайт']], ['context.products', 'Товары для дома'], ['context.audience', 'Частные покупатели'], ['context.channels', ['Сайт']], ['context.geography', ['Москва']], ['context.revenue_year', '10 млн рублей'], ['context.revenue_3y', '25 млн рублей'], ['context.average_check', '5 тысяч рублей'], ['context.deal_cycle', 'Один день'], ['context.goal_period', 'К весне'], ['context.main_problem', 'Мало продаж'] ].map(([id, value], i) => ({ id: `seed-${i}`, question_id: library.questions.find(question => question.fact_ids.includes(id as string))!.id, fact_id: id as string, state: 'known', value: value as Json, event_ids: [event.id], channel: 'chat', method: 'selection', confirmation: 'explicit', library_version: library.version, created_at: now }));
     await f.core.store.commit({ sessionId: f.session.id, operationId: 'seed', expectedRevision: 0, channelRevision: 0, event, answers: seed, state: advanceAudit(f.session.state, seed, now, library, { allowDraft: true }), now });
     const response = await f.handler(f.request, f.context(f.body('selection-1', 1, { kind: 'selection', option_ids: ['strategy'] }, 'context_priority'))) as { operation: Record<string, Json> };
     assert.equal(f.calls(), 1); assert.equal(response.operation.text, null);
