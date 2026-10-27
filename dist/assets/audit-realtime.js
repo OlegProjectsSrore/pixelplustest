@@ -1,5 +1,5 @@
 // Native WebRTC transport. The permanent OpenAI key never enters the browser.
-export function createRealtimeVoiceAdapter({ onState, onEvents, onTranscript, onTool, onError, onControl,
+export function createRealtimeVoiceAdapter({ onState, onEvents, onTranscript, onTool, onError, onControl, onFallback,
   now = Date.now, peerFactory = () => new RTCPeerConnection(), mediaDevices = navigator.mediaDevices,
   audioFactory = () => new Audio() }) {
   let pc = null, dc = null, stream = null, audio = null, callId = null;
@@ -9,7 +9,8 @@ export function createRealtimeVoiceAdapter({ onState, onEvents, onTranscript, on
   const handledTools = new Set(), pendingInputs = new Set(), completedTools = new Map();
   let playingAudio = false;
   let responseActive = false, responseRequested = false, responseQueued = null, toolsPending = 0, userSpeaking = false;
-  // A reply OpenAI could not produce (a rate limit, a provider fault) is asked again, at most twice in a row.
+  // A reply OpenAI could not produce (a rate limit, a provider fault) is asked again once; after the second failure in a row
+  // the interview continues in the chat.
   let failedResponses = 0, retryTimer = null, rateLimits = [];
   const error = message => new Error(message);
   const emit = state => onState?.(state, callId);
@@ -22,7 +23,7 @@ export function createRealtimeVoiceAdapter({ onState, onEvents, onTranscript, on
   function queueResponse(response) { responseQueued = { type: 'response.create', ...(response ? { response } : {}) }; respond(); }
 
   // Reports a failed reply to the server log (provider codes only, no visitor words) and asks for the reply again.
-  // After a rate limit it waits for the provider's token window; false when the failure is final or retries are used up.
+  // After a rate limit it waits for the provider's token window; false when the failure is final or the retry is used up.
   function retryFailed(problem, current) {
     const text = (value, max) => typeof value === 'string' ? value.slice(0, max) : '';
     const tokens = rateLimits.find(limit => limit?.name === 'tokens');
@@ -30,7 +31,7 @@ export function createRealtimeVoiceAdapter({ onState, onEvents, onTranscript, on
       ...(Number.isFinite(tokens?.remaining) ? { tokens_remaining: tokens.remaining } : {}), ...(Number.isFinite(tokens?.reset_seconds) ? { reset_seconds: tokens.reset_seconds } : {}) };
     void Promise.resolve(onControl?.('diagnostic', callId, false, details)).catch(() => {});
     const kind = `${details.type} ${details.code}`;
-    if (failedResponses >= 2 || /insufficient_quota|invalid_api_key|billing/i.test(kind)) return false;
+    if (failedResponses >= 1 || /insufficient_quota|invalid_api_key|billing/i.test(kind)) return false;
     failedResponses++;
     const limited = /rate_limit/i.test(`${kind} ${details.message}`);
     const wait = limited ? Math.min(20000, Math.max(1000, Math.ceil((Number(tokens?.reset_seconds) || 2) * 1000) + 250)) : 1500;
@@ -38,6 +39,11 @@ export function createRealtimeVoiceAdapter({ onState, onEvents, onTranscript, on
     clearTimeout(retryTimer);
     retryTimer = setTimeout(() => { retryTimer = null; if (current === generation && !closing) queueResponse(); }, wait);
     return true;
+  }
+  // Voice could not answer twice in a row: the host moves the interview to the chat; without a host handler the visitor sees the error.
+  function fallBack() {
+    if (onFallback) onFallback(callId);
+    else onError?.(error('OpenAI не смог сформировать голосовой ответ. Переключитесь в чат или повторите подключение.'));
   }
 
   function item(id, role) {
@@ -146,7 +152,7 @@ export function createRealtimeVoiceAdapter({ onState, onEvents, onTranscript, on
       case 'response.done':
         responseRequested = false; responseActive = false;
         if (event.response?.status === 'failed') {
-          if (!retryFailed(event.response.status_details?.error, current)) onError?.(error('OpenAI не смог сформировать голосовой ответ. Переключитесь в чат или повторите подключение.'));
+          if (!retryFailed(event.response.status_details?.error, current)) fallBack();
         } else if (event.response?.status === 'completed') {
           failedResponses = 0;
           const calls = (event.response.output || []).filter(i => i.type === 'function_call' && !handledTools.has(i.call_id));
@@ -165,7 +171,7 @@ export function createRealtimeVoiceAdapter({ onState, onEvents, onTranscript, on
         if (event.error?.code === 'conversation_already_has_active_response') { responseRequested = false; responseActive = true; responseQueued = { type: 'response.create' }; break; }
         responseRequested = false;
         // A reply request refused for a rate limit is asked again once the token window resets.
-        if (/rate_limit/i.test(`${event.error?.type} ${event.error?.code}`) && retryFailed(event.error, current)) break;
+        if (/rate_limit/i.test(`${event.error?.type} ${event.error?.code}`)) { if (!retryFailed(event.error, current)) fallBack(); break; }
         onError?.(error('Ошибка голосового соединения OpenAI. Повторите подключение.')); break;
     }
   }

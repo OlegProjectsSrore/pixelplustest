@@ -169,8 +169,9 @@ test('startDiagnostic goes through the save barrier and its new instructions rep
   assert.equal(f.errors.length, 0);
 });
 
-test('A reply OpenAI failed to produce is reported and asked again; the third failure in a row and a quota failure are shown', async t => {
-  const f = fixture(t); await f.start();
+test('A reply OpenAI failed to produce is reported and asked again once; the second failure in a row and a quota failure move to the chat', async t => {
+  const fallbacks = [];
+  const f = fixture(t, { onFallback: id => fallbacks.push(id) }); await f.start();
   const sent = f.peers.at(-1).dc.sent, creates = () => sent.filter(e => e.type === 'response.create').length, before = creates();
   f.emit({ type: 'rate_limits.updated', rate_limits: [{ name: 'tokens', limit: 40000, remaining: 0, reset_seconds: 0.2 }] });
   f.emit({ type: 'response.created' });
@@ -183,13 +184,22 @@ test('A reply OpenAI failed to produce is reported and asked again; the third fa
   f.emit({ type: 'response.created' });
   f.emit({ type: 'response.done', response: { status: 'failed', status_details: { type: 'failed', error: { type: 'server_error' } } } });
   await new Promise(resolve => setTimeout(resolve, 1600));
-  assert.equal(creates(), before + 2);
-  f.emit({ type: 'response.created' });
-  f.emit({ type: 'response.done', response: { status: 'failed', status_details: { type: 'failed', error: { type: 'server_error' } } } });
-  assert.equal(f.errors.length, 1, 'the third failure in a row is shown');
-  // A completed reply resets the count; a quota failure is final at once.
+  assert.equal(creates(), before + 1, 'no third voice attempt');
+  assert.deepEqual(fallbacks, ['call1'], 'the second failure in a row moves the interview to the chat');
+  assert.equal(f.errors.length, 0, 'no error is shown');
+  // A completed reply resets the count; a quota failure moves to the chat at once.
   f.emit({ type: 'response.created' }); f.emit({ type: 'response.done', response: { status: 'completed', output: [] } });
   f.emit({ type: 'response.created' });
   f.emit({ type: 'response.done', response: { status: 'failed', status_details: { type: 'failed', error: { type: 'insufficient_quota', code: 'insufficient_quota' } } } });
-  assert.equal(f.errors.length, 2);
+  assert.equal(fallbacks.length, 2);
+});
+
+test('Without a chat handler the second failure in a row is shown as an error', async t => {
+  const f = fixture(t); await f.start();
+  f.emit({ type: 'response.created' });
+  f.emit({ type: 'response.done', response: { status: 'failed', status_details: { type: 'failed', error: { type: 'server_error' } } } });
+  await new Promise(resolve => setTimeout(resolve, 1600));
+  f.emit({ type: 'response.created' });
+  f.emit({ type: 'response.done', response: { status: 'failed', status_details: { type: 'failed', error: { type: 'server_error' } } } });
+  assert.equal(f.errors.length, 1);
 });

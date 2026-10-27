@@ -529,3 +529,18 @@ test('too little information after management expiry: the report token returns t
   t.mock.timers.tick(10000); await new Promise(setImmediate);
   assert.equal(polled.model.phase, 'ready'); assert.equal(polled.model.notice, message);
 });
+
+test('two failed voice replies in a row move the interview to the chat with a request to write there', async t => {
+  const f = fixture(t, { initial: null });
+  await f.client.open('voice');
+  assert.equal(f.client.session.active_channel, 'voice');
+  f.voice.onFallback('call1');
+  for (let i = 0; i < 40 && f.model.mode !== 'chat'; i++) await new Promise(resolve => setTimeout(resolve, 25));
+  await new Promise(resolve => setTimeout(resolve, 25));
+  assert.equal(f.client.session.active_channel, 'chat');
+  assert.equal(f.model.mode, 'chat');
+  assert.equal(f.voiceActive, false, 'the voice call is stopped');
+  assert.equal(f.model.error, '');
+  assert.equal(f.model.messages.at(-1).role, 'assistant');
+  assert.equal(f.model.messages.at(-1).text, 'Пожалуйста, лучше напишите здесь');
+});

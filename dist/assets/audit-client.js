@@ -3,9 +3,10 @@ import { createAuditTransport, createAuditStorage, AuditRequestError } from './a
 import { getTurnstileToken } from './audit-turnstile.js';
 import { checkMicrophone, createVoiceAdapter, loadVoiceSdk } from './audit-voice.js?v=7f69e524a9';
 
-import { createRealtimeVoiceAdapter } from './audit-realtime.js?v=178d432e70';
+import { createRealtimeVoiceAdapter } from './audit-realtime.js?v=54504d9f6e';
 
 const THANKS = 'Спасибо за предоставленную информацию, сейчас подготовим результат предварительного аудита.';
+const VOICE_FALLBACK = 'Пожалуйста, лучше напишите здесь';
 const VOICE_STATUS = { connecting: 'Соединяемся…', listening: 'Слушаю Вас', thinking: 'Обрабатываю ответ…', speaking: 'Помощник говорит', idle: 'Соединение установлено', disconnected: 'Голосовой разговор отключён', disconnecting: 'Завершаем соединение…' };
 const EMAIL_STATUS = { pending: 'Письмо ожидает отправки.', sending: 'Отправляем письмо…', sent: 'Письмо отправлено.', unknown: 'Результат отправки пока не подтверждён. Повторное письмо автоматически не отправляем.', failed: 'Не удалось отправить письмо. PDF можно скачать.' };
 
@@ -293,6 +294,14 @@ export function createAuditClient({ config, viewFactory = createAuditView, trans
       onEvents: postTranscript,
       onTranscript: showVoiceTranscript,
       onError(problem) { error = problem.message; render(); },
+      // Voice could not answer twice in a row: stop the call, continue in the chat and say so there.
+      onFallback() {
+        const run = () => busy ? setTimeout(run, 300) : void action(async () => {
+          await switchChannel('chat');
+          addMessage(`voice-fallback:${Date.now()}`, 'assistant', VOICE_FALLBACK); persist();
+        });
+        run();
+      },
       onTool(name, args, callId) {
         // A knowledge search reads only; it bypasses the mutation queue so it never waits behind a save.
         if (name === 'searchKnowledge') return searchKnowledge(args?.query);
