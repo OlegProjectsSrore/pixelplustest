@@ -5,7 +5,7 @@ import { getLibrary } from './audit/library.ts';
 import { buildChatContext } from './chat/build-context.ts';
 import { classifyTurn, parseClassification, type ClassificationResult } from './chat/classifier.ts';
 import { spokenWebsite } from './chat/website-check.ts';
-import { createChatRuntime } from './channel-runtime.ts';
+import { createChatRuntime, screenVoiceNameAnswers } from './channel-runtime.ts';
 import type { CoreServices } from './core.ts';
 import type { StoredSession, VoiceCall } from './storage/types.ts';
 import { fail, requestHash } from './security.ts';
@@ -153,9 +153,11 @@ export function createRecoveryClassifier(): RecoveryClassifier {
       return { ...answer, id: `recovery:${boundaryHash}:${index}`, channel: 'voice', method: 'recovery',
         confirmation: 'unconfirmed', library_version: lib.version, created_at: Math.max(...sources.map(event => event.received_at)) };
     });
-    validateAnswers(answers, all, existing, lib, input.core.engineOptions);
+    // A recovered word that is not a person's name («Собака») is kept as ambiguous, as in the chat and the voice answer packet.
+    const screened = await screenVoiceNameAnswers({ core: input.core, session: input.session, answers });
+    validateAnswers(screened, all, existing, lib, input.core.engineOptions);
     await requireRevision(input.core, input.session);
-    return answers;
+    return screened;
   };
 }
 

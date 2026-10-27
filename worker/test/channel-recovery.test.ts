@@ -86,6 +86,25 @@ test('a site address dictated in the call is not recovered from the transcript; 
   } finally { f.db.close(); }
 });
 
+test('a name recovered from the transcript is checked: a word that is not a name is kept as ambiguous, a real name is kept', async () => {
+  for (const [said, isName] of [['Собака', false], ['Анна', true]] as const) {
+    const checked: string[] = [];
+    const f = await fixture(context => {
+      // The name check asks about the answer alone; the recovery classifier gets the transcript.
+      const check = context as unknown as { answer?: string };
+      if (typeof check.answer === 'string') { checked.push(check.answer); return { is_name: isName }; }
+      const source = context.source_events[0];
+      return { ...empty('answer'), answers: [{ question_id: 'context_name', fact_id: 'context.name', state: 'known', value: said,
+        event_ids: [source.id], evidence: [{ event_id: source.id, text: source.text! }] }] };
+    });
+    try {
+      const answers = await createRecoveryClassifier()(await f.input());
+      assert.deepEqual(checked, [said]);
+      assert.deepEqual(answers.map(item => [item.fact_id, item.state, item.value]), [['context.name', isName ? 'known' : 'ambiguous', isName ? said : null]]);
+    } finally { f.db.close(); }
+  }
+});
+
 test('unknown provider outcome remains charged and never authorizes another extraction', async () => {
   const f = await fixture(() => { throw new Error('mock network disconnect'); });
   try {
